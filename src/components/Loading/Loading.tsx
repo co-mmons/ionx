@@ -10,34 +10,34 @@ import {LoadingOptions} from "./LoadingOptions";
 export class Loading implements LoadingOptions {
 
     @Prop()
-    fill: boolean;
+    fill?: boolean;
 
     @Prop()
-    header: string;
+    header?: string;
 
     @Prop()
-    message: string;
+    message?: string;
 
     /**
      * @inheritDoc
      */
     @Prop()
-    type: "spinner" | "progress";
+    type?: "spinner" | "progress";
 
     @Prop()
-    progressMessage: string;
+    progressMessage?: string;
 
     @Prop()
-    progressType: "determinate" | "indeterminate" = "determinate";
+    progressType?: "determinate" | "indeterminate" = "determinate";
 
     @Prop()
-    progressValue = 0;
+    progressValue?: number = 0;
 
     @Prop()
-    progressBuffer = 0;
+    progressBuffer?: number = 0;
 
     @Prop()
-    progressPercent: number;
+    progressPercent?: number;
 
     get progressPercentVisible() {
         return typeof this.progressPercent === "number";
