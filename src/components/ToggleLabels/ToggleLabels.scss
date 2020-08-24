@@ -1,0 +1,29 @@
+:host {
+    display: flex;
+    align-items: center;
+
+    ::slotted(ion-toggle) {
+        padding-inline-start: 2px;
+        padding-inline-end: 2px;
+    }
+
+    .on {
+        cursor: pointer;
+        margin-left: 4px;
+    }
+
+    .off {
+        cursor: pointer;
+        margin-right: 4px;
+    }
+
+}
+
+:host-context(.item-label-stacked) {
+    align-self: flex-start;
+}
+
+:host-context(.ios .item-label-stacked) {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
