@@ -11,6 +11,9 @@
     "collection:main": "dist/collection/index.js",
     "unpkg": "dist/ionx/ionx.js",
     "sourceDependencyDir": "src/components",
+    "files": [
+        "src/"
+    ],
     "scripts": {
         "build": "stencil build --docs",
         "start": "stencil build --dev --watch --serve",
