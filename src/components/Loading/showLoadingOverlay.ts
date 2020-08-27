@@ -12,6 +12,9 @@ export async function showLoadingOverlay(options: LoadingOptions) {
         componentProps: Object.assign({type: "spinner"} as LoadingOptions, options)
     });
 
+    const wrapper = popover.querySelector<HTMLElement>(".popover-content");
+    wrapper.style.padding = "16px";
+
     await popover.present();
 
     return popover.querySelector("ionx-loading");

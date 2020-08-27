@@ -1,15 +1,21 @@
 import {intl} from "@co.mmons/js-intl";
-import {Component, Element, h, Method, Prop} from "@stencil/core";
+import {Component, Element, h, Host, Method, Prop} from "@stencil/core";
 import {LoadingOptions} from "./LoadingOptions";
 
+/**
+ * Very customizable loading indicator. It can be used as inline element or within overlay.
+ */
 @Component({
     tag: "ionx-loading",
-    styleUrls: ["Loading.scss"],
+    styleUrl: "Loading.scss",
     shadow: true
 })
 export class Loading implements LoadingOptions {
 
-    @Prop()
+    /**
+     * If loading element should fill available space and center content both h and v.
+     */
+    @Prop({reflect: true})
     fill?: boolean;
 
     @Prop()
@@ -22,7 +28,7 @@ export class Loading implements LoadingOptions {
      * @inheritDoc
      */
     @Prop()
-    type?: "spinner" | "progress";
+    type: "spinner" | "progress";
 
     @Prop()
     progressMessage?: string;
@@ -63,23 +69,24 @@ export class Loading implements LoadingOptions {
     }
 
     render() {
-        return <div>
+        return <Host>
 
-            <div style={{display: "flex", alignItems: "center"}}>
+            <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.fill ? "0" : "1"}}>
 
-                {this.spinnerMode ?
-                    <div style={{padding: "16px", paddingRight: "0px"}}>
-                        <ion-spinner/>
-                    </div> : ""}
+                {this.spinnerMode && <ion-spinner style={{marginRight: !!(this.header || this.message) && "8px"}}/>}
 
-                <div style={{padding: "16px", flex: "1", display: "flex", flexDirection: "column", justifyItems: "center"}}>
-                    {this.header ? <h5 style={{"margin": "0px"}}>{this.header}</h5> : ""}
+                {!!(this.header || this.message) && <div style={{flexBasis: this.progressMode && "100%", display: "flex", flexDirection: "column", justifyItems: "center"}}>
+                    {this.header ? <h4 style={{"margin": "0px"}}>{this.header}</h4> : ""}
                     {this.message ? <ion-text innerHTML={this.message}/> : ""}
-                </div>
+                </div>}
 
-                {this.progressMode && <ion-progress-bar style={{margin: "8px 0px 16px 0px"}} value={this.progressValue} type={this.progressType} buffer={this.progressBuffer}/>}
+                {this.progressMode && <ion-progress-bar
+                    style={{flexBasis: "100%", marginTop: !!(this.header || this.message) && "8px"}}
+                    value={this.progressValue}
+                    type={this.progressType}
+                    buffer={this.progressBuffer}/>}
 
-                {(!!this.progressMessage || this.progressPercentVisible) && <div style={{display: "flex", margin: "0px 16px 16px 16px"}}>
+                {(!!this.progressMessage || this.progressPercentVisible) && <div style={{display: "flex", flex: "1", marginTop: "8px"}}>
 
                     <ion-text innerHTML={this.progressMessage} style={{flex: "1"}}/>
 
@@ -88,6 +95,6 @@ export class Loading implements LoadingOptions {
                 </div>}
             </div>
 
-        </div>;
+        </Host>;
     }
 }

@@ -5,7 +5,7 @@ export interface LoadingOptions {
     /**
      * The type of loader.
      */
-    type?: "spinner" | "progress";
+    type: "spinner" | "progress";
 
     progressMessage?: string;
     progressType?: "determinate" | "indeterminate";
