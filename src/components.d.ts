@@ -30,6 +30,14 @@ export namespace Components {
          */
         "useHash": boolean;
     }
+    interface IonxFormItem {
+        "error": string;
+        /**
+          * This attributes determines the background and border color of the form item. By default, items have a clear background and no border.
+         */
+        "fill": "clear" | "solid" | "outline";
+        "hint": string;
+    }
     interface IonxLoading {
         "dismiss": () => Promise<void>;
         /**
@@ -61,6 +69,12 @@ declare global {
         prototype: HTMLIonRouterElement;
         new (): HTMLIonRouterElement;
     };
+    interface HTMLIonxFormItemElement extends Components.IonxFormItem, HTMLStencilElement {
+    }
+    var HTMLIonxFormItemElement: {
+        prototype: HTMLIonxFormItemElement;
+        new (): HTMLIonxFormItemElement;
+    };
     interface HTMLIonxLoadingElement extends Components.IonxLoading, HTMLStencilElement {
     }
     var HTMLIonxLoadingElement: {
@@ -75,6 +89,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "ion-router": HTMLIonRouterElement;
+        "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-loading": HTMLIonxLoadingElement;
         "ionx-toggle-labels": HTMLIonxToggleLabelsElement;
     }
@@ -97,6 +112,14 @@ declare namespace LocalJSX {
           * The router can work in two "modes": - With hash: `/index.html#/path/to/page` - Without hash: `/path/to/page`  Using one or another might depend in the requirements of your app and/or where it"s deployed.  Usually "hash-less" navigation works better for SEO and it"s more user friendly too, but it might requires additional server-side configuration in order to properly work.  On the otherside hash-navigation is much easier to deploy, it even works over the file protocol.  By default, this property is `true`, change to `false` to allow hash-less URLs.
          */
         "useHash"?: boolean;
+    }
+    interface IonxFormItem {
+        "error"?: string;
+        /**
+          * This attributes determines the background and border color of the form item. By default, items have a clear background and no border.
+         */
+        "fill"?: "clear" | "solid" | "outline";
+        "hint"?: string;
     }
     interface IonxLoading {
         /**
@@ -122,6 +145,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "ion-router": IonRouter;
+        "ionx-form-item": IonxFormItem;
         "ionx-loading": IonxLoading;
         "ionx-toggle-labels": IonxToggleLabels;
     }
@@ -131,6 +155,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ion-router": LocalJSX.IonRouter & JSXBase.HTMLAttributes<HTMLIonRouterElement>;
+            "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
             "ionx-toggle-labels": LocalJSX.IonxToggleLabels & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsElement>;
         }

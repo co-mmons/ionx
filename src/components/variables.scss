@@ -1,0 +1,27 @@
+:root {
+    /**
+     * @prop --ionx-border-radius: Value of single corner's radius.
+     */
+    --ionx-border-radius: 4px;
+    --ionx-border-width: 1px;
+
+    --ion-text-color: #000000;
+    --ion-text-color-rgb: 0,0,0;
+    --ion-text-color-contrast: #ffffff;
+    --ion-text-color-contrast-rgb: 255,255,255;
+    --ion-text-color-shade: #000000;
+    --ion-text-color-tint: #1a1a1a;
+
+    --ion-border-color: #c8c7cc;
+    --ion-border-color-rgb: 200,199,204;
+    --ion-border-color-contrast: #000000;
+    --ion-border-color-contrast-rgb: 0,0,0;
+    --ion-border-color-shade: #b0afb4;
+    --ion-border-color-tint: #cecdd1;
+
+}
+
+.ios {
+    --ionx-border-radius: 8px;
+    --ionx-border-width: 0.55px;
+}
