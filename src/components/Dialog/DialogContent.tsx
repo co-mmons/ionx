@@ -1,4 +1,4 @@
-import {Component, Host, h} from "@stencil/core";
+import {Component, h, Host} from "@stencil/core";
 
 @Component({
     tag: "ionx-dialog-content",
@@ -9,7 +9,13 @@ export class DialogContent {
 
     render() {
         return <Host>
-            <slot/>
+
+            <slot name="header"/>
+
+            <slot name="content" slot=""/>
+
+            <slot name="footer"/>
+
         </Host>
     }
 }

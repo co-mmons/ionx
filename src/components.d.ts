@@ -6,7 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, RouterDirection, RouterEventDetail } from "@ionic/core";
-import { TagName } from "./components/Dialog/Dialog";
+import { DialogButton } from "./components/Dialog/DialogButton";
 export namespace Components {
     interface IonRouter {
         /**
@@ -32,16 +32,20 @@ export namespace Components {
         "useHash": boolean;
     }
     interface IonxDialog {
+        "buttons"?: DialogButton[];
         /**
           * Name of the tag, that should be displayed inside....
          */
-        "component"?: TagName;
+        "component"?: string;
         "componentProps"?: {[prop: string]: any};
         "header"?: string;
         "message"?: string;
         "messageComponent"?: string;
         "messageComponentProps"?: {[prop: string]: any};
         "subheader"?: string;
+    }
+    interface IonxDialogButtons {
+        "buttons": DialogButton[];
     }
     interface IonxDialogContent {
     }
@@ -106,6 +110,12 @@ declare global {
     var HTMLIonxDialogElement: {
         prototype: HTMLIonxDialogElement;
         new (): HTMLIonxDialogElement;
+    };
+    interface HTMLIonxDialogButtonsElement extends Components.IonxDialogButtons, HTMLStencilElement {
+    }
+    var HTMLIonxDialogButtonsElement: {
+        prototype: HTMLIonxDialogButtonsElement;
+        new (): HTMLIonxDialogButtonsElement;
     };
     interface HTMLIonxDialogContentElement extends Components.IonxDialogContent, HTMLStencilElement {
     }
@@ -176,6 +186,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "ion-router": HTMLIonRouterElement;
         "ionx-dialog": HTMLIonxDialogElement;
+        "ionx-dialog-buttons": HTMLIonxDialogButtonsElement;
         "ionx-dialog-content": HTMLIonxDialogContentElement;
         "ionx-dialog-headers": HTMLIonxDialogHeadersElement;
         "ionx-dialog-message": HTMLIonxDialogMessageElement;
@@ -209,16 +220,20 @@ declare namespace LocalJSX {
         "useHash"?: boolean;
     }
     interface IonxDialog {
+        "buttons"?: DialogButton[];
         /**
           * Name of the tag, that should be displayed inside....
          */
-        "component"?: TagName;
+        "component"?: string;
         "componentProps"?: {[prop: string]: any};
         "header"?: string;
         "message"?: string;
         "messageComponent"?: string;
         "messageComponentProps"?: {[prop: string]: any};
         "subheader"?: string;
+    }
+    interface IonxDialogButtons {
+        "buttons": DialogButton[];
     }
     interface IonxDialogContent {
     }
@@ -272,6 +287,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "ion-router": IonRouter;
         "ionx-dialog": IonxDialog;
+        "ionx-dialog-buttons": IonxDialogButtons;
         "ionx-dialog-content": IonxDialogContent;
         "ionx-dialog-headers": IonxDialogHeaders;
         "ionx-dialog-message": IonxDialogMessage;
@@ -291,6 +307,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ion-router": LocalJSX.IonRouter & JSXBase.HTMLAttributes<HTMLIonRouterElement>;
             "ionx-dialog": LocalJSX.IonxDialog & JSXBase.HTMLAttributes<HTMLIonxDialogElement>;
+            "ionx-dialog-buttons": LocalJSX.IonxDialogButtons & JSXBase.HTMLAttributes<HTMLIonxDialogButtonsElement>;
             "ionx-dialog-content": LocalJSX.IonxDialogContent & JSXBase.HTMLAttributes<HTMLIonxDialogContentElement>;
             "ionx-dialog-headers": LocalJSX.IonxDialogHeaders & JSXBase.HTMLAttributes<HTMLIonxDialogHeadersElement>;
             "ionx-dialog-message": LocalJSX.IonxDialogMessage & JSXBase.HTMLAttributes<HTMLIonxDialogMessageElement>;
