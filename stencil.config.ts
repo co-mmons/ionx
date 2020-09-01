@@ -2,16 +2,16 @@ import {Config} from "@stencil/core";
 import {sass} from "@stencil/sass";
 
 export const config: Config = {
-    namespace: "ionx",
-    taskQueue: "async",
+    namespace: "App",
     devServer: {
-        openBrowser: false
+        openBrowser: false,
+        reloadStrategy: "pageReload",
+        port: 9001
     },
+    globalScript: "src/test/global.ts",
+    globalStyle: "src/test/styles/global.scss",
     plugins: [sass()],
     outputTargets: [
-        {type: "dist", esmLoaderPath: "../loader"},
-        {type: "dist-custom-elements-bundle"},
-        {type: "docs-readme"},
-        {type: "www", serviceWorker: null}
-    ]
+        {type: "www", serviceWorker: null, baseUrl: "/"}
+    ],
 };

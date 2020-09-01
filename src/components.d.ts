@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, RouterDirection, RouterEventDetail } from "@ionic/core";
+import { TagName } from "./components/Dialog/Dialog";
 export namespace Components {
     interface IonRouter {
         /**
@@ -29,6 +30,27 @@ export namespace Components {
           * The router can work in two "modes": - With hash: `/index.html#/path/to/page` - Without hash: `/path/to/page`  Using one or another might depend in the requirements of your app and/or where it"s deployed.  Usually "hash-less" navigation works better for SEO and it"s more user friendly too, but it might requires additional server-side configuration in order to properly work.  On the otherside hash-navigation is much easier to deploy, it even works over the file protocol.  By default, this property is `true`, change to `false` to allow hash-less URLs.
          */
         "useHash": boolean;
+    }
+    interface IonxDialog {
+        /**
+          * Name of the tag, that should be displayed inside....
+         */
+        "component"?: TagName;
+        "componentProps"?: {[prop: string]: any};
+        "header"?: string;
+        "message"?: string;
+        "messageComponent"?: string;
+        "messageComponentProps"?: {[prop: string]: any};
+        "subheader"?: string;
+    }
+    interface IonxDialogContent {
+    }
+    interface IonxDialogHeaders {
+        "header"?: string;
+        "subheader"?: string;
+    }
+    interface IonxDialogMessage {
+        "message": string;
     }
     interface IonxFormItem {
         "error": string;
@@ -57,6 +79,16 @@ export namespace Components {
          */
         "type": "spinner" | "progress";
     }
+    interface IonxTestDialog {
+    }
+    interface IonxTestDialogContent {
+    }
+    interface IonxTestHome {
+    }
+    interface IonxTestLoading {
+    }
+    interface IonxTestRoot {
+    }
     interface IonxToggleLabels {
         "off": string;
         "on": string;
@@ -68,6 +100,30 @@ declare global {
     var HTMLIonRouterElement: {
         prototype: HTMLIonRouterElement;
         new (): HTMLIonRouterElement;
+    };
+    interface HTMLIonxDialogElement extends Components.IonxDialog, HTMLStencilElement {
+    }
+    var HTMLIonxDialogElement: {
+        prototype: HTMLIonxDialogElement;
+        new (): HTMLIonxDialogElement;
+    };
+    interface HTMLIonxDialogContentElement extends Components.IonxDialogContent, HTMLStencilElement {
+    }
+    var HTMLIonxDialogContentElement: {
+        prototype: HTMLIonxDialogContentElement;
+        new (): HTMLIonxDialogContentElement;
+    };
+    interface HTMLIonxDialogHeadersElement extends Components.IonxDialogHeaders, HTMLStencilElement {
+    }
+    var HTMLIonxDialogHeadersElement: {
+        prototype: HTMLIonxDialogHeadersElement;
+        new (): HTMLIonxDialogHeadersElement;
+    };
+    interface HTMLIonxDialogMessageElement extends Components.IonxDialogMessage, HTMLStencilElement {
+    }
+    var HTMLIonxDialogMessageElement: {
+        prototype: HTMLIonxDialogMessageElement;
+        new (): HTMLIonxDialogMessageElement;
     };
     interface HTMLIonxFormItemElement extends Components.IonxFormItem, HTMLStencilElement {
     }
@@ -81,6 +137,36 @@ declare global {
         prototype: HTMLIonxLoadingElement;
         new (): HTMLIonxLoadingElement;
     };
+    interface HTMLIonxTestDialogElement extends Components.IonxTestDialog, HTMLStencilElement {
+    }
+    var HTMLIonxTestDialogElement: {
+        prototype: HTMLIonxTestDialogElement;
+        new (): HTMLIonxTestDialogElement;
+    };
+    interface HTMLIonxTestDialogContentElement extends Components.IonxTestDialogContent, HTMLStencilElement {
+    }
+    var HTMLIonxTestDialogContentElement: {
+        prototype: HTMLIonxTestDialogContentElement;
+        new (): HTMLIonxTestDialogContentElement;
+    };
+    interface HTMLIonxTestHomeElement extends Components.IonxTestHome, HTMLStencilElement {
+    }
+    var HTMLIonxTestHomeElement: {
+        prototype: HTMLIonxTestHomeElement;
+        new (): HTMLIonxTestHomeElement;
+    };
+    interface HTMLIonxTestLoadingElement extends Components.IonxTestLoading, HTMLStencilElement {
+    }
+    var HTMLIonxTestLoadingElement: {
+        prototype: HTMLIonxTestLoadingElement;
+        new (): HTMLIonxTestLoadingElement;
+    };
+    interface HTMLIonxTestRootElement extends Components.IonxTestRoot, HTMLStencilElement {
+    }
+    var HTMLIonxTestRootElement: {
+        prototype: HTMLIonxTestRootElement;
+        new (): HTMLIonxTestRootElement;
+    };
     interface HTMLIonxToggleLabelsElement extends Components.IonxToggleLabels, HTMLStencilElement {
     }
     var HTMLIonxToggleLabelsElement: {
@@ -89,8 +175,17 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "ion-router": HTMLIonRouterElement;
+        "ionx-dialog": HTMLIonxDialogElement;
+        "ionx-dialog-content": HTMLIonxDialogContentElement;
+        "ionx-dialog-headers": HTMLIonxDialogHeadersElement;
+        "ionx-dialog-message": HTMLIonxDialogMessageElement;
         "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-loading": HTMLIonxLoadingElement;
+        "ionx-test-dialog": HTMLIonxTestDialogElement;
+        "ionx-test-dialog-content": HTMLIonxTestDialogContentElement;
+        "ionx-test-home": HTMLIonxTestHomeElement;
+        "ionx-test-loading": HTMLIonxTestLoadingElement;
+        "ionx-test-root": HTMLIonxTestRootElement;
         "ionx-toggle-labels": HTMLIonxToggleLabelsElement;
     }
 }
@@ -112,6 +207,27 @@ declare namespace LocalJSX {
           * The router can work in two "modes": - With hash: `/index.html#/path/to/page` - Without hash: `/path/to/page`  Using one or another might depend in the requirements of your app and/or where it"s deployed.  Usually "hash-less" navigation works better for SEO and it"s more user friendly too, but it might requires additional server-side configuration in order to properly work.  On the otherside hash-navigation is much easier to deploy, it even works over the file protocol.  By default, this property is `true`, change to `false` to allow hash-less URLs.
          */
         "useHash"?: boolean;
+    }
+    interface IonxDialog {
+        /**
+          * Name of the tag, that should be displayed inside....
+         */
+        "component"?: TagName;
+        "componentProps"?: {[prop: string]: any};
+        "header"?: string;
+        "message"?: string;
+        "messageComponent"?: string;
+        "messageComponentProps"?: {[prop: string]: any};
+        "subheader"?: string;
+    }
+    interface IonxDialogContent {
+    }
+    interface IonxDialogHeaders {
+        "header"?: string;
+        "subheader"?: string;
+    }
+    interface IonxDialogMessage {
+        "message": string;
     }
     interface IonxFormItem {
         "error"?: string;
@@ -139,14 +255,33 @@ declare namespace LocalJSX {
          */
         "type"?: "spinner" | "progress";
     }
+    interface IonxTestDialog {
+    }
+    interface IonxTestDialogContent {
+    }
+    interface IonxTestHome {
+    }
+    interface IonxTestLoading {
+    }
+    interface IonxTestRoot {
+    }
     interface IonxToggleLabels {
         "off"?: string;
         "on"?: string;
     }
     interface IntrinsicElements {
         "ion-router": IonRouter;
+        "ionx-dialog": IonxDialog;
+        "ionx-dialog-content": IonxDialogContent;
+        "ionx-dialog-headers": IonxDialogHeaders;
+        "ionx-dialog-message": IonxDialogMessage;
         "ionx-form-item": IonxFormItem;
         "ionx-loading": IonxLoading;
+        "ionx-test-dialog": IonxTestDialog;
+        "ionx-test-dialog-content": IonxTestDialogContent;
+        "ionx-test-home": IonxTestHome;
+        "ionx-test-loading": IonxTestLoading;
+        "ionx-test-root": IonxTestRoot;
         "ionx-toggle-labels": IonxToggleLabels;
     }
 }
@@ -155,8 +290,17 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ion-router": LocalJSX.IonRouter & JSXBase.HTMLAttributes<HTMLIonRouterElement>;
+            "ionx-dialog": LocalJSX.IonxDialog & JSXBase.HTMLAttributes<HTMLIonxDialogElement>;
+            "ionx-dialog-content": LocalJSX.IonxDialogContent & JSXBase.HTMLAttributes<HTMLIonxDialogContentElement>;
+            "ionx-dialog-headers": LocalJSX.IonxDialogHeaders & JSXBase.HTMLAttributes<HTMLIonxDialogHeadersElement>;
+            "ionx-dialog-message": LocalJSX.IonxDialogMessage & JSXBase.HTMLAttributes<HTMLIonxDialogMessageElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
+            "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
+            "ionx-test-dialog-content": LocalJSX.IonxTestDialogContent & JSXBase.HTMLAttributes<HTMLIonxTestDialogContentElement>;
+            "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
+            "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
+            "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;
             "ionx-toggle-labels": LocalJSX.IonxToggleLabels & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsElement>;
         }
     }

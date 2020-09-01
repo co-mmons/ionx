@@ -2,14 +2,6 @@
     "name": "ionx",
     "version": "1.0.0",
     "description": "Components and extensions for Ionic",
-    "main": "dist/index.js",
-    "module": "dist/custom-elements/index.js",
-    "es2015": "dist/esm/index.mjs",
-    "es2017": "dist/esm/index.mjs",
-    "types": "dist/custom-elements/index.d.ts",
-    "collection": "dist/collection/collection-manifest.json",
-    "collection:main": "dist/collection/index.js",
-    "unpkg": "dist/ionx/ionx.js",
     "sourceDependencyDir": "src/components",
     "files": [
         "src/"
@@ -32,7 +24,7 @@
         "@co.mmons/js-intl": "github:co-mmons/js-intl",
         "@co.mmons/js-utils": "github:co-mmons/js-utils",
         "@ionic/core": "^5.3.1",
-        "@stencil/core": "^1.17.3",
+        "@stencil/core": "^2.0.1",
         "@stencil/sass": "^1.3.2",
         "@types/jest": "^26.0.10",
         "bignumber.js": "^9.0.0"

@@ -1,0 +1,26 @@
+:host-context(.md) {
+    --dialog--header-font-size-default: 20px;
+    --dialog--subheader-font-size-default: 16px;
+}
+
+:host-context(.ios) {
+    --dialog--header-font-size-default: 18px;
+    --dialog--subheader-font-size-default: 14px;
+}
+
+:host {
+    display: block;
+    margin: 16px;
+    font-weight: var(--dialog--header-font-weight, 500);
+
+    [ionx--header] {
+        font-size: var(--dialog--header-font-size, var(--dialog--header-font-size-default));
+    }
+
+    [ionx--subheader] {
+        font-size: var(--dialog--subheader-font-size, var(--dialog--subheader-font-size-default));
+        opacity: .7;
+    }
+
+    text-align: var(--dialog--text-align, left);
+}

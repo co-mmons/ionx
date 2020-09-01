@@ -1,0 +1,9 @@
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    background-color: transparent !important;
+    animation-name: autofill;
+    animation-fill-mode: both;
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}

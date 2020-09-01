@@ -1,0 +1,9 @@
+import {bestLocale} from "@co.mmons/js-intl";
+
+export default async function() {
+    INTL_DEFAULT_LOCALE = "en";
+    INTL_SUPPORTED_LOCALE = ["en", "pl"];
+    INTL_LOCALE_URL_PARAM = "locale";
+    INTL_LOCALE_URL_PATH = "__";
+    INTL_LOCALE = bestLocale();
+}
