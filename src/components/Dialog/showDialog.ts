@@ -13,11 +13,10 @@ export async function showDialog(options: DialogOptions & Exclude<Partial<ModalO
     modal.style.setProperty("--max-width", "90vw");
     modal.style.setProperty("--max-height", "90vh");
     modal.style.setProperty("--border-radius", "var(--ionx-border-radius)");
-    //
-    // if (!document.querySelector("html.ios")) {
-    //     modal.style.setProperty("--border-radius", "4px");
-    //     modal.style.setProperty("--box-shadow", "0 28px 48px rgba(0,0,0,0.4)");
-    // }
+
+    if (!document.querySelector("html.ios")) {
+        modal.style.setProperty("--box-shadow", "0px 28px 48px rgba(0, 0, 0, 0.4)");
+    }
 
     await modal.present();
 
