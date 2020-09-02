@@ -46,10 +46,6 @@ export namespace Components {
          */
         "componentProps"?: {[prop: string]: any};
         /**
-          * A promise resolved when dialog was fully presented.
-         */
-        "didEnter": () => Promise<true>;
-        /**
           * @inheritDoc
          */
         "header"?: string;
@@ -65,6 +61,12 @@ export namespace Components {
           * @inheritDoc
          */
         "messageComponentProps"?: {[prop: string]: any};
+        "onDidDismiss": () => Promise<any>;
+        /**
+          * A promise resolved when dialog was fully presented.
+         */
+        "onDidEnter": () => Promise<true>;
+        "onWillDismiss": () => Promise<any>;
         /**
           * @inheritDoc
          */
@@ -81,6 +83,12 @@ export namespace Components {
     }
     interface IonxDialogMessage {
         "message": string;
+    }
+    interface IonxExpandingSearchbar {
+        "expand": () => Promise<void>;
+        "expanded": boolean;
+    }
+    interface IonxExpandingSearchbarParent {
     }
     interface IonxFormItem {
         "error": string;
@@ -114,7 +122,9 @@ export namespace Components {
     interface IonxTestDialogContent {
     }
     interface IonxTestDialogMessage {
-        "dialogValue": () => any;
+        "dialogValue": () => Promise<string>;
+    }
+    interface IonxTestExpandingSearchbar {
     }
     interface IonxTestHome {
     }
@@ -164,6 +174,18 @@ declare global {
         prototype: HTMLIonxDialogMessageElement;
         new (): HTMLIonxDialogMessageElement;
     };
+    interface HTMLIonxExpandingSearchbarElement extends Components.IonxExpandingSearchbar, HTMLStencilElement {
+    }
+    var HTMLIonxExpandingSearchbarElement: {
+        prototype: HTMLIonxExpandingSearchbarElement;
+        new (): HTMLIonxExpandingSearchbarElement;
+    };
+    interface HTMLIonxExpandingSearchbarParentElement extends Components.IonxExpandingSearchbarParent, HTMLStencilElement {
+    }
+    var HTMLIonxExpandingSearchbarParentElement: {
+        prototype: HTMLIonxExpandingSearchbarParentElement;
+        new (): HTMLIonxExpandingSearchbarParentElement;
+    };
     interface HTMLIonxFormItemElement extends Components.IonxFormItem, HTMLStencilElement {
     }
     var HTMLIonxFormItemElement: {
@@ -193,6 +215,12 @@ declare global {
     var HTMLIonxTestDialogMessageElement: {
         prototype: HTMLIonxTestDialogMessageElement;
         new (): HTMLIonxTestDialogMessageElement;
+    };
+    interface HTMLIonxTestExpandingSearchbarElement extends Components.IonxTestExpandingSearchbar, HTMLStencilElement {
+    }
+    var HTMLIonxTestExpandingSearchbarElement: {
+        prototype: HTMLIonxTestExpandingSearchbarElement;
+        new (): HTMLIonxTestExpandingSearchbarElement;
     };
     interface HTMLIonxTestHomeElement extends Components.IonxTestHome, HTMLStencilElement {
     }
@@ -225,11 +253,14 @@ declare global {
         "ionx-dialog-content": HTMLIonxDialogContentElement;
         "ionx-dialog-headers": HTMLIonxDialogHeadersElement;
         "ionx-dialog-message": HTMLIonxDialogMessageElement;
+        "ionx-expanding-searchbar": HTMLIonxExpandingSearchbarElement;
+        "ionx-expanding-searchbar-parent": HTMLIonxExpandingSearchbarParentElement;
         "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-loading": HTMLIonxLoadingElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
         "ionx-test-dialog-content": HTMLIonxTestDialogContentElement;
         "ionx-test-dialog-message": HTMLIonxTestDialogMessageElement;
+        "ionx-test-expanding-searchbar": HTMLIonxTestExpandingSearchbarElement;
         "ionx-test-home": HTMLIonxTestHomeElement;
         "ionx-test-loading": HTMLIonxTestLoadingElement;
         "ionx-test-root": HTMLIonxTestRootElement;
@@ -302,6 +333,11 @@ declare namespace LocalJSX {
     interface IonxDialogMessage {
         "message": string;
     }
+    interface IonxExpandingSearchbar {
+        "expanded"?: boolean;
+    }
+    interface IonxExpandingSearchbarParent {
+    }
     interface IonxFormItem {
         "error"?: string;
         /**
@@ -334,6 +370,8 @@ declare namespace LocalJSX {
     }
     interface IonxTestDialogMessage {
     }
+    interface IonxTestExpandingSearchbar {
+    }
     interface IonxTestHome {
     }
     interface IonxTestLoading {
@@ -351,11 +389,14 @@ declare namespace LocalJSX {
         "ionx-dialog-content": IonxDialogContent;
         "ionx-dialog-headers": IonxDialogHeaders;
         "ionx-dialog-message": IonxDialogMessage;
+        "ionx-expanding-searchbar": IonxExpandingSearchbar;
+        "ionx-expanding-searchbar-parent": IonxExpandingSearchbarParent;
         "ionx-form-item": IonxFormItem;
         "ionx-loading": IonxLoading;
         "ionx-test-dialog": IonxTestDialog;
         "ionx-test-dialog-content": IonxTestDialogContent;
         "ionx-test-dialog-message": IonxTestDialogMessage;
+        "ionx-test-expanding-searchbar": IonxTestExpandingSearchbar;
         "ionx-test-home": IonxTestHome;
         "ionx-test-loading": IonxTestLoading;
         "ionx-test-root": IonxTestRoot;
@@ -372,11 +413,14 @@ declare module "@stencil/core" {
             "ionx-dialog-content": LocalJSX.IonxDialogContent & JSXBase.HTMLAttributes<HTMLIonxDialogContentElement>;
             "ionx-dialog-headers": LocalJSX.IonxDialogHeaders & JSXBase.HTMLAttributes<HTMLIonxDialogHeadersElement>;
             "ionx-dialog-message": LocalJSX.IonxDialogMessage & JSXBase.HTMLAttributes<HTMLIonxDialogMessageElement>;
+            "ionx-expanding-searchbar": LocalJSX.IonxExpandingSearchbar & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarElement>;
+            "ionx-expanding-searchbar-parent": LocalJSX.IonxExpandingSearchbarParent & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarParentElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
             "ionx-test-dialog-content": LocalJSX.IonxTestDialogContent & JSXBase.HTMLAttributes<HTMLIonxTestDialogContentElement>;
             "ionx-test-dialog-message": LocalJSX.IonxTestDialogMessage & JSXBase.HTMLAttributes<HTMLIonxTestDialogMessageElement>;
+            "ionx-test-expanding-searchbar": LocalJSX.IonxTestExpandingSearchbar & JSXBase.HTMLAttributes<HTMLIonxTestExpandingSearchbarElement>;
             "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;

@@ -10,14 +10,14 @@ export class DialogTestMessage implements ComponentInterface, DialogValue {
     element: HTMLElement;
 
     @Method()
-    dialogValue(): any {
-        return this.element.querySelector("ion-input").value;
+    async dialogValue(): Promise<string> {
+        return this.element.querySelector("ion-input").value as string;
     }
 
     async componentDidLoad() {
 
         const dialog = this.element.closest<HTMLIonxDialogElement>("ionx-dialog");
-        if (await dialog.didEnter()) {
+        if (await dialog.onDidEnter()) {
             this.element.querySelector("input").focus();
         }
     }

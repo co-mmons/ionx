@@ -1,4 +1,4 @@
-import {Component, h, Host, Listen, Method, Prop} from "@stencil/core";
+import {Component, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
 import {Subject} from "rxjs";
 import {first} from "rxjs/operators";
 import {DialogButton} from "./DialogButton";
@@ -8,6 +8,9 @@ import {DialogOptions} from "./DialogOptions";
     tag: "ionx-dialog"
 })
 export class Dialog implements DialogOptions {
+
+    @Element()
+    element: HTMLElement;
 
     /**
      * @inheritDoc
@@ -63,13 +66,23 @@ export class Dialog implements DialogOptions {
      * A promise resolved when dialog was fully presented.
      */
     @Method()
-    didEnter(): Promise<true> {
+    onDidEnter(): Promise<true> {
         return this.#didEnter.pipe(first()).toPromise();
     }
 
     @Listen("ionViewDidEnter")
     ionDidEnter() {
         this.#didEnter.next(true);
+    }
+
+    @Method()
+    onDidDismiss(): Promise<any> {
+        return this.element.closest("ion-modal").onDidDismiss();
+    }
+
+    @Method()
+    onWillDismiss(): Promise<any> {
+        return this.element.closest("ion-modal").onWillDismiss();
     }
 
     render() {

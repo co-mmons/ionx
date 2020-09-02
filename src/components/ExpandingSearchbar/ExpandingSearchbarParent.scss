@@ -1,0 +1,7 @@
+[ionx-expanding-searchbar-parent] {
+
+    & > *:not(ionx-expanding-searchbar) {
+        visibility: hidden !important;
+        transition: none;
+    }
+}

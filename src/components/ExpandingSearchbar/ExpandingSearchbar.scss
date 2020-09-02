@@ -1,0 +1,56 @@
+:host {
+
+    &::slotted(ion-searchbar) {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 0px;
+        overflow: hidden;
+        padding: 0px;
+        margin: 0px;
+        display: none;
+
+        &:not(.searchbar-show-cancel) .searchbar-clear-button {
+            display: block !important;
+        }
+    }
+
+    &[expanded]::slotted(ion-searchbar) {
+        display: flex;
+        width: 100%;
+    }
+
+    // &.searchbar-ios.searchbar-show-cancel.searchbar-ios-cancel {
+    //     display: block !important;
+    // }
+}
+
+:host-context(ion-toolbar) {
+
+    &::slotted(ion-searchbar) {
+        height: 100%;
+    }
+
+    &[expanded]::slotted(ion-searchbar) {
+        padding-top: var(--padding-top);
+        padding-bottom: var(--padding-bottom);
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+:host-context(ion-toolbar.ios) {
+
+    &[expanded]::slotted(ion-searchbar[ionx-searchbar-flat]) {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+}
+
+:host-context(ion-toolbar.md) {
+
+    &[expanded]::slotted(ion-searchbar[ionx-searchbar-flat]) {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
