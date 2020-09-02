@@ -32,16 +32,39 @@ export namespace Components {
         "useHash": boolean;
     }
     interface IonxDialog {
+        /**
+          * @inheritDoc
+         */
         "buttons"?: DialogButton[];
         /**
           * Name of the tag, that should be displayed inside....
+          * @inheritDoc
          */
         "component"?: string;
+        /**
+          * @inheritDoc
+         */
         "componentProps"?: {[prop: string]: any};
+        "didEnter": () => Promise<true>;
+        /**
+          * @inheritDoc
+         */
         "header"?: string;
+        /**
+          * @inheritDoc
+         */
         "message"?: string;
+        /**
+          * @inheritDoc
+         */
         "messageComponent"?: string;
+        /**
+          * @inheritDoc
+         */
         "messageComponentProps"?: {[prop: string]: any};
+        /**
+          * @inheritDoc
+         */
         "subheader"?: string;
     }
     interface IonxDialogButtons {
@@ -86,6 +109,8 @@ export namespace Components {
     interface IonxTestDialog {
     }
     interface IonxTestDialogContent {
+    }
+    interface IonxTestDialogMessage {
     }
     interface IonxTestHome {
     }
@@ -159,6 +184,12 @@ declare global {
         prototype: HTMLIonxTestDialogContentElement;
         new (): HTMLIonxTestDialogContentElement;
     };
+    interface HTMLIonxTestDialogMessageElement extends Components.IonxTestDialogMessage, HTMLStencilElement {
+    }
+    var HTMLIonxTestDialogMessageElement: {
+        prototype: HTMLIonxTestDialogMessageElement;
+        new (): HTMLIonxTestDialogMessageElement;
+    };
     interface HTMLIonxTestHomeElement extends Components.IonxTestHome, HTMLStencilElement {
     }
     var HTMLIonxTestHomeElement: {
@@ -194,6 +225,7 @@ declare global {
         "ionx-loading": HTMLIonxLoadingElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
         "ionx-test-dialog-content": HTMLIonxTestDialogContentElement;
+        "ionx-test-dialog-message": HTMLIonxTestDialogMessageElement;
         "ionx-test-home": HTMLIonxTestHomeElement;
         "ionx-test-loading": HTMLIonxTestLoadingElement;
         "ionx-test-root": HTMLIonxTestRootElement;
@@ -220,16 +252,38 @@ declare namespace LocalJSX {
         "useHash"?: boolean;
     }
     interface IonxDialog {
+        /**
+          * @inheritDoc
+         */
         "buttons"?: DialogButton[];
         /**
           * Name of the tag, that should be displayed inside....
+          * @inheritDoc
          */
         "component"?: string;
+        /**
+          * @inheritDoc
+         */
         "componentProps"?: {[prop: string]: any};
+        /**
+          * @inheritDoc
+         */
         "header"?: string;
+        /**
+          * @inheritDoc
+         */
         "message"?: string;
+        /**
+          * @inheritDoc
+         */
         "messageComponent"?: string;
+        /**
+          * @inheritDoc
+         */
         "messageComponentProps"?: {[prop: string]: any};
+        /**
+          * @inheritDoc
+         */
         "subheader"?: string;
     }
     interface IonxDialogButtons {
@@ -274,6 +328,8 @@ declare namespace LocalJSX {
     }
     interface IonxTestDialogContent {
     }
+    interface IonxTestDialogMessage {
+    }
     interface IonxTestHome {
     }
     interface IonxTestLoading {
@@ -295,6 +351,7 @@ declare namespace LocalJSX {
         "ionx-loading": IonxLoading;
         "ionx-test-dialog": IonxTestDialog;
         "ionx-test-dialog-content": IonxTestDialogContent;
+        "ionx-test-dialog-message": IonxTestDialogMessage;
         "ionx-test-home": IonxTestHome;
         "ionx-test-loading": IonxTestLoading;
         "ionx-test-root": IonxTestRoot;
@@ -315,6 +372,7 @@ declare module "@stencil/core" {
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
             "ionx-test-dialog-content": LocalJSX.IonxTestDialogContent & JSXBase.HTMLAttributes<HTMLIonxTestDialogContentElement>;
+            "ionx-test-dialog-message": LocalJSX.IonxTestDialogMessage & JSXBase.HTMLAttributes<HTMLIonxTestDialogMessageElement>;
             "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;

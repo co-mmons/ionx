@@ -12,7 +12,7 @@ export class DialogContent {
 
             <slot name="header"/>
 
-            <slot name="content" slot=""/>
+            <slot name="message"/>
 
             <slot name="footer"/>
 

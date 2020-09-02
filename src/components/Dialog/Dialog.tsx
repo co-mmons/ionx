@@ -1,37 +1,73 @@
-import {Component, h, Host, Prop} from "@stencil/core";
+import {Component, h, Host, Listen, Method, Prop} from "@stencil/core";
+import {Subject} from "rxjs";
+import {first} from "rxjs/operators";
 import {DialogButton} from "./DialogButton";
+import {DialogOptions} from "./DialogOptions";
 
 @Component({
     tag: "ionx-dialog"
 })
-export class Dialog {
+export class Dialog implements DialogOptions {
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     header?: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     subheader?: string;
 
     /**
-     * Name of the tag, that should be displayed inside....
+     * @inheritDoc
      */
     @Prop()
     component?: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     componentProps?: {[prop: string]: any};
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     message?: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     messageComponent?: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     messageComponentProps?: {[prop: string]: any};
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     buttons?: DialogButton[];
+
+    #didEnter = new Subject<true>();
+
+    @Method()
+    didEnter(): Promise<true> {
+        return this.#didEnter.pipe(first()).toPromise();
+    }
+
+    @Listen("ionViewDidEnter")
+    ionDidEnter() {
+        this.#didEnter.next(true);
+    }
 
     render() {
 
@@ -45,9 +81,9 @@ export class Dialog {
 
                 {(this.header || this.subheader) && <ionx-dialog-headers slot="header" header={this.header} subheader={this.subheader}/>}
 
-                {this.messageComponent && <Message {...this.messageComponent} slot="content"/>}
+                {this.messageComponent && <Message {...this.messageComponentProps} slot="message"/>}
 
-                {!this.messageComponent && this.message && <ionx-dialog-message message={this.message} slot="content"/>}
+                {!this.messageComponent && this.message && <ionx-dialog-message message={this.message} slot="message"/>}
 
                 {this.buttons && this.buttons.length && <ionx-dialog-buttons buttons={this.buttons} slot="footer"/>}
 
