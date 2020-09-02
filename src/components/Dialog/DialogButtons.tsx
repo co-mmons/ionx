@@ -1,6 +1,7 @@
 import {modalController} from "@ionic/core";
 import {Component, Element, h, Host, Prop} from "@stencil/core";
 import {DialogButton} from "./DialogButton";
+import {DialogValue, dialogValueAttribute} from "./DialogValue";
 
 @Component({
     tag: "ionx-dialog-buttons",
@@ -15,11 +16,9 @@ export class DialogButtons {
     @Prop()
     buttons!: DialogButton[];
 
-    buttonClicked(button: DialogButton) {
+    async buttonClicked(button: DialogButton) {
 
-        // @ts-ignore
-        const dialog = this.element.closest("ionx-dialog");
-        const value = null;
+        const value = await ((this.element.closest("ionx-dialog").querySelector(`[${dialogValueAttribute}]`) as any as DialogValue)?.dialogValue?.());
 
         if (button.handler) {
             const res = button.handler(value);

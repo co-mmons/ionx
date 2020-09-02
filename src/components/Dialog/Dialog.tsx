@@ -59,6 +59,9 @@ export class Dialog implements DialogOptions {
 
     #didEnter = new Subject<true>();
 
+    /**
+     * A promise resolved when dialog was fully presented.
+     */
     @Method()
     didEnter(): Promise<true> {
         return this.#didEnter.pipe(first()).toPromise();

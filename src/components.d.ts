@@ -45,6 +45,9 @@ export namespace Components {
           * @inheritDoc
          */
         "componentProps"?: {[prop: string]: any};
+        /**
+          * A promise resolved when dialog was fully presented.
+         */
         "didEnter": () => Promise<true>;
         /**
           * @inheritDoc
@@ -111,6 +114,7 @@ export namespace Components {
     interface IonxTestDialogContent {
     }
     interface IonxTestDialogMessage {
+        "dialogValue": () => any;
     }
     interface IonxTestHome {
     }
