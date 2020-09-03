@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { AnimationBuilder, RouterDirection, RouterEventDetail } from "@ionic/core";
+import { AnimationBuilder, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
 export namespace Components {
     interface IonRouter {
@@ -117,6 +117,21 @@ export namespace Components {
          */
         "type": "spinner" | "progress";
     }
+    interface IonxTagsInput {
+        "canBackspaceRemove": boolean;
+        "canEnterAdd": boolean;
+        "hideRemove": boolean;
+        "maxTags": number;
+        "placeholder": string;
+        "readonly": boolean;
+        "separator": string;
+        "sortFn": (a: string, b: string) => number;
+        "sortable": boolean;
+        "type": TextFieldTypes;
+        "unique": boolean;
+        "value": string[];
+        "verifyFn": (tagSrt: string) => boolean;
+    }
     interface IonxTestDialog {
     }
     interface IonxTestDialogContent {
@@ -131,6 +146,8 @@ export namespace Components {
     interface IonxTestLoading {
     }
     interface IonxTestRoot {
+    }
+    interface IonxTestTagsInput {
     }
     interface IonxToggleLabels {
         "off": string;
@@ -198,6 +215,12 @@ declare global {
         prototype: HTMLIonxLoadingElement;
         new (): HTMLIonxLoadingElement;
     };
+    interface HTMLIonxTagsInputElement extends Components.IonxTagsInput, HTMLStencilElement {
+    }
+    var HTMLIonxTagsInputElement: {
+        prototype: HTMLIonxTagsInputElement;
+        new (): HTMLIonxTagsInputElement;
+    };
     interface HTMLIonxTestDialogElement extends Components.IonxTestDialog, HTMLStencilElement {
     }
     var HTMLIonxTestDialogElement: {
@@ -240,6 +263,12 @@ declare global {
         prototype: HTMLIonxTestRootElement;
         new (): HTMLIonxTestRootElement;
     };
+    interface HTMLIonxTestTagsInputElement extends Components.IonxTestTagsInput, HTMLStencilElement {
+    }
+    var HTMLIonxTestTagsInputElement: {
+        prototype: HTMLIonxTestTagsInputElement;
+        new (): HTMLIonxTestTagsInputElement;
+    };
     interface HTMLIonxToggleLabelsElement extends Components.IonxToggleLabels, HTMLStencilElement {
     }
     var HTMLIonxToggleLabelsElement: {
@@ -257,6 +286,7 @@ declare global {
         "ionx-expanding-searchbar-parent": HTMLIonxExpandingSearchbarParentElement;
         "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-loading": HTMLIonxLoadingElement;
+        "ionx-tags-input": HTMLIonxTagsInputElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
         "ionx-test-dialog-content": HTMLIonxTestDialogContentElement;
         "ionx-test-dialog-message": HTMLIonxTestDialogMessageElement;
@@ -264,6 +294,7 @@ declare global {
         "ionx-test-home": HTMLIonxTestHomeElement;
         "ionx-test-loading": HTMLIonxTestLoadingElement;
         "ionx-test-root": HTMLIonxTestRootElement;
+        "ionx-test-tags-input": HTMLIonxTestTagsInputElement;
         "ionx-toggle-labels": HTMLIonxToggleLabelsElement;
     }
 }
@@ -364,6 +395,21 @@ declare namespace LocalJSX {
          */
         "type"?: "spinner" | "progress";
     }
+    interface IonxTagsInput {
+        "canBackspaceRemove"?: boolean;
+        "canEnterAdd"?: boolean;
+        "hideRemove"?: boolean;
+        "maxTags"?: number;
+        "placeholder"?: string;
+        "readonly"?: boolean;
+        "separator"?: string;
+        "sortFn"?: (a: string, b: string) => number;
+        "sortable"?: boolean;
+        "type"?: TextFieldTypes;
+        "unique"?: boolean;
+        "value"?: string[];
+        "verifyFn"?: (tagSrt: string) => boolean;
+    }
     interface IonxTestDialog {
     }
     interface IonxTestDialogContent {
@@ -377,6 +423,8 @@ declare namespace LocalJSX {
     interface IonxTestLoading {
     }
     interface IonxTestRoot {
+    }
+    interface IonxTestTagsInput {
     }
     interface IonxToggleLabels {
         "off"?: string;
@@ -393,6 +441,7 @@ declare namespace LocalJSX {
         "ionx-expanding-searchbar-parent": IonxExpandingSearchbarParent;
         "ionx-form-item": IonxFormItem;
         "ionx-loading": IonxLoading;
+        "ionx-tags-input": IonxTagsInput;
         "ionx-test-dialog": IonxTestDialog;
         "ionx-test-dialog-content": IonxTestDialogContent;
         "ionx-test-dialog-message": IonxTestDialogMessage;
@@ -400,6 +449,7 @@ declare namespace LocalJSX {
         "ionx-test-home": IonxTestHome;
         "ionx-test-loading": IonxTestLoading;
         "ionx-test-root": IonxTestRoot;
+        "ionx-test-tags-input": IonxTestTagsInput;
         "ionx-toggle-labels": IonxToggleLabels;
     }
 }
@@ -417,6 +467,7 @@ declare module "@stencil/core" {
             "ionx-expanding-searchbar-parent": LocalJSX.IonxExpandingSearchbarParent & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarParentElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
+            "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
             "ionx-test-dialog-content": LocalJSX.IonxTestDialogContent & JSXBase.HTMLAttributes<HTMLIonxTestDialogContentElement>;
             "ionx-test-dialog-message": LocalJSX.IonxTestDialogMessage & JSXBase.HTMLAttributes<HTMLIonxTestDialogMessageElement>;
@@ -424,6 +475,7 @@ declare module "@stencil/core" {
             "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;
+            "ionx-test-tags-input": LocalJSX.IonxTestTagsInput & JSXBase.HTMLAttributes<HTMLIonxTestTagsInputElement>;
             "ionx-toggle-labels": LocalJSX.IonxToggleLabels & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsElement>;
         }
     }

@@ -2,7 +2,12 @@ import {Component, Host, h} from "@stencil/core";
 import "@ionic/core";
 import "../components.d.ts";
 
-const tests = ["loading", "dialog", "expanding-searchbar"];
+const tests = [
+    "dialog",
+    "expanding-searchbar",
+    "loading",
+    "tags-input"
+];
 
 @Component({
     tag: "ionx-test-root"
