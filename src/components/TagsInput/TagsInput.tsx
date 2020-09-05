@@ -1,5 +1,5 @@
 import {TextFieldTypes} from "@ionic/core";
-import {Component, Host, h, Prop, Element, State} from "@stencil/core";
+import {Component, Host, h, Prop, Element, State, EventEmitter, Event} from "@stencil/core";
 
 @Component({
     tag: "ionx-tags-input",
@@ -59,7 +59,10 @@ export class TagsInput {
         return this.element.shadowRoot.querySelector("input");
     }
 
-    blur() {
+    @Event()
+    ionxChange: EventEmitter<string[]>;
+
+    setBlur() {
 
         if (this.currentTag) {
             this.pushTag(this.currentTag);
@@ -69,15 +72,15 @@ export class TagsInput {
             this.#focused = false;
             // this.ionBlur.emit(this._tags);
         }
+
+        this.input?.blur();
     }
 
     setFocus(): any {
         if (!this.#focused) {
             this.#focused = true;
 
-            if (this.input) {
-                this.input.focus();
-            }
+            this.input?.focus();
 
             // this.ionFocus.emit(this._tags);
         }
@@ -140,7 +143,7 @@ export class TagsInput {
         this.value.push(tagStr.trim());
         this.sortTags();
 
-        // this.change.emit(this._tags.slice());
+        this.ionxChange.emit(this.value.slice());
         this.currentTag = "";
     }
 
@@ -168,7 +171,6 @@ export class TagsInput {
 
             return;
         }
-        console.log(ev.key);
 
         if (ev.key === "Enter") {
             const tagStr = this.currentTag.trim();
@@ -206,11 +208,11 @@ export class TagsInput {
         if (this.value && this.value.length > 0) {
             if (index === -1) {
                 this.value = this.value.splice(0, this.value.length - 1);
-                // this.change.emit(this._tags);
+                this.ionxChange.emit(this.value.slice());
             } else if (index > -1) {
                 this.value = this.value.slice();
                 this.value.splice(index, 1);
-                // this.change.emit(this._tags);
+                this.ionxChange.emit(this.value.slice());
             }
         }
     }

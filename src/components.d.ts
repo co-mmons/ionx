@@ -400,6 +400,7 @@ declare namespace LocalJSX {
         "canEnterAdd"?: boolean;
         "hideRemove"?: boolean;
         "maxTags"?: number;
+        "onIonxChange"?: (event: CustomEvent<string[]>) => void;
         "placeholder"?: string;
         "readonly"?: boolean;
         "separator"?: string;

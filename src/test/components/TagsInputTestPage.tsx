@@ -6,18 +6,18 @@ import {Component, Host, h, State} from "@stencil/core";
 export class TagsInputTestPage {
 
     @State()
-    backspaceRemove: boolean = true;
+    backspaceRemove: boolean;
 
     render() {
 
         return <Host>
             <div>
-                <div>Test</div>
+                <div>Test {this.backspaceRemove}</div>
                 <ion-item>
                     <ion-label>canBackspaceRemove</ion-label>
-                    <ion-checkbox slot="start" checked={this.backspaceRemove} onIonChange={(ev) => this.backspaceRemove = ev.returnValue}/>
+                    <ion-checkbox slot="start" checked={this.backspaceRemove} onIonChange={(ev) => this.backspaceRemove = ev.target["checked"]}/>
                 </ion-item>
-                <ionx-tags-input canBackspaceRemove={this.backspaceRemove}/>
+                <ionx-tags-input canBackspaceRemove={this.backspaceRemove} onIonxChange={(ev) => console.log(ev)}/>
             </div>
         </Host>
     }
