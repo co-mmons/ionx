@@ -5,7 +5,7 @@ export function applyPartStyles(element: HTMLElement, partName: string, styles: 
 export function applyPartStyles(): Promise<void> | ((element: HTMLElement) => void) {
 
     if ("part" in HTMLElement.prototype) {
-        // return;
+        return;
     }
 
     const element: HTMLElement = arguments[0] instanceof HTMLElement && arguments[0];
