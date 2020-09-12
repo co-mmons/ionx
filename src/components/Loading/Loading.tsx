@@ -71,7 +71,7 @@ export class Loading implements LoadingOptions {
     render() {
         return <Host>
 
-            <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.fill ? "0" : "1"}}>
+            <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.fill ? "initial" : "1"}}>
 
                 {this.spinnerMode && <ion-spinner style={{marginRight: !!(this.header || this.message) && "8px"}}/>}
 

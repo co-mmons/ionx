@@ -4,7 +4,7 @@ import {Component, Host, h, Prop, Element, State, EventEmitter, Event} from "@st
 @Component({
     tag: "ionx-tags-input",
     styleUrl: "TagsInput.scss",
-    shadow: true
+    scoped: true
 })
 export class TagsInput {
 
@@ -48,6 +48,9 @@ export class TagsInput {
     unique: boolean = true;
 
     #focused: boolean = false;
+
+    @Prop()
+    required?: boolean;
 
     @Prop()
     value: string[] = [];
@@ -232,6 +235,7 @@ export class TagsInput {
 
             {!this.readonly && <ion-input
                 disabled={this.readonly}
+                required={this.required}
                 class={{"ionx-tags-input-input": true}}
                 type={this.type}
                 value={this.currentTag}

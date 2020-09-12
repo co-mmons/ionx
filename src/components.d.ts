@@ -124,6 +124,7 @@ export namespace Components {
         "maxTags": number;
         "placeholder": string;
         "readonly": boolean;
+        "required"?: boolean;
         "separator": string;
         "sortFn": (a: string, b: string) => number;
         "sortable": boolean;
@@ -403,6 +404,7 @@ declare namespace LocalJSX {
         "onIonxChange"?: (event: CustomEvent<string[]>) => void;
         "placeholder"?: string;
         "readonly"?: boolean;
+        "required"?: boolean;
         "separator"?: string;
         "sortFn"?: (a: string, b: string) => number;
         "sortable"?: boolean;
