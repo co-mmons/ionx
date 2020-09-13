@@ -1,15 +1,15 @@
-import {FormControlValueAccessor} from "./FormControlValueAccessor";
+import {Observable} from "rxjs";
 
-export class FormControl<Value = any> {
+export interface FormControl<Value = any> {
 
     readonly name: string;
 
-    get accessor(): FormControlValueAccessor {
-        return null;
-    }
+    readonly element: HTMLElement;
 
-    setValue(__value: Value) {
+    readonly valueChanges: Observable<Value>;
 
-    }
+    readonly statusChanges: Observable<Value>;
+
+    setValue(value: Value);
 
 }

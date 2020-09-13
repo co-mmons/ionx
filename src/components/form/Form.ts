@@ -1,28 +1,32 @@
 import {ComponentInterface} from "@stencil/core";
 import {Observable, Subject} from "rxjs";
 import {FormControl} from "./FormControl";
-import {FormControlValueAccessor} from "./FormControlValueAccessor";
+import {FormControlElement} from "./FormControlElement";
+import {FormControlImpl} from "./FormControlImpl";
 import {FormState} from "./FormState";
 
-export interface FormControls {
-    [name: string]: any;
-}
-
 export interface FormOptions {
-    component?: ComponentInterface;
+    owner?: ComponentInterface;
+
 }
 
 export class Form {
 
-    constructor(_controls?: {[name: string]: any} | string[], _options?: FormOptions) {
+    constructor(controls?: {[name: string]: any} | string[], _options?: FormOptions) {
         this.controls = {};
+
+        for (const controlName of (Array.isArray(controls) ? controls : Object.keys(controls))) {
+            this.controls[controlName] = new FormControlImpl(controlName);
+        }
     }
 
     state: FormState;
 
-    controls: {[name: string]: FormControl};
+    readonly controls: {[name: string]: FormControl} = {};
 
-    accessors: {[name: string]: HTMLElement & FormControlValueAccessor};
+    readonly accessors: {[name: string]: HTMLElement & FormControlElement} = {};
+
+    private destroyed = false;
 
     controlList() {
         return Object.values(this.controls);
@@ -39,6 +43,7 @@ export class Form {
     removeControl(name: string) {
         const control = this.controls[name];
         if (control) {
+            (control as FormControlImpl).destroy();
             delete this.controls[name];
         }
     }
@@ -52,31 +57,40 @@ export class Form {
 
         if (typeof elOrName === "string") {
             return (el: HTMLElement) => form.bindImpl(el, elOrName);
-        } else {
+        } else if (elOrName instanceof HTMLElement) {
             this.bindImpl(elOrName, name);
         }
     }
 
     private bindImpl(el: HTMLElement, name: string) {
 
-        const previous = this.accessors[name];
-
-        // do nothing, as same element given
-        if (previous && previous === el) {
+        if (!el) {
+            (this.controls[name] as FormControlImpl)?.detach();
             return;
         }
 
-        // new element, unbind previous
-        else if (previous) {
-
+        if (!(name in this.controls)) {
+            throw new Error(`Form control "${name}" not exists`);
         }
 
-        this.accessors[name] = el as HTMLElement & FormControlValueAccessor;
+        (this.controls[name] as FormControlImpl).attach(el);
     }
 
     readonly stateChanged: Observable<FormState> = new Subject();
 
     protected buildState() {
         // const current = this.state;
+    }
+
+    isDestroyed() {
+        return this.destroyed;
+    }
+
+    /**
+     * Cleanups all the referencies to controls and closes subscribers.
+     */
+    destroy() {
+        (this.stateChanged as Subject<any>).complete();
+        this.destroyed = true;
     }
 }

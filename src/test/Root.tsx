@@ -6,7 +6,8 @@ const tests = [
     "dialog",
     "expanding-searchbar",
     "loading",
-    "tags-input"
+    "tags-input",
+    "form"
 ];
 
 @Component({

@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { AnimationBuilder, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
+import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
 export namespace Components {
     interface IonRouter {
@@ -61,12 +61,12 @@ export namespace Components {
           * @inheritDoc
          */
         "messageComponentProps"?: {[prop: string]: any};
-        "onDidDismiss": () => Promise<any>;
+        "onDidDismiss": () => Promise<OverlayEventDetail<any>>;
         /**
           * A promise resolved when dialog was fully presented.
          */
         "onDidEnter": () => Promise<true>;
-        "onWillDismiss": () => Promise<any>;
+        "onWillDismiss": () => Promise<OverlayEventDetail<any>>;
         /**
           * @inheritDoc
          */
@@ -141,6 +141,8 @@ export namespace Components {
         "dialogValue": () => Promise<string>;
     }
     interface IonxTestExpandingSearchbar {
+    }
+    interface IonxTestForm {
     }
     interface IonxTestHome {
     }
@@ -246,6 +248,12 @@ declare global {
         prototype: HTMLIonxTestExpandingSearchbarElement;
         new (): HTMLIonxTestExpandingSearchbarElement;
     };
+    interface HTMLIonxTestFormElement extends Components.IonxTestForm, HTMLStencilElement {
+    }
+    var HTMLIonxTestFormElement: {
+        prototype: HTMLIonxTestFormElement;
+        new (): HTMLIonxTestFormElement;
+    };
     interface HTMLIonxTestHomeElement extends Components.IonxTestHome, HTMLStencilElement {
     }
     var HTMLIonxTestHomeElement: {
@@ -292,6 +300,7 @@ declare global {
         "ionx-test-dialog-content": HTMLIonxTestDialogContentElement;
         "ionx-test-dialog-message": HTMLIonxTestDialogMessageElement;
         "ionx-test-expanding-searchbar": HTMLIonxTestExpandingSearchbarElement;
+        "ionx-test-form": HTMLIonxTestFormElement;
         "ionx-test-home": HTMLIonxTestHomeElement;
         "ionx-test-loading": HTMLIonxTestLoadingElement;
         "ionx-test-root": HTMLIonxTestRootElement;
@@ -421,6 +430,8 @@ declare namespace LocalJSX {
     }
     interface IonxTestExpandingSearchbar {
     }
+    interface IonxTestForm {
+    }
     interface IonxTestHome {
     }
     interface IonxTestLoading {
@@ -449,6 +460,7 @@ declare namespace LocalJSX {
         "ionx-test-dialog-content": IonxTestDialogContent;
         "ionx-test-dialog-message": IonxTestDialogMessage;
         "ionx-test-expanding-searchbar": IonxTestExpandingSearchbar;
+        "ionx-test-form": IonxTestForm;
         "ionx-test-home": IonxTestHome;
         "ionx-test-loading": IonxTestLoading;
         "ionx-test-root": IonxTestRoot;
@@ -475,6 +487,7 @@ declare module "@stencil/core" {
             "ionx-test-dialog-content": LocalJSX.IonxTestDialogContent & JSXBase.HTMLAttributes<HTMLIonxTestDialogContentElement>;
             "ionx-test-dialog-message": LocalJSX.IonxTestDialogMessage & JSXBase.HTMLAttributes<HTMLIonxTestDialogMessageElement>;
             "ionx-test-expanding-searchbar": LocalJSX.IonxTestExpandingSearchbar & JSXBase.HTMLAttributes<HTMLIonxTestExpandingSearchbarElement>;
+            "ionx-test-form": LocalJSX.IonxTestForm & JSXBase.HTMLAttributes<HTMLIonxTestFormElement>;
             "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;
