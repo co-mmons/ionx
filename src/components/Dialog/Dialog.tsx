@@ -1,3 +1,4 @@
+import {OverlayEventDetail} from "@ionic/core";
 import {Component, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
 import {Subject} from "rxjs";
 import {first} from "rxjs/operators";
@@ -76,12 +77,12 @@ export class Dialog implements DialogOptions {
     }
 
     @Method()
-    onDidDismiss(): Promise<any> {
+    onDidDismiss(): Promise<OverlayEventDetail<any>> {
         return this.element.closest("ion-modal").onDidDismiss();
     }
 
     @Method()
-    onWillDismiss(): Promise<any> {
+    onWillDismiss(): Promise<OverlayEventDetail<any>> {
         return this.element.closest("ion-modal").onWillDismiss();
     }
 

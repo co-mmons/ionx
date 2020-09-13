@@ -13,6 +13,7 @@ export async function showDialog(options: DialogOptions & Exclude<Partial<ModalO
     modal.style.setProperty("--max-width", "90vw");
     modal.style.setProperty("--max-height", "90vh");
     modal.style.setProperty("--border-radius", "var(--ionx-border-radius)");
+    modal.style.setProperty("--backdrop-opacity", "var(--ion-backdrop-opacity, 0.32)");
 
     if (!document.querySelector("html.ios")) {
         modal.style.setProperty("--box-shadow", "0px 28px 48px rgba(0, 0, 0, 0.4)");
@@ -20,5 +21,5 @@ export async function showDialog(options: DialogOptions & Exclude<Partial<ModalO
 
     await modal.present();
 
-    return modal.querySelector("ionx-dialog");
+    return modal.querySelector<HTMLIonxDialogElement>("ionx-dialog");
 }

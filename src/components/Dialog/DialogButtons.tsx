@@ -18,7 +18,16 @@ export class DialogButtons {
 
     async buttonClicked(button: DialogButton) {
 
-        const value = await ((this.element.closest("ionx-dialog").querySelector(`[${dialogValueAttribute}]`) as any as DialogValue)?.dialogValue?.());
+        let value: any;
+
+        if (!button.role || button.role !== "cancel") {
+            try {
+                value = await ((this.element.closest("ionx-dialog").querySelector(`[${dialogValueAttribute}]`) as any as DialogValue)?.dialogValue?.());
+            } catch (error) {
+                console.debug("Dialog value aborted", error);
+                return;
+            }
+        }
 
         if (button.handler) {
             const res = button.handler(value);
