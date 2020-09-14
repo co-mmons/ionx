@@ -1,4 +1,4 @@
-import {FormState} from "./FormState";
+import {FormStatus} from "./FormStatus";
 
 /**
  * Defines an interface that acts as a bridge between the forms API and an element in the DOM.
@@ -13,7 +13,7 @@ export interface FormControlElement {
      */
     applyFormValue(value: any);
 
-    applyFormState(state: FormState);
+    applyFormStatus(status: FormStatus);
 
     readonly formValueChangeEventName?: string;
 

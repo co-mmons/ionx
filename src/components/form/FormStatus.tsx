@@ -1,3 +1,5 @@
+import {FormValidationError} from "./FormValidationError";
+
 export interface FormStatus {
     readonly touched: boolean;
     readonly untouched: boolean;
@@ -7,5 +9,5 @@ export interface FormStatus {
     readonly enabled: boolean;
     readonly valid: boolean;
     readonly invalid: boolean;
-    readonly errors: {[key: string]: any};
+    readonly error: FormValidationError;
 }

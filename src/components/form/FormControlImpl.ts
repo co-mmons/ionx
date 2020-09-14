@@ -33,8 +33,20 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         return this.touched$;
     }
 
+    get untouched() {
+        return !this.touched$;
+    }
+
     get dirty() {
         return this.dirty$;
+    }
+
+    get pristine() {
+        return !this.dirty$;
+    }
+
+    get enabled() {
+        return !this.disabled$;
     }
 
     get disabled() {
@@ -42,7 +54,11 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     }
 
     get valid() {
-        return false;
+        return !!this.error$;
+    }
+
+    get invalid() {
+        return !this.error$;
     }
 
     get value() {
@@ -59,27 +75,28 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     readonly valueChanges: Observable<Value> = new Subject();
 
-    readonly statusChanges: Observable<FormStatus> = new Subject();
+    readonly statusChanges: Observable<{current: FormStatus, previous: FormStatus}> = new Subject();
 
 
-    private setStatus(status: "touched" | "dirty" | "disabled" | "valid", not = false) {
-        console.debug(`[ionx-form-control] set status ${status} as ${!not}`);
+    private setStatus(what: "touched" | "dirty" | "disabled" | "valid", not = false) {
+        console.debug(`[ionx-form-control] set status ${what} as ${!not}`);
 
-        const was = this[status];
+        const status = this.status();
+        const was = status[what];
 
         const item = this.element$.closest("ion-item");
         const formItem = this.element$.closest("ionx-form-item");
 
         const classes = [];
 
-        if (status !== "disabled") {
-            classes.push(`ion-${status}`);
+        if (what !== "disabled") {
+            classes.push(`ion-${what}`);
 
-            if (status === "touched") {
+            if (what === "touched") {
                 classes.push("ion-untouched");
-            } else if (status === "dirty") {
+            } else if (what === "dirty") {
                 classes.push("ion-pristine");
-            } else if (status === "valid") {
+            } else if (what === "valid") {
                 classes.push("ion-invalid");
             }
         }
@@ -97,8 +114,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             }
         }
 
-        if (!was) {
-            this.fireStatusChange();
+        if (was !== !not) {
+            this.fireStatusChange(status);
         }
     }
 
@@ -110,12 +127,32 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         this.setStatus("touched");
     }
 
+    markAsUntouched() {
+        this.setStatus("touched", true);
+    }
+
     markAsPristine() {
         this.setStatus("dirty", true);
     }
 
     setValidators(...validators: FormValidator[]) {
         this.validators$ = validators;
+    }
+
+    getValidators() {
+        return this.validators$.slice();
+    }
+
+    clearValidators() {
+        this.validators$ = undefined;
+    }
+
+    enable() {
+
+    }
+
+    disable() {
+
     }
 
     setValue(value: Value) {
@@ -135,14 +172,14 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         }
     }
 
-    async validate(): Promise<boolean> {
+    async validateImpl(options: {trigger: "valueChange" | "validate"}): Promise<boolean> {
 
         let error: FormValidationError;
 
         if (this.validators$) {
             VALIDATORS: for (const validator of this.validators$) {
                 try {
-                    const result = validator(this);
+                    const result = validator(this, options);
                     if (result instanceof Promise) {
                         await result;
                     }
@@ -171,6 +208,10 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         }
     }
 
+    async validate(): Promise<boolean> {
+        return this.validateImpl({trigger: "validate"});
+    }
+
     attach(element: HTMLElement) {
 
         if (this.element$ !== element) {
@@ -184,6 +225,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             this.unlistenOnChange = addEventListener(this.element$, this.element$.formValueChangeEventName || "ionChange", ev => this.onChange(ev as CustomEvent));
 
             this.unlistenOnFocus = addEventListener(this.element$, this.element$.formTouchEventName || "ionFocus", () => this.markAsTouched());
+
+            this.applyStatus();
         }
 
     }
@@ -205,13 +248,52 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         // const previous = this.value$;
         this.value$ = ev.detail?.value;
 
-        (this.valueChanges as Subject<Value>).next(this.value$);
         this.markAsDirty();
-        this.validate();
+        (this.valueChanges as Subject<Value>).next(this.value$);
+        this.validateImpl({trigger: "valueChange"});
     }
 
-    private fireStatusChange() {
-        //
+    status(): FormStatus {
+        return {
+            dirty: this.dirty,
+            disabled: this.disabled,
+            enabled: this.enabled,
+            invalid: this.invalid,
+            pristine: this.pristine,
+            touched: this.touched,
+            untouched: this.untouched,
+            valid: this.valid,
+            error: this.error$
+        }
+    }
+
+    private applyStatus(current?: FormStatus) {
+
+        if (!current) {
+            current = this.status();
+        }
+
+        if (this.element$?.applyFormStatus) {
+
+            try {
+                this.element$.applyFormStatus(current);
+            } catch (error) {
+                console.warn(`[ionx-form-control] unhandled error`, error);
+            }
+
+        } else if (this.element$) {
+            this.element$["disabled"] = current.disabled;
+        }
+    }
+
+    private fireStatusChange(previous: FormStatus) {
+        const current = this.status();
+
+        this.applyStatus(current);
+
+        if (JSON.stringify(previous) !== JSON.stringify(current)) {
+            (this.statusChanges as Subject<any>).next({current, previous});
+        }
     }
 
     destroy() {
