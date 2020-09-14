@@ -1,3 +1,5 @@
+import {FormState} from "./FormState";
+
 /**
  * Defines an interface that acts as a bridge between the forms API and an element in the DOM.
  */
@@ -11,8 +13,10 @@ export interface FormControlElement {
      */
     applyFormValue(value: any);
 
-    registerFormOnChange(fn: (value: any) => void);
+    applyFormState(state: FormState);
 
-    registerFormOnTouched(fn: () => void);
+    readonly formValueChangeEventName?: string;
+
+    readonly formTouchEventName?: string;
 
 }

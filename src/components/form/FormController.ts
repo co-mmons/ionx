@@ -1,6 +1,7 @@
 import {ComponentInterface} from "@stencil/core";
 import {Observable, Subject} from "rxjs";
 import {FormControl} from "./FormControl";
+import {FormControlBindOptions} from "./FormControlBindOptions";
 import {FormControlElement} from "./FormControlElement";
 import {FormControlImpl} from "./FormControlImpl";
 import {FormState} from "./FormState";
@@ -10,7 +11,7 @@ export interface FormOptions {
 
 }
 
-export class Form {
+export class FormController {
 
     constructor(controls?: {[name: string]: any} | string[], _options?: FormOptions) {
         this.controls = {};
@@ -48,38 +49,52 @@ export class Form {
         }
     }
 
-    bind(el: HTMLElement, name: string): void;
+    bind(el: HTMLElement, name: string, options?: FormControlBindOptions): void;
 
-    bind(name: string): (el: HTMLElement) => void;
+    bind(name: string, options?: FormControlBindOptions): (el: HTMLElement) => void;
 
-    bind(elOrName: HTMLElement | string, name?: string) {
+    bind(elOrName: HTMLElement | string, nameOrOptions?: string | FormControlBindOptions, options?: FormControlBindOptions) {
         const form = this;
 
         if (typeof elOrName === "string") {
-            return (el: HTMLElement) => form.bindImpl(el, elOrName);
+            return (el: HTMLElement) => form.bindImpl(el, elOrName, nameOrOptions as FormControlBindOptions);
         } else if (elOrName instanceof HTMLElement) {
-            this.bindImpl(elOrName, name);
+            this.bindImpl(elOrName, name, options);
         }
     }
 
-    private bindImpl(el: HTMLElement, name: string) {
+    private bindImpl(el: HTMLElement, name: string, options?: FormControlBindOptions) {
 
         if (!el) {
             (this.controls[name] as FormControlImpl)?.detach();
             return;
         }
 
-        if (!(name in this.controls)) {
-            throw new Error(`Form control "${name}" not exists`);
+        const control = this.controls[name] ? this.controls[name] as FormControlImpl : new FormControlImpl(name);
+        control.attach(el);
+
+        if (options && "validators" in options) {
+            control.setValidators(...(Array.isArray(options.validators) ? options.validators : [options.validators]));
         }
 
-        (this.controls[name] as FormControlImpl).attach(el);
+        control.statusChanges.subscribe(() => this.buildState());
     }
 
     readonly stateChanged: Observable<FormState> = new Subject();
 
     protected buildState() {
         // const current = this.state;
+    }
+
+    async validate(): Promise<boolean> {
+
+        for (const control of this.controlList()) {
+            if (!(await control.validate())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     isDestroyed() {

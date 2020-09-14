@@ -1,5 +1,6 @@
 import {Component, ComponentInterface, h, Host, State} from "@stencil/core";
-import {Form} from "../../../components/form/Form";
+import {FormController} from "../../../components/form";
+import {required} from "../../../components/form/validators";
 
 @Component({
     tag: "ionx-test-form",
@@ -7,7 +8,7 @@ import {Form} from "../../../components/form/Form";
 })
 export class FormTestPage implements ComponentInterface {
 
-    form: Form;
+    form: FormController;
 
     @State()
     test: number = 1;
@@ -16,14 +17,10 @@ export class FormTestPage implements ComponentInterface {
         this.prepareForm();
     }
 
-    disconnectedCallback() {
-        this.form?.destroy();
-    }
-
     prepareForm() {
 
         if (!this.form || this.form.isDestroyed()) {
-            this.form = new Form(["firstName"], {owner: this});
+            this.form = new FormController(["firstName"], {owner: this});
         }
 
         for (const control of this.form.controlList()) {
@@ -37,7 +34,13 @@ export class FormTestPage implements ComponentInterface {
             <ion-content>
                 <ion-button onClick={() => this.test++}>up</ion-button>
                 <ion-button onClick={() => this.test--}>down</ion-button>
-                <ion-input placeholder="Sdsdsd" ref={this.form.bind("firstName")}/>
+                <ionx-form controller={this.form}>
+                    <ion-item>
+                        <ion-input placeholder="Sdsdsd" ref={this.form.bind("firstName", {validators: required})}/>
+                    </ion-item>
+                </ionx-form>
+
+                <ion-button onClick={() => this.form.validate()}>validate</ion-button>
             </ion-content>
         </Host>;
     }

@@ -7,6 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
+import { FormController } from "./components/form/FormController";
 export namespace Components {
     interface IonRouter {
         /**
@@ -89,6 +90,9 @@ export namespace Components {
         "expanded": boolean;
     }
     interface IonxExpandingSearchbarParent {
+    }
+    interface IonxForm {
+        "controller": FormController;
     }
     interface IonxFormItem {
         "error": string;
@@ -206,6 +210,12 @@ declare global {
         prototype: HTMLIonxExpandingSearchbarParentElement;
         new (): HTMLIonxExpandingSearchbarParentElement;
     };
+    interface HTMLIonxFormElement extends Components.IonxForm, HTMLStencilElement {
+    }
+    var HTMLIonxFormElement: {
+        prototype: HTMLIonxFormElement;
+        new (): HTMLIonxFormElement;
+    };
     interface HTMLIonxFormItemElement extends Components.IonxFormItem, HTMLStencilElement {
     }
     var HTMLIonxFormItemElement: {
@@ -293,6 +303,7 @@ declare global {
         "ionx-dialog-message": HTMLIonxDialogMessageElement;
         "ionx-expanding-searchbar": HTMLIonxExpandingSearchbarElement;
         "ionx-expanding-searchbar-parent": HTMLIonxExpandingSearchbarParentElement;
+        "ionx-form": HTMLIonxFormElement;
         "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-loading": HTMLIonxLoadingElement;
         "ionx-tags-input": HTMLIonxTagsInputElement;
@@ -379,6 +390,9 @@ declare namespace LocalJSX {
     }
     interface IonxExpandingSearchbarParent {
     }
+    interface IonxForm {
+        "controller": FormController;
+    }
     interface IonxFormItem {
         "error"?: string;
         /**
@@ -453,6 +467,7 @@ declare namespace LocalJSX {
         "ionx-dialog-message": IonxDialogMessage;
         "ionx-expanding-searchbar": IonxExpandingSearchbar;
         "ionx-expanding-searchbar-parent": IonxExpandingSearchbarParent;
+        "ionx-form": IonxForm;
         "ionx-form-item": IonxFormItem;
         "ionx-loading": IonxLoading;
         "ionx-tags-input": IonxTagsInput;
@@ -480,6 +495,7 @@ declare module "@stencil/core" {
             "ionx-dialog-message": LocalJSX.IonxDialogMessage & JSXBase.HTMLAttributes<HTMLIonxDialogMessageElement>;
             "ionx-expanding-searchbar": LocalJSX.IonxExpandingSearchbar & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarElement>;
             "ionx-expanding-searchbar-parent": LocalJSX.IonxExpandingSearchbarParent & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarParentElement>;
+            "ionx-form": LocalJSX.IonxForm & JSXBase.HTMLAttributes<HTMLIonxFormElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
             "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
