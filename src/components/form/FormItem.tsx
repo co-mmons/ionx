@@ -1,4 +1,6 @@
+import {intl, MessageRef} from "@co.mmons/js-intl";
 import {Component, h, Host, Prop} from "@stencil/core";
+import {FormValidationError} from "./FormValidationError";
 
 @Component({
     tag: "ionx-form-item",
@@ -15,7 +17,19 @@ export class FormItem {
     fill: "clear" | "solid" | "outline";
 
     @Prop()
-    error: string;
+    error: string | FormValidationError | MessageRef;
+
+    get errorMessage() {
+        if (typeof this.error === "string") {
+            return this.error;
+        } else if (this.error instanceof FormValidationError) {
+            return this.error.message;
+        } else if (this.error instanceof MessageRef) {
+            return intl.message(this.error);
+        } else if (this.error) {
+            return `${this.error}`;
+        }
+    }
 
     @Prop()
     hint: string;
@@ -39,7 +53,7 @@ export class FormItem {
 
             <slot name="error"/>
 
-            {!!this.error && <div ionx--error>{this.error}</div>}
+            {!!this.error && <div ionx--error>{this.errorMessage}</div>}
 
             <slot name="hint"/>
 

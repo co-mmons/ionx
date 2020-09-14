@@ -11,5 +11,7 @@ export async function required(control: FormControl) {
 }
 
 export class RequiredError extends FormValidationError {
-
+    constructor() {
+        super("Field is required");
+    }
 }

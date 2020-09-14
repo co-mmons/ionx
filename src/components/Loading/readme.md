@@ -35,6 +35,10 @@ Type: `Promise<void>`
 
 ## Dependencies
 
+### Used by
+
+ - [ionx-test-loading](../../test/components)
+
 ### Depends on
 
 - ion-spinner
@@ -47,6 +51,7 @@ graph TD;
   ionx-loading --> ion-spinner
   ionx-loading --> ion-text
   ionx-loading --> ion-progress-bar
+  ionx-test-loading --> ionx-loading
   style ionx-loading fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

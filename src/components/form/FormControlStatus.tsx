@@ -1,6 +1,6 @@
 import {FormValidationError} from "./FormValidationError";
 
-export interface FormStatus {
+export interface FormControlStatus {
     readonly touched: boolean;
     readonly untouched: boolean;
     readonly dirty: boolean;

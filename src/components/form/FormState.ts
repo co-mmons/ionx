@@ -1,6 +1,11 @@
-import {FormStatus} from "./FormStatus";
+import {FormControlState} from "./FormControlState";
 
-export interface FormState extends FormStatus {
-    readonly value: any;
-    readonly controls?: {[name: string]: FormState};
+export interface FormState {
+    readonly touched: boolean;
+    readonly untouched: boolean;
+    readonly dirty: boolean;
+    readonly pristine: boolean;
+    readonly valid: boolean;
+    readonly invalid: boolean;
+    readonly controls?: {[name: string]: FormControlState};
 }

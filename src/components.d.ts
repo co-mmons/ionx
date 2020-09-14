@@ -8,6 +8,8 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
 import { FormController } from "./components/form/FormController";
+import { FormValidationError } from "./components/form/FormValidationError";
+import { MessageRef } from "@co.mmons/js-intl";
 export namespace Components {
     interface IonRouter {
         /**
@@ -95,7 +97,7 @@ export namespace Components {
         "controller": FormController;
     }
     interface IonxFormItem {
-        "error": string;
+        "error": string | FormValidationError | MessageRef;
         /**
           * This attributes determines the background and border color of the form item. By default, items have a clear background and no border.
          */
@@ -394,7 +396,7 @@ declare namespace LocalJSX {
         "controller": FormController;
     }
     interface IonxFormItem {
-        "error"?: string;
+        "error"?: string | FormValidationError | MessageRef;
         /**
           * This attributes determines the background and border color of the form item. By default, items have a clear background and no border.
          */

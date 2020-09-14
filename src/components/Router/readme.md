@@ -44,6 +44,19 @@ Type: `Promise<boolean>`
 
 
 
+## Dependencies
+
+### Used by
+
+ - [ionx-test-root](../../test)
+
+### Graph
+```mermaid
+graph TD;
+  ionx-test-root --> ion-router
+  style ion-router fill:#f9f,stroke:#333,stroke-width:4px
+```
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

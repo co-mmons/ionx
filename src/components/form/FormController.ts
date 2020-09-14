@@ -1,31 +1,29 @@
 import {ComponentInterface} from "@stencil/core";
-import {Observable, Subject} from "rxjs";
+import {deepEqual} from "fast-equals";
+import {BehaviorSubject, Observable, Subject} from "rxjs";
 import {FormControl} from "./FormControl";
 import {FormControlBindOptions} from "./FormControlBindOptions";
-import {FormControlElement} from "./FormControlElement";
 import {FormControlImpl} from "./FormControlImpl";
 import {FormState} from "./FormState";
 
-export interface FormOptions {
+export interface FormControllerOptions {
     owner?: ComponentInterface;
-
 }
 
+/**
+ *
+ */
 export class FormController {
 
-    constructor(controls?: {[name: string]: any} | string[], _options?: FormOptions) {
+    constructor(controls?: {[name: string]: any} | string[], _options?: FormControllerOptions) {
         this.controls = {};
 
         for (const controlName of (Array.isArray(controls) ? controls : Object.keys(controls))) {
-            this.controls[controlName] = new FormControlImpl(controlName);
+            this.addControl(controlName);
         }
     }
 
-    state: FormState;
-
     readonly controls: {[name: string]: FormControl} = {};
-
-    readonly accessors: {[name: string]: HTMLElement & FormControlElement} = {};
 
     private destroyed = false;
 
@@ -38,7 +36,8 @@ export class FormController {
     }
 
     addControl(name: string, _value?: any) {
-        this.controls[name] = null;
+        this.controls[name] = new FormControlImpl(name);
+        this.fireStateChange();
     }
 
     removeControl(name: string) {
@@ -46,6 +45,7 @@ export class FormController {
         if (control) {
             (control as FormControlImpl).destroy();
             delete this.controls[name];
+            this.fireStateChange();
         }
     }
 
@@ -71,25 +71,81 @@ export class FormController {
         }
 
         const control = this.controls[name] ? this.controls[name] as FormControlImpl : new FormControlImpl(name);
+
+        if (control.element === el) {
+            return;
+        }
+
         control.attach(el);
 
         if (options && "validators" in options) {
             control.setValidators(...(Array.isArray(options.validators) ? options.validators : [options.validators]));
         }
 
-        control.statusChanges.subscribe(() => this.buildState());
+        control.statusChanges.subscribe(() => this.fireStateChange());
+        control.valueChanges.subscribe(() => this.fireStateChange());
+
+        this.fireStateChange();
     }
 
-    readonly stateChanged: Observable<FormState> = new Subject();
+    readonly stateChanged: Observable<FormState> = new BehaviorSubject(this.state());
 
-    protected buildState() {
-        // const current = this.state;
+    state(): FormState {
+
+        const state = {
+            controls: {},
+            dirty: false,
+            pristine: true,
+            touched: false,
+            untouched: true,
+            valid: true,
+            invalid: false
+        };
+
+        for (const control of this.controlList()) {
+            const s = control.state();
+
+            state.controls[control.name] = s;
+
+            if (s.dirty) {
+                state.dirty = true;
+                state.pristine = false;
+            }
+
+            if (s.touched) {
+                state.touched = true;
+                state.untouched = false;
+            }
+
+            if (!s.valid) {
+                state.valid = false;
+                state.invalid = true;
+            }
+        }
+
+        return state as FormState;
     }
 
-    async validate(): Promise<boolean> {
+    private fireStateChange() {
+        const subject = this.stateChanged as BehaviorSubject<FormState>;
+
+        const previous = subject.getValue();
+        const current = this.state();
+
+        if (!deepEqual(previous, current)) {
+            subject.next(current);
+        }
+    }
+
+    async validate(options?: {preventScroll?: boolean, preventFocus?: boolean}): Promise<boolean> {
 
         for (const control of this.controlList()) {
             if (!(await control.validate())) {
+
+                if (!options?.preventFocus) {
+                    control.focus({preventScroll: options?.preventScroll});
+                }
+
                 return false;
             }
         }

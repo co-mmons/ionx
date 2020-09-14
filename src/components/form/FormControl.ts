@@ -1,5 +1,6 @@
 import {Observable} from "rxjs";
-import {FormStatus} from "./FormStatus";
+import {FormControlState} from "./FormControlState";
+import {FormControlStatus} from "./FormControlStatus";
 import {FormValidator} from "./FormValidator";
 
 export interface FormControl<Value = any> {
@@ -10,7 +11,7 @@ export interface FormControl<Value = any> {
 
     readonly valueChanges: Observable<Value>;
 
-    readonly statusChanges: Observable<{current: FormStatus, previous: FormStatus}>;
+    readonly statusChanges: Observable<{current: FormControlStatus, previous: FormControlStatus}>;
 
     readonly valid: boolean;
 
@@ -32,6 +33,8 @@ export interface FormControl<Value = any> {
 
     setValue(value: Value);
 
+    focus(options?: FocusOptions): void;
+
     enable(): void;
 
     disable(): void;
@@ -49,5 +52,9 @@ export interface FormControl<Value = any> {
     setValidators(...validators: FormValidator[]);
 
     clearValidators(): void;
+
+    status(): FormControlStatus;
+
+    state(): FormControlState;
 
 }
