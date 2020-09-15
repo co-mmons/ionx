@@ -9,6 +9,7 @@ import {FormState} from "./FormState";
 
 export interface FormControllerOptions {
     owner?: ComponentInterface;
+    onStateChange?: (state: FormState) => void;
 }
 
 /**
@@ -16,8 +17,12 @@ export interface FormControllerOptions {
  */
 export class FormController {
 
-    constructor(controls?: {[name: string]: any} | string[], _options?: FormControllerOptions) {
+    constructor(controls?: {[name: string]: any} | string[], options?: FormControllerOptions) {
         this.controls = {};
+
+        if (options?.onStateChange) {
+            this.onStateChange(options.onStateChange);
+        }
 
         for (const controlName of (Array.isArray(controls) ? controls : Object.keys(controls))) {
             this.addControl(controlName);
@@ -36,7 +41,7 @@ export class FormController {
         return Object.keys(this.controls);
     }
 
-    controlMutableStates() {
+    controlStates() {
         const states: {[controlName: string]: FormControlState} = {};
 
         for (const control of this.controlList()) {
@@ -146,26 +151,25 @@ export class FormController {
 
         for (const controlName in states) {
             if (this.controls[controlName]) {
-                const {statusChanged, valueChanged} = (this.controls[controlName] as FormControlImpl).setState(states[controlName], {preventEvent: true});
-                if (statusChanged || valueChanged) {
+                const {statusChange, valueChange} = (this.controls[controlName] as FormControlImpl).setState(states[controlName], {preventEvent: true});
+                if (statusChange || valueChange) {
                     anyChange = true;
                 }
             }
         }
 
         if (anyChange) {
-            this.fireStateChange();
+            this.fireStateChange(false);
         }
     }
 
-    private fireStateChange() {
-        const subject = this.stateChanged as BehaviorSubject<FormState>;
+    private fireStateChange(checkForChange = true) {
 
-        const previous = subject.getValue();
+        const previous = this.stateChanged.getValue();
         const current = this.state();
 
-        if (!deepEqual(previous, current)) {
-            subject.next(current);
+        if (!checkForChange || (checkForChange && !deepEqual(previous, current))) {
+            this.stateChanged.next(current);
         }
     }
 

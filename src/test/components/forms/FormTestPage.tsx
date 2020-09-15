@@ -1,5 +1,6 @@
 import {Component, ComponentInterface, h, Host, State} from "@stencil/core";
 import {FormController, FormState} from "../../../components/form";
+import {FormControlState} from "../../../components/form/FormControlState";
 import {required} from "../../../components/form/validators";
 
 @Component({
@@ -16,6 +17,9 @@ export class FormTestPage implements ComponentInterface {
     @State()
     test: number = 1;
 
+    @State()
+    firstName: FormControlState<string>;
+
     connectedCallback() {
         this.prepareForm();
     }
@@ -23,12 +27,13 @@ export class FormTestPage implements ComponentInterface {
     prepareForm() {
 
         if (!this.form || this.form.isDestroyed()) {
-            this.form = new FormController(["firstName"], {owner: this});
-
-            this.form.onStateChange(state => this.formState = state);
+            this.form = new FormController(["firstName"], {
+                owner: this,
+                onStateChange: state => this.formState = state
+            });
         }
 
-        const states = this.form.controlMutableStates();
+        const states = this.form.controlStates();
 
         for (const controlName of this.form.controlNames()) {
             if (controlName === "firstName") {

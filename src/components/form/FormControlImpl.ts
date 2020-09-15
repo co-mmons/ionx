@@ -8,12 +8,12 @@ import {FormControlReadonlyStatus} from "./FormControlStatus";
 import {FormValidationError} from "./FormValidationError";
 import {FormValidator} from "./FormValidator";
 
-interface ApplyState {
+interface ApplyState<Value = any> {
     touched?: boolean;
     dirty?: boolean;
     disabled?: boolean;
     valid?: boolean;
-    value?: boolean;
+    value?: Value;
 }
 
 export class FormControlImpl<Value = any> implements FormControl<Value> {
@@ -123,9 +123,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     }
 
     setValue(value: Value) {
-
-        this.value$ = value;
-        this.applyElementValue();
+        this.applyState({value: value});
     }
 
     async validate(): Promise<boolean> {
@@ -173,8 +171,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
             this.unlistenOnFocus = addEventListener(this.element$, this.element$.formTouchEventName || "ionFocus", () => this.markAsTouched());
 
-            this.applyElementStatus();
-            this.applyElementValue();
+            this.applyElementState({value: this.value$, valueChange: true, status: this.status(), statusChange: true});
         }
 
     }
@@ -261,90 +258,46 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private stateChanges = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
 
-    private applyState(state: ApplyState, options?: {preventEvent?: boolean, trigger?: "elementValueChange"}): {valueChanged: boolean, statusChanged: boolean} {
+    private applyState(state: ApplyState, options?: {preventEvent?: boolean, trigger?: "elementValueChange"}): {valueChange: boolean, statusChange: boolean} {
         console.debug(`[ionx-form-control] apply "${this.name} state`, state);
 
         // we need to know status and value before any change
         const status = this.status();
         const value = this.value$;
 
-        // sync element's css classes
-        // we do it without checking for a change in state
-        // to make sure, that element's ui matches state
-        if (this.element$) {
-
-            let itemsSearched = false;
-            let item: HTMLIonItemElement = this.element$.closest("ion-item");
-            let formItem: HTMLIonxFormItemElement = this.element$.closest("ionx-form-item");
-
-            for (const key in state) {
-
-                if (key === "disabled" || key === "value") {
-                    continue;
-                }
-
-                if (!itemsSearched) {
-                    item = this.element$.closest("ion-item");
-                    formItem = this.element$.closest("ionx-form-item");
-                }
-
-                const classes = [];
-
-                classes.push(`ion-${key}`);
-
-                if (key === "touched") {
-                    classes.push("ion-untouched");
-                } else if (key === "dirty") {
-                    classes.push("ion-pristine");
-                } else if (key === "valid") {
-                    classes.push("ion-invalid");
-                }
-
-                if (!state[key]) {
-                    classes.reverse();
-                }
-
-                if (classes.length > 0) {
-                    for (const el of [this.element$, item, formItem]) {
-                        if (el) {
-                            el.classList.add(classes[0]);
-                            el.classList.remove(classes[1]);
-                        }
-                    }
-                }
-            }
-        }
-
-        let statusChanged = false;
-        let valueChanged = false;
+        let statusChange = false;
+        let valueChange = false;
 
         for (const key in state) {
 
             if (!deepEqual(state[key], this[key])) {
 
                 if (key === "value") {
-                    valueChanged = true;
+                    valueChange = true;
                 } else {
-                    statusChanged = true;
+                    statusChange = true;
                 }
 
                 this[`${key}$`] = state[key];
             }
         }
 
-        if (valueChanged && (!options || options.trigger !== "elementValueChange")) {
-            this.applyElementValue();
+        const elementValueChange = valueChange && (!options || options.trigger !== "elementValueChange");
+
+        if (elementValueChange || statusChange) {
+            this.applyElementState({
+                value: elementValueChange ? state.value : value,
+                valueChange: elementValueChange,
+                status: statusChange ? this.status() : status,
+                statusChange
+            });
         }
 
-        if (statusChanged) {
-            this.applyElementStatus();
-        }
-
-        if ((statusChanged || valueChanged) && (!options || !options.preventEvent)) {
+        if ((statusChange || valueChange) && (!options || !options.preventEvent)) {
             this.fireStateChange({status, value});
         }
 
-        return {valueChanged, statusChanged};
+        return {valueChange: valueChange, statusChange: statusChange};
     }
 
     private onElementChange(ev: CustomEvent) {
@@ -352,37 +305,76 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         this.validateImpl({trigger: "valueChange"});
     }
 
-    private applyElementValue() {
+    private applyElementState(state: {value: Value, valueChange: boolean, status: FormControlReadonlyStatus, statusChange: boolean}) {
+
+        // that should be an error?
+        if (!state.valueChange && !state.statusChange) {
+            console.warn("[ionx-form-control] apply element state only when something changed", new Error());
+            return;
+        }
 
         if (this.element$) {
+
+            // sync element's css classes
+            if (state.statusChange) {
+
+                const item = this.element$.closest("ion-item");
+                const formItem = this.element$.closest("ionx-form-item");
+
+                for (const key of ["dirty", "touched", "valid"]) {
+
+                    const status = state.status[key];
+                    const classes = [];
+
+                    classes.push(`ion-${key}`);
+
+                    if (key === "touched") {
+                        classes.push("ion-untouched");
+                    } else if (key === "dirty") {
+                        classes.push("ion-pristine");
+                    } else if (key === "valid") {
+                        classes.push("ion-invalid");
+                    }
+
+                    if (!status) {
+                        classes.reverse();
+                    }
+
+                    if (classes.length > 0) {
+                        for (const el of [this.element$, item, formItem]) {
+                            if (el) {
+                                el.classList.add(classes[0]);
+                                el.classList.remove(classes[1]);
+                            }
+                        }
+                    }
+                }
+            }
+
             const tagName = this.element$.tagName.toLowerCase();
 
-            if (tagName === "ion-input" || tagName === "ion-select" || tagName === "ion-textarea") {
-                (this.element$ as HTMLIonInputElement | HTMLIonSelectElement | HTMLIonTextareaElement).value = this.value$ as any;
-            } else if (tagName === "ion-checkbox") {
-                (this.element$ as HTMLIonCheckboxElement).checked = !!this.value$;
-            } else if (this.element$.applyFormValue) {
-                this.element$.applyFormValue(this.value$);
+            if (this.element$.applyFormState) {
+
+                try {
+                    this.element$.applyFormState(state);
+                } catch (error) {
+                    console.warn(`[ionx-form-control] unhandled error`, error);
+                }
+
+            } else {
+
+                if (state.valueChange) {
+                    if (tagName === "ion-input" || tagName === "ion-select" || tagName === "ion-textarea") {
+                        (this.element$ as HTMLIonInputElement | HTMLIonSelectElement | HTMLIonTextareaElement).value = this.value$ as any;
+                    } else if (tagName === "ion-checkbox") {
+                        (this.element$ as HTMLIonCheckboxElement).checked = !!this.value$;
+                    }
+                }
+
+                if (state.statusChange) {
+                    this.element$["disabled"] = state.status.disabled;
+                }
             }
-        }
-    }
-
-    private applyElementStatus(current?: FormControlReadonlyStatus) {
-
-        if (!current) {
-            current = this.status();
-        }
-
-        if (this.element$?.applyFormStatus) {
-
-            try {
-                this.element$.applyFormStatus(current);
-            } catch (error) {
-                console.warn(`[ionx-form-control] unhandled error`, error);
-            }
-
-        } else if (this.element$) {
-            this.element$["disabled"] = current.disabled;
         }
     }
 
