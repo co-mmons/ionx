@@ -197,6 +197,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     async validateImpl(options: {trigger: "valueChange" | "validate"}): Promise<boolean> {
 
+        this.validated$ = true;
+
         let error: FormValidationError;
 
         if (this.validators$) {
@@ -255,6 +257,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     private value$: Value;
 
     private error$: FormValidationError;
+
+    private validated$: boolean;
 
     private stateChanges = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
 
@@ -343,8 +347,13 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
                     if (classes.length > 0) {
                         for (const el of [this.element$, item, formItem]) {
                             if (el) {
-                                el.classList.add(classes[0]);
-                                el.classList.remove(classes[1]);
+
+                                if (key === "valid" && !this.validated$ && !state.status.dirty) {
+                                    el.classList.remove(...classes);
+                                } else {
+                                    el.classList.add(classes[0]);
+                                    el.classList.remove(classes[1]);
+                                }
                             }
                         }
                     }

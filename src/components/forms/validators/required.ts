@@ -1,3 +1,4 @@
+import {intl} from "@co.mmons/js-intl";
 import {FormControl} from "../FormControl";
 import {FormValidationError} from "../FormValidationError";
 
@@ -12,6 +13,6 @@ export async function required(control: FormControl) {
 
 export class RequiredError extends FormValidationError {
     constructor() {
-        super("Field is required");
+        super(intl.message`@ionx#forms/validators/RequiredError`);
     }
 }

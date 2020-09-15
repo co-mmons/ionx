@@ -7,8 +7,9 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
-import { FormController } from "./components/form/FormController";
-import { FormValidationError } from "./components/form/FormValidationError";
+import { FormController } from "./components/forms/FormController";
+import { FormControlState } from "./components/forms/FormControlState";
+import { FormValidationError } from "./components/forms/FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
 export namespace Components {
     interface IonRouter {
@@ -94,10 +95,11 @@ export namespace Components {
     interface IonxExpandingSearchbarParent {
     }
     interface IonxForm {
-        "controller": FormController;
+        "controller": FormController<any>;
     }
     interface IonxFormItem {
-        "error": string | FormValidationError | MessageRef;
+        "control"?: FormControlState;
+        "error"?: string | FormValidationError | MessageRef;
         /**
           * This attributes determines the background and border color of the form item. By default, items have a clear background and no border.
          */
@@ -393,9 +395,10 @@ declare namespace LocalJSX {
     interface IonxExpandingSearchbarParent {
     }
     interface IonxForm {
-        "controller": FormController;
+        "controller": FormController<any>;
     }
     interface IonxFormItem {
+        "control"?: FormControlState;
         "error"?: string | FormValidationError | MessageRef;
         /**
           * This attributes determines the background and border color of the form item. By default, items have a clear background and no border.

@@ -1,6 +1,6 @@
 import {FormValidator} from "./FormValidator";
 
-export interface FormControlBindOptions {
+export interface FormControlAttachOptions {
     validators?: FormValidator | FormValidator[];
     value?: any;
 }

@@ -1,5 +1,6 @@
 import {intl, MessageRef} from "@co.mmons/js-intl";
 import {Component, h, Host, Prop} from "@stencil/core";
+import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
 
 @Component({
@@ -17,7 +18,10 @@ export class FormItem {
     fill: "clear" | "solid" | "outline";
 
     @Prop()
-    error: string | FormValidationError | MessageRef;
+    control?: FormControlState;
+
+    @Prop()
+    error?: string | FormValidationError | MessageRef;
 
     get errorMessage() {
         if (typeof this.error === "string") {
@@ -28,6 +32,8 @@ export class FormItem {
             return intl.message(this.error);
         } else if (this.error) {
             return `${this.error}`;
+        } else if (this.control?.error) {
+            return this.control.error.message || this.control.error.name;
         }
     }
 
