@@ -1,37 +1,30 @@
 import {deepEqual} from "fast-equals";
-import {Observable, Subject} from "rxjs";
+import {Subject} from "rxjs";
 import {addEventListener, EventUnlisten} from "../dom";
 import {FormControl} from "./FormControl";
 import {FormControlElement} from "./FormControlElement";
-import {FormControlState} from "./FormControlState";
-import {FormControlStatus} from "./FormControlStatus";
+import {FormControlReadonlyState, FormControlState} from "./FormControlState";
+import {FormControlReadonlyStatus} from "./FormControlStatus";
 import {FormValidationError} from "./FormValidationError";
 import {FormValidator} from "./FormValidator";
+
+interface ApplyState {
+    touched?: boolean;
+    dirty?: boolean;
+    disabled?: boolean;
+    valid?: boolean;
+    value?: boolean;
+}
 
 export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     constructor(public readonly name: string) {
     }
 
-    private element$: HTMLElement & Partial<FormControlElement>;
 
-    private touched$ = false;
-
-    private dirty$ = false;
-
-    private disabled$ = false;
-
-    private valid$ = true;
-
-    private value$: Value;
-
-    private unlistenOnChange: EventUnlisten;
-
-    private unlistenOnFocus: EventUnlisten;
-
-    private validators$: FormValidator[];
-
-    private error$: FormValidationError;
+    //
+    // ------------ INTERFACE API -----------
+    //
 
     get touched() {
         return this.touched$;
@@ -77,53 +70,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         return this.error$;
     }
 
-    readonly valueChanges: Observable<Value> = new Subject();
-
-    readonly statusChanges: Observable<{current: FormControlStatus, previous: FormControlStatus}> = new Subject();
-
-
-    private setStatus(what: "touched" | "dirty" | "disabled" | "valid", value: boolean) {
-        console.debug(`[ionx-form-control] set "${this.name} status ${what} as ${value}`);
-
-        const status = this.status();
-        const was = !!status[what];
-
-        if (this.element$) {
-
-            const item = this.element$.closest("ion-item");
-            const formItem = this.element$.closest("ionx-form-item");
-
-            const classes = [];
-
-            if (what !== "disabled") {
-                classes.push(`ion-${what}`);
-
-                if (what === "touched") {
-                    classes.push("ion-untouched");
-                } else if (what === "dirty") {
-                    classes.push("ion-pristine");
-                } else if (what === "valid") {
-                    classes.push("ion-invalid");
-                }
-            }
-
-            if (!value) {
-                classes.reverse();
-            }
-
-            if (classes.length > 0) {
-                for (const el of [this.element$, item, formItem]) {
-                    if (el) {
-                        el.classList.add(classes[0]);
-                        el.classList.remove(classes[1]);
-                    }
-                }
-            }
-        }
-        if (was !== value) {
-            this[`${what}$`] = value;
-            this.fireStatusChange(status);
-        }
+    onStateChange(observer: (event: {current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}) => void) {
+        return this.stateChanges.subscribe(change => observer(change));
     }
 
     async focus(options?: FocusOptions) {
@@ -139,19 +87,19 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     }
 
     markAsDirty() {
-        this.setStatus("dirty", true);
+        this.applyState({dirty: true});
     }
 
     markAsTouched() {
-        this.setStatus("touched", true);
+        this.applyState({touched: true});
     }
 
     markAsUntouched() {
-        this.setStatus("touched", false);
+        this.applyState({touched: false});
     }
 
     markAsPristine() {
-        this.setStatus("dirty", false);
+        this.applyState({dirty: false});
     }
 
     setValidators(...validators: FormValidator[]) {
@@ -167,17 +115,87 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     }
 
     enable() {
-        this.setStatus("disabled", false);
+        this.applyState({disabled: false});
     }
 
     disable() {
-        this.setStatus("disabled", true);
+        this.applyState({disabled: true});
     }
 
     setValue(value: Value) {
 
         this.value$ = value;
-        this.applyValue();
+        this.applyElementValue();
+    }
+
+    async validate(): Promise<boolean> {
+        return this.validateImpl({trigger: "validate"});
+    }
+
+    status(): FormControlReadonlyStatus {
+        return {
+            dirty: this.dirty,
+            disabled: this.disabled,
+            enabled: this.enabled,
+            invalid: this.invalid,
+            pristine: this.pristine,
+            touched: this.touched,
+            untouched: this.untouched,
+            valid: this.valid,
+            error: this.error$
+        }
+    }
+
+    state(): FormControlReadonlyState {
+        return this.mutableState();
+    }
+
+
+    //
+    // ------------ INTERNAL API -----------
+    //
+
+    mutableState(): FormControlState {
+        return Object.assign({value: this.value}, this.status());
+    }
+
+    attach(element: HTMLElement) {
+
+        if (this.element$ !== element) {
+
+            if (this.element$) {
+                this.detach();
+            }
+
+            this.element$ = element;
+
+            this.unlistenOnChange = addEventListener(this.element$, this.element$.formValueChangeEventName || "ionChange", ev => this.onElementChange(ev as CustomEvent));
+
+            this.unlistenOnFocus = addEventListener(this.element$, this.element$.formTouchEventName || "ionFocus", () => this.markAsTouched());
+
+            this.applyElementStatus();
+            this.applyElementValue();
+        }
+
+    }
+
+    detach() {
+        if (this.element$) {
+            console.debug(`[ionx-form] detach control "${this.name}"`);
+
+            this.unlistenOnChange?.();
+            this.unlistenOnChange = undefined;
+
+            this.unlistenOnFocus?.();
+            this.unlistenOnFocus = undefined;
+        }
+    }
+
+    /**
+     * Doesn't fire change observers.
+     */
+    setState(state: FormControlState, options?: {preventEvent: boolean}) {
+        return this.applyState(state, options);
     }
 
     async validateImpl(options: {trigger: "valueChange" | "validate"}): Promise<boolean> {
@@ -207,69 +225,134 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
         if (error) {
             this.error$ = error;
-            this.setStatus("valid", false);
+            this.applyState({valid: false});
             return false;
         } else {
             this.error$ = undefined;
-            this.setStatus("valid", true);
+            this.applyState({valid: true});
             return true;
         }
     }
 
-    async validate(): Promise<boolean> {
-        return this.validateImpl({trigger: "validate"});
-    }
 
-    attach(element: HTMLElement) {
+    //
+    // ------------ PRIVATE API -----------
+    //
 
-        if (this.element$ !== element) {
+    private element$: HTMLElement & Partial<FormControlElement>;
 
-            if (this.element$) {
-                this.detach();
-            }
+    private unlistenOnChange: EventUnlisten;
 
-            this.element$ = element;
+    private unlistenOnFocus: EventUnlisten;
 
-            this.unlistenOnChange = addEventListener(this.element$, this.element$.formValueChangeEventName || "ionChange", ev => this.onChange(ev as CustomEvent));
+    private validators$: FormValidator[];
 
-            this.unlistenOnFocus = addEventListener(this.element$, this.element$.formTouchEventName || "ionFocus", () => this.markAsTouched());
+    private touched$ = false;
 
-            this.applyStatus();
-            this.applyValue();
-        }
+    private dirty$ = false;
 
-    }
+    private disabled$ = false;
 
-    detach() {
+    private valid$ = true;
+
+    private value$: Value;
+
+    private error$: FormValidationError;
+
+    private stateChanges = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
+
+    private applyState(state: ApplyState, options?: {preventEvent?: boolean, trigger?: "elementValueChange"}): {valueChanged: boolean, statusChanged: boolean} {
+        console.debug(`[ionx-form-control] apply "${this.name} state`, state);
+
+        // we need to know status and value before any change
+        const status = this.status();
+        const value = this.value$;
+
+        // sync element's css classes
+        // we do it without checking for a change in state
+        // to make sure, that element's ui matches state
         if (this.element$) {
-            console.debug(`[ionx-form] detach control "${this.name}"`);
 
-            this.unlistenOnChange?.();
-            this.unlistenOnChange = undefined;
+            let itemsSearched = false;
+            let item: HTMLIonItemElement = this.element$.closest("ion-item");
+            let formItem: HTMLIonxFormItemElement = this.element$.closest("ionx-form-item");
 
-            this.unlistenOnFocus?.();
-            this.unlistenOnFocus = undefined;
+            for (const key in state) {
+
+                if (key === "disabled" || key === "value") {
+                    continue;
+                }
+
+                if (!itemsSearched) {
+                    item = this.element$.closest("ion-item");
+                    formItem = this.element$.closest("ionx-form-item");
+                }
+
+                const classes = [];
+
+                classes.push(`ion-${key}`);
+
+                if (key === "touched") {
+                    classes.push("ion-untouched");
+                } else if (key === "dirty") {
+                    classes.push("ion-pristine");
+                } else if (key === "valid") {
+                    classes.push("ion-invalid");
+                }
+
+                if (!state[key]) {
+                    classes.reverse();
+                }
+
+                if (classes.length > 0) {
+                    for (const el of [this.element$, item, formItem]) {
+                        if (el) {
+                            el.classList.add(classes[0]);
+                            el.classList.remove(classes[1]);
+                        }
+                    }
+                }
+            }
         }
+
+        let statusChanged = false;
+        let valueChanged = false;
+
+        for (const key in state) {
+
+            if (!deepEqual(state[key], this[key])) {
+
+                if (key === "value") {
+                    valueChanged = true;
+                } else {
+                    statusChanged = true;
+                }
+
+                this[`${key}$`] = state[key];
+            }
+        }
+
+        if (valueChanged && (!options || options.trigger !== "elementValueChange")) {
+            this.applyElementValue();
+        }
+
+        if (statusChanged) {
+            this.applyElementStatus();
+        }
+
+        if ((statusChanged || valueChanged) && (!options || !options.preventEvent)) {
+            this.fireStateChange({status, value});
+        }
+
+        return {valueChanged, statusChanged};
     }
 
-    private onChange(ev: CustomEvent) {
-
-        const previous = this.value$;
-        this.value$ = ev.detail?.value;
-
-        this.markAsDirty();
-        this.fireValueChange(previous);
+    private onElementChange(ev: CustomEvent) {
+        this.applyState({dirty: true, value: ev.detail?.value}, {trigger: "elementValueChange"});
         this.validateImpl({trigger: "valueChange"});
     }
 
-    private fireValueChange(previous: Value) {
-
-        if (!deepEqual(previous, this.value$)) {
-            (this.valueChanges as Subject<Value>).next(this.value$);
-        }
-    }
-
-    private applyValue() {
+    private applyElementValue() {
 
         if (this.element$) {
             const tagName = this.element$.tagName.toLowerCase();
@@ -284,25 +367,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         }
     }
 
-    status(): FormControlStatus {
-        return {
-            dirty: this.dirty,
-            disabled: this.disabled,
-            enabled: this.enabled,
-            invalid: this.invalid,
-            pristine: this.pristine,
-            touched: this.touched,
-            untouched: this.untouched,
-            valid: this.valid,
-            error: this.error$
-        }
-    }
-
-    state(): FormControlState {
-        return Object.assign({value: this.value}, this.status());
-    }
-
-    private applyStatus(current?: FormControlStatus) {
+    private applyElementStatus(current?: FormControlReadonlyStatus) {
 
         if (!current) {
             current = this.status();
@@ -321,22 +386,31 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         }
     }
 
-    private fireStatusChange(previous: FormControlStatus) {
-        const current = this.status();
+    private fireStateChange(previous: {status?: FormControlReadonlyStatus, value?: Value}) {
+        const status = this.status();
 
-        console.debug(`[ionx-form-control] status of "${this.name}" changed`, current);
+        const statusChanged = !!("status" in previous && !deepEqual(previous.status, status));
+        const valueChanged = !!("value" in previous && !deepEqual(previous.value, this.value$));
 
-        this.applyStatus(current);
+        if (statusChanged || valueChanged) {
 
-        if (!deepEqual(previous, current)) {
-            (this.statusChanges as Subject<any>).next({current, previous});
+            console.debug(`[ionx-form-control] state of "${this.name}" changed`);
+
+            const previousStatus = "status" in previous ? previous.status : status;
+            const previousValue = "value" in previous ? previous.value : this.value$;
+
+            (this.stateChanges as Subject<any>).next({
+                current: Object.assign({value: this.value$}, status),
+                previous: Object.assign({value: previousValue}, previousStatus),
+                status: statusChanged,
+                value: valueChanged
+            });
         }
     }
 
     destroy() {
         this.detach();
-        (this.valueChanges as Subject<any>).complete();
-        (this.statusChanges as Subject<any>).complete();
+        (this.stateChanges as Subject<any>).complete();
     }
 
 }

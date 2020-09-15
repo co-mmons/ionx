@@ -1,13 +1,16 @@
 import {FormValidationError} from "./FormValidationError";
 
 export interface FormControlStatus {
-    readonly touched: boolean;
+    touched: boolean;
     readonly untouched: boolean;
-    readonly dirty: boolean;
+    dirty: boolean;
     readonly pristine: boolean;
-    readonly disabled: boolean;
+    disabled: boolean;
     readonly enabled: boolean;
-    readonly valid: boolean;
+    valid: boolean;
     readonly invalid: boolean;
-    readonly error: FormValidationError;
+    error: FormValidationError;
+}
+
+export interface FormControlReadonlyStatus extends Readonly<FormControlStatus> {
 }

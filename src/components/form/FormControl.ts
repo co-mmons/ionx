@@ -1,6 +1,6 @@
-import {Observable} from "rxjs";
-import {FormControlState} from "./FormControlState";
-import {FormControlStatus} from "./FormControlStatus";
+import {Subscription} from "rxjs";
+import {FormControlReadonlyState} from "./FormControlState";
+import {FormControlReadonlyStatus} from "./FormControlStatus";
 import {FormValidator} from "./FormValidator";
 
 export interface FormControl<Value = any> {
@@ -8,10 +8,6 @@ export interface FormControl<Value = any> {
     readonly name: string;
 
     readonly element: HTMLElement;
-
-    readonly valueChanges: Observable<Value>;
-
-    readonly statusChanges: Observable<{current: FormControlStatus, previous: FormControlStatus}>;
 
     readonly valid: boolean;
 
@@ -53,8 +49,10 @@ export interface FormControl<Value = any> {
 
     clearValidators(): void;
 
-    status(): FormControlStatus;
+    status(): FormControlReadonlyStatus;
 
-    state(): FormControlState;
+    state(): FormControlReadonlyState;
+
+    onStateChange(observer: (event: {current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}) => void): Subscription;
 
 }

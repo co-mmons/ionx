@@ -1,4 +1,4 @@
-import {FormControlState} from "./FormControlState";
+import {FormControlReadonlyState} from "./FormControlState";
 
 export interface FormState {
     readonly touched: boolean;
@@ -7,5 +7,5 @@ export interface FormState {
     readonly pristine: boolean;
     readonly valid: boolean;
     readonly invalid: boolean;
-    readonly controls?: {[name: string]: FormControlState};
+    readonly controls?: {[name: string]: FormControlReadonlyState};
 }

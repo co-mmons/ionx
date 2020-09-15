@@ -1,9 +1,10 @@
 import {ComponentInterface} from "@stencil/core";
 import {deepEqual} from "fast-equals";
-import {BehaviorSubject, Observable, Subject} from "rxjs";
+import {BehaviorSubject, Subject, Subscription} from "rxjs";
 import {FormControl} from "./FormControl";
 import {FormControlBindOptions} from "./FormControlBindOptions";
 import {FormControlImpl} from "./FormControlImpl";
+import {FormControlState} from "./FormControlState";
 import {FormState} from "./FormState";
 
 export interface FormControllerOptions {
@@ -33,6 +34,16 @@ export class FormController {
 
     controlNames() {
         return Object.keys(this.controls);
+    }
+
+    controlMutableStates() {
+        const states: {[controlName: string]: FormControlState} = {};
+
+        for (const control of this.controlList()) {
+            states[control.name] = (control as FormControlImpl).mutableState();
+        }
+
+        return states;
     }
 
     addControl(name: string, _value?: any) {
@@ -82,13 +93,16 @@ export class FormController {
             control.setValidators(...(Array.isArray(options.validators) ? options.validators : [options.validators]));
         }
 
-        control.statusChanges.subscribe(() => this.fireStateChange());
-        control.valueChanges.subscribe(() => this.fireStateChange());
+        control.onStateChange(() => this.fireStateChange());
 
         this.fireStateChange();
     }
 
-    readonly stateChanged: Observable<FormState> = new BehaviorSubject(this.state());
+    private stateChanged = new BehaviorSubject(this.state());
+
+    onStateChange(observer: (state: FormState) => void): Subscription {
+        return this.stateChanged.subscribe((state) => observer(state));
+    }
 
     state(): FormState {
 
@@ -124,6 +138,24 @@ export class FormController {
         }
 
         return state as FormState;
+    }
+
+    setStates(states: {[controlName: string]: FormControlState}) {
+
+        let anyChange = false;
+
+        for (const controlName in states) {
+            if (this.controls[controlName]) {
+                const {statusChanged, valueChanged} = (this.controls[controlName] as FormControlImpl).setState(states[controlName], {preventEvent: true});
+                if (statusChanged || valueChanged) {
+                    anyChange = true;
+                }
+            }
+        }
+
+        if (anyChange) {
+            this.fireStateChange();
+        }
     }
 
     private fireStateChange() {

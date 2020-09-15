@@ -21,19 +21,22 @@ export class FormTestPage implements ComponentInterface {
     }
 
     prepareForm() {
+
         if (!this.form || this.form.isDestroyed()) {
             this.form = new FormController(["firstName"], {owner: this});
-            this.form.stateChanged.subscribe(state => {
-                this.formState = state;
-                console.log("new state")
-            });
+
+            this.form.onStateChange(state => this.formState = state);
         }
-        console.log("eee");
-        for (const control of this.form.controlList()) {
-            if (control.name === "firstName") {
-                control.setValue("ahaha");
+
+        const states = this.form.controlMutableStates();
+
+        for (const controlName of this.form.controlNames()) {
+            if (controlName === "firstName") {
+                states[controlName].value = "ahaha";
             }
         }
+
+        this.form.setStates(states);
     }
 
     render() {
