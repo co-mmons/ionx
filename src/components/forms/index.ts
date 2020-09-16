@@ -1,6 +1,10 @@
-export {formGrid} from "./formGrid";
+export {FormControlAttachOptions} from "./FormControlAttachOptions";
+export {FormControlElement} from "./FormControlElement";
+export {FormController} from "./FormController";
+export {FormControlState, FormControlReadonlyState} from "./FormControlState";
+export {FormControlStatus, FormControlReadonlyStatus} from "./FormControlStatus";
 export {FormControl} from "./FormControl";
+export {formGrid} from "./formGrid";
 export {FormState} from "./FormState";
-export {FormController, FormControllerOptions} from "./FormController";
-export {FormControlReadonlyState} from "./FormControlState";
-export {FormControlReadonlyStatus} from "./FormControlStatus";
+export {FormValidationError} from "./FormValidationError";
+export {FormValidator, FormValidatorOptions} from "./FormValidator";

@@ -9,10 +9,6 @@ export class Form implements ComponentInterface {
     @Prop()
     controller!: FormController<any>;
 
-    disconnectedCallback() {
-        this.controller.destroy();
-    }
-
     render() {
         return <Host>
             <slot/>

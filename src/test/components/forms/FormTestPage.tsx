@@ -1,6 +1,5 @@
 import {Component, ComponentInterface, h, Host, State} from "@stencil/core";
-import {FormController, FormState} from "../../../components/forms";
-import {FormControlState} from "../../../components/forms/FormControlState";
+import {FormController, FormState, FormControlState} from "../../../components/forms";
 import {required} from "../../../components/forms/validators";
 
 @Component({
@@ -12,7 +11,7 @@ export class FormTestPage implements ComponentInterface {
     form = new FormController({
         firstName: {value: null as string, validators: [required]},
         lastName: {value: null as number}
-    });
+    }).bindStates(this);
 
     @State()
     formState: FormState;
@@ -27,9 +26,11 @@ export class FormTestPage implements ComponentInterface {
         this.prepareForm();
     }
 
-    prepareForm() {
+    disconnectedCallback() {
+        this.form.disconnect();
+    }
 
-        this.form.bindStates(this);
+    prepareForm() {
 
         const states = this.form.states();
 

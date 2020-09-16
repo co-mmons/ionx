@@ -1,6 +1,5 @@
-import {ComponentInterface} from "@stencil/core";
 import {deepEqual} from "fast-equals";
-import {BehaviorSubject, Subject, Subscription} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 import {FormControl} from "./FormControl";
 import {FormControlAttachOptions} from "./FormControlAttachOptions";
 import {FormControlImpl} from "./FormControlImpl";
@@ -8,21 +7,12 @@ import {FormControlState} from "./FormControlState";
 import {FormState} from "./FormState";
 import {FormValidator} from "./FormValidator";
 
-export interface FormControllerOptions {
-    owner?: ComponentInterface;
-    onStateChange?: (state: FormState) => void;
-}
-
 /**
  *
  */
 export class FormController<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}}> {
 
-    constructor(controls?: Controls, options?: FormControllerOptions) {
-
-        if (options?.onStateChange) {
-            this.onStateChange(options.onStateChange);
-        }
+    constructor(controls?: Controls) {
 
         if (controls) {
             for (const controlName of (Array.isArray(controls) ? controls : Object.keys(controls))) {
@@ -36,7 +26,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
 
     private stateChanged = new BehaviorSubject(this.state());
 
-    private destroyed = false;
+    // private disconnected = false;
 
     private bindHosts: Array<[any, {[controlName: string]: string}]> = [];
 
@@ -87,10 +77,10 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         }
     }
 
-    remove(controlName: (keyof Controls) | string) {
-        const control = this.controls[controlName];
+    remove(controlName: (keyof Controls) & string) {
+        const control = this.controls[controlName] as FormControlImpl;
         if (control) {
-            (control as any as FormControlImpl).destroy();
+            control.disconnect();
             delete this.controls[controlName];
             this.fireStateChange();
         }
@@ -249,7 +239,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
      * @param host
      * @param controls
      */
-    bindStates(host: any, controls?: string[] | {[controlName: string]: string}) {
+    bindStates(host: any, controls?: string[] | {[controlName: string]: string}): this {
 
         let bindRecord: [any, {[controlName: string]: string}];
 
@@ -273,17 +263,22 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         } else {
             bindRecord[1] = Object.keys(controls).length > 0 ? controls : undefined;
         }
-    }
 
-    isDestroyed() {
-        return this.destroyed;
+        return this;
     }
 
     /**
-     * Cleanups all the referencies to controls and closes subscribers.
+     * Detach all HTML elements from the form and closes all observables.
+     * Should be called within disconnectedCallback to free memory resource.
      */
-    destroy() {
-        (this.stateChanged as Subject<any>).complete();
-        this.destroyed = true;
+    disconnect() {
+
+        const lastState = this.stateChanged.value;
+        this.stateChanged.complete();
+        this.stateChanged = new BehaviorSubject(lastState);
+
+        for (const controlName in this.controls) {
+            (this.controls[controlName] as FormControlImpl).disconnect();
+        }
     }
 }

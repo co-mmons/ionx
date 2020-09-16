@@ -185,6 +185,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
             this.unlistenOnFocus?.();
             this.unlistenOnFocus = undefined;
+
+            this.element$ = undefined;
         }
     }
 
@@ -409,9 +411,11 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         }
     }
 
-    destroy() {
+    disconnect() {
         this.detach();
-        (this.stateChanges as Subject<any>).complete();
+
+        this.stateChanges.complete();
+        this.stateChanges = new Subject();
     }
 
 }
