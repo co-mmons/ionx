@@ -1,6 +1,6 @@
 import {Component, ComponentInterface, h, Host, State} from "@stencil/core";
-import {FormController, FormState, FormControlState} from "../../../components/forms";
-import {required} from "../../../components/forms/validators";
+import {FormController, FormControlState, FormState} from "../../../components/forms";
+import {minLength, required} from "../../../components/forms/validators";
 
 @Component({
     tag: "ionx-test-form",
@@ -9,9 +9,9 @@ import {required} from "../../../components/forms/validators";
 export class FormTestPage implements ComponentInterface {
 
     form = new FormController({
-        firstName: {value: null as string, validators: [required]},
+        firstName: {value: null as string, validators: [minLength(3)]},
         lastName: {value: null as number}
-    }).bindStates(this);
+    });
 
     @State()
     formState: FormState;
@@ -23,14 +23,19 @@ export class FormTestPage implements ComponentInterface {
     firstName: FormControlState<string>;
 
     connectedCallback() {
-        this.prepareForm();
+
+        this.form
+            .bindStates(this)
+            .onStateChange(state => this.formState = state);
+
+        this.prepareData();
     }
 
     disconnectedCallback() {
         this.form.disconnect();
     }
 
-    prepareForm() {
+    prepareData() {
 
         const states = this.form.states();
 
@@ -39,9 +44,6 @@ export class FormTestPage implements ComponentInterface {
                 states[controlName].value = "ahaha";
             }
         }
-
-        const names = this.form.names();
-        names.includes("l");
 
         this.form.setStates(states);
     }
@@ -53,17 +55,49 @@ export class FormTestPage implements ComponentInterface {
                 <ion-button onClick={() => this.test++}>up</ion-button>
                 <ion-button onClick={() => this.test--}>down</ion-button>
 
-                <ionx-form-item error={this.firstName?.error}>
+                <ion-grid>
 
-                    <ion-label position="stacked">No to jak?</ion-label>
+                    <ion-row>
 
-                    <ion-input placeholder="Sdsdsd" ref={this.form.attach("firstName")}/>
+                        <ion-col size-xs="12">
+                            <ionx-form-item control={this.firstName}>
 
-                </ionx-form-item>
+                                <ion-label position="stacked">First name</ion-label>
 
-                <ion-button onClick={() => this.form.validate()}>validate</ion-button>
+                                <ion-input ref={this.form.attach("firstName")}/>
 
-                <div>{this.firstName?.value}</div>
+                            </ionx-form-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12">
+                            <ionx-form-item error={this.formState?.controls.lastName.error}>
+
+                                <ion-label position="stacked">Last name</ion-label>
+
+                                <ion-input ref={this.form.attach("lastName")}/>
+
+                            </ionx-form-item>
+                        </ion-col>
+
+                        <ion-col size-xs="12">
+
+                            <ionx-form-item error={this.formState?.controls.placeOfBirth?.error}>
+
+                                <ion-label position="stacked">Place of birth {this.formState?.controls.placeOfBirth?.value}</ion-label>
+
+                                <ion-input ref={this.form.attach("placeOfBirth", {validators: [required]})}/>
+
+                            </ionx-form-item>
+
+                        </ion-col>
+
+                        <ion-col size-xs="12">
+                            <ion-button onClick={() => this.form.validate()}>validate</ion-button>
+                        </ion-col>
+
+                    </ion-row>
+
+                </ion-grid>
 
             </ion-content>
         </Host>;

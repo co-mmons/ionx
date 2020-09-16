@@ -26,8 +26,6 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
 
     private stateChanged = new BehaviorSubject(this.state());
 
-    // private disconnected = false;
-
     private bindHosts: Array<[any, {[controlName: string]: string}]> = [];
 
     /**
@@ -121,8 +119,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         }
 
         control.onStateChange(() => this.fireStateChange());
-
-        this.fireStateChange();
+        //
+        // this.fireStateChange();
     }
 
     onStateChange(observer: (state: FormState) => void): Subscription {
@@ -268,10 +266,12 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
     }
 
     /**
-     * Detach all HTML elements from the form and closes all observables.
+     * Detach all HTML elements from the form, closes all observables and unbind hosts.
      * Should be called within disconnectedCallback to free memory resource.
      */
     disconnect() {
+
+        this.bindHosts = [];
 
         const lastState = this.stateChanged.value;
         this.stateChanged.complete();

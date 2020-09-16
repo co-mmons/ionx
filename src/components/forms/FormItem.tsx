@@ -1,5 +1,5 @@
 import {intl, MessageRef} from "@co.mmons/js-intl";
-import {Component, h, Host, Prop} from "@stencil/core";
+import {Component, h, Host, Prop, State, Watch} from "@stencil/core";
 import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
 
@@ -21,19 +21,37 @@ export class FormItem {
     control?: FormControlState;
 
     @Prop()
-    error?: string | FormValidationError | MessageRef;
+    error?: string | FormValidationError | MessageRef | Error;
 
-    get errorMessage() {
+    @State()
+    errorMessage: string;
+
+    @Watch("control")
+    watchControl() {
+        this.buildErrorMessage();
+    }
+
+    @Watch("error")
+    watchError() {
+        this.buildErrorMessage();
+    }
+
+    buildErrorMessage() {
+
         if (typeof this.error === "string") {
-            return this.error;
+            this.errorMessage = this.error;
         } else if (this.error instanceof FormValidationError) {
-            return this.error.message;
+            this.errorMessage = this.error.message;
         } else if (this.error instanceof MessageRef) {
-            return intl.message(this.error);
+            this.errorMessage = intl.message(this.error);
+        } else if (this.error instanceof Error) {
+            this.errorMessage = `${this.error.message}` || intl.message`@ionx#forms/validators/InvalidValueError`;
         } else if (this.error) {
-            return `${this.error}`;
+            this.errorMessage =  intl.message`@ionx#forms/validators/InvalidValueError`;
         } else if (this.control?.error) {
-            return this.control.error.message || this.control.error.name;
+            this.errorMessage = this.control.error.message || intl.message`@ionx#forms/validators/InvalidValueError`;
+        } else {
+            this.errorMessage = undefined;
         }
     }
 
@@ -59,7 +77,7 @@ export class FormItem {
 
             <slot name="error"/>
 
-            {!!this.error && <div ionx--error>{this.errorMessage}</div>}
+            {!!this.errorMessage && <div ionx--error>{this.errorMessage}</div>}
 
             <slot name="hint"/>
 

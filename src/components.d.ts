@@ -99,7 +99,7 @@ export namespace Components {
     }
     interface IonxFormItem {
         "control"?: FormControlState;
-        "error"?: string | FormValidationError | MessageRef;
+        "error"?: string | FormValidationError | MessageRef | Error;
         /**
           * This attributes determines the background and border color of the form item. By default, items have a clear background and no border.
          */
@@ -399,7 +399,7 @@ declare namespace LocalJSX {
     }
     interface IonxFormItem {
         "control"?: FormControlState;
-        "error"?: string | FormValidationError | MessageRef;
+        "error"?: string | FormValidationError | MessageRef | Error;
         /**
           * This attributes determines the background and border color of the form item. By default, items have a clear background and no border.
          */
