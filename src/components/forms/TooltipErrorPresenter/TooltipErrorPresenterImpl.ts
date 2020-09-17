@@ -1,3 +1,4 @@
+import {isPlatform} from "@ionic/core";
 import {Subscription} from "rxjs";
 import tippy, {Instance as TippyInstance} from "tippy.js";
 import {FormControl} from "../FormControl";
@@ -23,7 +24,7 @@ export class TooltipErrorPresenterImpl implements FormValidationErrorPresenter {
             placement: "bottom",
             trigger: "manual",
             hideOnClick: true,
-            theme: "light-border"
+            theme: isPlatform("ios") ? "light-border" : "material"
         } as TooltipErrorPresenterOptions, this.options,{content: errorControl.error.message}));
 
         this.lastErrorSubscription = errorControl.stateChanges.subscribe(state => !(state.current.touched && state.previous.untouched) && this.dismiss(controller));
