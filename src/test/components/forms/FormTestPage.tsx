@@ -1,3 +1,4 @@
+import {intl, pushMessages} from "@co.mmons/js-intl";
 import {Component, ComponentInterface, h, Host, State} from "@stencil/core";
 import {FormController, FormControlState, FormState} from "../../../components/forms";
 import {minLength, required} from "../../../components/forms/validators";
@@ -24,6 +25,8 @@ export class FormTestPage implements ComponentInterface {
 
     connectedCallback() {
 
+        import(`../../../components/forms/intl/pl.json`).then(messages => pushMessages(intl.locale, "ionx/forms", messages.default));
+
         this.form
             .bindStates(this)
             .onStateChange(state => this.formState = state);
@@ -41,7 +44,6 @@ export class FormTestPage implements ComponentInterface {
 
         for (const controlName of this.form.names()) {
             if (controlName === "firstName") {
-                states[controlName].value = "ahaha";
             }
         }
 
@@ -55,49 +57,52 @@ export class FormTestPage implements ComponentInterface {
                 <ion-button onClick={() => this.test++}>up</ion-button>
                 <ion-button onClick={() => this.test--}>down</ion-button>
 
-                <ion-grid>
+                <ionx-form controller={this.form}>
+                    <ion-grid>
 
-                    <ion-row>
+                        <ion-row>
 
-                        <ion-col size-xs="12">
-                            <ionx-form-item control={this.firstName}>
+                            <ion-col size-xs="12">
+                                <ionx-form-item control={this.firstName}>
 
-                                <ion-label position="stacked">First name</ion-label>
+                                    <ion-label position="stacked">First name</ion-label>
 
-                                <ion-input ref={this.form.attach("firstName")}/>
+                                    <ion-input ref={this.form.attach("firstName")}/>
 
-                            </ionx-form-item>
-                        </ion-col>
+                                </ionx-form-item>
+                            </ion-col>
 
-                        <ion-col size-xs="12">
-                            <ionx-form-item error={this.formState?.controls.lastName.error}>
+                            <ion-col size-xs="12">
+                                <ionx-form-item error={this.formState?.controls.lastName?.error}>
 
-                                <ion-label position="stacked">Last name</ion-label>
+                                    <ion-label position="stacked">Last name</ion-label>
 
-                                <ion-input ref={this.form.attach("lastName")}/>
+                                    <ion-input ref={this.form.attach("lastName")}/>
 
-                            </ionx-form-item>
-                        </ion-col>
+                                </ionx-form-item>
+                            </ion-col>
 
-                        <ion-col size-xs="12">
+                            <ion-col size-xs="12">
 
-                            <ionx-form-item error={this.formState?.controls.placeOfBirth?.error}>
+                                <ionx-form-item error={this.formState?.controls.placeOfBirth?.error}>
 
-                                <ion-label position="stacked">Place of birth {this.formState?.controls.placeOfBirth?.value}</ion-label>
+                                    <ion-label position="stacked">Place of birth {this.formState?.controls.placeOfBirth?.value}</ion-label>
 
-                                <ion-input ref={this.form.attach("placeOfBirth", {validators: [required]})}/>
+                                    <ion-input ref={this.form.attach("placeOfBirth", {validators: [required]})}/>
 
-                            </ionx-form-item>
+                                </ionx-form-item>
 
-                        </ion-col>
+                            </ion-col>
 
-                        <ion-col size-xs="12">
-                            <ion-button onClick={() => this.form.validate()}>validate</ion-button>
-                        </ion-col>
+                            <ion-col size-xs="12">
+                                <ion-button onClick={() => this.form.validate()}>validate</ion-button>
+                            </ion-col>
 
-                    </ion-row>
+                        </ion-row>
 
-                </ion-grid>
+                    </ion-grid>
+
+                </ionx-form>
 
             </ion-content>
         </Host>;

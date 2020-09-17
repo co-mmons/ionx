@@ -5,7 +5,7 @@ import {FormValidationError} from "../FormValidationError";
 export function minLength(minLength: number) {
     return async function(control: FormControl<string>) {
         const value = control.value;
-        if (typeof value === "string" && value.length < minLength) {
+        if (typeof value !== "string" || value.length < minLength) {
             throw new MinLengthError(minLength);
         }
     }
@@ -13,6 +13,6 @@ export function minLength(minLength: number) {
 
 export class MinLengthError extends FormValidationError {
     constructor(minLength: number) {
-        super(intl.message("@ionx#forms/validators/MinLengthError", {length: minLength}));
+        super(intl.message("ionx/forms#validators/MinLengthError", {length: minLength}));
     }
 }

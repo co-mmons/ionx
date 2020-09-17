@@ -1,0 +1,5 @@
+{
+    "validators/InvalidValueError": "Hodnota je neplatná.",
+    "validators/MinLengthError": "{length, plural, =0 {Hodnota má příliš málo znaků.} =1 {Hodnota musí mít alespoň jeden znak.} few {Hodnota musí obsahovat alespoň # znaky.} other {Hodnota musí obsahovat nejméně # znaků.}}",
+    "validators/RequiredError": "Hodnota je povinná."
+}

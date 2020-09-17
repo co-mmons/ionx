@@ -1,0 +1,5 @@
+{
+    "validators/InvalidValueError": "The value is invalid.",
+    "validators/MinLengthError": "{length, plural, =0 {The value has too few characters.} =1 {The value must have at least one character.} other {The value must contain at least # characters.}}",
+    "validators/RequiredError": "The value is required."
+}

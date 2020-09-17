@@ -36,5 +36,12 @@
     "dependencies": {
         "fast-equals": "^2.0.0",
         "ts-error": "^1.0.6"
-    }
+    },
+    "intlBundleItems": [
+        {
+            "type": "message",
+            "path": "./src/components/forms/intl/{{LOCALE}}.json",
+            "module": "ionx/forms"
+        }
+    ]
 }

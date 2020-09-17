@@ -218,8 +218,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
 
     async validate(options?: {preventScroll?: boolean, preventFocus?: boolean}): Promise<boolean> {
 
-        for (const control of this.list()) {
-            if (!(await control.validate())) {
+        for (const control of this.orderedControls()) {
+            if (!(await control.validate()) && control.element) {
 
                 if (!options?.preventFocus) {
                     control.focus({preventScroll: options?.preventScroll});
@@ -230,6 +230,87 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         }
 
         return true;
+    }
+
+    /**
+     * Returns ordered (by the sequence of appearance in DOM) list of controls,
+     * when ordering is not available, controls will be ordered randomly
+     */
+    private orderedControls(): FormControl<Controls[keyof Controls]["value"] | any>[] {
+
+        let firstControl: FormControl;
+        const controls = [];
+
+        const allControls = [];
+        for (const controlName in this.controls) {
+            allControls.push(this.controls[controlName]);
+
+            if (!firstControl && this.controls[controlName].element) {
+                firstControl = this.controls[controlName];
+            }
+        }
+
+        ORDERED: if (firstControl) {
+
+            const getParents = (parents: HTMLElement[], el: HTMLElement) => (!!el.parentElement ? parents.push(el.parentElement) && getParents(parents, el.parentElement) : true) && parents;
+            const tree = getParents([], firstControl.element);
+
+            for (const controlName in this.controls) {
+
+                const control = this.controls[controlName];
+
+                if (control === firstControl || !control.element) {
+                    // omit controls without element
+                    continue;
+                }
+
+                let parent = control.element.parentElement;
+                if (!parent) {
+                    // no common parent
+                    break ORDERED;
+                }
+
+                let treeIndex = tree.indexOf(parent);
+                while (treeIndex < 0) {
+                    parent = parent.parentElement;
+
+                    if (!parent) {
+                        // no common parent
+                        break ORDERED;
+                    }
+
+                    treeIndex = tree.indexOf(parent);
+                }
+
+                tree.splice(0, treeIndex);
+            }
+
+            const topParent = tree.length > 0 ? tree[0] : undefined;
+
+            if (topParent) {
+
+                const elements = topParent.querySelectorAll("[ionx-form-control]");
+                for (let i = 0; i < elements.length; i++) {
+                    const control = this.controls[elements[i].getAttribute("ionx-form-control")];
+                    if (control) {
+                        controls.push(control);
+                    }
+                }
+
+                // add controls without elements
+                for (const control of allControls) {
+                    if (!controls.includes(control)) {
+                        controls.push(control);
+                    }
+                }
+            }
+        }
+
+        if (controls.length > 0) {
+            return controls;
+        }
+
+        return allControls;
     }
 
     /**

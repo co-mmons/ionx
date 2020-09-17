@@ -166,6 +166,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             }
 
             this.element$ = element;
+            this.element$.setAttribute("ionx-form-control", this.name);
 
             this.unlistenOnChange = addEventListener(this.element$, this.element$.formValueChangeEventName || "ionChange", ev => this.onElementChange(ev as CustomEvent));
 
@@ -186,6 +187,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             this.unlistenOnFocus?.();
             this.unlistenOnFocus = undefined;
 
+            this.element$.removeAttribute("ionx-form-control");
             this.element$ = undefined;
         }
     }

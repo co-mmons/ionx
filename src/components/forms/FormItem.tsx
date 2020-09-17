@@ -45,11 +45,11 @@ export class FormItem {
         } else if (this.error instanceof MessageRef) {
             this.errorMessage = intl.message(this.error);
         } else if (this.error instanceof Error) {
-            this.errorMessage = `${this.error.message}` || intl.message`@ionx#forms/validators/InvalidValueError`;
+            this.errorMessage = `${this.error.message}` || intl.message`ionx/forms#validators/InvalidValueError`;
         } else if (this.error) {
-            this.errorMessage =  intl.message`@ionx#forms/validators/InvalidValueError`;
+            this.errorMessage =  intl.message`ionx/forms#validators/InvalidValueError`;
         } else if (this.control?.error) {
-            this.errorMessage = this.control.error.message || intl.message`@ionx#forms/validators/InvalidValueError`;
+            this.errorMessage = this.control.error.message || intl.message`ionx/forms#validators/InvalidValueError`;
         } else {
             this.errorMessage = undefined;
         }
