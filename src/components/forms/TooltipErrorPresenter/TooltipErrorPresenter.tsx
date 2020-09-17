@@ -28,7 +28,7 @@ export class TooltipErrorPresenter implements ComponentInterface {
         }
 
         if (this.instance$) {
-            const form = this.element.closest<HTMLIonxFormElement>("ionx-form");
+            const form = this.element.closest<HTMLIonxFormControllerElement>("ionx-form-controller");
             if (form?.controller) {
                 form.controller.errorPresenter = this.instance$;
             }

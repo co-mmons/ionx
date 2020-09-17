@@ -11,7 +11,7 @@ import {FormValidator} from "./FormValidator";
 /**
  *
  */
-export class FormController<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}} = any> {
+export class FormControllerImpl<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}} = any> {
 
     constructor(controls?: Controls, options?: {errorHandler?: FormValidationErrorPresenter}) {
 

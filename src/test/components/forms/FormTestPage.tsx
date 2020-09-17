@@ -1,6 +1,6 @@
 import {intl, pushMessages} from "@co.mmons/js-intl";
 import {Component, ComponentInterface, h, Host, State} from "@stencil/core";
-import {FormController, FormControlState, FormState} from "../../../components/forms";
+import {FormControllerImpl, FormControlState, FormState} from "../../../components/forms";
 import {minLength, required} from "../../../components/forms/validators";
 
 @Component({
@@ -9,7 +9,7 @@ import {minLength, required} from "../../../components/forms/validators";
 })
 export class FormTestPage implements ComponentInterface {
 
-    form = new FormController({
+    form = new FormControllerImpl({
         firstName: {value: null as string, validators: [minLength(3)]},
         lastName: {value: null as number}
     });

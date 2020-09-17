@@ -1,7 +1,7 @@
 import {FormControl} from "./FormControl";
-import {FormController} from "./FormController";
+import {FormControllerImpl} from "./FormControllerImpl";
 
 export interface FormValidationErrorPresenter {
-    present(controller: FormController, errorControl: FormControl): Promise<void>;
-    dismiss(controller: FormController): Promise<void>;
+    present(controller: FormControllerImpl, errorControl: FormControl): Promise<void>;
+    dismiss(controller: FormControllerImpl): Promise<void>;
 }
