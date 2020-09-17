@@ -7,7 +7,7 @@ import {FormController} from "./FormController";
 export class Form implements ComponentInterface {
 
     @Prop()
-    controller!: FormController<any>;
+    controller!: FormController;
 
     render() {
         return <Host>

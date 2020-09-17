@@ -5,19 +5,24 @@ import {FormControlAttachOptions} from "./FormControlAttachOptions";
 import {FormControlImpl} from "./FormControlImpl";
 import {FormControlState} from "./FormControlState";
 import {FormState} from "./FormState";
+import {FormValidationErrorPresenter} from "./FormValidationErrorPresenter";
 import {FormValidator} from "./FormValidator";
 
 /**
  *
  */
-export class FormController<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}}> {
+export class FormController<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}} = any> {
 
-    constructor(controls?: Controls) {
+    constructor(controls?: Controls, options?: {errorHandler?: FormValidationErrorPresenter}) {
 
         if (controls) {
             for (const controlName of (Array.isArray(controls) ? controls : Object.keys(controls))) {
                 this.add(controlName, (!Array.isArray(controls) && controls[controlName]) || undefined);
             }
+        }
+
+        if (options?.errorHandler) {
+            this.errorPresenter$ = options.errorHandler;
         }
     }
 
@@ -27,6 +32,23 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
     private stateChanged = new BehaviorSubject(this.state());
 
     private bindHosts: Array<[any, {[controlName: string]: string}]> = [];
+
+    private errorPresenter$: FormValidationErrorPresenter;
+
+    set errorPresenter(presenter: FormValidationErrorPresenter) {
+        this.setErrorPresenter(presenter);
+    }
+
+    setErrorPresenter(errorHandler: FormValidationErrorPresenter): this {
+
+        if (this.errorPresenter$) {
+            this.errorPresenter$.dismiss(this);
+        }
+
+        this.errorPresenter$ = errorHandler;
+
+        return this;
+    }
 
     /**
      * Returns list of controls.
@@ -184,10 +206,14 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
     private fireStateChange(checkForChange = true) {
         const previous = this.stateChanged.getValue();
         const current = this.state();
-        // console.log(checkForChange, deepEqual(previous, current), current, previous);
+
         if (!checkForChange || (checkForChange && !deepEqual(previous, current))) {
             this.runBindHost(current);
             this.stateChanged.next(current);
+        }
+
+        if (current.valid) {
+            this.errorPresenter$?.dismiss(this);
         }
     }
 
@@ -225,9 +251,13 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
                     control.focus({preventScroll: options?.preventScroll});
                 }
 
+                this.errorPresenter$?.present(this, control);
+
                 return false;
             }
         }
+
+        this.errorPresenter$?.dismiss(this);
 
         return true;
     }

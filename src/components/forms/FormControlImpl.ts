@@ -1,5 +1,5 @@
 import {deepEqual} from "fast-equals";
-import {Subject} from "rxjs";
+import {Observable, Subject} from "rxjs";
 import {addEventListener, EventUnlisten} from "../dom";
 import {FormControl} from "./FormControl";
 import {FormControlElement} from "./FormControlElement";
@@ -70,8 +70,12 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         return this.error$;
     }
 
+    get stateChanges(): Observable<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}> {
+        return this.stateChanges$;
+    }
+
     onStateChange(observer: (event: {current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}) => void) {
-        return this.stateChanges.subscribe(change => observer(change));
+        return this.stateChanges$.subscribe(change => observer(change));
     }
 
     async focus(options?: FocusOptions) {
@@ -264,7 +268,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private validated$: boolean;
 
-    private stateChanges = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
+    private stateChanges$ = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
 
     private applyState(state: ApplyState, options?: {preventEvent?: boolean, trigger?: "elementValueChange"}): {valueChange: boolean, statusChange: boolean} {
         console.debug(`[ionx-form-control] apply "${this.name} state`, state);
@@ -416,8 +420,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     disconnect() {
         this.detach();
 
-        this.stateChanges.complete();
-        this.stateChanges = new Subject();
+        this.stateChanges$.complete();
+        this.stateChanges$ = new Subject();
     }
 
 }

@@ -6,5 +6,6 @@ export {FormControlStatus, FormControlReadonlyStatus} from "./FormControlStatus"
 export {FormControl} from "./FormControl";
 export {formGrid} from "./formGrid";
 export {FormState} from "./FormState";
+export {FormValidationErrorPresenter} from "./FormValidationErrorPresenter";
 export {FormValidationError} from "./FormValidationError";
 export {FormValidator, FormValidatorOptions} from "./FormValidator";

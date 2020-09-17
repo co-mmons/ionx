@@ -58,12 +58,15 @@ export class FormTestPage implements ComponentInterface {
                 <ion-button onClick={() => this.test--}>down</ion-button>
 
                 <ionx-form controller={this.form}>
+
+                    <ionx-form-tooltip-error-presenter/>
+
                     <ion-grid>
 
                         <ion-row>
 
                             <ion-col size-xs="12">
-                                <ionx-form-item control={this.firstName}>
+                                <ionx-form-item>
 
                                     <ion-label position="stacked">First name</ion-label>
 

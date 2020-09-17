@@ -11,6 +11,8 @@ import { FormController } from "./components/forms/FormController";
 import { FormControlState } from "./components/forms/FormControlState";
 import { FormValidationError } from "./components/forms/FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
+import { TooltipErrorPresenterImpl } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterImpl";
+import { TooltipErrorPresenterOptions } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterOptions";
 export namespace Components {
     interface IonRouter {
         /**
@@ -95,7 +97,7 @@ export namespace Components {
     interface IonxExpandingSearchbarParent {
     }
     interface IonxForm {
-        "controller": FormController<any>;
+        "controller": FormController;
     }
     interface IonxFormItem {
         "control"?: FormControlState;
@@ -105,6 +107,10 @@ export namespace Components {
          */
         "fill": "clear" | "solid" | "outline";
         "hint": string;
+    }
+    interface IonxFormTooltipErrorPresenter {
+        "instance"?: TooltipErrorPresenterImpl | false;
+        "options"?: TooltipErrorPresenterOptions;
     }
     interface IonxLoading {
         "dismiss": () => Promise<void>;
@@ -226,6 +232,12 @@ declare global {
         prototype: HTMLIonxFormItemElement;
         new (): HTMLIonxFormItemElement;
     };
+    interface HTMLIonxFormTooltipErrorPresenterElement extends Components.IonxFormTooltipErrorPresenter, HTMLStencilElement {
+    }
+    var HTMLIonxFormTooltipErrorPresenterElement: {
+        prototype: HTMLIonxFormTooltipErrorPresenterElement;
+        new (): HTMLIonxFormTooltipErrorPresenterElement;
+    };
     interface HTMLIonxLoadingElement extends Components.IonxLoading, HTMLStencilElement {
     }
     var HTMLIonxLoadingElement: {
@@ -309,6 +321,7 @@ declare global {
         "ionx-expanding-searchbar-parent": HTMLIonxExpandingSearchbarParentElement;
         "ionx-form": HTMLIonxFormElement;
         "ionx-form-item": HTMLIonxFormItemElement;
+        "ionx-form-tooltip-error-presenter": HTMLIonxFormTooltipErrorPresenterElement;
         "ionx-loading": HTMLIonxLoadingElement;
         "ionx-tags-input": HTMLIonxTagsInputElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
@@ -395,7 +408,7 @@ declare namespace LocalJSX {
     interface IonxExpandingSearchbarParent {
     }
     interface IonxForm {
-        "controller": FormController<any>;
+        "controller": FormController;
     }
     interface IonxFormItem {
         "control"?: FormControlState;
@@ -405,6 +418,10 @@ declare namespace LocalJSX {
          */
         "fill"?: "clear" | "solid" | "outline";
         "hint"?: string;
+    }
+    interface IonxFormTooltipErrorPresenter {
+        "instance"?: TooltipErrorPresenterImpl | false;
+        "options"?: TooltipErrorPresenterOptions;
     }
     interface IonxLoading {
         /**
@@ -474,6 +491,7 @@ declare namespace LocalJSX {
         "ionx-expanding-searchbar-parent": IonxExpandingSearchbarParent;
         "ionx-form": IonxForm;
         "ionx-form-item": IonxFormItem;
+        "ionx-form-tooltip-error-presenter": IonxFormTooltipErrorPresenter;
         "ionx-loading": IonxLoading;
         "ionx-tags-input": IonxTagsInput;
         "ionx-test-dialog": IonxTestDialog;
@@ -502,6 +520,7 @@ declare module "@stencil/core" {
             "ionx-expanding-searchbar-parent": LocalJSX.IonxExpandingSearchbarParent & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarParentElement>;
             "ionx-form": LocalJSX.IonxForm & JSXBase.HTMLAttributes<HTMLIonxFormElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
+            "ionx-form-tooltip-error-presenter": LocalJSX.IonxFormTooltipErrorPresenter & JSXBase.HTMLAttributes<HTMLIonxFormTooltipErrorPresenterElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
             "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
