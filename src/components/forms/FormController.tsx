@@ -1,10 +1,12 @@
-import {Component, ComponentInterface, h, Host, Prop} from "@stencil/core";
+import {Component, ComponentInterface, h, Host, Method, Prop} from "@stencil/core";
+import {FormControlAttachOptions} from "./FormControlAttachOptions";
 import {FormControllerImpl} from "./FormControllerImpl";
+import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormControllerPublicApi";
 
 @Component({
     tag: "ionx-form-controller"
 })
-export class FormController implements ComponentInterface {
+export class FormController implements ComponentInterface, FormControllerPublicApi {
 
     @Prop()
     controller!: FormControllerImpl;
@@ -16,6 +18,16 @@ export class FormController implements ComponentInterface {
      */
     @Prop()
     disconnect?: boolean = true;
+
+    @Method()
+    async attach(element: HTMLElement, name: string, options?: FormControlAttachOptions) {
+        this.controller.attach(element, name, options);
+    }
+
+    @Method()
+    validate(options?: FormControllerValidateOptions) {
+        return this.controller.validate(options);
+    }
 
     render() {
         return <Host>

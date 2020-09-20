@@ -1,6 +1,6 @@
 import {intl, pushMessages} from "@co.mmons/js-intl";
 import {Component, ComponentInterface, h, Host, State} from "@stencil/core";
-import {FormControllerImpl, FormControlState, FormState} from "../../../components/forms";
+import {FormController, FormControlState, FormState} from "../../../components/forms";
 import {minLength, required} from "../../../components/forms/validators";
 
 @Component({
@@ -9,7 +9,7 @@ import {minLength, required} from "../../../components/forms/validators";
 })
 export class FormTestPage implements ComponentInterface {
 
-    form = new FormControllerImpl({
+    form = new FormController({
         firstName: {value: null as string, validators: [minLength(3)]},
         lastName: {value: null as number}
     });
@@ -57,7 +57,7 @@ export class FormTestPage implements ComponentInterface {
                 <ion-button onClick={() => this.test++}>up</ion-button>
                 <ion-button onClick={() => this.test--}>down</ion-button>
 
-                <ionx-form controller={this.form}>
+                <ionx-form-controller controller={this.form} disconnect={false}>
 
                     <ionx-form-tooltip-error-presenter/>
 
@@ -105,7 +105,7 @@ export class FormTestPage implements ComponentInterface {
 
                     </ion-grid>
 
-                </ionx-form>
+                </ionx-form-controller>
 
             </ion-content>
         </Host>;

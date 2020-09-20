@@ -1,3 +1,4 @@
+import {HtmlString} from "@co.mmons/js-utils/core";
 import {OverlayEventDetail} from "@ionic/core";
 import {Component, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
 import {Subject} from "rxjs";
@@ -41,7 +42,7 @@ export class Dialog implements DialogOptions {
      * @inheritDoc
      */
     @Prop()
-    message?: string;
+    message?: string | HtmlString;
 
     /**
      * @inheritDoc

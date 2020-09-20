@@ -1,3 +1,4 @@
+import {HtmlString} from "@co.mmons/js-utils/core";
 import {DialogButton} from "./DialogButton";
 
 export interface DialogOptions {
@@ -12,7 +13,7 @@ export interface DialogOptions {
 
     componentProps?: {[prop: string]: any};
 
-    message?: string;
+    message?: string | HtmlString;
 
     messageComponent?: string;
 

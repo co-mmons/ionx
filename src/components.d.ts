@@ -6,8 +6,11 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
+import { HtmlString } from "@co.mmons/js-utils/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
-import { FormControllerImpl } from "./components/forms/FormController";
+import { FormControllerImpl } from "./components/forms/FormControllerImpl";
+import { FormControlAttachOptions } from "./components/forms/FormControlAttachOptions";
+import { FormControllerValidateOptions } from "./components/forms/FormControllerPublicApi";
 import { FormControlState } from "./components/forms/FormControlState";
 import { FormValidationError } from "./components/forms/FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
@@ -58,7 +61,7 @@ export namespace Components {
         /**
           * @inheritDoc
          */
-        "message"?: string;
+        "message"?: string | HtmlString;
         /**
           * @inheritDoc
          */
@@ -88,7 +91,7 @@ export namespace Components {
         "subheader"?: string;
     }
     interface IonxDialogMessage {
-        "message": string;
+        "message"?: string | HtmlString;
     }
     interface IonxExpandingSearchbar {
         "expand": () => Promise<void>;
@@ -96,8 +99,14 @@ export namespace Components {
     }
     interface IonxExpandingSearchbarParent {
     }
-    interface IonxForm {
+    interface IonxFormController {
+        "attach": (element: HTMLElement, name: string, options?: FormControlAttachOptions) => Promise<void>;
         "controller": FormControllerImpl;
+        /**
+          * If controller should be disconnected when component is disconnected from the DOM. By default is true, but you can set to false when you expect that form controller component can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).
+         */
+        "disconnect"?: boolean;
+        "validate": (options?: FormControllerValidateOptions) => Promise<boolean>;
     }
     interface IonxFormItem {
         "control"?: FormControlState;
@@ -220,11 +229,11 @@ declare global {
         prototype: HTMLIonxExpandingSearchbarParentElement;
         new (): HTMLIonxExpandingSearchbarParentElement;
     };
-    interface HTMLIonxFormElement extends Components.IonxForm, HTMLStencilElement {
+    interface HTMLIonxFormControllerElement extends Components.IonxFormController, HTMLStencilElement {
     }
-    var HTMLIonxFormElement: {
-        prototype: HTMLIonxFormElement;
-        new (): HTMLIonxFormElement;
+    var HTMLIonxFormControllerElement: {
+        prototype: HTMLIonxFormControllerElement;
+        new (): HTMLIonxFormControllerElement;
     };
     interface HTMLIonxFormItemElement extends Components.IonxFormItem, HTMLStencilElement {
     }
@@ -319,7 +328,7 @@ declare global {
         "ionx-dialog-message": HTMLIonxDialogMessageElement;
         "ionx-expanding-searchbar": HTMLIonxExpandingSearchbarElement;
         "ionx-expanding-searchbar-parent": HTMLIonxExpandingSearchbarParentElement;
-        "ionx-form": HTMLIonxFormElement;
+        "ionx-form-controller": HTMLIonxFormControllerElement;
         "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-form-tooltip-error-presenter": HTMLIonxFormTooltipErrorPresenterElement;
         "ionx-loading": HTMLIonxLoadingElement;
@@ -376,7 +385,7 @@ declare namespace LocalJSX {
         /**
           * @inheritDoc
          */
-        "message"?: string;
+        "message"?: string | HtmlString;
         /**
           * @inheritDoc
          */
@@ -400,15 +409,19 @@ declare namespace LocalJSX {
         "subheader"?: string;
     }
     interface IonxDialogMessage {
-        "message": string;
+        "message"?: string | HtmlString;
     }
     interface IonxExpandingSearchbar {
         "expanded"?: boolean;
     }
     interface IonxExpandingSearchbarParent {
     }
-    interface IonxForm {
+    interface IonxFormController {
         "controller": FormControllerImpl;
+        /**
+          * If controller should be disconnected when component is disconnected from the DOM. By default is true, but you can set to false when you expect that form controller component can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).
+         */
+        "disconnect"?: boolean;
     }
     interface IonxFormItem {
         "control"?: FormControlState;
@@ -489,7 +502,7 @@ declare namespace LocalJSX {
         "ionx-dialog-message": IonxDialogMessage;
         "ionx-expanding-searchbar": IonxExpandingSearchbar;
         "ionx-expanding-searchbar-parent": IonxExpandingSearchbarParent;
-        "ionx-form": IonxForm;
+        "ionx-form-controller": IonxFormController;
         "ionx-form-item": IonxFormItem;
         "ionx-form-tooltip-error-presenter": IonxFormTooltipErrorPresenter;
         "ionx-loading": IonxLoading;
@@ -518,7 +531,7 @@ declare module "@stencil/core" {
             "ionx-dialog-message": LocalJSX.IonxDialogMessage & JSXBase.HTMLAttributes<HTMLIonxDialogMessageElement>;
             "ionx-expanding-searchbar": LocalJSX.IonxExpandingSearchbar & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarElement>;
             "ionx-expanding-searchbar-parent": LocalJSX.IonxExpandingSearchbarParent & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarParentElement>;
-            "ionx-form": LocalJSX.IonxForm & JSXBase.HTMLAttributes<HTMLIonxFormElement>;
+            "ionx-form-controller": LocalJSX.IonxFormController & JSXBase.HTMLAttributes<HTMLIonxFormControllerElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-form-tooltip-error-presenter": LocalJSX.IonxFormTooltipErrorPresenter & JSXBase.HTMLAttributes<HTMLIonxFormTooltipErrorPresenterElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;

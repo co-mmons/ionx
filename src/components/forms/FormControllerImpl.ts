@@ -3,6 +3,7 @@ import {BehaviorSubject, Subscription} from "rxjs";
 import {FormControl} from "./FormControl";
 import {FormControlAttachOptions} from "./FormControlAttachOptions";
 import {FormControlImpl} from "./FormControlImpl";
+import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormControllerPublicApi";
 import {FormControlState} from "./FormControlState";
 import {FormState} from "./FormState";
 import {FormValidationErrorPresenter} from "./FormValidationErrorPresenter";
@@ -11,7 +12,7 @@ import {FormValidator} from "./FormValidator";
 /**
  *
  */
-export class FormControllerImpl<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}} = any> {
+export class FormControllerImpl<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}} = any> implements FormControllerPublicApi {
 
     constructor(controls?: Controls, options?: {errorHandler?: FormValidationErrorPresenter}) {
 
@@ -116,7 +117,7 @@ export class FormControllerImpl<Controls extends {[name: string]: {value?: any, 
         if (typeof elOrName === "string") {
             return (el: HTMLElement) => form.attachImpl(el, elOrName, nameOrOptions as FormControlAttachOptions);
         } else if (elOrName instanceof HTMLElement) {
-            this.attachImpl(elOrName, name, options);
+            this.attachImpl(elOrName, nameOrOptions as string, options);
         }
     }
 
@@ -242,7 +243,7 @@ export class FormControllerImpl<Controls extends {[name: string]: {value?: any, 
         }
     }
 
-    async validate(options?: {preventScroll?: boolean, preventFocus?: boolean}): Promise<boolean> {
+    async validate(options?: FormControllerValidateOptions): Promise<boolean> {
 
         for (const control of this.orderedControls()) {
             if (!(await control.validate()) && control.element) {

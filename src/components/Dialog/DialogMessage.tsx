@@ -1,3 +1,4 @@
+import {HtmlString} from "@co.mmons/js-utils/core";
 import {Component, Host, h, Prop} from "@stencil/core";
 
 @Component({
@@ -8,11 +9,12 @@ import {Component, Host, h, Prop} from "@stencil/core";
 export class DialogMessage {
 
     @Prop()
-    message!: string;
+    message?: string | HtmlString;
 
     render() {
         return <Host>
-            <div>{this.message}</div>
+            {this.message && (this.message instanceof HtmlString ? <div innerHTML={this.message.toString()}/> : <div>{this.message}</div>)}
+            <slot/>
         </Host>
     }
 
