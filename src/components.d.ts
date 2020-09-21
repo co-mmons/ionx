@@ -142,6 +142,8 @@ export namespace Components {
          */
         "type": "spinner" | "progress";
     }
+    interface IonxMasonryGrid {
+    }
     interface IonxTagsInput {
         "canBackspaceRemove": boolean;
         "canEnterAdd": boolean;
@@ -174,6 +176,8 @@ export namespace Components {
     interface IonxTestLazyLoad {
     }
     interface IonxTestLoading {
+    }
+    interface IonxTestMasonryGrid {
     }
     interface IonxTestRoot {
     }
@@ -263,6 +267,12 @@ declare global {
         prototype: HTMLIonxLoadingElement;
         new (): HTMLIonxLoadingElement;
     };
+    interface HTMLIonxMasonryGridElement extends Components.IonxMasonryGrid, HTMLStencilElement {
+    }
+    var HTMLIonxMasonryGridElement: {
+        prototype: HTMLIonxMasonryGridElement;
+        new (): HTMLIonxMasonryGridElement;
+    };
     interface HTMLIonxTagsInputElement extends Components.IonxTagsInput, HTMLStencilElement {
     }
     var HTMLIonxTagsInputElement: {
@@ -317,6 +327,12 @@ declare global {
         prototype: HTMLIonxTestLoadingElement;
         new (): HTMLIonxTestLoadingElement;
     };
+    interface HTMLIonxTestMasonryGridElement extends Components.IonxTestMasonryGrid, HTMLStencilElement {
+    }
+    var HTMLIonxTestMasonryGridElement: {
+        prototype: HTMLIonxTestMasonryGridElement;
+        new (): HTMLIonxTestMasonryGridElement;
+    };
     interface HTMLIonxTestRootElement extends Components.IonxTestRoot, HTMLStencilElement {
     }
     var HTMLIonxTestRootElement: {
@@ -349,6 +365,7 @@ declare global {
         "ionx-form-tooltip-error-presenter": HTMLIonxFormTooltipErrorPresenterElement;
         "ionx-lazy-load": HTMLIonxLazyLoadElement;
         "ionx-loading": HTMLIonxLoadingElement;
+        "ionx-masonry-grid": HTMLIonxMasonryGridElement;
         "ionx-tags-input": HTMLIonxTagsInputElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
         "ionx-test-dialog-content": HTMLIonxTestDialogContentElement;
@@ -358,6 +375,7 @@ declare global {
         "ionx-test-home": HTMLIonxTestHomeElement;
         "ionx-test-lazy-load": HTMLIonxTestLazyLoadElement;
         "ionx-test-loading": HTMLIonxTestLoadingElement;
+        "ionx-test-masonry-grid": HTMLIonxTestMasonryGridElement;
         "ionx-test-root": HTMLIonxTestRootElement;
         "ionx-test-tags-input": HTMLIonxTestTagsInputElement;
         "ionx-toggle-labels": HTMLIonxToggleLabelsElement;
@@ -474,6 +492,10 @@ declare namespace LocalJSX {
          */
         "type"?: "spinner" | "progress";
     }
+    interface IonxMasonryGrid {
+        "onDidFirstLayout"?: (event: CustomEvent<void>) => void;
+        "onDidLayout"?: (event: CustomEvent<void>) => void;
+    }
     interface IonxTagsInput {
         "canBackspaceRemove"?: boolean;
         "canEnterAdd"?: boolean;
@@ -507,6 +529,8 @@ declare namespace LocalJSX {
     }
     interface IonxTestLoading {
     }
+    interface IonxTestMasonryGrid {
+    }
     interface IonxTestRoot {
     }
     interface IonxTestTagsInput {
@@ -529,6 +553,7 @@ declare namespace LocalJSX {
         "ionx-form-tooltip-error-presenter": IonxFormTooltipErrorPresenter;
         "ionx-lazy-load": IonxLazyLoad;
         "ionx-loading": IonxLoading;
+        "ionx-masonry-grid": IonxMasonryGrid;
         "ionx-tags-input": IonxTagsInput;
         "ionx-test-dialog": IonxTestDialog;
         "ionx-test-dialog-content": IonxTestDialogContent;
@@ -538,6 +563,7 @@ declare namespace LocalJSX {
         "ionx-test-home": IonxTestHome;
         "ionx-test-lazy-load": IonxTestLazyLoad;
         "ionx-test-loading": IonxTestLoading;
+        "ionx-test-masonry-grid": IonxTestMasonryGrid;
         "ionx-test-root": IonxTestRoot;
         "ionx-test-tags-input": IonxTestTagsInput;
         "ionx-toggle-labels": IonxToggleLabels;
@@ -560,6 +586,7 @@ declare module "@stencil/core" {
             "ionx-form-tooltip-error-presenter": LocalJSX.IonxFormTooltipErrorPresenter & JSXBase.HTMLAttributes<HTMLIonxFormTooltipErrorPresenterElement>;
             "ionx-lazy-load": LocalJSX.IonxLazyLoad & JSXBase.HTMLAttributes<HTMLIonxLazyLoadElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
+            "ionx-masonry-grid": LocalJSX.IonxMasonryGrid & JSXBase.HTMLAttributes<HTMLIonxMasonryGridElement>;
             "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
             "ionx-test-dialog-content": LocalJSX.IonxTestDialogContent & JSXBase.HTMLAttributes<HTMLIonxTestDialogContentElement>;
@@ -569,6 +596,7 @@ declare module "@stencil/core" {
             "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
             "ionx-test-lazy-load": LocalJSX.IonxTestLazyLoad & JSXBase.HTMLAttributes<HTMLIonxTestLazyLoadElement>;
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
+            "ionx-test-masonry-grid": LocalJSX.IonxTestMasonryGrid & JSXBase.HTMLAttributes<HTMLIonxTestMasonryGridElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;
             "ionx-test-tags-input": LocalJSX.IonxTestTagsInput & JSXBase.HTMLAttributes<HTMLIonxTestTagsInputElement>;
             "ionx-toggle-labels": LocalJSX.IonxToggleLabels & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsElement>;

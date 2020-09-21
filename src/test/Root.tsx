@@ -8,7 +8,8 @@ const tests = [
     "loading",
     "tags-input",
     "form",
-    "lazy-load"
+    "lazy-load",
+    "masonry-grid"
 ];
 
 @Component({

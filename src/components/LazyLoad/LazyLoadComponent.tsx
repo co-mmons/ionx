@@ -1,4 +1,4 @@
-import {Component, Host, h, Element} from "@stencil/core";
+import {Component, Element, h, Host} from "@stencil/core";
 import {ExtendedContent} from "./ExtendedContent";
 import {LazyLoadController} from "./LazyLoadController";
 
@@ -36,7 +36,10 @@ export class LazyLoad {
     }
 
     onMutation(_mutations: MutationRecord[]) {
-        console.log(_mutations);
+        const content = this.element.closest<HTMLIonContentElement & ExtendedContent>("ion-content");
+        if (content && content.__ionxLazyLoad) {
+            content.__ionxLazyLoad.ensureLoaded();
+        }
     }
 
     disconnectedCallback() {

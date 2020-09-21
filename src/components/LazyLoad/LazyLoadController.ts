@@ -134,7 +134,7 @@ export class LazyLoadController {
             this.containers.push(container);
         }
 
-        this.checkItems();
+        this.ensureLoaded();
     }
 
     disconnectContainer(container: HTMLIonxLazyLoadElement) {
@@ -149,7 +149,7 @@ export class LazyLoadController {
         }
     }
 
-    checkItems(options?: {retryError?: boolean}) {
+    ensureLoaded(options?: {retryError?: boolean}) {
 
         if (options?.retryError) {
             const errors = this.content.getElementsByClassName(itemErrorCssClass);

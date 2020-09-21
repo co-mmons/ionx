@@ -23,6 +23,7 @@
         "tippy.js": "^6.2.6"
     },
     "devDependencies": {
+        "@capacitor/core": "^2.4.1",
         "@co.mmons/js-intl": "github:co-mmons/js-intl",
         "@co.mmons/js-utils": "github:co-mmons/js-utils",
         "@ionic/core": "^5.3.1",

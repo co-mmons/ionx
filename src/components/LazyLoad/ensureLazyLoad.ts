@@ -18,7 +18,7 @@ export function ensureLazyLoad(contentOrOptions: HTMLIonContentElement | EnsureL
 
     for (let i = 0; i < contentElements.length; i++) {
         if (contentElements[i].__ionxLazyLoad) {
-            contentElements[i].__ionxLazyLoad.checkItems({retryError: options?.retryError});
+            contentElements[i].__ionxLazyLoad.ensureLoaded({retryError: options?.retryError});
         }
     }
 }

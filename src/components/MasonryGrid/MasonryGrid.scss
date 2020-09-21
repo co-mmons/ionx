@@ -1,0 +1,15 @@
+:host {
+    display: block;
+    position: relative;
+    width: 100%;
+
+    //&:not([cascade]) {
+    //    height: auto !important;
+    //}
+}
+
+::slotted(*) {
+    position: absolute;
+    display: inline-block;
+
+}
