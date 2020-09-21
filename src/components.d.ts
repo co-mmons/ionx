@@ -121,6 +121,8 @@ export namespace Components {
         "instance"?: TooltipErrorPresenterImpl | false;
         "options"?: TooltipErrorPresenterOptions;
     }
+    interface IonxLazyLoad {
+    }
     interface IonxLoading {
         "dismiss": () => Promise<void>;
         /**
@@ -168,6 +170,8 @@ export namespace Components {
     interface IonxTestForm {
     }
     interface IonxTestHome {
+    }
+    interface IonxTestLazyLoad {
     }
     interface IonxTestLoading {
     }
@@ -247,6 +251,12 @@ declare global {
         prototype: HTMLIonxFormTooltipErrorPresenterElement;
         new (): HTMLIonxFormTooltipErrorPresenterElement;
     };
+    interface HTMLIonxLazyLoadElement extends Components.IonxLazyLoad, HTMLStencilElement {
+    }
+    var HTMLIonxLazyLoadElement: {
+        prototype: HTMLIonxLazyLoadElement;
+        new (): HTMLIonxLazyLoadElement;
+    };
     interface HTMLIonxLoadingElement extends Components.IonxLoading, HTMLStencilElement {
     }
     var HTMLIonxLoadingElement: {
@@ -295,6 +305,12 @@ declare global {
         prototype: HTMLIonxTestHomeElement;
         new (): HTMLIonxTestHomeElement;
     };
+    interface HTMLIonxTestLazyLoadElement extends Components.IonxTestLazyLoad, HTMLStencilElement {
+    }
+    var HTMLIonxTestLazyLoadElement: {
+        prototype: HTMLIonxTestLazyLoadElement;
+        new (): HTMLIonxTestLazyLoadElement;
+    };
     interface HTMLIonxTestLoadingElement extends Components.IonxTestLoading, HTMLStencilElement {
     }
     var HTMLIonxTestLoadingElement: {
@@ -331,6 +347,7 @@ declare global {
         "ionx-form-controller": HTMLIonxFormControllerElement;
         "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-form-tooltip-error-presenter": HTMLIonxFormTooltipErrorPresenterElement;
+        "ionx-lazy-load": HTMLIonxLazyLoadElement;
         "ionx-loading": HTMLIonxLoadingElement;
         "ionx-tags-input": HTMLIonxTagsInputElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
@@ -339,6 +356,7 @@ declare global {
         "ionx-test-expanding-searchbar": HTMLIonxTestExpandingSearchbarElement;
         "ionx-test-form": HTMLIonxTestFormElement;
         "ionx-test-home": HTMLIonxTestHomeElement;
+        "ionx-test-lazy-load": HTMLIonxTestLazyLoadElement;
         "ionx-test-loading": HTMLIonxTestLoadingElement;
         "ionx-test-root": HTMLIonxTestRootElement;
         "ionx-test-tags-input": HTMLIonxTestTagsInputElement;
@@ -436,6 +454,8 @@ declare namespace LocalJSX {
         "instance"?: TooltipErrorPresenterImpl | false;
         "options"?: TooltipErrorPresenterOptions;
     }
+    interface IonxLazyLoad {
+    }
     interface IonxLoading {
         /**
           * If loading element should fill available space and center content both h and v.
@@ -483,6 +503,8 @@ declare namespace LocalJSX {
     }
     interface IonxTestHome {
     }
+    interface IonxTestLazyLoad {
+    }
     interface IonxTestLoading {
     }
     interface IonxTestRoot {
@@ -505,6 +527,7 @@ declare namespace LocalJSX {
         "ionx-form-controller": IonxFormController;
         "ionx-form-item": IonxFormItem;
         "ionx-form-tooltip-error-presenter": IonxFormTooltipErrorPresenter;
+        "ionx-lazy-load": IonxLazyLoad;
         "ionx-loading": IonxLoading;
         "ionx-tags-input": IonxTagsInput;
         "ionx-test-dialog": IonxTestDialog;
@@ -513,6 +536,7 @@ declare namespace LocalJSX {
         "ionx-test-expanding-searchbar": IonxTestExpandingSearchbar;
         "ionx-test-form": IonxTestForm;
         "ionx-test-home": IonxTestHome;
+        "ionx-test-lazy-load": IonxTestLazyLoad;
         "ionx-test-loading": IonxTestLoading;
         "ionx-test-root": IonxTestRoot;
         "ionx-test-tags-input": IonxTestTagsInput;
@@ -534,6 +558,7 @@ declare module "@stencil/core" {
             "ionx-form-controller": LocalJSX.IonxFormController & JSXBase.HTMLAttributes<HTMLIonxFormControllerElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-form-tooltip-error-presenter": LocalJSX.IonxFormTooltipErrorPresenter & JSXBase.HTMLAttributes<HTMLIonxFormTooltipErrorPresenterElement>;
+            "ionx-lazy-load": LocalJSX.IonxLazyLoad & JSXBase.HTMLAttributes<HTMLIonxLazyLoadElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
             "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
@@ -542,6 +567,7 @@ declare module "@stencil/core" {
             "ionx-test-expanding-searchbar": LocalJSX.IonxTestExpandingSearchbar & JSXBase.HTMLAttributes<HTMLIonxTestExpandingSearchbarElement>;
             "ionx-test-form": LocalJSX.IonxTestForm & JSXBase.HTMLAttributes<HTMLIonxTestFormElement>;
             "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
+            "ionx-test-lazy-load": LocalJSX.IonxTestLazyLoad & JSXBase.HTMLAttributes<HTMLIonxTestLazyLoadElement>;
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;
             "ionx-test-tags-input": LocalJSX.IonxTestTagsInput & JSXBase.HTMLAttributes<HTMLIonxTestTagsInputElement>;

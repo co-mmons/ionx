@@ -7,7 +7,8 @@ const tests = [
     "expanding-searchbar",
     "loading",
     "tags-input",
-    "form"
+    "form",
+    "lazy-load"
 ];
 
 @Component({
