@@ -1,8 +1,9 @@
 import {Capacitor} from "@capacitor/core";
 import {sleep, waitTill} from "@co.mmons/js-utils/core";
-import {Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Listen} from "@stencil/core";
-import {Subscription} from "rxjs";
+import {Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Listen, Method} from "@stencil/core";
+import {addEventListener, EventUnlisten} from "../dom";
 import {ExtendedItemElement} from "./ExtendedItemElement";
+import {lineBreakAttribute} from "./lineBreak";
 
 @Component({
     tag: "ionx-masonry-grid",
@@ -17,12 +18,12 @@ export class MasonryGrid implements ComponentInterface {
     @Event()
     didFirstLayout: EventEmitter<void>;
 
-    didFirstRender$ = false;
+    didFirstLayout$ = false;
 
     @Event()
     didLayout: EventEmitter<void>;
 
-    laying: boolean;
+    busy: boolean;
 
     observer: MutationObserver;
 
@@ -47,13 +48,13 @@ export class MasonryGrid implements ComponentInterface {
 
     paused: boolean = false;
 
-    pauseSubscription: Subscription;
+    pauseUnlisten: EventUnlisten;
 
-    resumeSubscription: Subscription;
+    resumeUnlisten: EventUnlisten;
 
-    viewDidEnterUnlisten: Function;
+    viewDidEnterUnlisten: EventUnlisten;
 
-    get parentViewActive() {
+    isParentViewActive() {
         return !this.parentView?.classList.contains("ion-page-hidden");
     }
 
@@ -68,15 +69,16 @@ export class MasonryGrid implements ComponentInterface {
         return items;
     }
 
-    async doLayout(force: boolean = false) {
+    @Method()
+    async layout(force: boolean = false) {
 
         try {
-            await waitTill(() => !this.laying, 10, 5000);
+            await waitTill(() => !this.busy, 10, 5000);
         } catch {
             return;
         }
 
-        this.laying = true;
+        this.busy = true;
 
         try {
 
@@ -120,7 +122,7 @@ export class MasonryGrid implements ComponentInterface {
             // console.log("rebuild check",  items.length, this.lastItemsCount, doRender);
 
             // kolejkujemy renderowania jeżeli strona nie jest widoczna lub aplikacja w pauzie
-            QUEUE: if (!this.parentViewActive || this.paused) {
+            QUEUE: if (!this.isParentViewActive() || this.paused) {
                 this.queuedLayout = doLayout || this.element.getBoundingClientRect().width !== this.lastWidth;
 
                 // poczekajmy na skończenie animacji zmiany strony
@@ -129,13 +131,13 @@ export class MasonryGrid implements ComponentInterface {
                 if (!this.paused) {
                     for (let i = 0; i < 40; i++) {
                         await sleep(50);
-                        if (this.parentViewActive) {
+                        if (this.isParentViewActive()) {
                             break QUEUE;
                         }
                     }
                 }
 
-                this.laying = false;
+                this.busy = false;
 
                 return;
             }
@@ -162,19 +164,15 @@ export class MasonryGrid implements ComponentInterface {
             }
 
             // ok, możemy przystąpić do renderowania
-            RENDER: if (doLayout) {
+            LAYOUT: if (doLayout) {
                 // console.log("rebuild grid", container.getBoundingClientRect().width, this.lastWidth, window.innerWidth);
-
-                // dajmy czas złapać oddech Angularowi ;-)
-                // a tak na serio chodzi o problem z ExpressionChangedAfterItHasBeenCheckedError
-                await sleep(10);
 
                 // upewniamy się, że możemy renderować - kontener musi mieć jakąś szerokość
                 if (this.element.getBoundingClientRect().width === 0) {
                     try {
                         await waitTill(() => this.element.getBoundingClientRect().width > 0, undefined, 5000);
                     } catch {
-                        break RENDER;
+                        break LAYOUT;
                     }
                 }
 
@@ -183,6 +181,7 @@ export class MasonryGrid implements ComponentInterface {
                     if (!item.__ionxMasonryLaid) {
                         item.style.top = "0px";
                         item.style.left = "0px";
+                        item.style.display = "inline-block";
                     }
                 }
 
@@ -205,13 +204,14 @@ export class MasonryGrid implements ComponentInterface {
                 // a wg wysokości itemów
                 let sectionCascade = false;
 
-                const itemsPositions: { [index: number]: { left: number, top: number } } = {};
+                const itemsPositions: {[index: number]: {left: number, top: number}} = {};
 
                 const gridRect = this.element.getBoundingClientRect();
 
                 for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 
                     const item = items[itemIndex];
+                    const previous = itemIndex > 0 ? items[itemIndex - 1] : undefined;
 
                     if (!item.__ionxMasonryCache) {
                         item.__ionxMasonryCache = {};
@@ -228,7 +228,8 @@ export class MasonryGrid implements ComponentInterface {
                         item.__ionxMasonryCache.rect = item.getBoundingClientRect();
                     }
 
-                    const isNewSection = sectionItems.length === 0 || false /*item.newRow*/;
+                    const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after");
+                    const isNewSection = sectionItems.length === 0 || breakLine;
 
                     // element, pod którym mam być wstawiony ten element
                     // w przypadku nowej lini albo puste, albo element, który jest najbardziej wysunięty do dołu
@@ -241,10 +242,10 @@ export class MasonryGrid implements ComponentInterface {
 
                     } else if (!sectionCascade) {
 
-                        sibling = items[itemIndex - 1];
+                        sibling = previous;
 
                         // console.log(sibling.__ionxMasonryCache.rect.left - gridRect.left, sibling.__ionxMasonryCache.rect.width, item.__ionxMasonryCache.rect.width, gridRect.width);
-                        console.log((sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width), gridRect.width);
+                        // console.log((sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width), gridRect.width);
 
                         // nie ma już miejsca w pierwszej lini sekcji, trzeba zawijać i szukać itemu, pod którym jest miejsce
                         if (~~(sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width) > gridRect.width) {
@@ -279,15 +280,13 @@ export class MasonryGrid implements ComponentInterface {
 
                     itemsPositions[item.__ionxMasonryCache.index] = {left: itemLeft, top: itemTop};
 
-                    if (!isNewSection || true /* !item.newRow */) {
+                    if (!isNewSection || !breakLine) {
                         sectionItems.push(item);
                         sectionItems.sort(sortSectionItems);
                     }
 
                     // console.log(item, itemLeft, itemTop);
-
                     // console.log(itemTop, siblingRect?.height);
-
                     // if (sibling && itemLeft === itemsPositions[sibling["index"]].left && itemsPositions[sibling["index"]].top + siblingRect.height > itemTop) {
                     // console.log("error", item.element.innerText, itemTop, "sibling", sibling.element.innerText, itemsPositions[sibling["index"]].top, siblingRect.top, siblingRect.height);
                     // }
@@ -304,16 +303,12 @@ export class MasonryGrid implements ComponentInterface {
                 this.lastWidth = gridRect.width;
                 this.lastItemsCount = items.length;
 
-                // this.didRender.emit();
-                //
-                // if (!this.didFirstRender.isStopped) {
-                //     this.didFirstRender.emit();
-                //     this.didFirstRender.complete();
-                // }
+                this.didLayout.emit();
 
-                // if (this.lazyLoad) {
-                //     this.lazyLoad.revalidate();
-                // }
+                if (!this.didFirstLayout$) {
+                    this.didFirstLayout.emit();
+                    this.didFirstLayout$ = true;
+                }
 
                 if (Capacitor.platform === "ios") {
                     let scroll: HTMLElement = await this.content.getScrollElement();
@@ -324,9 +319,9 @@ export class MasonryGrid implements ComponentInterface {
             }
 
         } finally {
-            this.laying = false;
+            this.busy = false;
 
-            if (!this.parentViewActive || this.paused) {
+            if (!this.isParentViewActive() || this.paused) {
                 this.render();
             }
         }
@@ -352,9 +347,34 @@ export class MasonryGrid implements ComponentInterface {
             }
         }
 
-        // if (this.cascade) {
-            this.doLayout(true);
-        // }
+        this.layout(true);
+    }
+
+    viewPaused() {
+        this.paused = true;
+    }
+
+    viewResumed() {
+        this.paused = false;
+
+        if (this.queuedLayout) {
+            this.layout();
+        }
+    }
+
+    viewDidEnter() {
+        if (this.queuedLayout) {
+            this.render();
+        }
+    }
+
+    @Listen("visibilitychange", {target: "document"})
+    visibilityChanged() {
+        if (document.visibilityState == "hidden") {
+            this.viewPaused();
+        } else if (document.visibilityState == "visible") {
+            this.viewResumed();
+        }
     }
 
     onMutation(mutations: MutationRecord[]) {
@@ -363,15 +383,15 @@ export class MasonryGrid implements ComponentInterface {
 
             for (let i = 0; i < mutation.addedNodes.length; i++) {
                 if (mutation.addedNodes[i] instanceof HTMLElement) {
-                    this.doLayout();
-                    break;
+                    this.layout();
+                    return;
                 }
             }
 
             for (let i = 0; i < mutation.removedNodes.length; i++) {
                 if (mutation.removedNodes[i] instanceof HTMLElement) {
-                    this.doLayout();
-                    break;
+                    this.layout();
+                    return;
                 }
             }
         }
@@ -379,9 +399,22 @@ export class MasonryGrid implements ComponentInterface {
     }
 
     connectedCallback() {
+        this.init();
+    }
+
+    init() {
 
         this.content = this.element.closest("ion-content");
-        this.parentView = this.element.closest("ion-page");
+        this.parentView = this.element.closest(".ion-page");
+
+        if (!this.content || !this.parentView) {
+            setTimeout(() => this.init());
+            return;
+        }
+
+        this.pauseUnlisten = addEventListener(document, "pause", () => this.viewPaused());
+        this.resumeUnlisten = addEventListener(document, "resume", () => this.viewPaused());
+        this.viewDidEnterUnlisten = addEventListener(this.parentView, "ionViewDidEnter", () => this.viewDidEnter())
 
         this.observer = new MutationObserver(mutations => this.onMutation(mutations));
         this.observer.observe(this.element, {childList: true});
@@ -390,6 +423,18 @@ export class MasonryGrid implements ComponentInterface {
     disconnectedCallback() {
         this.observer.disconnect();
         this.observer = undefined;
+
+        this.content = undefined;
+        this.parentView = undefined;
+
+        this.pauseUnlisten();
+        this.pauseUnlisten = undefined;
+
+        this.resumeUnlisten();
+        this.resumeUnlisten = undefined;
+
+        this.viewDidEnterUnlisten();
+        this.viewDidEnterUnlisten = undefined;
     }
 
     render() {

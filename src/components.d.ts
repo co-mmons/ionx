@@ -16,6 +16,7 @@ import { FormValidationError } from "./components/forms/FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
 import { TooltipErrorPresenterImpl } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterImpl";
 import { TooltipErrorPresenterOptions } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterOptions";
+import { ExtendedItemElement } from "./components/MasonryGrid/ExtendedItemElement";
 export namespace Components {
     interface IonRouter {
         /**
@@ -143,6 +144,7 @@ export namespace Components {
         "type": "spinner" | "progress";
     }
     interface IonxMasonryGrid {
+        "layout": (force?: boolean) => Promise<void>;
     }
     interface IonxTagsInput {
         "canBackspaceRemove": boolean;

@@ -168,7 +168,8 @@ export class LazyLoadController {
     private init() {
 
         this.observer = new IntersectionObserver(entries => this.callback(entries), {
-            root: this.content
+            root: this.content,
+            threshold: 0.1,
         });
 
         this.items = this.content.getElementsByClassName("ionx-lazy-load-pending");

@@ -6,6 +6,9 @@ export interface ExtendedItemElement {
      */
     __ionxMasonryCache?: { index?: number, left?: number, top?: number, rect?: DOMRect };
 
+    /**
+     * If item was already laid on the grid.
+     */
     __ionxMasonryLaid?: boolean;
 
 }

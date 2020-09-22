@@ -26,6 +26,7 @@
         "@capacitor/core": "^2.4.1",
         "@co.mmons/js-intl": "github:co-mmons/js-intl",
         "@co.mmons/js-utils": "github:co-mmons/js-utils",
+        "@co.mmons/rxjs-utils": "github:co-mmons/rxjs-utils",
         "@ionic/core": "^5.3.1",
         "@stencil/core": "^2.0.1",
         "@stencil/forms": "github:adamdbradley/stencil-forms",
