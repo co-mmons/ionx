@@ -14,6 +14,8 @@
         background-position: center;
         background-size: cover;
 
-        @include ionx-loading-skeleton;
+        &.ionx-lazy-load-loading {
+            @include ionx-loading-skeleton;
+        }
     }
 }
