@@ -71,7 +71,7 @@ export class LazyLoadController {
                         const img = new Image();
                         img.addEventListener("error", onItemError);
                         img.addEventListener("load", onItemLoad);
-                        element.__lazyLoadSrc = img.src = src[lastSrcIndex + 1];
+                        // element.__lazyLoadSrc = img.src = src[lastSrcIndex + 1];
                     }
                 }
             }
