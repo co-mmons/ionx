@@ -12,6 +12,5 @@
 @import "../../components/styles/variables";
 @import "variables.css";
 
-@import "../../components/styles/input-autofill.scss";
-@import "../../components/styles/searchbar-flat.scss";
-@import "../../components/styles/loading-skeleton.scss";
+@import "../../components/Input/transparent-autofill";
+@import "../../components/Searchbar/flat";

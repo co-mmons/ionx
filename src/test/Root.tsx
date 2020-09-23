@@ -5,11 +5,12 @@ import "../components.d.ts";
 const tests = [
     "dialog",
     "expanding-searchbar",
-    "loading",
-    "tags-input",
     "form",
     "lazy-load",
-    "masonry-grid"
+    "loading",
+    "masonry-grid",
+    "select",
+    "tags-input"
 ];
 
 @Component({

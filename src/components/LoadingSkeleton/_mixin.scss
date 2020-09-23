@@ -1,20 +1,21 @@
-@keyframes ionx-loading-skeleton-animation {
-
-    from {
-        left: -100%;
-    }
-
-    to {
-        left: 100%;
-    }
-}
-
 @mixin ionx-loading-skeleton {
+
+    @keyframes ionx-loading-skeleton-animation {
+
+        from {
+            left: -100%;
+        }
+
+        to {
+            left: 100%;
+        }
+    }
+
     &:after {
         ---default-background-color: 150, 150, 150;
         ---default-foreground-color: 150, 150, 150;
-        ---background-color: var(--background-color, var(---default-background-color));
-        ---foreground-color: var(--foreground-color, var(---default-foreground-color));
+        ---background-color: var(--skeleton-background-color, var(---default-background-color));
+        ---foreground-color: var(--skeleton-foreground-color, var(---default-foreground-color));
 
         content: "";
         position: absolute;
@@ -26,8 +27,4 @@
         background: linear-gradient(90deg, rgba(var(---foreground-color), 0) 0%, rgba(var(---foreground-color), 0.2) 50%, rgba(var(---foreground-color), 0) 100%);
         animation: ionx-loading-skeleton-animation 1s ease-in-out infinite;
     }
-}
-
-.ionx-loading-skeleton {
-    @include ionx-loading-skeleton;
 }

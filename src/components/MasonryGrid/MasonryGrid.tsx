@@ -70,10 +70,10 @@ export class MasonryGrid implements ComponentInterface {
     }
 
     @Method()
-    async layout(force: boolean = false) {
+    async layout(options?: {force?: boolean, trigger?: "onresize"}) {
 
         try {
-            await waitTill(() => !this.busy, 10, 5000);
+            await waitTill(() => !this.busy, 10, 500);
         } catch {
             return;
         }
@@ -99,7 +99,7 @@ export class MasonryGrid implements ComponentInterface {
                 // }
 
                 // zmieniła się pozycja itemu albo wymuszony rendering
-                if (item.__ionxMasonryCache?.index !== i || force) {
+                if (item.__ionxMasonryCache?.index !== i || options?.force) {
                     item.__ionxMasonryLaid = false;
                 }
 
@@ -108,8 +108,21 @@ export class MasonryGrid implements ComponentInterface {
                     item.__ionxMasonryLaid = false;
                 }
 
-                if (!item.__ionxMasonryLaid || force) {
+                const rect = item.getBoundingClientRect();
+                if (item.__ionxMasonryCache?.rect?.width !== rect.width || item.__ionxMasonryCache?.rect?.height !== rect.height) {
+                    item.__ionxMasonryLaid = false;
+
+                    if (!item.__ionxMasonryCache) {
+                        item.__ionxMasonryCache = {rect};
+                    }
+                }
+
+                if (!item.__ionxMasonryLaid || options?.force) {
                     doLayout = true;
+                }
+
+                if (!item.__ionxMasonryLaid) {
+                    item.style.display = "none";
                 }
             }
 
@@ -146,7 +159,7 @@ export class MasonryGrid implements ComponentInterface {
 
             // podczas przekręcania urządzenia iOS mamy opóźnienie w uzyskaniu nowego rozmiaru okna
             // todo zweryfikować jak to działa
-            if (Capacitor.platform === "ios" && items.length > 0 && !doLayout && force && this.element.getBoundingClientRect().width === this.lastWidth) {
+            if (Capacitor.platform === "ios" && items.length > 0 && !doLayout && options?.force && this.element.getBoundingClientRect().width === this.lastWidth) {
                 for (let i = 0; i < 40; i++) {
                     await sleep(50);
                     if (this.element.getBoundingClientRect().width !== this.lastWidth) {
@@ -165,7 +178,7 @@ export class MasonryGrid implements ComponentInterface {
 
             // ok, możemy przystąpić do renderowania
             LAYOUT: if (doLayout) {
-                // console.log("rebuild grid", container.getBoundingClientRect().width, this.lastWidth, window.innerWidth);
+                // console.log("rebuild grid", this.element.getBoundingClientRect().width, this.lastWidth, window.innerWidth);
 
                 // upewniamy się, że możemy renderować - kontener musi mieć jakąś szerokość
                 if (this.element.getBoundingClientRect().width === 0) {
@@ -322,7 +335,9 @@ export class MasonryGrid implements ComponentInterface {
             this.busy = false;
 
             if (!this.isParentViewActive() || this.paused) {
-                this.render();
+                this.layout();
+            } else if (options?.trigger === "onresize") {
+                setTimeout(() => this.layout());
             }
         }
 
@@ -347,7 +362,7 @@ export class MasonryGrid implements ComponentInterface {
             }
         }
 
-        this.layout(true);
+        this.layout({force: true, trigger: "onresize"});
     }
 
     viewPaused() {
