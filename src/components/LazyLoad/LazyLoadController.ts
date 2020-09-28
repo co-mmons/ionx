@@ -15,7 +15,9 @@ export class LazyLoadController {
 
     private content: HTMLIonContentElement & ExtendedContent;
 
-    private observer: IntersectionObserver;
+    private intersectionObserver: IntersectionObserver;
+
+    private mutationObserver: MutationObserver;
 
     private items: HTMLCollectionOf<Element>;
 
@@ -85,7 +87,7 @@ export class LazyLoadController {
             element.removeEventListener("load", onItemLoad);
             element.removeEventListener("error", onItemError);
 
-            this.observer.unobserve(element);
+            this.intersectionObserver.unobserve(element);
         }
 
         const onItemError = (_ev: Event) => {
@@ -108,7 +110,7 @@ export class LazyLoadController {
             element.classList.remove(itemPendingCssClass, itemLoadingCssClass, itemErrorCssClass);
             styleParents(element, options?.styleParents);
 
-            this.observer.unobserve(element);
+            this.intersectionObserver.unobserve(element);
 
             target.removeEventListener("load", onItemLoad);
             target.removeEventListener("error", onItemError);
@@ -161,13 +163,16 @@ export class LazyLoadController {
         }
 
         for (let i = 0; i < this.items.length; i++) {
-            this.observer.observe(this.items[i]);
+            this.intersectionObserver.observe(this.items[i]);
         }
     }
 
     private init() {
 
-        this.observer = new IntersectionObserver(entries => this.callback(entries), {
+        this.mutationObserver = new MutationObserver(records => records.find(record => record.addedNodes) && this.ensureLoaded());
+        this.mutationObserver.observe(this.content, {subtree: true, childList: true});
+
+        this.intersectionObserver = new IntersectionObserver(entries => this.callback(entries), {
             root: this.content,
             threshold: 0.1,
         });
@@ -178,8 +183,11 @@ export class LazyLoadController {
     disconnect() {
         console.debug("[ionx-lazy-load] disconnect controller")
 
-        this.observer.disconnect();
-        this.observer = undefined;
+        this.intersectionObserver.disconnect();
+        this.intersectionObserver = undefined;
+
+        this.mutationObserver.disconnect();
+        this.mutationObserver = undefined;
 
         this.content.__ionxLazyLoad = undefined;
         this.content = undefined;

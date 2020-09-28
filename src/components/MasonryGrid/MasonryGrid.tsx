@@ -185,8 +185,8 @@ export class MasonryGrid implements ComponentInterface {
                 // resetujemy brudne itemy - ustawiamy pozycję na 0x0
                 for (const item of items) {
                     if (!item.__ionxMasonryLaid) {
-                        item.style.top = "0px";
-                        item.style.left = "0px";
+                        item.style.top = "-100%";
+                        item.style.left = "-100%";
                         item.style.display = "inline-block";
                         item.style.visibility = "hidden";
                     }
