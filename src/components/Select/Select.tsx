@@ -60,7 +60,7 @@ export class Select {
     checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
 
     @Event()
-    change: EventEmitter<any>;
+    ionChange: EventEmitter<any>;
 
     render() {
         return <Host>

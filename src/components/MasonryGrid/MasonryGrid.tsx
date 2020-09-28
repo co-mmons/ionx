@@ -1,7 +1,8 @@
 import {Capacitor} from "@capacitor/core";
 import {sleep, waitTill} from "@co.mmons/js-utils/core";
-import {Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Listen, Method} from "@stencil/core";
-import {addEventListener, EventUnlisten} from "../dom";
+import {Component, ComponentInterface, Element, h, Host, Listen, Method} from "@stencil/core";
+import {addEventListener, EventUnlisten, isHydrated, markAsReady} from "../dom";
+import {markAsUnready} from "../dom/readyStateChangeEvent";
 import {ExtendedItemElement} from "./ExtendedItemElement";
 import {lineBreakAttribute} from "./lineBreak";
 
@@ -14,14 +15,6 @@ export class MasonryGrid implements ComponentInterface {
 
     @Element()
     element: HTMLElement;
-
-    @Event()
-    didFirstLayout: EventEmitter<void>;
-
-    didFirstLayout$ = false;
-
-    @Event()
-    didLayout: EventEmitter<void>;
 
     busy: boolean;
 
@@ -195,6 +188,7 @@ export class MasonryGrid implements ComponentInterface {
                         item.style.top = "0px";
                         item.style.left = "0px";
                         item.style.display = "inline-block";
+                        item.style.visibility = "hidden";
                     }
                 }
 
@@ -233,7 +227,7 @@ export class MasonryGrid implements ComponentInterface {
                     item.__ionxMasonryCache.index = itemIndex;
 
                     // czekamy na hydrację
-                    while (item.querySelectorAll(":scope[hydratable]:not(.hydrated), :scope.hydratable:not(.hydrated), [hydratable]:not(.hydrated), .hydratable:not(.hydrated)").length > 0) {
+                    while (!isHydrated(item)) {
                         await sleep(10);
                     }
 
@@ -292,6 +286,7 @@ export class MasonryGrid implements ComponentInterface {
                     }
 
                     itemsPositions[item.__ionxMasonryCache.index] = {left: itemLeft, top: itemTop};
+                    item.style.visibility = "visible";
 
                     if (!isNewSection || !breakLine) {
                         sectionItems.push(item);
@@ -316,12 +311,7 @@ export class MasonryGrid implements ComponentInterface {
                 this.lastWidth = gridRect.width;
                 this.lastItemsCount = items.length;
 
-                this.didLayout.emit();
-
-                if (!this.didFirstLayout$) {
-                    this.didFirstLayout.emit();
-                    this.didFirstLayout$ = true;
-                }
+                markAsReady(this);
 
                 if (Capacitor.platform === "ios") {
                     let scroll: HTMLElement = await this.content.getScrollElement();
@@ -414,6 +404,8 @@ export class MasonryGrid implements ComponentInterface {
     }
 
     connectedCallback() {
+        markAsUnready(this);
+
         this.init();
     }
 
