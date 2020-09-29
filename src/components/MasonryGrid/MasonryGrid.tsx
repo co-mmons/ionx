@@ -66,8 +66,8 @@ export class MasonryGrid implements ComponentInterface {
     }
 
     @Method()
-    async markItemAsDirty(item: Element) {
-        const extended: Element & ExtendedItemElement = item;
+    async markItemAsDirty(item: HTMLElement) {
+        const extended: HTMLElement & ExtendedItemElement = item;
         extended.__ionxMasonryLaid = false;
         this.layout({force: true});
     }
