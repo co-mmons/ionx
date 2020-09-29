@@ -66,6 +66,13 @@ export class MasonryGrid implements ComponentInterface {
     }
 
     @Method()
+    async markItemAsDirty(item: Element) {
+        const extended: Element & ExtendedItemElement = item;
+        extended.__ionxMasonryLaid = false;
+        this.layout({force: true});
+    }
+
+    @Method()
     async layout(options?: {force?: boolean, trigger?: "onresize"}) {
 
         try {
@@ -190,7 +197,7 @@ export class MasonryGrid implements ComponentInterface {
                     if (!item.__ionxMasonryLaid) {
                         item.style.top = "-100%";
                         item.style.left = "-100%";
-                        item.style.display = "inline-block";
+                        item.style.display = "block";
                         item.style.visibility = "hidden";
                     }
                 }
