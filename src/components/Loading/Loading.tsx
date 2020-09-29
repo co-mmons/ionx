@@ -45,6 +45,9 @@ export class Loading implements LoadingOptions {
     @Prop()
     progressPercent?: number;
 
+    @Prop()
+    color?: string;
+
     get progressPercentVisible() {
         return typeof this.progressPercent === "number";
     }
@@ -73,14 +76,15 @@ export class Loading implements LoadingOptions {
 
             <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.fill ? "initial" : "1"}}>
 
-                {this.spinnerMode && <ion-spinner style={{marginRight: !!(this.header || this.message) && "8px"}}/>}
+                {this.spinnerMode && <ion-spinner color={this.color} style={{marginRight: !!(this.header || this.message) && "8px"}}/>}
 
                 {!!(this.header || this.message) && <div style={{flexBasis: this.progressMode && "100%", display: "flex", flexDirection: "column", justifyItems: "center"}}>
                     {this.header ? <h4 style={{"margin": "0px"}}>{this.header}</h4> : ""}
-                    {this.message ? <ion-text innerHTML={this.message}/> : ""}
+                    {this.message ? <ion-text color={this.color} innerHTML={this.message}/> : ""}
                 </div>}
 
                 {this.progressMode && <ion-progress-bar
+                    color={this.color}
                     style={{flexBasis: "100%", marginTop: !!(this.header || this.message) && "8px"}}
                     value={this.progressValue}
                     type={this.progressType}
@@ -88,7 +92,7 @@ export class Loading implements LoadingOptions {
 
                 {(!!this.progressMessage || this.progressPercentVisible) && <div style={{display: "flex", flex: "1", marginTop: "8px"}}>
 
-                    <ion-text innerHTML={this.progressMessage} style={{flex: "1"}}/>
+                    <ion-text color={this.color} innerHTML={this.progressMessage} style={{flex: "1"}}/>
 
                     {this.progressPercentVisible && <span style={{width: "60px", textAlign: "right"}}>{intl.percentFormat(this. progressPercent, {maximumFractionDigits: 0})}</span>}
 
