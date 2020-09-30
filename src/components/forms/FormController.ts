@@ -385,8 +385,9 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         return this;
     }
 
-    bindRenderer(component: {render: () => void}) {
+    bindRenderer(component: {render: () => void}): this {
         this.renderer = component;
+        return this;
     }
 
     /**
