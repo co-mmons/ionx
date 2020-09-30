@@ -86,8 +86,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         const exists = !!this.controls[controlName];
 
         if (!this.controls[controlName]) {
-            // @ts-ignore
-            this.controls[controlName] = new FormControlImpl(controlName);
+            (this.controls[controlName] as any) = new FormControlImpl(controlName);
+            this.controls[controlName].onStateChange(() => this.fireStateChange());
         }
 
         if (options?.validators) {
@@ -99,6 +99,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         } else if (!exists) {
             this.fireStateChange();
         }
+
+        return this.controls[controlName];
     }
 
     remove(controlName: (keyof Controls) & string) {
@@ -132,7 +134,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         }
 
         // @ts-ignore
-        const control = this.controls[name] ? this.controls[name] as FormControlImpl : (this.controls[name] = new FormControlImpl(name));
+        const control = this.controls[name] ? this.controls[name] as FormControlImpl : this.add(name) as FormControlImpl;
 
         if (control.element === el) {
             return;
@@ -143,8 +145,6 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         if (options && "validators" in options) {
             control.setValidators(...(Array.isArray(options.validators) ? options.validators : [options.validators]));
         }
-
-        control.onStateChange(() => this.fireStateChange());
         //
         // this.fireStateChange();
     }
@@ -212,6 +212,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         const current = this.state();
 
         if (!checkForChange || (checkForChange && !deepEqual(previous, current))) {
+            console.debug(`[ionx-form-controller] form state changed`, current);
+
             this.runBindHost(current);
 
             if (this.renderer) {
