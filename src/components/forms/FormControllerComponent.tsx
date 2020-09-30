@@ -1,15 +1,15 @@
 import {Component, ComponentInterface, h, Host, Method, Prop} from "@stencil/core";
 import {FormControlAttachOptions} from "./FormControlAttachOptions";
-import {FormControllerImpl} from "./FormControllerImpl";
+import {FormController} from "./FormController";
 import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormControllerPublicApi";
 
 @Component({
     tag: "ionx-form-controller"
 })
-export class FormController implements ComponentInterface, FormControllerPublicApi {
+export class FormControllerComponent implements ComponentInterface, FormControllerPublicApi {
 
     @Prop()
-    controller!: FormControllerImpl;
+    controller!: FormController;
 
     /**
      * If controller should be disconnected when component is disconnected from the DOM.

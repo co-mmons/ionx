@@ -1,3 +1,4 @@
+import {forceUpdate} from "@stencil/core";
 import {deepEqual} from "fast-equals";
 import {BehaviorSubject, Subscription} from "rxjs";
 import {FormControl} from "./FormControl";
@@ -12,7 +13,7 @@ import {FormValidator} from "./FormValidator";
 /**
  *
  */
-export class FormControllerImpl<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}} = any> implements FormControllerPublicApi {
+export class FormController<Controls extends {[name: string]: {value?: any, validators?: FormValidator[]}} = any> implements FormControllerPublicApi {
 
     constructor(controls?: Controls, options?: {errorHandler?: FormValidationErrorPresenter}) {
 
@@ -33,6 +34,8 @@ export class FormControllerImpl<Controls extends {[name: string]: {value?: any, 
     private stateChanged = new BehaviorSubject(this.state());
 
     private bindHosts: Array<[any, {[controlName: string]: string}]> = [];
+
+    private renderer: any;
 
     private errorPresenter$: FormValidationErrorPresenter;
 
@@ -210,6 +213,11 @@ export class FormControllerImpl<Controls extends {[name: string]: {value?: any, 
 
         if (!checkForChange || (checkForChange && !deepEqual(previous, current))) {
             this.runBindHost(current);
+
+            if (this.renderer) {
+                forceUpdate(this.renderer);
+            }
+
             this.stateChanged.next(current);
         }
 
@@ -377,6 +385,10 @@ export class FormControllerImpl<Controls extends {[name: string]: {value?: any, 
         return this;
     }
 
+    bindRenderer(component: {render: () => void}) {
+        this.renderer = component;
+    }
+
     /**
      * Detach all HTML elements from the form, closes all observables and unbind hosts.
      * Should be called within disconnectedCallback to free memory resource.
@@ -384,6 +396,7 @@ export class FormControllerImpl<Controls extends {[name: string]: {value?: any, 
     disconnect() {
 
         this.bindHosts = [];
+        this.renderer = undefined;
 
         const lastState = this.stateChanged.value;
         this.stateChanged.complete();

@@ -2,7 +2,7 @@ import {isPlatform} from "@ionic/core";
 import {Subscription} from "rxjs";
 import tippy, {Instance as TippyInstance} from "tippy.js";
 import {FormControl} from "../FormControl";
-import {FormControllerImpl} from "../FormControllerImpl";
+import {FormController} from "../FormController";
 import {FormValidationErrorPresenter} from "../FormValidationErrorPresenter";
 import {TooltipErrorPresenterOptions} from "./TooltipErrorPresenterOptions";
 
@@ -15,7 +15,7 @@ export class TooltipErrorPresenterImpl implements FormValidationErrorPresenter {
 
     private lastErrorSubscription: Subscription;
 
-    async present(controller: FormControllerImpl<any>, errorControl: FormControl<any>): Promise<void> {
+    async present(controller: FormController<any>, errorControl: FormControl<any>): Promise<void> {
 
         this.destroyTippy();
 
@@ -32,7 +32,7 @@ export class TooltipErrorPresenterImpl implements FormValidationErrorPresenter {
         this.instance.show();
     }
 
-    async dismiss(_controller: FormControllerImpl<any>): Promise<void> {
+    async dismiss(_controller: FormController<any>): Promise<void> {
         this.destroyTippy();
     }
 

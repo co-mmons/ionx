@@ -8,7 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
 import { HtmlString } from "@co.mmons/js-utils/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
-import { FormControllerImpl } from "./components/forms/FormControllerImpl";
+import { FormController } from "./components/forms/FormControllerImpl";
 import { FormControlAttachOptions } from "./components/forms/FormControlAttachOptions";
 import { FormControllerValidateOptions } from "./components/forms/FormControllerPublicApi";
 import { FormControlState } from "./components/forms/FormControlState";
@@ -102,7 +102,7 @@ export namespace Components {
     }
     interface IonxFormController {
         "attach": (element: HTMLElement, name: string, options?: FormControlAttachOptions) => Promise<void>;
-        "controller": FormControllerImpl;
+        "controller": FormController;
         /**
           * If controller should be disconnected when component is disconnected from the DOM. By default is true, but you can set to false when you expect that form controller component can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).
          */
@@ -455,7 +455,7 @@ declare namespace LocalJSX {
     interface IonxExpandingSearchbarParent {
     }
     interface IonxFormController {
-        "controller": FormControllerImpl;
+        "controller": FormController;
         /**
           * If controller should be disconnected when component is disconnected from the DOM. By default is true, but you can set to false when you expect that form controller component can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).
          */
