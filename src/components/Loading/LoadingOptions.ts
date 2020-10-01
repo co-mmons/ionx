@@ -12,4 +12,6 @@ export interface LoadingOptions {
     progressValue?: number;
     progressBuffer?: number;
     progressPercent?: number;
+
+    backdropVisible?: boolean;
 }

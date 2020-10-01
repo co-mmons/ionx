@@ -1,6 +1,8 @@
 :host {
     display: flex;
     align-items: center;
+    --backdrop-color: 255, 255, 255;
+    --backdrop-opacity: 0.8;
 }
 
 :host-context(:host[fill]) {
@@ -11,4 +13,8 @@
     align-content: center;
     justify-items: center;
     justify-content: center;
+}
+
+:host-context(:host.ionx--backdrop-visible) {
+    background-color: rgba(var(--backdrop-color), var(--backdrop-opacity));
 }

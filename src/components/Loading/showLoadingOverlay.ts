@@ -6,10 +6,11 @@ export async function showLoadingOverlay(options: LoadingOptions) {
     const popover = await popoverController.create({
         animated: false,
         cssClass: "ionx-popover-flex",
+        showBackdrop: options?.backdropVisible || false,
         backdropDismiss: false,
         keyboardClose: false,
         component: "ionx-loading",
-        componentProps: Object.assign({type: "spinner"} as LoadingOptions, options)
+        componentProps: Object.assign({type: "spinner"} as LoadingOptions, options, {backdropVisible: false})
     });
 
     const wrapper = popover.querySelector<HTMLElement>(".popover-content");

@@ -38,13 +38,13 @@ export function isReady(elementOrComponent: Element | {element: Element}, option
     }
 
     if (!options?.noChildrenCheck) {
-        return checkChildrenReady(element, options);
+        return isChildrenReady(element, options);
     }
 
     return true;
 }
 
-export function checkChildrenReady(element: Element, options?: {noShadowCheck?: boolean}) {
+export function isChildrenReady(element: Element, options?: {noShadowCheck?: boolean}) {
 
     if (element.querySelector(notReadySelector)) {
         return false;

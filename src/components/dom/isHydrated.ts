@@ -1,6 +1,6 @@
 import {hydratablePrefixes, hydratableTagNames} from "./hydratables";
 
-const notHydratedSelector = ":not(.hydrated):not(div):not(span):not(slot):not(a):not(img):not(input)"
+const notHydratedSelector = ":not(.hydrated):not(div):not(span):not(slot):not(a):not(img):not(input)";
 
 export function isHydrated(element: Element, options?: {noChildrenCheck?: boolean, noShadowCheck?: boolean}) {
 
@@ -9,13 +9,13 @@ export function isHydrated(element: Element, options?: {noChildrenCheck?: boolea
     }
 
     if (!options?.noChildrenCheck) {
-        return checkChildrenHydrated(element, options);
+        return isChildrenHydrated(element, options);
     }
 
     return true;
 }
 
-export function checkChildrenHydrated(element: Element, options?: {noShadowCheck?: boolean}) {
+export function isChildrenHydrated(element: Element, options?: {noShadowCheck?: boolean}) {
 
     const children = element.querySelectorAll(notHydratedSelector);
 

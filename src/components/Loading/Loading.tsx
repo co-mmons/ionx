@@ -19,6 +19,9 @@ export class Loading implements LoadingOptions {
     fill?: boolean;
 
     @Prop()
+    backdropVisible?: boolean;
+
+    @Prop()
     header?: string;
 
     @Prop()
@@ -72,7 +75,7 @@ export class Loading implements LoadingOptions {
     }
 
     render() {
-        return <Host>
+        return <Host class={{"ionx--backdrop-visible": this.backdropVisible}}>
 
             <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.fill ? "initial" : "1"}}>
 

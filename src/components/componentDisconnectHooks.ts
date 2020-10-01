@@ -41,6 +41,11 @@ export function addComponentDisconnectHook(component: any, hookName: string, hoo
 }
 
 function disconnectHook(component: ComponentInterface, hookName: string) {
+
+    if (!component[hooksProperty]) {
+        return;
+    }
+
     const hook = component[hooksProperty][hookName];
     if (hook) {
         console.debug(`[ionx/componentDisconnectHooks] disconnected hook "${hookName}"`);
@@ -52,8 +57,14 @@ function disconnectHook(component: ComponentInterface, hookName: string) {
             console.warn("[componentDisconnectHooks] error when disconnecting hook", e);
         }
     }
+
+    return hook;
 }
 
 export function getComponentDisconnectHook<T extends ComponentDisconnectHook>(component: ComponentInterface, hookName: string): T {
     return component?.[hooksProperty]?.[hookName];
+}
+
+export function removeComponentDisconnectHook<T extends ComponentDisconnectHook>(component: ComponentInterface, hookName: string): T {
+    return disconnectHook(component, hookName);
 }

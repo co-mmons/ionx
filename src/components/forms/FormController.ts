@@ -39,6 +39,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
 
     private errorPresenter$: FormValidationErrorPresenter;
 
+    private lastState: Omit<FormState, "controls">;
+
     set errorPresenter(presenter: FormValidationErrorPresenter) {
         this.setErrorPresenter(presenter);
     }
@@ -153,6 +155,14 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         return this.stateChanged.subscribe((state) => observer(state));
     }
 
+    get dirty() {
+        return this.lastState?.dirty || false;
+    }
+
+    get valid() {
+        return this.lastState ? this.lastState.valid : false;
+    }
+
     state(): FormState {
 
         const state = {
@@ -210,6 +220,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
     private fireStateChange(checkForChange = true) {
         const previous = this.stateChanged.getValue();
         const current = this.state();
+
+        this.lastState = Object.assign({}, current, {controls: undefined});
 
         if (!checkForChange || (checkForChange && !deepEqual(previous, current))) {
             console.debug(`[ionx-form-controller] form state changed`, current);
