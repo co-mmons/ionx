@@ -37,15 +37,21 @@
     }
 
     &[fill=solid] > ion-item {
-        --padding-start: 16px;
-        --padding-end: 16px;
-        --inner-padding-end: 0px;
+        --padding-start: var(--item-padding-start, 16px);
+        --padding-end: var(--item-padding-end, 16px);
+        --inner-padding-start: var(--item-inner-padding-start, 0px);
+        --inner-padding-end: var(--item-inner-padding-end, 0px);
         --background: var(--solid-background-color);
         --border-width: 0px 0px var(--ionx-border-width, 1px) 0px;
         --border-radius: var(--ionx-border-radius, 4px) var(--ionx-border-radius, 4px) 0px 0px;
         --inner-border-width: 0px;
         --full-highlight-height: 2px;
     }
+}
+
+::slotted(ion-label) {
+    padding-left: var(--label-padding-start, 0px);
+    padding-right: var(--label-padding-end, 0px);
 }
 
 ::slotted(ion-input) {

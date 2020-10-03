@@ -93,7 +93,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         }
 
         if (options?.validators) {
-            this.controls[controlName].setValidators(...options.validators);
+            this.controls[controlName].setValidators(options.validators);
         }
 
         if (options && "value" in options) {
@@ -145,7 +145,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         control.attach(el);
 
         if (options && "validators" in options) {
-            control.setValidators(...(Array.isArray(options.validators) ? options.validators : [options.validators]));
+            control.setValidators(Array.isArray(options.validators) ? options.validators : [options.validators]);
         }
         //
         // this.fireStateChange();

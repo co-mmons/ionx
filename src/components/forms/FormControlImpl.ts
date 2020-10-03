@@ -106,8 +106,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         this.applyState({dirty: false});
     }
 
-    setValidators(...validators: FormValidator[]) {
-        this.validators$ = validators;
+    setValidators(validators: FormValidator | FormValidator[]) {
+        this.validators$ = Array.isArray(validators) ? validators : (validators ? [validators] : []);
     }
 
     getValidators() {
@@ -383,7 +383,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
                 if (state.valueChange) {
                     if (tagName === "ion-input" || tagName === "ion-select" || tagName === "ion-textarea") {
                         (this.element$ as HTMLIonInputElement | HTMLIonSelectElement | HTMLIonTextareaElement).value = this.value$ as any;
-                    } else if (tagName === "ion-checkbox") {
+                    } else if (tagName === "ion-checkbox" || tagName === "ion-toggle") {
                         (this.element$ as HTMLIonCheckboxElement).checked = !!this.value$;
                     }
                 }

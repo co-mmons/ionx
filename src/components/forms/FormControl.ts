@@ -50,7 +50,7 @@ export interface FormControl<Value = any> {
 
     validate(): Promise<boolean>;
 
-    setValidators(...validators: FormValidator[]);
+    setValidators(validators: FormValidator | FormValidator[]);
 
     clearValidators(): void;
 
