@@ -21,6 +21,11 @@ export class MasonryGrid implements ComponentInterface {
 
     busy: boolean;
 
+    /**
+     * If at least one layout call is waiting.
+     */
+    waiting: boolean;
+
     observer: MutationObserver;
 
     /**
@@ -75,12 +80,18 @@ export class MasonryGrid implements ComponentInterface {
     @Method()
     async layout(options?: {force?: boolean, trigger?: "onresize"}) {
 
-        try {
-            await waitTill(() => !this.busy, 10, 500);
-        } catch {
-            return;
+        while (this.busy) {
+
+            if (this.waiting) {
+                return;
+            }
+
+            this.waiting = true;
+
+            await sleep(10);
         }
 
+        this.waiting = false;
         this.busy = true;
 
         try {
@@ -90,6 +101,7 @@ export class MasonryGrid implements ComponentInterface {
 
             // wszystkie itemy gridu
             const items = this.items();
+            console.error("[ionx-masonry-grid] checking items")
 
             // sprawdzamy item pod kątem zmienionych itemów, usuniętych lub przesuniętych
             for (let i = 0; i < items.length; i++) {
@@ -332,12 +344,14 @@ export class MasonryGrid implements ComponentInterface {
             }
 
         } finally {
-            this.busy = false;
+            if (this.busy) {
+                this.busy = false;
 
-            if (!this.isParentViewActive() || this.paused) {
-                this.layout();
-            } else if (options?.trigger === "onresize") {
-                setTimeout(() => this.layout());
+                if (!this.isParentViewActive() || this.paused) {
+                    this.layout();
+                } else if (options?.trigger === "onresize") {
+                    setTimeout(() => this.layout());
+                }
             }
         }
 
@@ -379,7 +393,7 @@ export class MasonryGrid implements ComponentInterface {
 
     viewDidEnter() {
         if (this.queuedLayout) {
-            this.render();
+            this.layout();
         }
     }
 
