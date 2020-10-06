@@ -5,10 +5,10 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, TextFieldTypes } from "@ionic/core";
+import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, StyleEventDetail, TextFieldTypes } from "@ionic/core";
 import { HtmlString } from "@co.mmons/js-utils/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
-import { FormController } from "./components/forms/FormControllerImpl";
+import { FormController } from "./components/forms/FormController";
 import { FormControlAttachOptions } from "./components/forms/FormControlAttachOptions";
 import { FormControllerValidateOptions } from "./components/forms/FormControllerPublicApi";
 import { FormControlState } from "./components/forms/FormControlState";
@@ -17,6 +17,8 @@ import { MessageRef } from "@co.mmons/js-intl";
 import { TooltipErrorPresenterImpl } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterImpl";
 import { TooltipErrorPresenterOptions } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterOptions";
 import { ExtendedItemElement } from "./components/MasonryGrid/ExtendedItemElement";
+import { ValueComparator } from "./components/Select/ValueComparator";
+import { SelectOption } from "./components/Select/SelectOption";
 export namespace Components {
     interface IonRouter {
         /**
@@ -125,6 +127,8 @@ export namespace Components {
     interface IonxLazyLoad {
     }
     interface IonxLoading {
+        "backdropVisible"?: boolean;
+        "color"?: string;
         "dismiss": () => Promise<void>;
         /**
           * If loading element should fill available space and center content both h and v.
@@ -144,7 +148,52 @@ export namespace Components {
         "type": "spinner" | "progress";
     }
     interface IonxMasonryGrid {
-        "layout": (force?: boolean) => Promise<void>;
+        "layout": (options?: { force?: boolean; trigger?: "onresize"; }) => Promise<void>;
+        "markItemAsDirty": (item: HTMLElement) => Promise<void>;
+        "singleColumn"?: boolean;
+    }
+    interface IonxSelect {
+        /**
+          * Whether value should be always returned as array, no matter if multiple is set to true.
+         */
+        "alwaysArray": boolean;
+        "checkValidator": (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+        "comparator": ValueComparator;
+        "disabled": boolean;
+        "empty": boolean;
+        "labelComponent"?: string;
+        "labelFormatter"?: (value: any) => string;
+        "lazyOptions": () => Promise<SelectOption[]>;
+        /**
+          * If multiple value selection is allowed.
+         */
+        "multiple": boolean;
+        "options": SelectOption[];
+        /**
+          * If multiple values selection can be ordered after selection.
+         */
+        "orderable": boolean;
+        "overlay": "popover" | "modal";
+        "overlayOptions": { whiteSpace?: "nowrap" | "normal", title?: string };
+        "overlayTitle": string;
+        "placeholder": string;
+        "readonly": boolean;
+        /**
+          * A function, that will be used for testing if value passes search critieria. Default implementation checks lowercased label of value against lowercased searched text.
+         */
+        "searchTest": (query: string, value: any, label: string) => boolean;
+        "separator"?: string;
+        "value": any;
+    }
+    interface IonxSelectOrderable {
+        "enabled": boolean;
+        "values": any[];
+    }
+    interface IonxSelectOverlay {
+        "options": SelectOption[];
+        "overlay": "modal" | "popover";
+        "overlayTitle": string;
+        "values": any[];
     }
     interface IonxTagsInput {
         "canBackspaceRemove": boolean;
@@ -182,6 +231,8 @@ export namespace Components {
     interface IonxTestMasonryGrid {
     }
     interface IonxTestRoot {
+    }
+    interface IonxTestSelect {
     }
     interface IonxTestTagsInput {
     }
@@ -275,6 +326,24 @@ declare global {
         prototype: HTMLIonxMasonryGridElement;
         new (): HTMLIonxMasonryGridElement;
     };
+    interface HTMLIonxSelectElement extends Components.IonxSelect, HTMLStencilElement {
+    }
+    var HTMLIonxSelectElement: {
+        prototype: HTMLIonxSelectElement;
+        new (): HTMLIonxSelectElement;
+    };
+    interface HTMLIonxSelectOrderableElement extends Components.IonxSelectOrderable, HTMLStencilElement {
+    }
+    var HTMLIonxSelectOrderableElement: {
+        prototype: HTMLIonxSelectOrderableElement;
+        new (): HTMLIonxSelectOrderableElement;
+    };
+    interface HTMLIonxSelectOverlayElement extends Components.IonxSelectOverlay, HTMLStencilElement {
+    }
+    var HTMLIonxSelectOverlayElement: {
+        prototype: HTMLIonxSelectOverlayElement;
+        new (): HTMLIonxSelectOverlayElement;
+    };
     interface HTMLIonxTagsInputElement extends Components.IonxTagsInput, HTMLStencilElement {
     }
     var HTMLIonxTagsInputElement: {
@@ -341,6 +410,12 @@ declare global {
         prototype: HTMLIonxTestRootElement;
         new (): HTMLIonxTestRootElement;
     };
+    interface HTMLIonxTestSelectElement extends Components.IonxTestSelect, HTMLStencilElement {
+    }
+    var HTMLIonxTestSelectElement: {
+        prototype: HTMLIonxTestSelectElement;
+        new (): HTMLIonxTestSelectElement;
+    };
     interface HTMLIonxTestTagsInputElement extends Components.IonxTestTagsInput, HTMLStencilElement {
     }
     var HTMLIonxTestTagsInputElement: {
@@ -368,6 +443,9 @@ declare global {
         "ionx-lazy-load": HTMLIonxLazyLoadElement;
         "ionx-loading": HTMLIonxLoadingElement;
         "ionx-masonry-grid": HTMLIonxMasonryGridElement;
+        "ionx-select": HTMLIonxSelectElement;
+        "ionx-select-orderable": HTMLIonxSelectOrderableElement;
+        "ionx-select-overlay": HTMLIonxSelectOverlayElement;
         "ionx-tags-input": HTMLIonxTagsInputElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
         "ionx-test-dialog-content": HTMLIonxTestDialogContentElement;
@@ -379,6 +457,7 @@ declare global {
         "ionx-test-loading": HTMLIonxTestLoadingElement;
         "ionx-test-masonry-grid": HTMLIonxTestMasonryGridElement;
         "ionx-test-root": HTMLIonxTestRootElement;
+        "ionx-test-select": HTMLIonxTestSelectElement;
         "ionx-test-tags-input": HTMLIonxTestTagsInputElement;
         "ionx-toggle-labels": HTMLIonxToggleLabelsElement;
     }
@@ -477,6 +556,8 @@ declare namespace LocalJSX {
     interface IonxLazyLoad {
     }
     interface IonxLoading {
+        "backdropVisible"?: boolean;
+        "color"?: string;
         /**
           * If loading element should fill available space and center content both h and v.
          */
@@ -495,8 +576,56 @@ declare namespace LocalJSX {
         "type"?: "spinner" | "progress";
     }
     interface IonxMasonryGrid {
-        "onDidFirstLayout"?: (event: CustomEvent<void>) => void;
-        "onDidLayout"?: (event: CustomEvent<void>) => void;
+        "singleColumn"?: boolean;
+    }
+    interface IonxSelect {
+        /**
+          * Whether value should be always returned as array, no matter if multiple is set to true.
+         */
+        "alwaysArray"?: boolean;
+        "checkValidator"?: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+        "comparator"?: ValueComparator;
+        "disabled"?: boolean;
+        "empty"?: boolean;
+        "labelComponent"?: string;
+        "labelFormatter"?: (value: any) => string;
+        "lazyOptions"?: () => Promise<SelectOption[]>;
+        /**
+          * If multiple value selection is allowed.
+         */
+        "multiple"?: boolean;
+        "onIonChange"?: (event: CustomEvent<any>) => void;
+        /**
+          * Emitted when the styles change.
+         */
+        "onIonStyle"?: (event: CustomEvent<StyleEventDetail>) => void;
+        "options"?: SelectOption[];
+        /**
+          * If multiple values selection can be ordered after selection.
+         */
+        "orderable"?: boolean;
+        "overlay"?: "popover" | "modal";
+        "overlayOptions"?: { whiteSpace?: "nowrap" | "normal", title?: string };
+        "overlayTitle"?: string;
+        "placeholder"?: string;
+        "readonly"?: boolean;
+        /**
+          * A function, that will be used for testing if value passes search critieria. Default implementation checks lowercased label of value against lowercased searched text.
+         */
+        "searchTest"?: (query: string, value: any, label: string) => boolean;
+        "separator"?: string;
+        "value"?: any;
+    }
+    interface IonxSelectOrderable {
+        "enabled"?: boolean;
+        "onOrderChanged"?: (event: CustomEvent<any[]>) => void;
+        "values"?: any[];
+    }
+    interface IonxSelectOverlay {
+        "options"?: SelectOption[];
+        "overlay": "modal" | "popover";
+        "overlayTitle"?: string;
+        "values"?: any[];
     }
     interface IonxTagsInput {
         "canBackspaceRemove"?: boolean;
@@ -535,6 +664,8 @@ declare namespace LocalJSX {
     }
     interface IonxTestRoot {
     }
+    interface IonxTestSelect {
+    }
     interface IonxTestTagsInput {
     }
     interface IonxToggleLabels {
@@ -556,6 +687,9 @@ declare namespace LocalJSX {
         "ionx-lazy-load": IonxLazyLoad;
         "ionx-loading": IonxLoading;
         "ionx-masonry-grid": IonxMasonryGrid;
+        "ionx-select": IonxSelect;
+        "ionx-select-orderable": IonxSelectOrderable;
+        "ionx-select-overlay": IonxSelectOverlay;
         "ionx-tags-input": IonxTagsInput;
         "ionx-test-dialog": IonxTestDialog;
         "ionx-test-dialog-content": IonxTestDialogContent;
@@ -567,6 +701,7 @@ declare namespace LocalJSX {
         "ionx-test-loading": IonxTestLoading;
         "ionx-test-masonry-grid": IonxTestMasonryGrid;
         "ionx-test-root": IonxTestRoot;
+        "ionx-test-select": IonxTestSelect;
         "ionx-test-tags-input": IonxTestTagsInput;
         "ionx-toggle-labels": IonxToggleLabels;
     }
@@ -589,6 +724,9 @@ declare module "@stencil/core" {
             "ionx-lazy-load": LocalJSX.IonxLazyLoad & JSXBase.HTMLAttributes<HTMLIonxLazyLoadElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
             "ionx-masonry-grid": LocalJSX.IonxMasonryGrid & JSXBase.HTMLAttributes<HTMLIonxMasonryGridElement>;
+            "ionx-select": LocalJSX.IonxSelect & JSXBase.HTMLAttributes<HTMLIonxSelectElement>;
+            "ionx-select-orderable": LocalJSX.IonxSelectOrderable & JSXBase.HTMLAttributes<HTMLIonxSelectOrderableElement>;
+            "ionx-select-overlay": LocalJSX.IonxSelectOverlay & JSXBase.HTMLAttributes<HTMLIonxSelectOverlayElement>;
             "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
             "ionx-test-dialog-content": LocalJSX.IonxTestDialogContent & JSXBase.HTMLAttributes<HTMLIonxTestDialogContentElement>;
@@ -600,6 +738,7 @@ declare module "@stencil/core" {
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
             "ionx-test-masonry-grid": LocalJSX.IonxTestMasonryGrid & JSXBase.HTMLAttributes<HTMLIonxTestMasonryGridElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;
+            "ionx-test-select": LocalJSX.IonxTestSelect & JSXBase.HTMLAttributes<HTMLIonxTestSelectElement>;
             "ionx-test-tags-input": LocalJSX.IonxTestTagsInput & JSXBase.HTMLAttributes<HTMLIonxTestTagsInputElement>;
             "ionx-toggle-labels": LocalJSX.IonxToggleLabels & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsElement>;
         }

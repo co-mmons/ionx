@@ -20,6 +20,8 @@
         "@ionic/core": "^5.3.1",
         "@stencil/core": "^1.17.3",
         "@stencil/sass": "^1.3.2",
+        "dragula": "^3.7.3",
+        "ts-error": "^1.0.6",
         "tippy.js": "^6.2.6"
     },
     "devDependencies": {
@@ -31,16 +33,16 @@
         "@stencil/core": "^2.0.1",
         "@stencil/forms": "github:adamdbradley/stencil-forms",
         "@stencil/sass": "^1.3.2",
+        "@types/dragula": "^3.7.0",
         "@types/jest": "^26.0.10",
         "bignumber.js": "^9.0.0",
+        "dragula": "^3.7.3",
         "rxjs": "^6.6.2",
         "tippy.js": "^6.2.6",
         "typescript": "^4.0.2"
     },
     "dependencies": {
-        "tippy.js": "*",
-        "fast-equals": "^2.0.0",
-        "ts-error": "^1.0.6"
+        "fast-equals": "^2.0.0"
     },
     "intlBundleItems": [
         {

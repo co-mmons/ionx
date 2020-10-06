@@ -5,3 +5,4 @@ export {isHydrated, isChildrenHydrated} from "./isHydrated";
 export {markTagNameAsHydratable, markTagPrefixAsHydratable} from "./markAsHydratable";
 export {isReady, isChildrenReady, markAsReady, markAsUnready} from "./readyStateChangeEvent";
 export {matchedMediaBreakpoints} from "./matchedMediaBreakpoints";
+export {loadScript} from "./loadScript";

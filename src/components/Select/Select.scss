@@ -1,0 +1,134 @@
+@import "../Input/input-cover";
+
+:host {
+    --placeholder-opacity: .5;
+    --dropdown-icon-opacity: .5;
+    --disabled-opacity: .5;
+    padding: var(--select-padding-top, 0px) var(--select-padding-end, 0px) var(--select-padding-bottom, 0px) var(--select-padding-start, 0px);
+    display: inline-block;
+    overflow: hidden;
+    color: var(--color);
+    font-family: var(--ion-font-family, inherit);
+    max-width: 100%;
+
+    .ionx--inner {
+        display: flex;
+        position: relative;
+    }
+
+    .ionx--icon {
+        position: relative;
+        width: 16px;
+        height: 20px;
+
+        .ionx--icon-inner {
+            top: 50%;
+            right: 0px;
+            margin-top: -3px;
+
+            position: absolute;
+
+            width: 0;
+            height: 0;
+
+            border-top: 5px solid;
+            border-right: 5px solid transparent;
+            border-left: 5px solid transparent;
+
+            color: currentColor;
+
+            opacity: var(--dropdown-icon-opacity, .5);
+
+            pointer-events: none;
+        }
+    }
+
+    .ionx--text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.ionx--placeholder-visible {
+            opacity: var(--placeholder-opacity, .5);
+        }
+    }
+
+    &.ionx--disabled {
+        opacity: var(--disabled-opacity, .5);
+        pointer-events: none;
+    }
+
+    &.ionx--readonly {
+        opacity: 1;
+        pointer-events: none;
+
+        .select-icon {
+            display: none;
+        }
+    }
+
+    &[white-space-normal] .ionx--text, &[ionx--white-space=normal] .ionx--text {
+        white-space: normal !important;
+        overflow: auto;
+    }
+
+    .ionx--cover {
+        @include ionx-input-cover;
+    }
+
+    &.in-item {
+        position: static;
+        //    max-width: 45%
+    }
+
+    ion-chip {
+        max-width: calc(50% - 4px);
+        margin-inline-start: 0px;
+        margin-bottom: 0px;
+        cursor: default;
+
+        > span {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            line-height: 1.1;
+        }
+    }
+
+    &.ionx--orderable {
+
+        ion-chip {
+            cursor: move;
+        }
+
+        .ionx--text {
+            white-space: normal;
+            overflow: auto;
+            width: 100%;
+        }
+    }
+}
+
+:host-context(ion-toolbar) {
+    color: var(--ion-toolbar-color);
+    --icon-color: var(--ion-toolbar-color);
+    --select-padding-start: 16px;
+    --select-padding-end: 16px;
+}
+
+:host-context(.item-label-stacked) {
+    align-self: flex-start;
+    --select-padding-top: 8px;
+    --select-padding-bottom: 8px;
+    --select-padding-start: 0px;
+    width: 100%;
+
+    .ionx--text {
+        max-width: calc(100% - 16px);
+        flex: initial;
+    }
+
+    &.ionx--orderable .ionx--text {
+        flex: 1;
+    }
+}

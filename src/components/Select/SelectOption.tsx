@@ -1,8 +1,8 @@
-import {Component} from "@stencil/core";
-
-@Component({
-    tag: "ionx-select-option"
-})
-export class SelectOption {
-
+export interface SelectOption {
+    label?: string;
+    value: any;
+    divider?: boolean;
+    group?: boolean;
+    options?: SelectOption[];
+    lazyOptions?: () => Promise<SelectOption>;
 }
