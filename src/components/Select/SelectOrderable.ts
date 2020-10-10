@@ -1,5 +1,6 @@
 import {Component, Element, Event, EventEmitter, Prop, Watch} from "@stencil/core";
 import dragula from "dragula";
+import {indexAttribute} from "./indexAttribute";
 
 @Component({
     tag: "ionx-select-orderable",
@@ -35,15 +36,24 @@ export class SelectOrderable {
                 // mirrorContainer: document.querySelector("ion-app"),
                 direction: "horizontal",
 
-                moves: () => {
+                moves: (el) => {
+
+                    if (!el.hasAttribute(indexAttribute)) {
+                        return false;
+                    }
+
                     return this.values && this.values.length > 1;
+                },
+
+                accepts: (_el, _target, _source, _sibling) => {
+                    return !!_sibling;
                 }
             });
 
             this.instance.on("drop", (el, _target, _source, sibling) => {
 
-                const startIndex = parseInt(el.getAttribute("ionx--index"), 10);
-                let endIndex = sibling ? parseInt(sibling.getAttribute("ionx--index"), 10) : this.values.length;
+                const startIndex = parseInt(el.getAttribute(indexAttribute), 10);
+                let endIndex = sibling ? parseInt(sibling.getAttribute(indexAttribute), 10) : this.values.length;
 
                 if (endIndex > startIndex) {
                     endIndex -= 1;
@@ -53,7 +63,6 @@ export class SelectOrderable {
                 const element = values[startIndex];
                 values.splice(startIndex, 1);
                 values.splice(endIndex, 0, element);
-                console.log(values);
 
                 this.orderChanged.emit(values);
             });

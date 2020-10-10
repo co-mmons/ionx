@@ -1,6 +1,7 @@
-import {modalController, popoverController, StyleEventDetail} from "@ionic/core";
+import {modalController, OverlayEventDetail, popoverController, StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, Fragment, h, Host, Prop, State, Watch} from "@stencil/core";
 import {deepEqual} from "fast-equals";
+import {indexAttribute} from "./indexAttribute";
 import {SelectOption} from "./SelectOption";
 import {ValueComparator} from "./ValueComparator";
 import {valueLabel} from "./valueLabel";
@@ -81,7 +82,6 @@ export class Select {
     @Prop()
     lazyOptions: () => Promise<SelectOption[]>;
 
-    @Prop()
     labelComponent?: string;
 
     @Prop()
@@ -184,25 +184,37 @@ export class Select {
         const overlayData = {
             overlay,
             options: this.options,
-            values: this.values,
+            values: this.values.slice(),
             multiple: !!this.multiple,
             overlayTitle: overlayTitle,
+            comparator: this.comparator,
             labelComponent: this.labelComponent,
             labelFormatter: this.labelFormatter,
             orderable: !!this.orderable,
             empty: !!this.empty,
+            searchTest: this.searchTest,
             // whiteSpace: this.overlayWhiteSpace,
-            valueValidator: this.checkValidator,
+            checkValidator: this.checkValidator,
             width: this.element.getBoundingClientRect().width,
             updateValues: this.changeValues.bind(this)
         };
 
-        if (overlay == "popover") {
+        let result: OverlayEventDetail<any[]>;
+
+        if (overlay === "popover") {
             const popover = await popoverController.create({component: "ionx-select-overlay", componentProps: overlayData, event});
             popover.present();
+
+            result = await popover.onWillDismiss();
+
         } else {
             const modal = await modalController.create({component: "ionx-select-overlay", componentProps: overlayData});
             modal.present();
+            result = await modal.onWillDismiss();
+        }
+
+        if (result.role === "ok") {
+            this.changeValues(result.data);
         }
     }
 
@@ -217,7 +229,7 @@ export class Select {
 
         const length = this.values.length;
 
-        return <Host class={{"ionx--orderable": this.orderable}}>
+        return <Host class={{"ionx--orderable": this.orderable && !this.disabled && !this.readonly}}>
 
             {this.orderable && <ionx-select-orderable enabled={!this.readonly && !this.disabled} values={this.values} onOrderChanged={ev => this.values = ev.detail}/>}
 
@@ -225,18 +237,20 @@ export class Select {
 
                 <div class={{
                     "ionx--text": true,
-                    "ionx--placeholder-visible": this.values.length === 0 && !!this.placeholder
+                    "ionx--placeholder-visible": length === 0 && !!this.placeholder
                 }}>
-                    {this.values.length === 0 && this.placeholder && <span>{this.placeholder}</span>}
+                    {length === 0 && this.placeholder && <span>{this.placeholder}</span>}
 
                     {this.values.map((value, index) => <Fragment>
 
-                        <ValueComponent key={value} outline={true} ionx--index={index}>
+                        <ValueComponent key={value} outline={true} {...{[indexAttribute]: index}}>
 
                             {!!LabelComponent ? <LabelComponent value={value} index={index}/> :
                                 <span>{valueLabel(this.options, value, {comparator: this.comparator, formatter: this.labelFormatter})}{!this.orderable && index < length - 1 ? this.separator : ""}</span>}
 
                         </ValueComponent>
+
+                        {!this.readonly && !this.disabled && this.multiple && this.orderable && index === length - 1 && <ion-chip onClick={ev => this.open(ev)}><ion-icon name="ellipsis-horizontal" style={{margin: "0px"}}/></ion-chip>}
 
                     </Fragment>)}
 
@@ -248,7 +262,7 @@ export class Select {
                         <div class="ionx--icon-inner"/>
                     </div>}
 
-                    {(!this.orderable || !this.values || this.values.length === 0) &&
+                    {(!this.orderable || !this.values || length === 0) &&
                         <button type="button" role="combobox" aria-haspopup="dialog" class="ionx--cover" onClick={ev => this.open(ev)}/>}
 
                 </Fragment>}

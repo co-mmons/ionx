@@ -49,6 +49,8 @@ export class DialogButtons {
                 <ion-toolbar>
                     <ion-buttons>
 
+                        <slot/>
+
                         {this.buttons.map(button => <ion-button fill="clear" style={{flex: `${button.flex}` || "1"}} color={button.color || "primary"} size={button.size || "default"} onClick={() => this.buttonClicked(button)}>
                             {button.label && <span>{button.label}</span>}
                             {button.icon && <ion-icon icon={button.icon} slot={button.label ? "start" : "icon-only"}/>}

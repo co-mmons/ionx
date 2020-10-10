@@ -19,6 +19,7 @@ import { TooltipErrorPresenterOptions } from "./components/forms/TooltipErrorPre
 import { ExtendedItemElement } from "./components/MasonryGrid/ExtendedItemElement";
 import { ValueComparator } from "./components/Select/ValueComparator";
 import { SelectOption } from "./components/Select/SelectOption";
+import { VNode } from "@stencil/core";
 export namespace Components {
     interface IonRouter {
         /**
@@ -161,7 +162,6 @@ export namespace Components {
         "comparator": ValueComparator;
         "disabled": boolean;
         "empty": boolean;
-        "labelComponent"?: string;
         "labelFormatter"?: (value: any) => string;
         "lazyOptions": () => Promise<SelectOption[]>;
         /**
@@ -190,9 +190,16 @@ export namespace Components {
         "values": any[];
     }
     interface IonxSelectOverlay {
+        "checkValidator": (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+        "comparator": ValueComparator;
+        "empty": boolean;
+        "labelFormatter"?: (value: any) => string;
+        "multiple": boolean;
         "options": SelectOption[];
+        "orderable": boolean;
         "overlay": "modal" | "popover";
         "overlayTitle": string;
+        "searchTest": (query: string, value: any, label: string) => boolean;
         "values": any[];
     }
     interface IonxTagsInput {
@@ -236,9 +243,17 @@ export namespace Components {
     }
     interface IonxTestTagsInput {
     }
+    interface IonxTestVirtualScroll {
+    }
     interface IonxToggleLabels {
         "off": string;
         "on": string;
+    }
+    interface IonxVirtualScroll {
+        "itemHeight": number;
+        "itemWidth": number;
+        "items": any[];
+        "renderer": (index: number) => VNode;
     }
 }
 declare global {
@@ -422,11 +437,23 @@ declare global {
         prototype: HTMLIonxTestTagsInputElement;
         new (): HTMLIonxTestTagsInputElement;
     };
+    interface HTMLIonxTestVirtualScrollElement extends Components.IonxTestVirtualScroll, HTMLStencilElement {
+    }
+    var HTMLIonxTestVirtualScrollElement: {
+        prototype: HTMLIonxTestVirtualScrollElement;
+        new (): HTMLIonxTestVirtualScrollElement;
+    };
     interface HTMLIonxToggleLabelsElement extends Components.IonxToggleLabels, HTMLStencilElement {
     }
     var HTMLIonxToggleLabelsElement: {
         prototype: HTMLIonxToggleLabelsElement;
         new (): HTMLIonxToggleLabelsElement;
+    };
+    interface HTMLIonxVirtualScrollElement extends Components.IonxVirtualScroll, HTMLStencilElement {
+    }
+    var HTMLIonxVirtualScrollElement: {
+        prototype: HTMLIonxVirtualScrollElement;
+        new (): HTMLIonxVirtualScrollElement;
     };
     interface HTMLElementTagNameMap {
         "ion-router": HTMLIonRouterElement;
@@ -459,7 +486,9 @@ declare global {
         "ionx-test-root": HTMLIonxTestRootElement;
         "ionx-test-select": HTMLIonxTestSelectElement;
         "ionx-test-tags-input": HTMLIonxTestTagsInputElement;
+        "ionx-test-virtual-scroll": HTMLIonxTestVirtualScrollElement;
         "ionx-toggle-labels": HTMLIonxToggleLabelsElement;
+        "ionx-virtual-scroll": HTMLIonxVirtualScrollElement;
     }
 }
 declare namespace LocalJSX {
@@ -587,7 +616,6 @@ declare namespace LocalJSX {
         "comparator"?: ValueComparator;
         "disabled"?: boolean;
         "empty"?: boolean;
-        "labelComponent"?: string;
         "labelFormatter"?: (value: any) => string;
         "lazyOptions"?: () => Promise<SelectOption[]>;
         /**
@@ -622,9 +650,16 @@ declare namespace LocalJSX {
         "values"?: any[];
     }
     interface IonxSelectOverlay {
+        "checkValidator"?: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+        "comparator"?: ValueComparator;
+        "empty"?: boolean;
+        "labelFormatter"?: (value: any) => string;
+        "multiple"?: boolean;
         "options"?: SelectOption[];
+        "orderable"?: boolean;
         "overlay": "modal" | "popover";
         "overlayTitle"?: string;
+        "searchTest"?: (query: string, value: any, label: string) => boolean;
         "values"?: any[];
     }
     interface IonxTagsInput {
@@ -668,9 +703,17 @@ declare namespace LocalJSX {
     }
     interface IonxTestTagsInput {
     }
+    interface IonxTestVirtualScroll {
+    }
     interface IonxToggleLabels {
         "off"?: string;
         "on"?: string;
+    }
+    interface IonxVirtualScroll {
+        "itemHeight"?: number;
+        "itemWidth"?: number;
+        "items": any[];
+        "renderer": (index: number) => VNode;
     }
     interface IntrinsicElements {
         "ion-router": IonRouter;
@@ -703,7 +746,9 @@ declare namespace LocalJSX {
         "ionx-test-root": IonxTestRoot;
         "ionx-test-select": IonxTestSelect;
         "ionx-test-tags-input": IonxTestTagsInput;
+        "ionx-test-virtual-scroll": IonxTestVirtualScroll;
         "ionx-toggle-labels": IonxToggleLabels;
+        "ionx-virtual-scroll": IonxVirtualScroll;
     }
 }
 export { LocalJSX as JSX };
@@ -740,7 +785,9 @@ declare module "@stencil/core" {
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;
             "ionx-test-select": LocalJSX.IonxTestSelect & JSXBase.HTMLAttributes<HTMLIonxTestSelectElement>;
             "ionx-test-tags-input": LocalJSX.IonxTestTagsInput & JSXBase.HTMLAttributes<HTMLIonxTestTagsInputElement>;
+            "ionx-test-virtual-scroll": LocalJSX.IonxTestVirtualScroll & JSXBase.HTMLAttributes<HTMLIonxTestVirtualScrollElement>;
             "ionx-toggle-labels": LocalJSX.IonxToggleLabels & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsElement>;
+            "ionx-virtual-scroll": LocalJSX.IonxVirtualScroll & JSXBase.HTMLAttributes<HTMLIonxVirtualScrollElement>;
         }
     }
 }

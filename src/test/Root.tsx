@@ -10,7 +10,8 @@ const tests = [
     "loading",
     "masonry-grid",
     "select",
-    "tags-input"
+    "tags-input",
+    "virtual-scroll"
 ];
 
 @Component({
