@@ -3,6 +3,7 @@ import "@ionic/core";
 import "../components.d.ts";
 
 const tests = [
+    "date-time",
     "dialog",
     "expanding-searchbar",
     "form",

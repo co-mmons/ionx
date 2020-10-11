@@ -44,6 +44,8 @@ export namespace Components {
          */
         "useHash": boolean;
     }
+    interface IonxDateTime {
+    }
     interface IonxDialog {
         /**
           * @inheritDoc
@@ -183,6 +185,8 @@ export namespace Components {
          */
         "searchTest": (query: string, value: any, label: string) => boolean;
         "separator"?: string;
+        "setBlur": () => Promise<void>;
+        "setFocus": (options?: FocusOptions) => Promise<void>;
         "value": any;
     }
     interface IonxSelectOrderable {
@@ -217,6 +221,8 @@ export namespace Components {
         "unique": boolean;
         "value": string[];
         "verifyFn": (tagSrt: string) => boolean;
+    }
+    interface IonxTestDateTime {
     }
     interface IonxTestDialog {
     }
@@ -262,6 +268,12 @@ declare global {
     var HTMLIonRouterElement: {
         prototype: HTMLIonRouterElement;
         new (): HTMLIonRouterElement;
+    };
+    interface HTMLIonxDateTimeElement extends Components.IonxDateTime, HTMLStencilElement {
+    }
+    var HTMLIonxDateTimeElement: {
+        prototype: HTMLIonxDateTimeElement;
+        new (): HTMLIonxDateTimeElement;
     };
     interface HTMLIonxDialogElement extends Components.IonxDialog, HTMLStencilElement {
     }
@@ -365,6 +377,12 @@ declare global {
         prototype: HTMLIonxTagsInputElement;
         new (): HTMLIonxTagsInputElement;
     };
+    interface HTMLIonxTestDateTimeElement extends Components.IonxTestDateTime, HTMLStencilElement {
+    }
+    var HTMLIonxTestDateTimeElement: {
+        prototype: HTMLIonxTestDateTimeElement;
+        new (): HTMLIonxTestDateTimeElement;
+    };
     interface HTMLIonxTestDialogElement extends Components.IonxTestDialog, HTMLStencilElement {
     }
     var HTMLIonxTestDialogElement: {
@@ -457,6 +475,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "ion-router": HTMLIonRouterElement;
+        "ionx-date-time": HTMLIonxDateTimeElement;
         "ionx-dialog": HTMLIonxDialogElement;
         "ionx-dialog-buttons": HTMLIonxDialogButtonsElement;
         "ionx-dialog-content": HTMLIonxDialogContentElement;
@@ -474,6 +493,7 @@ declare global {
         "ionx-select-orderable": HTMLIonxSelectOrderableElement;
         "ionx-select-overlay": HTMLIonxSelectOverlayElement;
         "ionx-tags-input": HTMLIonxTagsInputElement;
+        "ionx-test-date-time": HTMLIonxTestDateTimeElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
         "ionx-test-dialog-content": HTMLIonxTestDialogContentElement;
         "ionx-test-dialog-message": HTMLIonxTestDialogMessageElement;
@@ -509,6 +529,8 @@ declare namespace LocalJSX {
           * The router can work in two "modes": - With hash: `/index.html#/path/to/page` - Without hash: `/path/to/page`  Using one or another might depend in the requirements of your app and/or where it"s deployed.  Usually "hash-less" navigation works better for SEO and it"s more user friendly too, but it might requires additional server-side configuration in order to properly work.  On the otherside hash-navigation is much easier to deploy, it even works over the file protocol.  By default, this property is `true`, change to `false` to allow hash-less URLs.
          */
         "useHash"?: boolean;
+    }
+    interface IonxDateTime {
     }
     interface IonxDialog {
         /**
@@ -623,6 +645,7 @@ declare namespace LocalJSX {
          */
         "multiple"?: boolean;
         "onIonChange"?: (event: CustomEvent<any>) => void;
+        "onIonFocus"?: (event: CustomEvent<any>) => void;
         /**
           * Emitted when the styles change.
          */
@@ -679,6 +702,8 @@ declare namespace LocalJSX {
         "value"?: string[];
         "verifyFn"?: (tagSrt: string) => boolean;
     }
+    interface IonxTestDateTime {
+    }
     interface IonxTestDialog {
     }
     interface IonxTestDialogContent {
@@ -717,6 +742,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "ion-router": IonRouter;
+        "ionx-date-time": IonxDateTime;
         "ionx-dialog": IonxDialog;
         "ionx-dialog-buttons": IonxDialogButtons;
         "ionx-dialog-content": IonxDialogContent;
@@ -734,6 +760,7 @@ declare namespace LocalJSX {
         "ionx-select-orderable": IonxSelectOrderable;
         "ionx-select-overlay": IonxSelectOverlay;
         "ionx-tags-input": IonxTagsInput;
+        "ionx-test-date-time": IonxTestDateTime;
         "ionx-test-dialog": IonxTestDialog;
         "ionx-test-dialog-content": IonxTestDialogContent;
         "ionx-test-dialog-message": IonxTestDialogMessage;
@@ -756,6 +783,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ion-router": LocalJSX.IonRouter & JSXBase.HTMLAttributes<HTMLIonRouterElement>;
+            "ionx-date-time": LocalJSX.IonxDateTime & JSXBase.HTMLAttributes<HTMLIonxDateTimeElement>;
             "ionx-dialog": LocalJSX.IonxDialog & JSXBase.HTMLAttributes<HTMLIonxDialogElement>;
             "ionx-dialog-buttons": LocalJSX.IonxDialogButtons & JSXBase.HTMLAttributes<HTMLIonxDialogButtonsElement>;
             "ionx-dialog-content": LocalJSX.IonxDialogContent & JSXBase.HTMLAttributes<HTMLIonxDialogContentElement>;
@@ -773,6 +801,7 @@ declare module "@stencil/core" {
             "ionx-select-orderable": LocalJSX.IonxSelectOrderable & JSXBase.HTMLAttributes<HTMLIonxSelectOrderableElement>;
             "ionx-select-overlay": LocalJSX.IonxSelectOverlay & JSXBase.HTMLAttributes<HTMLIonxSelectOverlayElement>;
             "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
+            "ionx-test-date-time": LocalJSX.IonxTestDateTime & JSXBase.HTMLAttributes<HTMLIonxTestDateTimeElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
             "ionx-test-dialog-content": LocalJSX.IonxTestDialogContent & JSXBase.HTMLAttributes<HTMLIonxTestDialogContentElement>;
             "ionx-test-dialog-message": LocalJSX.IonxTestDialogMessage & JSXBase.HTMLAttributes<HTMLIonxTestDialogMessageElement>;

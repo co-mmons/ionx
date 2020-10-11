@@ -1,5 +1,18 @@
 import {modalController, OverlayEventDetail, popoverController, StyleEventDetail} from "@ionic/core";
-import {Component, Element, Event, EventEmitter, Fragment, h, Host, Prop, State, Watch} from "@stencil/core";
+import {
+    Component,
+    Element,
+    Event,
+    EventEmitter,
+    Fragment,
+    h,
+    Host,
+    Listen,
+    Method,
+    Prop,
+    State,
+    Watch
+} from "@stencil/core";
 import {deepEqual} from "fast-equals";
 import {indexAttribute} from "./indexAttribute";
 import {SelectOption} from "./SelectOption";
@@ -73,9 +86,6 @@ export class Select {
     @Prop()
     checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
 
-    @Event()
-    ionChange: EventEmitter<any>;
-
     @Prop({mutable: true})
     options: SelectOption[];
 
@@ -93,12 +103,66 @@ export class Select {
     @State()
     values: any[] = [];
 
-    @Prop()
+    @Prop({mutable: true})
     value: any;
+
+    valueChangeSilent: boolean;
 
     @Watch("value")
     valueChanged(niu: any) {
-        this.changeValues(Array.isArray(niu) ? niu : (niu === undefined || niu === null ? [] : [niu]));
+
+        if (!this.valueChangeSilent) {
+            this.changeValues(Array.isArray(niu) ? niu : (niu === undefined || niu === null ? [] : [niu]));
+        }
+
+         this.valueChangeSilent = false;
+    }
+
+    private changeValues(values: any[]) {
+
+        if (!deepEqual(this.values, values)) {
+            this.values = values.slice();
+
+            this.valueChangeSilent = true;
+            this.value = this.multiple ? values.slice() : (this.values.length > 0 ? this.values[0] : undefined);
+
+            this.emitStyle();
+        }
+    }
+
+    @Event()
+    ionChange: EventEmitter<any>;
+
+    @Event()
+    ionFocus: EventEmitter<any>;
+
+    @Method()
+    async setFocus(options?: FocusOptions): Promise<void> {
+        this.element.focus(options);
+    }
+
+    @Method()
+    async setBlur(): Promise<void> {
+        this.element.blur();
+    }
+
+    focused: boolean;
+
+    @Listen("focus")
+    onFocus() {
+        this.focused = true;
+        this.emitStyle();
+    }
+
+    @Listen("blur")
+    onBlur() {
+        this.focused = false;
+        this.emitStyle();
+    }
+
+    @Listen("click")
+    onClick(ev: MouseEvent) {
+        this.open(ev);
     }
 
     /**
@@ -108,22 +172,14 @@ export class Select {
     @Event()
     ionStyle!: EventEmitter<StyleEventDetail>;
 
-    private changeValues(values: any[]) {
-
-        if (!deepEqual(this.values, values)) {
-            this.values = values.slice();
-            this.emitStyle();
-        }
-    }
-
     private emitStyle() {
 
         this.ionStyle.emit({
-            "interactive": true,
+            "interactive": !this.disabled && !this.readonly,
             "input": true,
             "has-placeholder": this.placeholder != null,
             "has-value": this.values.length > 0,
-            // "has-focus": this.hasFocus,
+            "has-focus": this.focused,
             "interactive-disabled": this.disabled,
         });
     }
@@ -131,27 +187,6 @@ export class Select {
     async open(event: Event) {
 
         const overlay: "popover" | "modal" = this.overlay || "popover";
-
-        //
-        // let options: SelectOverlayOption[] = [];
-        // if (this.options instanceof SelectOptions) {
-        //     for (const option of this.options) {
-        //         const valueIndex = option.value ? this.indexOfValue(option.value) : -1;
-        //         options.push({value: option.value, checked: option.value ? valueIndex > -1 : false, checkedTimestamp: this.orderable && valueIndex, label: option.label ? option.label : ((!this.searchTest || !this.labelTemplate) ? this.labelImpl$(option.value) : undefined), disabled: option.disabled, divider: option.divider});
-        //     }
-        //
-        // } else if (this.options) {
-        //     for (const option of this.options) {
-        //         const valueIndex = this.indexOfValue(option);
-        //         options.push({value: option, checked: valueIndex > -1, checkedTimestamp: this.orderable && valueIndex, label: !this.labelTemplate || !this.searchTest ? this.labelImpl$(option) : undefined});
-        //     }
-        //
-        // } else if (this.optionsComponents) {
-        //     for (const option of this.optionsComponents.toArray()) {
-        //         const valueIndex = this.indexOfValue(option.value);
-        //         options.push({value: option.value, checked: valueIndex > -1, checkedTimestamp: this.orderable && valueIndex, label: option.label, divider: !!option.divider});
-        //     }
-        // }
 
         let overlayTitle: string;
         if (this.overlayTitle) {
@@ -194,32 +229,42 @@ export class Select {
             empty: !!this.empty,
             searchTest: this.searchTest,
             // whiteSpace: this.overlayWhiteSpace,
-            checkValidator: this.checkValidator,
-            width: this.element.getBoundingClientRect().width,
-            updateValues: this.changeValues.bind(this)
+            checkValidator: this.checkValidator
         };
 
         let result: OverlayEventDetail<any[]>;
+        let didDismiss: Promise<any>;
 
         if (overlay === "popover") {
             const popover = await popoverController.create({component: "ionx-select-overlay", componentProps: overlayData, event});
             popover.present();
 
             result = await popover.onWillDismiss();
+            didDismiss = popover.onDidDismiss();
 
         } else {
             const modal = await modalController.create({component: "ionx-select-overlay", componentProps: overlayData});
             modal.present();
             result = await modal.onWillDismiss();
+            didDismiss = modal.onDidDismiss();
         }
 
         if (result.role === "ok") {
             this.changeValues(result.data);
         }
+
+        await didDismiss;
+
+        this.setFocus();
     }
 
     connectedCallback() {
+
         this.valueChanged(this.value);
+
+        if (!this.element.hasAttribute("tabIndex")) {
+            this.element.setAttribute("tabIndex", "0");
+        }
     }
 
     render() {
@@ -229,7 +274,14 @@ export class Select {
 
         const length = this.values.length;
 
-        return <Host class={{"ionx--orderable": this.orderable && !this.disabled && !this.readonly}}>
+        return <Host
+            role="combobox"
+            aria-haspopup="dialog"
+            class={{
+                "ionx--orderable": this.orderable && !this.disabled && !this.readonly,
+                "ionx--readonly": !!this.readonly,
+                "ionx--disabled": !!this.disabled
+            }}>
 
             {this.orderable && <ionx-select-orderable enabled={!this.readonly && !this.disabled} values={this.values} onOrderChanged={ev => this.values = ev.detail}/>}
 
@@ -261,9 +313,6 @@ export class Select {
                     {!this.orderable && <div class="ionx--icon" role="presentation">
                         <div class="ionx--icon-inner"/>
                     </div>}
-
-                    {(!this.orderable || !this.values || length === 0) &&
-                        <button type="button" role="combobox" aria-haspopup="dialog" class="ionx--cover" onClick={ev => this.open(ev)}/>}
 
                 </Fragment>}
 
