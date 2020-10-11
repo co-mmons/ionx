@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, StyleEventDetail, TextFieldTypes } from "@ionic/core";
+import { DateTimeValue } from "./components/DateTime/DateTimeValue";
 import { HtmlString } from "@co.mmons/js-utils/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
 import { FormController } from "./components/forms/FormController";
@@ -45,6 +46,31 @@ export namespace Components {
         "useHash": boolean;
     }
     interface IonxDateTime {
+        "clearButtonIcon": string;
+        "clearButtonText": string;
+        "clearButtonVisible": boolean;
+        /**
+          * Timezone, that will be set, when new value is picked from picker.
+         */
+        "defaultTimeZone": string;
+        "disabled": boolean;
+        "displayFormat": Intl.DateTimeFormatOptions;
+        "overlay": "popover" | "modal";
+        "overlayTitle": string;
+        "pickerFormat": Intl.DateTimeFormatOptions;
+        "placeholder": string;
+        "readonly": boolean;
+        "setBlur": () => Promise<void>;
+        "setFocus": (options?: FocusOptions) => Promise<void>;
+        /**
+          * Whether timezone cannot be changed.
+         */
+        "timeZoneDisabled": boolean;
+        "value": DateTimeValue;
+    }
+    interface IonxDateTimeOverlay {
+        "overlayTitle": string;
+        "timeZoneDisabled": boolean;
     }
     interface IonxDialog {
         /**
@@ -275,6 +301,12 @@ declare global {
         prototype: HTMLIonxDateTimeElement;
         new (): HTMLIonxDateTimeElement;
     };
+    interface HTMLIonxDateTimeOverlayElement extends Components.IonxDateTimeOverlay, HTMLStencilElement {
+    }
+    var HTMLIonxDateTimeOverlayElement: {
+        prototype: HTMLIonxDateTimeOverlayElement;
+        new (): HTMLIonxDateTimeOverlayElement;
+    };
     interface HTMLIonxDialogElement extends Components.IonxDialog, HTMLStencilElement {
     }
     var HTMLIonxDialogElement: {
@@ -476,6 +508,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "ion-router": HTMLIonRouterElement;
         "ionx-date-time": HTMLIonxDateTimeElement;
+        "ionx-date-time-overlay": HTMLIonxDateTimeOverlayElement;
         "ionx-dialog": HTMLIonxDialogElement;
         "ionx-dialog-buttons": HTMLIonxDialogButtonsElement;
         "ionx-dialog-content": HTMLIonxDialogContentElement;
@@ -531,6 +564,35 @@ declare namespace LocalJSX {
         "useHash"?: boolean;
     }
     interface IonxDateTime {
+        "clearButtonIcon"?: string;
+        "clearButtonText"?: string;
+        "clearButtonVisible"?: boolean;
+        /**
+          * Timezone, that will be set, when new value is picked from picker.
+         */
+        "defaultTimeZone"?: string;
+        "disabled"?: boolean;
+        "displayFormat"?: Intl.DateTimeFormatOptions;
+        "onIonChange"?: (event: CustomEvent<any>) => void;
+        "onIonFocus"?: (event: CustomEvent<any>) => void;
+        /**
+          * Emitted when the styles change.
+         */
+        "onIonStyle"?: (event: CustomEvent<StyleEventDetail>) => void;
+        "overlay"?: "popover" | "modal";
+        "overlayTitle"?: string;
+        "pickerFormat"?: Intl.DateTimeFormatOptions;
+        "placeholder"?: string;
+        "readonly"?: boolean;
+        /**
+          * Whether timezone cannot be changed.
+         */
+        "timeZoneDisabled"?: boolean;
+        "value"?: DateTimeValue;
+    }
+    interface IonxDateTimeOverlay {
+        "overlayTitle"?: string;
+        "timeZoneDisabled"?: boolean;
     }
     interface IonxDialog {
         /**
@@ -743,6 +805,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "ion-router": IonRouter;
         "ionx-date-time": IonxDateTime;
+        "ionx-date-time-overlay": IonxDateTimeOverlay;
         "ionx-dialog": IonxDialog;
         "ionx-dialog-buttons": IonxDialogButtons;
         "ionx-dialog-content": IonxDialogContent;
@@ -784,6 +847,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ion-router": LocalJSX.IonRouter & JSXBase.HTMLAttributes<HTMLIonRouterElement>;
             "ionx-date-time": LocalJSX.IonxDateTime & JSXBase.HTMLAttributes<HTMLIonxDateTimeElement>;
+            "ionx-date-time-overlay": LocalJSX.IonxDateTimeOverlay & JSXBase.HTMLAttributes<HTMLIonxDateTimeOverlayElement>;
             "ionx-dialog": LocalJSX.IonxDialog & JSXBase.HTMLAttributes<HTMLIonxDialogElement>;
             "ionx-dialog-buttons": LocalJSX.IonxDialogButtons & JSXBase.HTMLAttributes<HTMLIonxDialogButtonsElement>;
             "ionx-dialog-content": LocalJSX.IonxDialogContent & JSXBase.HTMLAttributes<HTMLIonxDialogContentElement>;

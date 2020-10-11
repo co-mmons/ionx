@@ -1,8 +1,8 @@
 
 :host {
-    --placeholder-opacity: .5;
-    --dropdown-icon-opacity: .5;
-    --disabled-opacity: .5;
+    --select-placeholder-opacity: .5;
+    --select-dropdown-icon-opacity: .5;
+    --select-disabled-opacity: .5;
     padding: var(--select-padding-top, 0px) var(--select-padding-end, 0px) var(--select-padding-bottom, 0px) var(--select-padding-start, 0px);
     display: inline-block;
     overflow: hidden;
@@ -43,7 +43,7 @@
 
             color: currentColor;
 
-            opacity: var(--dropdown-icon-opacity, .5);
+            opacity: var(--select-dropdown-icon-opacity, .5);
 
             pointer-events: none;
         }
@@ -55,12 +55,12 @@
         text-overflow: ellipsis;
 
         &.ionx--placeholder-visible {
-            opacity: var(--placeholder-opacity, .5);
+            opacity: var(--select-placeholder-opacity, .5);
         }
     }
 
     &.ionx--disabled {
-        opacity: var(--disabled-opacity, .5);
+        opacity: var(--select-disabled-opacity, .5);
         pointer-events: none;
     }
 

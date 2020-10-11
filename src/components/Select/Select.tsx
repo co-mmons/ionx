@@ -196,7 +196,7 @@ export class Select {
         if (!overlayTitle) {
             const ionItem = this.element.closest("ion-item");
             if (ionItem) {
-                const titleElement = ionItem.querySelector<HTMLElement>("ionx-select-overlay-title");
+                const titleElement = ionItem.querySelector<HTMLElement>("ionx-select-title");
                 if (titleElement) {
                     overlayTitle = titleElement.innerText;
                 } else {
