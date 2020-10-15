@@ -1,11 +1,20 @@
-import {Component, Host, h} from "@stencil/core";
+import {Component, Host, h, Element} from "@stencil/core";
 
 @Component({
     tag: "ionx-test-date-time"
 })
 export class DateTimeTestPage {
 
+    @Element()
+    element: HTMLElement;
+
     date = new Date()
+
+    componentDidLoad() {
+        const dt = this.element.querySelector<HTMLIonxDateTimeElement>("ionx-date-time");
+        dt.open();
+        // dt.ope
+    }
 
     render() {
 

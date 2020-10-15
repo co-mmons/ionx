@@ -1,6 +1,6 @@
 import {intl} from "@co.mmons/js-intl";
 import {TimeZoneDate} from "@co.mmons/js-utils/core";
-import {isPlatform, popoverController, StyleEventDetail} from "@ionic/core";
+import {popoverController, StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
 import {DateTimeValue} from "./DateTimeValue";
 import {defaultDateTimeFormat} from "./defaultFormats";
@@ -186,7 +186,8 @@ export class Loading {
         this.value = undefined;
     }
 
-    async open(event: Event) {
+    @Method()
+    async open(event?: MouseEvent): Promise<void> {
 
         let overlayTitle: string;
         if (this.overlayTitle) {
@@ -217,14 +218,17 @@ export class Loading {
         }
 
         const overlayProps = {
-            overlayTitle
+            overlayTitle,
+            value: this.value ?? new Date()
         };
 
-        if (!isPlatform("mobile")) {
-            const popover = await popoverController.create({component: "ionx-date-time-overlay", componentProps: overlayProps, event});
-            popover.present();
-        }
+        const popover = await popoverController.create({component: "ionx-date-time-overlay", componentProps: overlayProps, event});
+        popover.present();
 
+        const result = await popover.onWillDismiss();
+        if (result.role === "ok") {
+            this.value = result.data;
+        }
     }
 
     connectedCallback() {

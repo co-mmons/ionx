@@ -7,7 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, StyleEventDetail, TextFieldTypes } from "@ionic/core";
 import { DateTimeValue } from "./components/DateTime/DateTimeValue";
-import { HtmlString } from "@co.mmons/js-utils/core";
+import { HtmlString, TimeZoneDate } from "@co.mmons/js-utils/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
 import { FormController } from "./components/forms/FormController";
 import { FormControlAttachOptions } from "./components/forms/FormControlAttachOptions";
@@ -55,6 +55,7 @@ export namespace Components {
         "defaultTimeZone": string;
         "disabled": boolean;
         "displayFormat": Intl.DateTimeFormatOptions;
+        "open": (event?: MouseEvent) => Promise<void>;
         "overlay": "popover" | "modal";
         "overlayTitle": string;
         "pickerFormat": Intl.DateTimeFormatOptions;
@@ -71,6 +72,7 @@ export namespace Components {
     interface IonxDateTimeOverlay {
         "overlayTitle": string;
         "timeZoneDisabled": boolean;
+        "value": TimeZoneDate;
     }
     interface IonxDialog {
         /**
@@ -593,6 +595,7 @@ declare namespace LocalJSX {
     interface IonxDateTimeOverlay {
         "overlayTitle"?: string;
         "timeZoneDisabled"?: boolean;
+        "value"?: TimeZoneDate;
     }
     interface IonxDialog {
         /**

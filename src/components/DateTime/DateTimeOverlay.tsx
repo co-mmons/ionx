@@ -1,25 +1,16 @@
 import {intl} from "@co.mmons/js-intl";
-import {Component, Host, h, Prop} from "@stencil/core";
-
-const weekdayNarrowFormat: Intl.DateTimeFormatOptions = {
-    weekday: "short"
-};
-
-// @ts-ignore
-const monthYearFormat: Intl.DateTimeFormatOptions = {
-    month: "long",
-    year: "numeric"
-};
-
-const monthFormat: Intl.DateTimeFormatOptions = {
-    month: "long"
-};
+import {TimeZoneDate} from "@co.mmons/js-utils/core";
+import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
 
 @Component({
     tag: "ionx-date-time-overlay",
-    styleUrl: "DateTimeOverlay.scss"
+    styleUrl: "DateTimeOverlay.scss",
+    shadow: true
 })
 export class DateTimeOverlay {
+
+    @Element()
+    element: HTMLElement;
 
     @Prop()
     overlayTitle: string;
@@ -27,88 +18,191 @@ export class DateTimeOverlay {
     @Prop()
     timeZoneDisabled: boolean;
 
-    dateView: "days" | "months" | "years" = "days";
+    @State()
+    date: Date;
 
-    dateValues: {id: number, label: string | number, sublabel?: string, checked?: boolean, hidden?: boolean}[];
+    @Prop()
+    value: TimeZoneDate;
 
-    dateViewValue: Date;
+    values: {[key: string]: string | number} = {};
 
-    value: Date;
+    ranges() {
 
-    generate() {
+        const ranges = {
+            "Year": [1900, new Date().getUTCFullYear() + 2],
+            "Month": [1, 12],
+            "Day": [1, 31],
+            "Hour": [0, 23],
+            "Minute": [0, 59]
+        };
 
-        this.dateValues = [];
+        let tmp: Date;
 
-        let tmpDate = new Date(this.dateViewValue);
+        // generate possible days
+        for (let d = 1; d <= 31; d++) {
 
-        if (this.dateView == "days") {
-
-            for (let d = 1; d <= 33; d++) {
-                tmpDate.setUTCDate(d);
-                tmpDate.setUTCHours(0, 0, 0, 0);
-                this.dateValues.push({
-                    id: d,
-                    label: d,
-                    sublabel: intl.dateFormat(tmpDate, weekdayNarrowFormat),
-                    checked: (this.value.getUTCFullYear() === tmpDate.getUTCFullYear() && this.value.getUTCMonth() === tmpDate.getUTCMonth() && this.value.getUTCDate() === d),
-                    hidden: tmpDate.getUTCMonth() != this.dateViewValue.getUTCMonth()
-                });
+            if (d === 1) {
+                tmp = new Date(this.date);
+                ranges["Day"] = [1, 1];
             }
 
-        } else if (this.dateView === "months") {
+            tmp.setUTCDate(d);
+            tmp.setUTCHours(0, 0, 0, 0);
 
-            let tmpDate = new Date(Date.UTC(1999, this.dateViewValue.getUTCMonth()));
+            if (tmp.getUTCMonth() === this.date.getUTCMonth()) {
+                ranges["Day"][1] = d;
+            }
+        }
 
-            for (let m = 0; m < 12; m++) {
-                tmpDate.setUTCMonth(m);
+        return ranges;
+    }
 
-                this.dateValues.push({
-                    id: m,
-                    label: intl.dateFormat(tmpDate, monthFormat),
-                    checked: this.value.getUTCFullYear() === this.dateViewValue.getUTCFullYear() && this.value.getUTCMonth() === m
-                });
+    ok() {
+        const popover = this.element.closest<HTMLIonPopoverElement>("ion-popover");
+        popover.dismiss(new TimeZoneDate(this.date), "ok");
+    }
+
+    cancel() {
+        const popover = this.element.closest<HTMLIonPopoverElement>("ion-popover");
+        popover.dismiss(undefined, "cancel");
+    }
+
+    @Listen("keydown")
+    async onKeyDown(event: KeyboardEvent) {
+
+        const input = event.composedPath().find(t => (t as HTMLElement).tagName === "ION-INPUT") as HTMLIonInputElement;
+
+        if (input && (event.key === "e" || event.key === "E" || event.key === "-" || event.key === "." || event.key === ",")) {
+            event.preventDefault();
+
+        } else if (input && event.key === "Enter") {
+            const next = input.closest("ion-item").nextElementSibling?.querySelector<HTMLIonInputElement>("ion-input");
+            if (next) {
+                event.preventDefault();
+                next.setFocus();
+                (await next.getInputElement()).select();
+            } else {
+                this.ok();
+            }
+        }
+    }
+
+    @Listen("ionChange")
+    onChange(event: CustomEvent) {
+
+        const input = event.composedPath().find(t => (t as HTMLElement).tagName === "ION-INPUT") as HTMLIonInputElement;
+
+        if (input) {
+
+            const stringed = `${input.value}`;
+
+            if (stringed.length < input.min.length) {
+                return;
             }
 
-        } else if (this.dateView === "years") {
-
-            let tmpDate = new Date(this.dateViewValue);
-
-            let yearHundred = Math.floor(tmpDate.getUTCFullYear() / 100) * 100;
-            let yearTens = tmpDate.getUTCFullYear() - yearHundred;
-
-            let yearStart = 0;
-            if (yearTens >= 80) {
-                yearStart = 80;
-            } else if (yearTens >= 60) {
-                yearStart = 60;
-            } else if (yearTens >= 40) {
-                yearStart = 40;
-            } else if (yearTens >= 20) {
-                yearStart = 20;
+            if (stringed.length > input.max.length || input.value > parseInt(input.max, 10)) {
+                input.value = this.values[input.name];
+                return;
             }
 
-            tmpDate.setUTCFullYear(yearHundred + yearStart - 1);
+            this.values[input.name] = input.value;
 
-            for (let y = 0; y < 20; y++) {
-                tmpDate.setUTCFullYear(tmpDate.getUTCFullYear() + 1);
+            const date = new Date(this.date);
 
-                this.dateValues.push({
-                    id: tmpDate.getUTCFullYear(),
-                    label: tmpDate.getUTCFullYear(),
-                    checked: this.value.getUTCFullYear() == tmpDate.getUTCFullYear()
-                });
+            if (input.name === "Year") {
+                date.setUTCFullYear(input.value as number);
+            } else if (input.name === "Month") {
+                date.setUTCMonth(input.value as number - 1);
+            } else if (input.name === "Day") {
+                date.setUTCDate(input.value as number);
+            } else if (input.name === "Minute") {
+                date.setUTCMinutes(input.value as number, 0, 0);
+            } else if (input.name === "Hour") {
+                date.setUTCHours(input.value as number);
             }
+
+            this.date = date;
         }
 
     }
 
+    connectedCallback() {
+        this.date = new Date(this.value);
+    }
+
+    renderPart(part: "Hour" | "Minute" | "Year" | "Month" | "Day" | "Time zone", range?: number[]) {
+
+        if (part !== "Time zone") {
+
+            let def: number;
+            let val: number | string;
+
+            if (part === "Hour") {
+                def = val = this.date.getUTCHours();
+            } else if (part === "Minute") {
+                def = val = this.date.getUTCMinutes();
+            } else if (part === "Year") {
+                def = val = this.date.getUTCFullYear(), length = 4;
+            } else if (part === "Month") {
+                def = val = this.date.getUTCMonth() + 1;
+            } else if (part === "Day") {
+                def = val = this.date.getUTCDate();
+            }
+
+            if (part in this.values && this.values[part] === "") {
+                val = "";
+            }
+
+            return <ion-item>
+                <ion-label>{part}</ion-label>
+                <ion-input
+                    type="number"
+                    name={part}
+                    placeholder={`${def}`}
+                    value={val}
+                    min={`${range[0]}`}
+                    max={`${range[1]}`}/>
+            </ion-item>
+
+        } else {
+
+            return <ion-item>
+                <ion-label position="stacked">{part}</ion-label>
+                <ionx-select options={[{value: "", label: intl.message`No time zone`}]} value={""}/>
+            </ion-item>
+        }
+    }
+
     render() {
+
+        const ranges = this.ranges();
+
         return <Host>
-            <ion-header>
+
+            <div>
+
+                {this.renderPart("Year", ranges["Year"])}
+                {this.renderPart("Month", ranges["Month"])}
+                {this.renderPart("Day", ranges["Day"])}
+                {this.renderPart("Hour", ranges["Hour"])}
+                {this.renderPart("Minute", ranges["Minute"])}
+
+            </div>
+
+            <ion-footer>
                 <ion-toolbar>
-                    <ion-title>{this.overlayTitle}</ion-title>
+
+                    <div>
+
+                        <ion-button size="small" fill="clear" onClick={() => this.cancel()}>{intl.message`@co.mmons/js-intl#Cancel`}</ion-button>
+
+                        <ion-button size="small" fill="clear" onClick={() => this.ok()}>{intl.message`@co.mmons/js-intl#Ok`}</ion-button>
+
+                    </div>
+
                 </ion-toolbar>
-            </ion-header>
+            </ion-footer>
+
         </Host>
     }
 }
