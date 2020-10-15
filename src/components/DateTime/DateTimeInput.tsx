@@ -1,9 +1,10 @@
 import {intl} from "@co.mmons/js-intl";
 import {TimeZoneDate} from "@co.mmons/js-utils/core";
 import {popoverController, StyleEventDetail} from "@ionic/core";
+import _default from "@ionic/core/dist/types/global/ionic-global";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
 import {DateTimeValue} from "./DateTimeValue";
-import {defaultDateTimeFormat} from "./defaultFormats";
+import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
 
 @Component({
     tag: "ionx-date-time",
@@ -19,10 +20,7 @@ export class Loading {
     placeholder: string;
 
     @Prop()
-    overlay: "popover" | "modal";
-
-    @Prop()
-    overlayTitle: string;
+    dateOnly: boolean;
 
     /**
      * Whether timezone cannot be changed.
@@ -62,10 +60,7 @@ export class Loading {
     }
 
     @Prop()
-    displayFormat: Intl.DateTimeFormatOptions;
-
-    @Prop()
-    pickerFormat: Intl.DateTimeFormatOptions;
+    formatOptions: Intl.DateTimeFormatOptions;
 
     @Prop({mutable: true})
     value: DateTimeValue;
@@ -97,7 +92,7 @@ export class Loading {
     formatValue() {
 
         if (this.value) {
-            const options = Object.assign({}, this.displayFormat || defaultDateTimeFormat);
+            const options = Object.assign({}, this.formatOptions || (this.dateOnly ? defaultDateFormat : defaultDateTimeFormat));
 
             if (this.normalizedValue.timeZone) {
                 options.timeZone = this.normalizedValue.timeZone;
@@ -112,7 +107,11 @@ export class Loading {
                 options.timeZoneName = undefined;
             }
 
-            return intl.dateTimeFormat(this.value, options);
+            if (this.dateOnly) {
+                return intl.dateFormat(this.normalizedValue, options);
+            } else {
+                return intl.dateTimeFormat(this.normalizedValue, options);
+            }
 
         } else {
             return null;
@@ -189,37 +188,9 @@ export class Loading {
     @Method()
     async open(event?: MouseEvent): Promise<void> {
 
-        let overlayTitle: string;
-        if (this.overlayTitle) {
-            overlayTitle = this.overlayTitle;
-        }
-
-        if (!overlayTitle) {
-            const ionItem = this.element.closest("ion-item");
-            if (ionItem) {
-                const titleElement = ionItem.querySelector<HTMLElement>("ionx-date-time-title");
-                if (titleElement) {
-                    overlayTitle = titleElement.innerText;
-                } else {
-                    const label = ionItem.querySelector<HTMLElement>("ion-label");
-                    if (label) {
-                        overlayTitle = label.innerText;
-                    }
-                }
-            }
-        }
-
-        if (!overlayTitle && this.element.title) {
-            overlayTitle = this.element.title;
-        }
-
-        if (!overlayTitle && this.placeholder) {
-            overlayTitle = this.placeholder;
-        }
-
         const overlayProps = {
-            overlayTitle,
-            value: this.value ?? new Date()
+            value: this.value ?? new Date(),
+            dateOnly: !!this.dateOnly
         };
 
         const popover = await popoverController.create({component: "ionx-date-time-overlay", componentProps: overlayProps, event});

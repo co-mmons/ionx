@@ -13,13 +13,13 @@ export class DateTimeOverlay {
     element: HTMLElement;
 
     @Prop()
-    overlayTitle: string;
-
-    @Prop()
-    timeZoneDisabled: boolean;
+    dateOnly: boolean;
 
     @State()
     date: Date;
+
+    @Prop()
+    timeZoneDisabled: boolean;
 
     @Prop()
     value: TimeZoneDate;
@@ -128,6 +128,11 @@ export class DateTimeOverlay {
 
     connectedCallback() {
         this.date = new Date(this.value);
+
+        if (this.dateOnly) {
+            this.date.setUTCHours(0);
+            this.date.setUTCMinutes(0, 0, 0);
+        }
     }
 
     renderPart(part: "Hour" | "Minute" | "Year" | "Month" | "Day" | "Time zone", range?: number[]) {
@@ -184,8 +189,8 @@ export class DateTimeOverlay {
                 {this.renderPart("Year", ranges["Year"])}
                 {this.renderPart("Month", ranges["Month"])}
                 {this.renderPart("Day", ranges["Day"])}
-                {this.renderPart("Hour", ranges["Hour"])}
-                {this.renderPart("Minute", ranges["Minute"])}
+                {!this.dateOnly && this.renderPart("Hour", ranges["Hour"])}
+                {!this.dateOnly && this.renderPart("Minute", ranges["Minute"])}
 
             </div>
 
