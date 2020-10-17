@@ -1,5 +1,6 @@
 import {deepEqual} from "fast-equals";
 import {Observable, Subject} from "rxjs";
+import scrollIntoView from "scroll-into-view";
 import {addEventListener, EventUnlisten} from "../dom";
 import {FormControl} from "./FormControl";
 import {FormControlElement} from "./FormControlElement";
@@ -83,7 +84,13 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         if (this.element$) {
 
             if (this.element$.setFocus) {
-                await this.element$.setFocus();
+                await this.element$.setFocus(options);
+
+            } else if (this.element$.tagName.startsWith("ION-") || this.element$.tagName.startsWith("IONX-")) {
+                if (!options?.preventScroll) {
+                    scrollIntoView(this.element$.closest("ion-item") || this.element$);
+                }
+
             } else {
                 this.element$.focus(options);
             }

@@ -14,7 +14,7 @@ export interface FormControlElement {
 
     applyFormState(state: ApplyFormState);
 
-    setFocus?(): Promise<void>;
+    setFocus?(options?: FocusOptions): Promise<void>;
 
     readonly formValueChangeEventName?: string;
 
