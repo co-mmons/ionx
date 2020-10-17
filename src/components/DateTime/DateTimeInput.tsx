@@ -1,7 +1,8 @@
 import {intl} from "@co.mmons/js-intl";
-import {TimeZoneDate} from "@co.mmons/js-utils/core";
+import {sleep, TimeZoneDate} from "@co.mmons/js-utils/core";
 import {popoverController, StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
+import {addEventListener, EventUnlisten} from "../dom";
 import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
 
 @Component({
@@ -71,7 +72,7 @@ export class Loading {
         this.emitStyle();
 
         if (fireEvent && (niu !== old || niu?.getTime() !== old?.getTime() || niu?.timeZone !== old?.timeZone)) {
-            this.ionChange.emit(niu);
+            this.ionChange.emit({value: niu});
         }
     }
 
@@ -123,6 +124,14 @@ export class Loading {
         this.element.blur();
     }
 
+    @Listen("keydown")
+    onKeyDown(ev: KeyboardEvent) {
+        if (!this.readonly && !this.disabled && (ev.key === "Enter" || ev.key === " ")) {
+            ev.preventDefault();
+            this.open(ev);
+        }
+    }
+
     focused: boolean;
 
     @Listen("focus")
@@ -133,13 +142,18 @@ export class Loading {
 
     @Listen("blur")
     onBlur() {
-        this.focused = false;
-        this.emitStyle();
+        if (this.focused && !this.overlayVisible) {
+            this.focused = false;
+            this.emitStyle();
+        }
     }
 
     @Listen("click")
     onClick(ev: MouseEvent) {
-        this.open(ev);
+
+        if (!ev.composedPath().find(t => (t as HTMLElement).tagName === "ION-BUTTON")) {
+            this.open(ev);
+        }
     }
 
     /**
@@ -174,22 +188,30 @@ export class Loading {
         this.value = undefined;
     }
 
+    overlayVisible: boolean;
+
     @Method()
-    async open(event?: MouseEvent): Promise<void> {
+    async open(event?: any): Promise<void> {
 
         const overlayProps = {
             value: this.value ?? new Date(),
             dateOnly: !!this.dateOnly
         };
 
-        const popover = await popoverController.create({component: "ionx-date-time-overlay", componentProps: overlayProps, event});
+        const popover = await popoverController.create({component: "ionx-date-time-overlay", componentProps: overlayProps, event, showBackdrop: true});
         popover.present();
+        this.overlayVisible = true;
 
         const result = await popover.onWillDismiss();
         if (result.role === "ok") {
             this.value = result.data;
         }
+
+        this.overlayVisible = false;
+        this.setFocus({preventScroll: true});
     }
+
+    itemClickUnlisten: EventUnlisten;
 
     connectedCallback() {
 
@@ -197,6 +219,31 @@ export class Loading {
 
         if (!this.element.hasAttribute("tabIndex")) {
             this.element.setAttribute("tabIndex", "0");
+        }
+
+        this.initItemListener();
+    }
+
+    disconnectedCallback() {
+        this.itemClickUnlisten?.();
+        this.itemClickUnlisten = undefined;
+    }
+
+    async initItemListener() {
+
+        while (!this.element.parentElement) {
+            await sleep(100);
+        }
+
+        if (this.element.parentElement.tagName === "IONX-FORM-ITEM") {
+            while (!this.element.assignedSlot) {
+                await sleep(100);
+            }
+        }
+
+        const item = this.element.closest("ion-item");
+        if (item) {
+            this.itemClickUnlisten = addEventListener(item, "click", ev => this.focused && ev.target === item && (this.open({target: this.element}) || true));
         }
     }
 

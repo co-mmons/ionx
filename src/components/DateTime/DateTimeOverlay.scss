@@ -31,6 +31,7 @@
         }
 
         ion-toolbar {
+            --border-width: 0px !important;
             --padding-start: 0px;
             --padding-end: 0px;
             --padding-top: 0px;
@@ -75,10 +76,6 @@
 
             ion-button {
                 width: 50%;
-            }
-
-            ion-button:not(:first-child) {
-                border-left: var(--ionx-border-width) solid var(--ion-border-color);
             }
         }
     }

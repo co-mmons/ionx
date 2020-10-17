@@ -31,7 +31,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
     readonly controls: {[controlName: string]: FormControl<any>}  & {
         [controlName in keyof Controls]: FormControl<Controls[controlName]["value"]>}= {} as any;
 
-    private stateChanged = new BehaviorSubject({current: this.state(), previous: null as FormState, valueChange: false, statusChange: false});
+    private stateChanged = new BehaviorSubject({current: this.state(), previous: null as FormState, value: false, status: false});
 
     private bindHosts: Array<[any, {[controlName: string]: string}]> = [];
 
@@ -151,7 +151,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         // this.fireStateChange();
     }
 
-    onStateChange(observer: (event: {current: FormState, previous: FormState}) => void): Subscription {
+    onStateChange(observer: (event: {current: FormState, previous: FormState, value: boolean, status: boolean}) => void): Subscription {
         return this.stateChanged.subscribe(event => observer(event));
     }
 
@@ -224,8 +224,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         const previousStatus = this.status;
         this.status = Object.assign({}, currentState, {controls: undefined});
 
-        const statusChange = deepEqual(this.status, previousStatus);
-        const valueChange = deepEqual(
+        const statusChange = !deepEqual(this.status, previousStatus);
+        const valueChange = !deepEqual(
             Object.entries(currentState?.controls || {}).map(entry => ({control: entry[0], value: entry[1].value})),
             Object.entries(previousEvent?.current?.controls || {}).map(entry => ({control: entry[0], value: entry[1].value}))
         );
@@ -239,7 +239,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
                 forceUpdate(this.renderer);
             }
 
-            this.stateChanged.next({current: currentState, previous: previousEvent?.current, statusChange, valueChange});
+            this.stateChanged.next({current: currentState, previous: previousEvent?.current, status: statusChange, value: valueChange});
         }
 
         if (currentState.valid) {

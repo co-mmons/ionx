@@ -406,7 +406,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
         if (statusChanged || valueChanged) {
 
-            console.debug(`[ionx-form-control] state of "${this.name}" changed`);
+            console.debug(`[ionx-form-control] state of "${this.name}" changed: {status: ${statusChanged}, value: ${valueChanged}}`);
 
             const previousStatus = "status" in previous ? previous.status : status;
             const previousValue = "value" in previous ? previous.value : this.value$;

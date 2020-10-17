@@ -199,9 +199,9 @@ export class DateTimeOverlay {
 
                     <div>
 
-                        <ion-button size="small" fill="clear" onClick={() => this.cancel()}>{intl.message`@co.mmons/js-intl#Cancel`}</ion-button>
+                        <ion-button fill="clear" onClick={() => this.cancel()}>{intl.message`@co.mmons/js-intl#Cancel`}</ion-button>
 
-                        <ion-button size="small" fill="clear" onClick={() => this.ok()}>{intl.message`@co.mmons/js-intl#Ok`}</ion-button>
+                        <ion-button fill="clear" onClick={() => this.ok()}>{intl.message`@co.mmons/js-intl#Ok`}</ion-button>
 
                     </div>
 
