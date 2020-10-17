@@ -31,7 +31,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
     readonly controls: {[controlName: string]: FormControl<any>}  & {
         [controlName in keyof Controls]: FormControl<Controls[controlName]["value"]>}= {} as any;
 
-    private stateChanged = new BehaviorSubject(this.state());
+    private stateChanged = new BehaviorSubject({current: this.state(), previous: null as FormState, valueChange: false, statusChange: false});
 
     private bindHosts: Array<[any, {[controlName: string]: string}]> = [];
 
@@ -39,7 +39,7 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
 
     private errorPresenter$: FormValidationErrorPresenter;
 
-    private lastState: Omit<FormState, "controls">;
+    private status: Omit<FormState, "controls">;
 
     set errorPresenter(presenter: FormValidationErrorPresenter) {
         this.setErrorPresenter(presenter);
@@ -151,16 +151,16 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         // this.fireStateChange();
     }
 
-    onStateChange(observer: (state: FormState) => void): Subscription {
-        return this.stateChanged.subscribe((state) => observer(state));
+    onStateChange(observer: (event: {current: FormState, previous: FormState}) => void): Subscription {
+        return this.stateChanged.subscribe(event => observer(event));
     }
 
     get dirty() {
-        return this.lastState?.dirty || false;
+        return this.status?.dirty || false;
     }
 
     get valid() {
-        return this.lastState ? this.lastState.valid : false;
+        return this.status ? this.status.valid : false;
     }
 
     state(): FormState {
@@ -218,24 +218,31 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
     }
 
     private fireStateChange(checkForChange = true) {
-        const previous = this.stateChanged.getValue();
-        const current = this.state();
+        const previousEvent = this.stateChanged.getValue();
+        const currentState = this.state();
 
-        this.lastState = Object.assign({}, current, {controls: undefined});
+        const previousStatus = this.status;
+        this.status = Object.assign({}, currentState, {controls: undefined});
 
-        if (!checkForChange || (checkForChange && !deepEqual(previous, current))) {
-            console.debug(`[ionx-form-controller] form state changed`, current);
+        const statusChange = deepEqual(this.status, previousStatus);
+        const valueChange = deepEqual(
+            Object.entries(currentState?.controls || {}).map(entry => ({control: entry[0], value: entry[1].value})),
+            Object.entries(previousEvent?.current?.controls || {}).map(entry => ({control: entry[0], value: entry[1].value}))
+        );
 
-            this.runBindHost(current);
+        if (!checkForChange || (checkForChange && (statusChange || valueChange))) {
+            console.debug(`[ionx-form-controller] form state changed`, currentState);
+
+            this.runBindHost(currentState);
 
             if (this.renderer) {
                 forceUpdate(this.renderer);
             }
 
-            this.stateChanged.next(current);
+            this.stateChanged.next({current: currentState, previous: previousEvent?.current, statusChange, valueChange});
         }
 
-        if (current.valid) {
+        if (currentState.valid) {
             this.errorPresenter$?.dismiss(this);
         }
     }

@@ -1,9 +1,7 @@
 import {intl} from "@co.mmons/js-intl";
 import {TimeZoneDate} from "@co.mmons/js-utils/core";
 import {popoverController, StyleEventDetail} from "@ionic/core";
-import _default from "@ionic/core/dist/types/global/ionic-global";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
-import {DateTimeValue} from "./DateTimeValue";
 import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
 
 @Component({
@@ -63,28 +61,19 @@ export class Loading {
     formatOptions: Intl.DateTimeFormatOptions;
 
     @Prop({mutable: true})
-    value: DateTimeValue;
+    value: TimeZoneDate;
 
     @Watch("value")
-    valueChanged(niu: DateTimeValue) {
-
-        if (niu instanceof TimeZoneDate) {
-            this.normalizedValue = niu;
-        } else if (niu instanceof Date) {
-            this.normalizedValue = new TimeZoneDate(niu, this.timeZoneDisabled ? undefined : this.defaultTimeZone);
-        } else if (typeof niu === "number") {
-            this.normalizedValue = new TimeZoneDate(niu, this.timeZoneDisabled ? undefined : this.defaultTimeZone);
-        } else {
-            this.normalizedValue = undefined;
-        }
+    valueChanged(niu: TimeZoneDate, old: TimeZoneDate, fireEvent = true) {
 
         this.formattedValue = this.formatValue();
 
         this.emitStyle();
-    }
 
-    @State()
-    normalizedValue: TimeZoneDate;
+        if (fireEvent && (niu !== old || niu?.getTime() !== old?.getTime() || niu?.timeZone !== old?.timeZone)) {
+            this.ionChange.emit(niu);
+        }
+    }
 
     @State()
     formattedValue: string;
@@ -94,23 +83,23 @@ export class Loading {
         if (this.value) {
             const options = Object.assign({}, this.formatOptions || (this.dateOnly ? defaultDateFormat : defaultDateTimeFormat));
 
-            if (this.normalizedValue.timeZone) {
-                options.timeZone = this.normalizedValue.timeZone;
+            if (this.value.timeZone) {
+                options.timeZone = this.value.timeZone;
 
                 if (!options.timeZoneName) {
                     options.timeZoneName = "short";
                 }
             }
 
-            if (!this.normalizedValue.timeZone) {
+            if (!this.value.timeZone) {
                 options.timeZone = "UTC";
                 options.timeZoneName = undefined;
             }
 
             if (this.dateOnly) {
-                return intl.dateFormat(this.normalizedValue, options);
+                return intl.dateFormat(this.value, options);
             } else {
-                return intl.dateTimeFormat(this.normalizedValue, options);
+                return intl.dateTimeFormat(this.value, options);
             }
 
         } else {
@@ -204,7 +193,7 @@ export class Loading {
 
     connectedCallback() {
 
-        this.valueChanged(this.value);
+        this.valueChanged(this.value, undefined, false);
 
         if (!this.element.hasAttribute("tabIndex")) {
             this.element.setAttribute("tabIndex", "0");

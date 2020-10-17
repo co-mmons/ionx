@@ -271,7 +271,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     private stateChanges$ = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
 
     private applyState(state: ApplyState, options?: {preventEvent?: boolean, trigger?: "elementValueChange"}): {valueChange: boolean, statusChange: boolean} {
-        console.debug(`[ionx-form-control] apply "${this.name} state`, state);
+        console.debug(`[ionx-form-control] apply "${this.name}" state`, state);
 
         // we need to know status and value before any change
         const status = this.status();
@@ -313,7 +313,10 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     }
 
     private onElementChange(ev: CustomEvent) {
-        this.applyState({dirty: true, value: ev.detail?.value}, {trigger: "elementValueChange"});
+
+        const value = "checked" in ev.detail ? ev.detail.checked : ev.detail.value;
+
+        this.applyState({dirty: true, value}, {trigger: "elementValueChange"});
         this.validateImpl({trigger: "valueChange"});
     }
 
