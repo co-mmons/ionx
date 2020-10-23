@@ -1,8 +1,9 @@
 export {addEventListener} from "./addEventListener";
-export {EventUnlisten} from "./EventUnlisten";
 export {applyPartStyles} from "./applyPartStyles";
+export {EventUnlisten} from "./EventUnlisten";
 export {isHydrated, isChildrenHydrated} from "./isHydrated";
-export {markTagNameAsHydratable, markTagPrefixAsHydratable} from "./markAsHydratable";
 export {isReady, isChildrenReady, markAsReady, markAsUnready} from "./readyStateChangeEvent";
-export {matchedMediaBreakpoints} from "./matchedMediaBreakpoints";
 export {loadScript} from "./loadScript";
+export {markTagNameAsHydratable, markTagPrefixAsHydratable} from "./markAsHydratable";
+export {matchedMediaBreakpoints} from "./matchedMediaBreakpoints";
+export {windowSize, WindowSize, WindowSizeOptions, WindowOrientation} from "./windowSize";
