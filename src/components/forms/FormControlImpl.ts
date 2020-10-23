@@ -1,7 +1,7 @@
 import {deepEqual} from "fast-equals";
 import {Observable, Subject} from "rxjs";
 import scrollIntoView from "scroll-into-view";
-import {addEventListener, EventUnlisten} from "../dom";
+import {addEventListener, EventUnlisten} from "../misc";
 import {FormControl} from "./FormControl";
 import {FormControlElement} from "./FormControlElement";
 import {FormControlReadonlyState, FormControlState} from "./FormControlState";

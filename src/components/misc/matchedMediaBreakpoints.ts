@@ -19,7 +19,7 @@ export type MediaBreakpoint = keyof typeof breakpointsMinWidth;
 
 const allBreakpoints = Object.keys(breakpointsMinWidth) as MediaBreakpoint[];
 
-const hookNamePrefix = "ionx/dom/matchedMediaBreakpoints:";
+const hookNamePrefix = "ionx/misc/matchedMediaBreakpoints:";
 
 type MatchedBreakpoints<T extends MediaBreakpoint = MediaBreakpoint> = {readonly [key in T]: boolean};
 
@@ -102,7 +102,7 @@ class BreakpointMatcher implements ComponentDisconnectHook {
             }
         }
 
-        console.debug("[ionx/dom/matchedMediaBreakpoints] changed breakpoint", event.media, event.matches);
+        console.debug("[ionx/misc/matchedMediaBreakpoints] changed breakpoint", event.media, event.matches);
 
         forceUpdate(this.component);
     }

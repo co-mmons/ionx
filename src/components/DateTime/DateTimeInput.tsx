@@ -2,7 +2,7 @@ import {intl} from "@co.mmons/js-intl";
 import {sleep, TimeZoneDate} from "@co.mmons/js-utils/core";
 import {popoverController, StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
-import {addEventListener, EventUnlisten} from "../dom";
+import {addEventListener, EventUnlisten} from "../misc";
 import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
 
 @Component({

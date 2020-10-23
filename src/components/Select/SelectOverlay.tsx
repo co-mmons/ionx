@@ -3,7 +3,7 @@ import {intl} from "@co.mmons/js-intl";
 import {sleep} from "@co.mmons/js-utils/core";
 import {isPlatform} from "@ionic/core";
 import {Component, ComponentInterface, Element, h, Host, Listen, Prop, State} from "@stencil/core";
-import {matchedMediaBreakpoint} from "../dom/matchedMediaBreakpoints";
+import {matchedMediaBreakpoint} from "../misc/matchedMediaBreakpoints";
 import {indexAttribute} from "./indexAttribute";
 import {isEqualValue} from "./isEqualValue";
 import {SelectOption} from "./SelectOption";

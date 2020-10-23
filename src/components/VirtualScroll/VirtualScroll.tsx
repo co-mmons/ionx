@@ -1,5 +1,5 @@
 import {Component, Element, forceUpdate, FunctionalComponent, h, Host, Prop, VNode} from "@stencil/core";
-import {addEventListener, EventUnlisten} from "../dom";
+import {addEventListener, EventUnlisten} from "../misc";
 
 const indexAttribute = "__ionx-vl-idx";
 

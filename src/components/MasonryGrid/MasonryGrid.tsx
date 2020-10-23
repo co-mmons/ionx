@@ -1,8 +1,7 @@
 import {Capacitor} from "@capacitor/core";
 import {sleep, waitTill} from "@co.mmons/js-utils/core";
 import {Component, ComponentInterface, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
-import {addEventListener, EventUnlisten, isHydrated, markAsReady} from "../dom";
-import {markAsUnready} from "../dom/readyStateChangeEvent";
+import {addEventListener, EventUnlisten, isHydrated, markAsReady, markAsUnready} from "../misc";
 import {ExtendedItemElement} from "./ExtendedItemElement";
 import {lineBreakAttribute} from "./lineBreak";
 
