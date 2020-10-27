@@ -8,7 +8,7 @@ import {LoadingOptions} from "./LoadingOptions";
 @Component({
     tag: "ionx-loading",
     styleUrl: "Loading.scss",
-    shadow: true
+    scoped: true
 })
 export class Loading implements LoadingOptions {
 

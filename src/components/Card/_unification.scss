@@ -1,0 +1,19 @@
+@mixin ionx-card-unification() {
+    margin: 16px;
+
+    ion-card-title {
+        font-size: 22px;
+    }
+
+    ion-card-subtitle {
+        font-size: 14px;
+        text-transform: none;
+        letter-spacing: initial;
+        margin: 0px;
+        padding: 0px;
+
+        &:first-of-type {
+            margin-top: 4px;
+        }
+    }
+}
