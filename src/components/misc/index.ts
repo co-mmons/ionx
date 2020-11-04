@@ -5,5 +5,6 @@ export {isHydrated, isChildrenHydrated} from "./isHydrated";
 export {isReady, isChildrenReady, markAsReady, markAsUnready} from "./readyStateChangeEvent";
 export {loadScript} from "./loadScript";
 export {markTagNameAsHydratable, markTagPrefixAsHydratable} from "./markAsHydratable";
-export {matchedMediaBreakpoints} from "./matchedMediaBreakpoints";
+export {matchesMediaBreakpoints, matchesMediaBreakpoint} from "./matchesMediaBreakpoints";
+export {matchesMediaQuery} from "./matchesMediaQuery";
 export {windowSize, WindowSize, WindowSizeOptions, WindowOrientation} from "./windowSize";

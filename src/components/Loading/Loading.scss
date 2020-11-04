@@ -1,8 +1,8 @@
 :host {
     display: flex;
     align-items: center;
-    --backdrop-color: 255, 255, 255;
-    --backdrop-opacity: 0.8;
+    --loading-backdrop-color: 255, 255, 255;
+    --loading-backdrop-opacity: 0.8;
 
     &[fill] {
         position: absolute;
@@ -17,6 +17,6 @@
     }
 
     &.ionx--backdrop-visible {
-        background-color: rgba(var(--backdrop-color), var(--backdrop-opacity));
+        background-color: rgba(var(--loading-backdrop-color), var(--loading-backdrop-opacity));
     }
 }

@@ -15,8 +15,12 @@ export class MasonryGrid implements ComponentInterface {
     @Element()
     element: HTMLElement;
 
-    @Prop()
-    singleColumn?: boolean;
+    /**
+     * If grid should behave as block element, where all its children
+     * are layed row by row in single column.
+     */
+    @Prop({reflect: true})
+    block?: boolean;
 
     busy: boolean;
 
@@ -93,6 +97,24 @@ export class MasonryGrid implements ComponentInterface {
         this.waiting = false;
         this.busy = true;
 
+        if (this.block) {
+
+            const items = this.items();
+
+            // czekamy na hydrację
+            for (let i = 0; i < items.length; i++) {
+                while (!isHydrated(items[i])) {
+                    await sleep(10);
+                }
+            }
+
+            markAsReady(this);
+
+            this.busy = false;
+
+            return;
+        }
+
         try {
 
             // czy są itemy, które trzeba ułożyć
@@ -100,7 +122,7 @@ export class MasonryGrid implements ComponentInterface {
 
             // wszystkie itemy gridu
             const items = this.items();
-            console.error("[ionx-masonry-grid] checking items")
+            // console.error("[ionx-masonry-grid] checking items")
 
             // sprawdzamy item pod kątem zmienionych itemów, usuniętych lub przesuniętych
             for (let i = 0; i < items.length; i++) {

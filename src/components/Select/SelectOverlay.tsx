@@ -3,7 +3,7 @@ import {intl} from "@co.mmons/js-intl";
 import {sleep} from "@co.mmons/js-utils/core";
 import {isPlatform} from "@ionic/core";
 import {Component, ComponentInterface, Element, h, Host, Listen, Prop, State} from "@stencil/core";
-import {matchedMediaBreakpoint} from "../misc/matchedMediaBreakpoints";
+import {matchesMediaBreakpoint} from "../misc/matchesMediaBreakpoints";
 import {indexAttribute} from "./indexAttribute";
 import {isEqualValue} from "./isEqualValue";
 import {SelectOption} from "./SelectOption";
@@ -273,7 +273,7 @@ export class SelectOverlay implements ComponentInterface {
 
                     <ion-back-button
                         style={{display: "inline-block"}}
-                        icon={matchedMediaBreakpoint(this, "md") ? "close" : null}
+                        icon={matchesMediaBreakpoint(this, "md") ? "close" : null}
                         onClick={ev => [ev.preventDefault(), this.cancel()]}
                         slot="start"/>
 

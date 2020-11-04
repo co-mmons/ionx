@@ -22,6 +22,9 @@ export class Loading implements LoadingOptions {
     backdropVisible?: boolean;
 
     @Prop()
+    backdropOpacity?: number;
+
+    @Prop()
     header?: string;
 
     @Prop()
@@ -75,7 +78,14 @@ export class Loading implements LoadingOptions {
     }
 
     render() {
-        return <Host class={{"ionx--backdrop-visible": this.backdropVisible}}>
+
+        const styles = {};
+
+        if (this.backdropOpacity > 0) {
+            styles["--loading-backdrop-opacity"] = `${this.backdropOpacity}`;
+        }
+
+        return <Host class={{"ionx--backdrop-visible": this.backdropVisible}} style={styles}>
 
             <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.fill ? "initial" : "1"}}>
 

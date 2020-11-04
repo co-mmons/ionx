@@ -3,12 +3,12 @@
     position: relative;
     width: 100%;
 
-    //&:not([cascade]) {
-    //    height: auto !important;
-    //}
+    &[block] {
+        height: auto !important;
+    }
 }
 
-::slotted(*) {
+:host(:not([block]))::slotted(*) {
     position: absolute;
     display: none;
 }

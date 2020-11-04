@@ -19,29 +19,29 @@ export type MediaBreakpoint = keyof typeof breakpointsMinWidth;
 
 const allBreakpoints = Object.keys(breakpointsMinWidth) as MediaBreakpoint[];
 
-const hookNamePrefix = "ionx/misc/matchedMediaBreakpoints:";
+const hookNamePrefix = "ionx/misc/matchesMediaBreakpoints:";
 
 type MatchedBreakpoints<T extends MediaBreakpoint = MediaBreakpoint> = {readonly [key in T]: boolean};
 
-export function matchedMediaBreakpoint(breakpoint: MediaBreakpoint): boolean;
+export function matchesMediaBreakpoint(breakpoint: MediaBreakpoint): boolean;
 
-export function matchedMediaBreakpoint(component: any, breakpoint: MediaBreakpoint): boolean;
+export function matchesMediaBreakpoint(component: any, breakpoint: MediaBreakpoint): boolean;
 
-export function matchedMediaBreakpoint(componentOrBreakpoint: any | MediaBreakpoint, breakpoint?: MediaBreakpoint): boolean {
+export function matchesMediaBreakpoint(componentOrBreakpoint: any | MediaBreakpoint, breakpoint?: MediaBreakpoint): boolean {
     const component = typeof componentOrBreakpoint === "string" ? null : componentOrBreakpoint;
-    const r = matchedMediaBreakpoints(component, [typeof componentOrBreakpoint === "string" ? componentOrBreakpoint as MediaBreakpoint : breakpoint]);
+    const r = matchesMediaBreakpoints(component, [typeof componentOrBreakpoint === "string" ? componentOrBreakpoint as MediaBreakpoint : breakpoint]);
     return r[breakpoint];
 }
 
-export function matchedMediaBreakpoints(): MatchedBreakpoints<MediaBreakpoint>;
+export function matchesMediaBreakpoints(): MatchedBreakpoints<MediaBreakpoint>;
 
-export function matchedMediaBreakpoints<T extends MediaBreakpoint>(breakpoints: T[]): MatchedBreakpoints<T>;
+export function matchesMediaBreakpoints<T extends MediaBreakpoint>(breakpoints: T[]): MatchedBreakpoints<T>;
 
-export function matchedMediaBreakpoints<T extends MediaBreakpoint>(component: any, breakpoints: MediaBreakpoint[]): MatchedBreakpoints<T>;
+export function matchesMediaBreakpoints<T extends MediaBreakpoint>(component: any, breakpoints: MediaBreakpoint[]): MatchedBreakpoints<T>;
 
-export function matchedMediaBreakpoints(component: any): MatchedBreakpoints;
+export function matchesMediaBreakpoints(component: any): MatchedBreakpoints;
 
-export function matchedMediaBreakpoints(componentOrBreakpoints?: any | MediaBreakpoint[], breakpoints?: MediaBreakpoint[]): MatchedBreakpoints {
+export function matchesMediaBreakpoints(componentOrBreakpoints?: any | MediaBreakpoint[], breakpoints?: MediaBreakpoint[]): MatchedBreakpoints {
 
     const component = Array.isArray(componentOrBreakpoints) ? null : componentOrBreakpoints;
 
@@ -102,7 +102,7 @@ class BreakpointMatcher implements ComponentDisconnectHook {
             }
         }
 
-        console.debug("[ionx/misc/matchedMediaBreakpoints] changed breakpoint", event.media, event.matches);
+        console.debug("[ionx/misc/matchesMediaBreakpoints] changed breakpoint", event.media, event.matches);
 
         forceUpdate(this.component);
     }
