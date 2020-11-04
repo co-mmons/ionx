@@ -34,7 +34,7 @@ export interface FormControl<Value = any> {
 
     setValue(value: Value);
 
-    focus(options?: FocusOptions): void;
+    focus(options?: FocusOptions & {waitForElement?: boolean | number}): void;
 
     enable(): void;
 

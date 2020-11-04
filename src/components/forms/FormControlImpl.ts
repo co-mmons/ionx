@@ -1,3 +1,4 @@
+import {waitTill} from "@co.mmons/js-utils/core";
 import {deepEqual} from "fast-equals";
 import {Observable, Subject} from "rxjs";
 import scrollIntoView from "scroll-into-view";
@@ -79,7 +80,14 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         return this.stateChanges$.subscribe(change => observer(change));
     }
 
-    async focus(options?: FocusOptions) {
+    async focus(options?: FocusOptions & {waitForElement?: boolean | number}) {
+
+        if (!this.element$ && (options?.waitForElement === true || (typeof options?.waitForElement === "number" && options.waitForElement > 0))) {
+            try {
+                await waitTill(() => !!this.element$, undefined, typeof options.waitForElement === "number" ? options.waitForElement : 1000);
+            } catch {
+            }
+        }
 
         if (this.element$) {
 

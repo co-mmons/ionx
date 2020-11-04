@@ -332,8 +332,6 @@ export class MasonryGrid implements ComponentInterface {
                 this.lastWidth = gridRect.width;
                 this.lastItemsCount = items.length;
 
-                markAsReady(this);
-
                 if (Capacitor.platform === "ios") {
                     let scroll: HTMLElement = await this.content.getScrollElement();
                     scroll.style.overflowY = "hidden";
@@ -345,6 +343,8 @@ export class MasonryGrid implements ComponentInterface {
         } finally {
             if (this.busy) {
                 this.busy = false;
+
+                markAsReady(this);
 
                 if (!this.isParentViewActive() || this.paused) {
                     this.layout();

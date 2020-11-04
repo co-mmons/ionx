@@ -1,0 +1,47 @@
+ion-toolbar {
+
+    &.md, &.ios {
+        ion-menu-button + ion-title, ion-back-button + ion-title {
+            padding-left: 0px;
+        }
+    }
+
+    &.md {
+        ion-title {
+            padding-left: 16px;
+        }
+    }
+
+    &.ios {
+        --padding-start: 0px;
+        --padding-end: 0px;
+
+        ion-back-button {
+            width: 48px;
+        }
+
+        ion-menu-button {
+            width: 54px;
+        }
+
+        ion-title {
+            position: relative;
+            left: 0px;
+            top: 0px;
+            padding: 0 16px 0 0px;
+            text-align: left;
+        }
+    }
+
+    > ion-buttons[slot=end] {
+        margin-right: 8px;
+
+        ion-button {
+            margin-left: 4px;
+            margin-right: 4px;
+            --padding-start: 4px;
+            --padding-end: 4px;
+        }
+    }
+
+}
