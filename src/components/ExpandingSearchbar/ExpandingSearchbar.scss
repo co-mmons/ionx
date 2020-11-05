@@ -41,16 +41,16 @@
 
 :host-context(ion-toolbar.ios) {
 
-    &[expanded]::slotted(ion-searchbar[ionx-searchbar-flat]) {
-        padding-left: 8px;
-        padding-right: 8px;
+    &[expanded]::slotted(ion-searchbar) {
+        padding-right: calc(var(--padding-start) + 8px);
+        padding-left: calc(var(--padding-end) + 8px);
     }
 }
 
 :host-context(ion-toolbar.md) {
 
-    &[expanded]::slotted(ion-searchbar[ionx-searchbar-flat]) {
-        padding-left: 0px;
-        padding-right: 0px;
+    &[expanded]::slotted(ion-searchbar) {
+        padding-right: var(--padding-start);
+        padding-left: var(--padding-end);
     }
 }
