@@ -56,6 +56,10 @@ export class Toolbar {
             return;
         }
 
+        if (!this.toolbarElement) {
+            return;
+        }
+
         const toolbarHeight = 56;
         const scrollTop = scrollElement.scrollTop;
 
