@@ -1,8 +1,7 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten} from "../misc";
-
-type TitleWrap = "collapse" | boolean;
+import {ToolbarTitleWrap} from "./ToolbarTitleWrap";
 
 @Component({
     tag: "ionx-toolbar",
@@ -24,10 +23,10 @@ export class Toolbar {
     defaultBackHref: string;
 
     @Prop()
-    titleWrap: TitleWrap = false;
+    titleWrap: ToolbarTitleWrap = false;
 
     @Watch("titleWrap")
-    titleWrapChanged(niu: TitleWrap, old: TitleWrap) {
+    titleWrapChanged(niu: ToolbarTitleWrap, old: ToolbarTitleWrap) {
         if (niu !== old) {
             if (niu !== "collapse") {
                 this.disableCollapsibleTitle();
@@ -78,7 +77,6 @@ export class Toolbar {
     async enableCollapsibleTitle() {
 
         if (!this.unlistenScroll) {
-            console.log("[ionx-main-toolbar] enabling collapsible title");
 
             let content: HTMLIonContentElement;
             try {
