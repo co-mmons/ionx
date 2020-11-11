@@ -279,7 +279,7 @@ export class MasonryGrid implements ComponentInterface {
                     }
 
                     const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after");
-                    const isNewSection = sectionItems.length === 0 || breakLine;
+                    let isNewSection = sectionItems.length === 0 || gridRect.width === item.__ionxMasonryCache.rect.width || breakLine;
 
                     // element, pod którym mam być wstawiony ten element
                     // w przypadku nowej lini albo puste, albo element, który jest najbardziej wysunięty do dołu
@@ -296,9 +296,15 @@ export class MasonryGrid implements ComponentInterface {
 
                         // console.log(sibling.__ionxMasonryCache.rect.left - gridRect.left, sibling.__ionxMasonryCache.rect.width, item.__ionxMasonryCache.rect.width, gridRect.width);
                         // console.log((sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width), gridRect.width);
+                        // console.log(sibling.__ionxMasonryCache.rect.left, gridRect.left, sibling.__ionxMasonryCache.rect.width, item.__ionxMasonryCache.rect.width, gridRect.width);
+
+                        if (gridRect.width === sibling.__ionxMasonryCache.rect.width) {
+                            isNewSection = true;
+                            sectionItems = [];
+                        }
 
                         // nie ma już miejsca w pierwszej lini sekcji, trzeba zawijać i szukać itemu, pod którym jest miejsce
-                        if (~~(sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width) > gridRect.width) {
+                        else if (~~(sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width) > gridRect.width) {
                             sibling = sectionItems.pop();
                             sectionCascade = true;
                         }
@@ -311,11 +317,14 @@ export class MasonryGrid implements ComponentInterface {
                     let itemTop: number;
 
                     if (!item.__ionxMasonryLaid) {
+
                         itemLeft = isNewSection ? 0 : (itemsPositions[sibling.__ionxMasonryCache.index].left + (!sectionCascade ? sibling.__ionxMasonryCache.rect.width : 0));
                         itemTop = !sibling ? 0 : (itemsPositions[sibling.__ionxMasonryCache.index].top + (sectionCascade || isNewSection ? sibling.__ionxMasonryCache.rect.height : 0));
 
                         item.style.left = `${itemLeft}px`;
                         item.style.top = `${itemTop}px`;
+
+                        // console.log(itemLeft, sibling, sibling && itemsPositions[sibling.__ionxMasonryCache.index].left);
 
                         item.__ionxMasonryLaid = true;
 
@@ -343,9 +352,9 @@ export class MasonryGrid implements ComponentInterface {
                     // }
                 }
 
-                let lowestItem = (sectionItems.length && sectionItems[0]) || (items.length && items[items.length - 1]);
+                const lowestItem = (sectionItems.length && sectionItems[0]) || (items.length && items[items.length - 1]);
                 if (lowestItem) {
-                    let rect = lowestItem.getBoundingClientRect();
+                    const rect = lowestItem.getBoundingClientRect();
                     this.element.style.height = `${rect.top - gridRect.top + rect.height}px`;
                 } else {
                     this.element.style.height = "0px";
@@ -355,7 +364,7 @@ export class MasonryGrid implements ComponentInterface {
                 this.lastItemsCount = items.length;
 
                 if (Capacitor.platform === "ios") {
-                    let scroll: HTMLElement = await this.content.getScrollElement();
+                    const scroll: HTMLElement = await this.content.getScrollElement();
                     scroll.style.overflowY = "hidden";
                     await sleep(200);
                     scroll.style.overflowY = "auto";

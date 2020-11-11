@@ -1,6 +1,7 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten} from "../misc";
+import {ToolbarButtonType} from "./ToolbarButtonType";
 import {ToolbarTitleWrap} from "./ToolbarTitleWrap";
 
 @Component({
@@ -14,7 +15,7 @@ export class Toolbar {
     element: HTMLElement;
 
     @Prop()
-    button!: "menu" | "back";
+    button!: ToolbarButtonType;
 
     @Prop()
     buttonIcon: string;

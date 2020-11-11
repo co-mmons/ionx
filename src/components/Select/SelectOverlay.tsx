@@ -297,7 +297,7 @@ export class SelectOverlay implements ComponentInterface {
 
             <ion-content scrollY={this.overlay === "modal"} scrollX={false}>
 
-                {!this.didEnter && this.overlay === "modal" && <ionx-loading type="spinner" fill={true} slot="fixed"/>}
+                {!this.didEnter && this.overlay === "modal" && <ionx-loading type="spinner" cover={true} slot="fixed"/>}
 
                 <ion-list lines="full">
 

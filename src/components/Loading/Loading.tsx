@@ -16,7 +16,7 @@ export class Loading implements LoadingOptions {
      * If loading element should fill available space and center content both h and v.
      */
     @Prop({reflect: true})
-    fill?: boolean;
+    cover?: boolean;
 
     @Prop()
     backdropVisible?: boolean;
@@ -87,7 +87,7 @@ export class Loading implements LoadingOptions {
 
         return <Host class={{"ionx--backdrop-visible": this.backdropVisible}} style={styles}>
 
-            <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.fill ? "initial" : "1"}}>
+            <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.cover ? "initial" : "1"}}>
 
                 {this.spinnerMode && <ion-spinner color={this.color} style={{marginRight: !!(this.header || this.message) && "8px"}}/>}
 

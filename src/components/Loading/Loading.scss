@@ -4,7 +4,7 @@
     --loading-backdrop-color: 255, 255, 255;
     --loading-backdrop-opacity: 0.8;
 
-    &[fill] {
+    &[cover] {
         position: absolute;
         width: 100%;
         height: 100%;
