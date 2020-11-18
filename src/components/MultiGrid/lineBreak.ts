@@ -1,4 +1,4 @@
-export const lineBreakAttribute = "ionx-masonry-grid-line-break";
+export const lineBreakAttribute = "ionx-multi-grid-line-break";
 
 export function lineBreak(beforeOrAfter: "before" | "after" | boolean = "before") {
     if (!beforeOrAfter) {

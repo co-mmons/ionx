@@ -1,0 +1,19 @@
+@mixin ionx-media-breakpoint-width($varPrefix, $defaultWidth) {
+    width: var(#{$varPrefix + "-xs"}, $defaultWidth);
+
+    @media (min-width: 576px) {
+        width: var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, $defaultWidth));
+    }
+
+    @media (min-width: 768px) {
+        width: var(#{$varPrefix + "-md"}, var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, $defaultWidth)));
+    }
+
+    @media (min-width: 992px) {
+        width: var(#{$varPrefix + "-lg"}, var(#{$varPrefix + "-md"}, var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, $defaultWidth))));
+    }
+
+    @media (min-width: 1200px) {
+        width: var(#{$varPrefix + "-xl"}, var(#{$varPrefix + "-lg"}, var(#{$varPrefix + "-md"}, var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, $defaultWidth)))));
+    }
+}

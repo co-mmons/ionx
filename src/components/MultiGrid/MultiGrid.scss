@@ -3,12 +3,12 @@
     position: relative;
     width: 100%;
 
-    &[block] {
+    &[layout=block] {
         height: auto !important;
     }
 }
 
-:host(:not([block]))::slotted(*) {
+:host(:not([layout=block]))::slotted(*) {
     position: absolute;
     display: none;
 }

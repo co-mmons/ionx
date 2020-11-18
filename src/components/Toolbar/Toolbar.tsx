@@ -1,6 +1,6 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
-import {addEventListener, EventUnlisten} from "../misc";
+import {addEventListener, EventUnlisten, matchesMediaBreakpoint} from "../misc";
 import {ToolbarButtonType} from "./ToolbarButtonType";
 import {ToolbarTitleWrap} from "./ToolbarTitleWrap";
 
@@ -19,6 +19,9 @@ export class Toolbar {
 
     @Prop()
     buttonIcon: string;
+
+    @Prop()
+    buttonHandler: () => void;
 
     @Prop()
     defaultBackHref: string;
@@ -107,6 +110,21 @@ export class Toolbar {
         }
     }
 
+    dismissOverlay() {
+
+        const modal = this.element.closest<HTMLIonModalElement>("ion-modal");
+        if (modal) {
+            modal.dismiss();
+            return;
+        }
+
+        const popover = this.element.closest<HTMLIonPopoverElement>("ion-popover");
+        if (popover) {
+            popover.dismiss();
+            return;
+        }
+    }
+
     connectedCallback() {
 
         if (this.titleWrap === "collapse") {
@@ -127,7 +145,12 @@ export class Toolbar {
 
                 {this.button === "menu" && <ion-menu-button slot="start"/>}
 
-                {this.button === "back" && <ion-back-button slot="start" defaultHref={this.defaultBackHref}/>}
+                {(this.button === "back" || this.button === "close") && <ion-back-button
+                    slot="start"
+                    style={{display: this.button === "close" ? "inline-block" : null}}
+                    icon={matchesMediaBreakpoint(this, "md") ? "close" : undefined}
+                    onClick={ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
+                    defaultHref={(this.button === "back" && this.defaultBackHref) || null}/>}
 
                 <div ionx--inner>
 

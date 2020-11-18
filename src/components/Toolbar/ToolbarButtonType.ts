@@ -1,1 +1,1 @@
-export type ToolbarButtonType = "menu" | "back" | "auto";
+export type ToolbarButtonType = "menu" | "back" | "close" | "auto";

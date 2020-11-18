@@ -6,11 +6,11 @@ import {ExtendedItemElement} from "./ExtendedItemElement";
 import {lineBreakAttribute} from "./lineBreak";
 
 @Component({
-    tag: "ionx-masonry-grid",
-    styleUrl: "MasonryGrid.scss",
+    tag: "ionx-multi-grid",
+    styleUrl: "MultiGrid.scss",
     scoped: true
 })
-export class MasonryGrid implements ComponentInterface {
+export class MultiGrid implements ComponentInterface {
 
     @Element()
     element: HTMLElement;
@@ -20,7 +20,7 @@ export class MasonryGrid implements ComponentInterface {
      * are layed row by row in single column.
      */
     @Prop({reflect: true})
-    block?: boolean;
+    layout: "masonry" | "block";
 
     busy: boolean;
 
@@ -76,12 +76,12 @@ export class MasonryGrid implements ComponentInterface {
     @Method()
     async markItemAsDirty(item: HTMLElement) {
         const extended: HTMLElement & ExtendedItemElement = item;
-        extended.__ionxMasonryLaid = false;
-        this.layout({force: true});
+        extended.__ionxMultiGridReady = false;
+        this.arrange({force: true});
     }
 
     @Method()
-    async layout(options?: {force?: boolean, trigger?: "onresize"}) {
+    async arrange(options?: {force?: boolean, trigger?: "onresize"}) {
 
         while (this.busy) {
 
@@ -97,7 +97,7 @@ export class MasonryGrid implements ComponentInterface {
         this.waiting = false;
         this.busy = true;
 
-        if (this.block) {
+        if (this.layout === "block") {
 
             const items = this.items();
 
@@ -122,7 +122,7 @@ export class MasonryGrid implements ComponentInterface {
 
             // wszystkie itemy gridu
             const items = this.items();
-            // console.error("[ionx-masonry-grid] checking items")
+            // console.error("[ionx-multi-grid] checking items")
 
             // sprawdzamy item pod kątem zmienionych itemów, usuniętych lub przesuniętych
             for (let i = 0; i < items.length; i++) {
@@ -135,29 +135,29 @@ export class MasonryGrid implements ComponentInterface {
                 // }
 
                 // zmieniła się pozycja itemu albo wymuszony rendering
-                if (item.__ionxMasonryCache?.index !== i || options?.force) {
-                    item.__ionxMasonryLaid = false;
+                if (item.__ionxMultiGridCache?.index !== i || options?.force) {
+                    item.__ionxMultiGridReady = false;
                 }
 
                 // jeżeli poprzedni item wymaga renderu, to jego sąsiad również
-                if (i > 0 && !items[i - 1].__ionxMasonryLaid) {
-                    item.__ionxMasonryLaid = false;
+                if (i > 0 && !items[i - 1].__ionxMultiGridReady) {
+                    item.__ionxMultiGridReady = false;
                 }
 
                 const rect = item.getBoundingClientRect();
-                if (item.__ionxMasonryCache?.rect?.width !== rect.width || item.__ionxMasonryCache?.rect?.height !== rect.height) {
-                    item.__ionxMasonryLaid = false;
+                if (item.__ionxMultiGridCache?.rect?.width !== rect.width || item.__ionxMultiGridCache?.rect?.height !== rect.height) {
+                    item.__ionxMultiGridReady = false;
 
-                    if (!item.__ionxMasonryCache) {
-                        item.__ionxMasonryCache = {rect};
+                    if (!item.__ionxMultiGridCache) {
+                        item.__ionxMultiGridCache = {rect};
                     }
                 }
 
-                if (!item.__ionxMasonryLaid || options?.force) {
+                if (!item.__ionxMultiGridReady || options?.force) {
                     doLayout = true;
                 }
 
-                if (!item.__ionxMasonryLaid) {
+                if (!item.__ionxMultiGridReady) {
                     item.style.display = "none";
                 }
             }
@@ -208,7 +208,7 @@ export class MasonryGrid implements ComponentInterface {
             if (this.element.getBoundingClientRect().width !== this.lastWidth) {
                 doLayout = true;
                 for (const item of items) {
-                    item.__ionxMasonryLaid = false;
+                    item.__ionxMultiGridReady = false;
                 }
             }
 
@@ -227,7 +227,7 @@ export class MasonryGrid implements ComponentInterface {
 
                 // resetujemy brudne itemy - ustawiamy pozycję na 0x0
                 for (const item of items) {
-                    if (!item.__ionxMasonryLaid) {
+                    if (!item.__ionxMultiGridReady) {
                         item.style.top = "-100%";
                         item.style.left = "-100%";
                         item.style.display = "block";
@@ -263,23 +263,23 @@ export class MasonryGrid implements ComponentInterface {
                     const item = items[itemIndex];
                     const previous = itemIndex > 0 ? items[itemIndex - 1] : undefined;
 
-                    if (!item.__ionxMasonryCache) {
-                        item.__ionxMasonryCache = {};
+                    if (!item.__ionxMultiGridCache) {
+                        item.__ionxMultiGridCache = {};
                     }
 
-                    item.__ionxMasonryCache.index = itemIndex;
+                    item.__ionxMultiGridCache.index = itemIndex;
 
                     // czekamy na hydrację
                     while (!isHydrated(item)) {
                         await sleep(10);
                     }
 
-                    if (!item.__ionxMasonryLaid || !item.__ionxMasonryCache.rect) {
-                        item.__ionxMasonryCache.rect = item.getBoundingClientRect();
+                    if (!item.__ionxMultiGridReady || !item.__ionxMultiGridCache.rect) {
+                        item.__ionxMultiGridCache.rect = item.getBoundingClientRect();
                     }
 
-                    const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after");
-                    let isNewSection = sectionItems.length === 0 || gridRect.width === item.__ionxMasonryCache.rect.width || breakLine;
+                    const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after") || gridRect.width === item.__ionxMultiGridCache.rect.width;
+                    const isNewSection = sectionItems.length === 0 || breakLine;
 
                     // element, pod którym mam być wstawiony ten element
                     // w przypadku nowej lini albo puste, albo element, który jest najbardziej wysunięty do dołu
@@ -298,46 +298,48 @@ export class MasonryGrid implements ComponentInterface {
                         // console.log((sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width), gridRect.width);
                         // console.log(sibling.__ionxMasonryCache.rect.left, gridRect.left, sibling.__ionxMasonryCache.rect.width, item.__ionxMasonryCache.rect.width, gridRect.width);
 
-                        if (gridRect.width === sibling.__ionxMasonryCache.rect.width) {
-                            isNewSection = true;
-                            sectionItems = [];
-                        }
-
                         // nie ma już miejsca w pierwszej lini sekcji, trzeba zawijać i szukać itemu, pod którym jest miejsce
-                        else if (~~(sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width) > gridRect.width) {
-                            sibling = sectionItems.pop();
+                        if (~~(sibling.__ionxMultiGridCache.rect.left - gridRect.left + sibling.__ionxMultiGridCache.rect.width + item.__ionxMultiGridCache.rect.width) > gridRect.width) {
                             sectionCascade = true;
+                            sibling = undefined;
+                            // console.log("newline item", item);
+                            // console.log("newline sibling", sibling);
+                            // console.log("---");
                         }
+                    }
 
-                    } else {
+                    if (sectionCascade) {
                         sibling = sectionItems.pop();
                     }
 
                     let itemLeft: number;
                     let itemTop: number;
 
-                    if (!item.__ionxMasonryLaid) {
+                    if (!item.__ionxMultiGridReady) {
+                        // console.log("item", item);
+                        // console.log("sibling", sibling);
+                        // console.log("---", itemIndex);
 
-                        itemLeft = isNewSection ? 0 : (itemsPositions[sibling.__ionxMasonryCache.index].left + (!sectionCascade ? sibling.__ionxMasonryCache.rect.width : 0));
-                        itemTop = !sibling ? 0 : (itemsPositions[sibling.__ionxMasonryCache.index].top + (sectionCascade || isNewSection ? sibling.__ionxMasonryCache.rect.height : 0));
+                        itemLeft = isNewSection ? 0 : (itemsPositions[sibling.__ionxMultiGridCache.index].left + (!sectionCascade ? sibling.__ionxMultiGridCache.rect.width : 0));
+                        itemTop = !sibling ? 0 : (itemsPositions[sibling.__ionxMultiGridCache.index].top + (sectionCascade || isNewSection ? sibling.__ionxMultiGridCache.rect.height : 0));
 
                         item.style.left = `${itemLeft}px`;
                         item.style.top = `${itemTop}px`;
 
                         // console.log(itemLeft, sibling, sibling && itemsPositions[sibling.__ionxMasonryCache.index].left);
 
-                        item.__ionxMasonryLaid = true;
+                        item.__ionxMultiGridReady = true;
 
-                        item.__ionxMasonryCache.left = itemLeft;
-                        item.__ionxMasonryCache.top = itemTop;
-                        item.__ionxMasonryCache.rect = item.getBoundingClientRect();
+                        item.__ionxMultiGridCache.left = itemLeft;
+                        item.__ionxMultiGridCache.top = itemTop;
+                        item.__ionxMultiGridCache.rect = item.getBoundingClientRect();
 
                     } else {
-                        itemLeft = item.__ionxMasonryCache.left;
-                        itemTop = item.__ionxMasonryCache.top;
+                        itemLeft = item.__ionxMultiGridCache.left;
+                        itemTop = item.__ionxMultiGridCache.top;
                     }
 
-                    itemsPositions[item.__ionxMasonryCache.index] = {left: itemLeft, top: itemTop};
+                    itemsPositions[item.__ionxMultiGridCache.index] = {left: itemLeft, top: itemTop};
                     item.style.visibility = "visible";
 
                     if (!isNewSection || !breakLine) {
@@ -378,9 +380,9 @@ export class MasonryGrid implements ComponentInterface {
                 markAsReady(this);
 
                 if (!this.isParentViewActive() || this.paused) {
-                    this.layout();
+                    this.arrange();
                 } else if (options?.trigger === "onresize") {
-                    setTimeout(() => this.layout());
+                    setTimeout(() => this.arrange());
                 }
             }
         }
@@ -406,7 +408,7 @@ export class MasonryGrid implements ComponentInterface {
             }
         }
 
-        this.layout({force: true, trigger: "onresize"});
+        this.arrange({force: true, trigger: "onresize"});
     }
 
     viewPaused() {
@@ -417,13 +419,13 @@ export class MasonryGrid implements ComponentInterface {
         this.paused = false;
 
         if (this.queuedLayout) {
-            this.layout();
+            this.arrange();
         }
     }
 
     viewDidEnter() {
         if (this.queuedLayout) {
-            this.layout();
+            this.arrange();
         }
     }
 
@@ -442,14 +444,14 @@ export class MasonryGrid implements ComponentInterface {
 
             for (let i = 0; i < mutation.addedNodes.length; i++) {
                 if (mutation.addedNodes[i] instanceof HTMLElement) {
-                    this.layout();
+                    this.arrange();
                     return;
                 }
             }
 
             for (let i = 0; i < mutation.removedNodes.length; i++) {
                 if (mutation.removedNodes[i] instanceof HTMLElement) {
-                    this.layout();
+                    this.arrange();
                     return;
                 }
             }
