@@ -256,7 +256,7 @@ export class MultiGrid implements ComponentInterface {
 
                 const itemsPositions: {[index: number]: {left: number, top: number}} = {};
 
-                const gridRect = this.element.getBoundingClientRect();
+                let gridRect = this.element.getBoundingClientRect();
 
                 for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 
@@ -353,6 +353,8 @@ export class MultiGrid implements ComponentInterface {
                     // console.log("error", item.element.innerText, itemTop, "sibling", sibling.element.innerText, itemsPositions[sibling["index"]].top, siblingRect.top, siblingRect.height);
                     // }
                 }
+
+                gridRect = this.element.getBoundingClientRect();
 
                 const lowestItem = (sectionItems.length && sectionItems[0]) || (items.length && items[items.length - 1]);
                 if (lowestItem) {
