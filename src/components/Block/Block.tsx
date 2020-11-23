@@ -1,7 +1,6 @@
 import {Component, h, Host, Prop} from "@stencil/core";
-
-type WidthValue = string;
-type WidthsMap = {xs?: WidthValue, sm?: WidthValue, md?: WidthValue, lg?: WidthValue, xl?: WidthValue};
+import {BlockWidthsMap} from "./BlockWidthsMap";
+import {BlockWidth} from "./BlockWidth";
 
 @Component({
     tag: "ionx-block",
@@ -11,7 +10,7 @@ type WidthsMap = {xs?: WidthValue, sm?: WidthValue, md?: WidthValue, lg?: WidthV
 export class Block {
 
     @Prop()
-    innerWidth: WidthValue | WidthsMap;
+    innerWidth: BlockWidth | BlockWidthsMap;
 
     @Prop()
     innerAlignment: "start" | "end" | "center";
@@ -25,7 +24,7 @@ export class Block {
     render() {
 
         const defaultWidth = typeof this.innerWidth === "string" ? this.innerWidth : null;
-        const widths = defaultWidth ? {} as WidthsMap : this.innerWidth as WidthsMap;
+        const widths = defaultWidth ? {} as BlockWidthsMap : this.innerWidth as BlockWidthsMap;
 
         return <Host
             class={{"ionx--margins": !!this.margins}}

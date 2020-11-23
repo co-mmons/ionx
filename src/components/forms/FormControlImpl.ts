@@ -7,7 +7,6 @@ import {FormControl} from "./FormControl";
 import {FormControlElement} from "./FormControlElement";
 import {FormControlReadonlyState, FormControlState} from "./FormControlState";
 import {FormControlReadonlyStatus} from "./FormControlStatus";
-import {FormValidationError} from "./FormValidationError";
 import {FormValidator} from "./FormValidator";
 
 interface ApplyState<Value = any> {
@@ -143,6 +142,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     setValue(value: Value) {
         this.applyState({value: value});
+        this.validateImpl({trigger: "valueChange"});
     }
 
     async validate(): Promise<boolean> {
@@ -222,7 +222,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
         this.validated$ = true;
 
-        let error: FormValidationError;
+        let error: Error;
 
         if (this.validators$) {
             VALIDATORS: for (const validator of this.validators$) {
@@ -232,15 +232,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
                         await result;
                     }
                 } catch (er) {
-
-                    if (er instanceof FormValidationError) {
-                        error = er;
-                        break VALIDATORS;
-
-                    } else {
-                        console.warn(`[ionx-form-control] unknown error during validation "${this.name}"`, error);
-                        return false;
-                    }
+                    error = er instanceof Error ? er : new Error(er);
+                    break VALIDATORS;
                 }
             }
         }
@@ -279,7 +272,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private value$: Value;
 
-    private error$: FormValidationError;
+    private error$: Error;
 
     private validated$: boolean;
 

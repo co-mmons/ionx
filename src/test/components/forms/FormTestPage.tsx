@@ -29,7 +29,7 @@ export class FormTestPage implements ComponentInterface {
 
         this.form
             .bindStates(this)
-            .onStateChange(state => this.formState = state);
+            .onStateChange(state => this.formState = state.current);
 
         this.prepareData();
     }

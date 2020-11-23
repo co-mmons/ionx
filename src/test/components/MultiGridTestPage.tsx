@@ -1,14 +1,14 @@
 import {Component, h, Host} from "@stencil/core";
 import {lazyLoadItem} from "../../components/LazyLoad";
-import {lineBreak} from "../../components/MasonryGrid";
+import {lineBreak} from "../../components/MultiGrid";
 import {photos} from "./photos";
 
 @Component({
-    tag: "ionx-test-masonry-grid",
-    styleUrl: "MasonryGridTestPage.scss",
+    tag: "ionx-test-multi-grid",
+    styleUrl: "MultiGridTestPage.scss",
     scoped: true
 })
-export class MasonryGridTestPage {
+export class MultiGridTestPage {
 
     render() {
 
@@ -17,7 +17,7 @@ export class MasonryGridTestPage {
 
                 <ionx-lazy-load/>
 
-                <ionx-masonry-grid>
+                <ionx-multi-grid>
 
                     {photos.map((photoUrl, index) => <div app--grid-item {...lineBreak(index === 1)}>
                         <ion-card>
@@ -25,7 +25,7 @@ export class MasonryGridTestPage {
                         </ion-card>
                     </div>)}
 
-                </ionx-masonry-grid>
+                </ionx-multi-grid>
 
             </ion-content>
         </Host>

@@ -6,7 +6,8 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, OverlayEventDetail, RouterDirection, RouterEventDetail, StyleEventDetail, TextFieldTypes } from "@ionic/core";
-import { DateTimeValue } from "./components/DateTime/DateTimeValue";
+import { BlockWidth } from "./components/Block/BlockWidth";
+import { BlockWidthsMap } from "./components/Block/BlockWidthsMap";
 import { HtmlString, TimeZoneDate } from "@co.mmons/js-utils/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
 import { FormController } from "./components/forms/FormController";
@@ -17,9 +18,11 @@ import { FormValidationError } from "./components/forms/FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
 import { TooltipErrorPresenterImpl } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterImpl";
 import { TooltipErrorPresenterOptions } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterOptions";
-import { ExtendedItemElement } from "./components/MasonryGrid/ExtendedItemElement";
+import { ExtendedItemElement } from "./components/MultiGrid/ExtendedItemElement";
 import { ValueComparator } from "./components/Select/ValueComparator";
 import { SelectOption } from "./components/Select/SelectOption";
+import { ToolbarButtonType } from "./components/Toolbar/ToolbarButtonType";
+import { ToolbarTitleWrap } from "./components/Toolbar/ToolbarTitleWrap";
 import { VNode } from "@stencil/core";
 export namespace Components {
     interface IonRouter {
@@ -45,20 +48,24 @@ export namespace Components {
          */
         "useHash": boolean;
     }
+    interface IonxBlock {
+        "innerAlignment": "start" | "end" | "center";
+        "innerWidth": BlockWidth | BlockWidthsMap;
+        "margins": boolean;
+        "padding": boolean;
+    }
     interface IonxDateTime {
         "clearButtonIcon": string;
         "clearButtonText": string;
         "clearButtonVisible": boolean;
+        "dateOnly": boolean;
         /**
           * Timezone, that will be set, when new value is picked from picker.
          */
         "defaultTimeZone": string;
         "disabled": boolean;
-        "displayFormat": Intl.DateTimeFormatOptions;
-        "open": (event?: MouseEvent) => Promise<void>;
-        "overlay": "popover" | "modal";
-        "overlayTitle": string;
-        "pickerFormat": Intl.DateTimeFormatOptions;
+        "formatOptions": Intl.DateTimeFormatOptions;
+        "open": (event?: any) => Promise<void>;
         "placeholder": string;
         "readonly": boolean;
         "setBlur": () => Promise<void>;
@@ -67,10 +74,10 @@ export namespace Components {
           * Whether timezone cannot be changed.
          */
         "timeZoneDisabled": boolean;
-        "value": DateTimeValue;
+        "value": TimeZoneDate;
     }
     interface IonxDateTimeOverlay {
-        "overlayTitle": string;
+        "dateOnly": boolean;
         "timeZoneDisabled": boolean;
         "value": TimeZoneDate;
     }
@@ -158,13 +165,14 @@ export namespace Components {
     interface IonxLazyLoad {
     }
     interface IonxLoading {
+        "backdropOpacity"?: number;
         "backdropVisible"?: boolean;
         "color"?: string;
-        "dismiss": () => Promise<void>;
         /**
           * If loading element should fill available space and center content both h and v.
          */
-        "fill"?: boolean;
+        "cover"?: boolean;
+        "dismiss": () => Promise<void>;
         "header"?: string;
         "message"?: string;
         "progressBuffer"?: number;
@@ -178,10 +186,13 @@ export namespace Components {
          */
         "type": "spinner" | "progress";
     }
-    interface IonxMasonryGrid {
-        "layout": (options?: { force?: boolean; trigger?: "onresize"; }) => Promise<void>;
+    interface IonxMultiGrid {
+        "arrange": (options?: { force?: boolean; trigger?: "onresize"; }) => Promise<void>;
+        /**
+          * If grid should behave as block element, where all its children are layed row by row in single column.
+         */
+        "layout": "masonry" | "block";
         "markItemAsDirty": (item: HTMLElement) => Promise<void>;
-        "singleColumn"?: boolean;
     }
     interface IonxSelect {
         /**
@@ -234,6 +245,9 @@ export namespace Components {
         "searchTest": (query: string, value: any, label: string) => boolean;
         "values": any[];
     }
+    interface IonxSvg {
+        "svg": string;
+    }
     interface IonxTagsInput {
         "canBackspaceRemove": boolean;
         "canEnterAdd": boolean;
@@ -269,7 +283,7 @@ export namespace Components {
     }
     interface IonxTestLoading {
     }
-    interface IonxTestMasonryGrid {
+    interface IonxTestMultiGrid {
     }
     interface IonxTestRoot {
     }
@@ -282,6 +296,13 @@ export namespace Components {
     interface IonxToggleLabels {
         "off": string;
         "on": string;
+    }
+    interface IonxToolbar {
+        "button": ToolbarButtonType;
+        "buttonHandler": () => void;
+        "buttonIcon": string;
+        "defaultBackHref": string;
+        "titleWrap": ToolbarTitleWrap;
     }
     interface IonxVirtualScroll {
         "itemHeight": number;
@@ -296,6 +317,12 @@ declare global {
     var HTMLIonRouterElement: {
         prototype: HTMLIonRouterElement;
         new (): HTMLIonRouterElement;
+    };
+    interface HTMLIonxBlockElement extends Components.IonxBlock, HTMLStencilElement {
+    }
+    var HTMLIonxBlockElement: {
+        prototype: HTMLIonxBlockElement;
+        new (): HTMLIonxBlockElement;
     };
     interface HTMLIonxDateTimeElement extends Components.IonxDateTime, HTMLStencilElement {
     }
@@ -381,11 +408,11 @@ declare global {
         prototype: HTMLIonxLoadingElement;
         new (): HTMLIonxLoadingElement;
     };
-    interface HTMLIonxMasonryGridElement extends Components.IonxMasonryGrid, HTMLStencilElement {
+    interface HTMLIonxMultiGridElement extends Components.IonxMultiGrid, HTMLStencilElement {
     }
-    var HTMLIonxMasonryGridElement: {
-        prototype: HTMLIonxMasonryGridElement;
-        new (): HTMLIonxMasonryGridElement;
+    var HTMLIonxMultiGridElement: {
+        prototype: HTMLIonxMultiGridElement;
+        new (): HTMLIonxMultiGridElement;
     };
     interface HTMLIonxSelectElement extends Components.IonxSelect, HTMLStencilElement {
     }
@@ -404,6 +431,12 @@ declare global {
     var HTMLIonxSelectOverlayElement: {
         prototype: HTMLIonxSelectOverlayElement;
         new (): HTMLIonxSelectOverlayElement;
+    };
+    interface HTMLIonxSvgElement extends Components.IonxSvg, HTMLStencilElement {
+    }
+    var HTMLIonxSvgElement: {
+        prototype: HTMLIonxSvgElement;
+        new (): HTMLIonxSvgElement;
     };
     interface HTMLIonxTagsInputElement extends Components.IonxTagsInput, HTMLStencilElement {
     }
@@ -465,11 +498,11 @@ declare global {
         prototype: HTMLIonxTestLoadingElement;
         new (): HTMLIonxTestLoadingElement;
     };
-    interface HTMLIonxTestMasonryGridElement extends Components.IonxTestMasonryGrid, HTMLStencilElement {
+    interface HTMLIonxTestMultiGridElement extends Components.IonxTestMultiGrid, HTMLStencilElement {
     }
-    var HTMLIonxTestMasonryGridElement: {
-        prototype: HTMLIonxTestMasonryGridElement;
-        new (): HTMLIonxTestMasonryGridElement;
+    var HTMLIonxTestMultiGridElement: {
+        prototype: HTMLIonxTestMultiGridElement;
+        new (): HTMLIonxTestMultiGridElement;
     };
     interface HTMLIonxTestRootElement extends Components.IonxTestRoot, HTMLStencilElement {
     }
@@ -501,6 +534,12 @@ declare global {
         prototype: HTMLIonxToggleLabelsElement;
         new (): HTMLIonxToggleLabelsElement;
     };
+    interface HTMLIonxToolbarElement extends Components.IonxToolbar, HTMLStencilElement {
+    }
+    var HTMLIonxToolbarElement: {
+        prototype: HTMLIonxToolbarElement;
+        new (): HTMLIonxToolbarElement;
+    };
     interface HTMLIonxVirtualScrollElement extends Components.IonxVirtualScroll, HTMLStencilElement {
     }
     var HTMLIonxVirtualScrollElement: {
@@ -509,6 +548,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "ion-router": HTMLIonRouterElement;
+        "ionx-block": HTMLIonxBlockElement;
         "ionx-date-time": HTMLIonxDateTimeElement;
         "ionx-date-time-overlay": HTMLIonxDateTimeOverlayElement;
         "ionx-dialog": HTMLIonxDialogElement;
@@ -523,10 +563,11 @@ declare global {
         "ionx-form-tooltip-error-presenter": HTMLIonxFormTooltipErrorPresenterElement;
         "ionx-lazy-load": HTMLIonxLazyLoadElement;
         "ionx-loading": HTMLIonxLoadingElement;
-        "ionx-masonry-grid": HTMLIonxMasonryGridElement;
+        "ionx-multi-grid": HTMLIonxMultiGridElement;
         "ionx-select": HTMLIonxSelectElement;
         "ionx-select-orderable": HTMLIonxSelectOrderableElement;
         "ionx-select-overlay": HTMLIonxSelectOverlayElement;
+        "ionx-svg": HTMLIonxSvgElement;
         "ionx-tags-input": HTMLIonxTagsInputElement;
         "ionx-test-date-time": HTMLIonxTestDateTimeElement;
         "ionx-test-dialog": HTMLIonxTestDialogElement;
@@ -537,12 +578,13 @@ declare global {
         "ionx-test-home": HTMLIonxTestHomeElement;
         "ionx-test-lazy-load": HTMLIonxTestLazyLoadElement;
         "ionx-test-loading": HTMLIonxTestLoadingElement;
-        "ionx-test-masonry-grid": HTMLIonxTestMasonryGridElement;
+        "ionx-test-multi-grid": HTMLIonxTestMultiGridElement;
         "ionx-test-root": HTMLIonxTestRootElement;
         "ionx-test-select": HTMLIonxTestSelectElement;
         "ionx-test-tags-input": HTMLIonxTestTagsInputElement;
         "ionx-test-virtual-scroll": HTMLIonxTestVirtualScrollElement;
         "ionx-toggle-labels": HTMLIonxToggleLabelsElement;
+        "ionx-toolbar": HTMLIonxToolbarElement;
         "ionx-virtual-scroll": HTMLIonxVirtualScrollElement;
     }
 }
@@ -565,35 +607,39 @@ declare namespace LocalJSX {
          */
         "useHash"?: boolean;
     }
+    interface IonxBlock {
+        "innerAlignment"?: "start" | "end" | "center";
+        "innerWidth"?: BlockWidth | BlockWidthsMap;
+        "margins"?: boolean;
+        "padding"?: boolean;
+    }
     interface IonxDateTime {
         "clearButtonIcon"?: string;
         "clearButtonText"?: string;
         "clearButtonVisible"?: boolean;
+        "dateOnly"?: boolean;
         /**
           * Timezone, that will be set, when new value is picked from picker.
          */
         "defaultTimeZone"?: string;
         "disabled"?: boolean;
-        "displayFormat"?: Intl.DateTimeFormatOptions;
+        "formatOptions"?: Intl.DateTimeFormatOptions;
         "onIonChange"?: (event: CustomEvent<any>) => void;
         "onIonFocus"?: (event: CustomEvent<any>) => void;
         /**
           * Emitted when the styles change.
          */
         "onIonStyle"?: (event: CustomEvent<StyleEventDetail>) => void;
-        "overlay"?: "popover" | "modal";
-        "overlayTitle"?: string;
-        "pickerFormat"?: Intl.DateTimeFormatOptions;
         "placeholder"?: string;
         "readonly"?: boolean;
         /**
           * Whether timezone cannot be changed.
          */
         "timeZoneDisabled"?: boolean;
-        "value"?: DateTimeValue;
+        "value"?: TimeZoneDate;
     }
     interface IonxDateTimeOverlay {
-        "overlayTitle"?: string;
+        "dateOnly"?: boolean;
         "timeZoneDisabled"?: boolean;
         "value"?: TimeZoneDate;
     }
@@ -672,12 +718,13 @@ declare namespace LocalJSX {
     interface IonxLazyLoad {
     }
     interface IonxLoading {
+        "backdropOpacity"?: number;
         "backdropVisible"?: boolean;
         "color"?: string;
         /**
           * If loading element should fill available space and center content both h and v.
          */
-        "fill"?: boolean;
+        "cover"?: boolean;
         "header"?: string;
         "message"?: string;
         "progressBuffer"?: number;
@@ -691,8 +738,11 @@ declare namespace LocalJSX {
          */
         "type"?: "spinner" | "progress";
     }
-    interface IonxMasonryGrid {
-        "singleColumn"?: boolean;
+    interface IonxMultiGrid {
+        /**
+          * If grid should behave as block element, where all its children are layed row by row in single column.
+         */
+        "layout"?: "masonry" | "block";
     }
     interface IonxSelect {
         /**
@@ -750,6 +800,9 @@ declare namespace LocalJSX {
         "searchTest"?: (query: string, value: any, label: string) => boolean;
         "values"?: any[];
     }
+    interface IonxSvg {
+        "svg": string;
+    }
     interface IonxTagsInput {
         "canBackspaceRemove"?: boolean;
         "canEnterAdd"?: boolean;
@@ -785,7 +838,7 @@ declare namespace LocalJSX {
     }
     interface IonxTestLoading {
     }
-    interface IonxTestMasonryGrid {
+    interface IonxTestMultiGrid {
     }
     interface IonxTestRoot {
     }
@@ -799,6 +852,13 @@ declare namespace LocalJSX {
         "off"?: string;
         "on"?: string;
     }
+    interface IonxToolbar {
+        "button": ToolbarButtonType;
+        "buttonHandler"?: () => void;
+        "buttonIcon"?: string;
+        "defaultBackHref"?: string;
+        "titleWrap"?: ToolbarTitleWrap;
+    }
     interface IonxVirtualScroll {
         "itemHeight"?: number;
         "itemWidth"?: number;
@@ -807,6 +867,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "ion-router": IonRouter;
+        "ionx-block": IonxBlock;
         "ionx-date-time": IonxDateTime;
         "ionx-date-time-overlay": IonxDateTimeOverlay;
         "ionx-dialog": IonxDialog;
@@ -821,10 +882,11 @@ declare namespace LocalJSX {
         "ionx-form-tooltip-error-presenter": IonxFormTooltipErrorPresenter;
         "ionx-lazy-load": IonxLazyLoad;
         "ionx-loading": IonxLoading;
-        "ionx-masonry-grid": IonxMasonryGrid;
+        "ionx-multi-grid": IonxMultiGrid;
         "ionx-select": IonxSelect;
         "ionx-select-orderable": IonxSelectOrderable;
         "ionx-select-overlay": IonxSelectOverlay;
+        "ionx-svg": IonxSvg;
         "ionx-tags-input": IonxTagsInput;
         "ionx-test-date-time": IonxTestDateTime;
         "ionx-test-dialog": IonxTestDialog;
@@ -835,12 +897,13 @@ declare namespace LocalJSX {
         "ionx-test-home": IonxTestHome;
         "ionx-test-lazy-load": IonxTestLazyLoad;
         "ionx-test-loading": IonxTestLoading;
-        "ionx-test-masonry-grid": IonxTestMasonryGrid;
+        "ionx-test-multi-grid": IonxTestMultiGrid;
         "ionx-test-root": IonxTestRoot;
         "ionx-test-select": IonxTestSelect;
         "ionx-test-tags-input": IonxTestTagsInput;
         "ionx-test-virtual-scroll": IonxTestVirtualScroll;
         "ionx-toggle-labels": IonxToggleLabels;
+        "ionx-toolbar": IonxToolbar;
         "ionx-virtual-scroll": IonxVirtualScroll;
     }
 }
@@ -849,6 +912,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ion-router": LocalJSX.IonRouter & JSXBase.HTMLAttributes<HTMLIonRouterElement>;
+            "ionx-block": LocalJSX.IonxBlock & JSXBase.HTMLAttributes<HTMLIonxBlockElement>;
             "ionx-date-time": LocalJSX.IonxDateTime & JSXBase.HTMLAttributes<HTMLIonxDateTimeElement>;
             "ionx-date-time-overlay": LocalJSX.IonxDateTimeOverlay & JSXBase.HTMLAttributes<HTMLIonxDateTimeOverlayElement>;
             "ionx-dialog": LocalJSX.IonxDialog & JSXBase.HTMLAttributes<HTMLIonxDialogElement>;
@@ -863,10 +927,11 @@ declare module "@stencil/core" {
             "ionx-form-tooltip-error-presenter": LocalJSX.IonxFormTooltipErrorPresenter & JSXBase.HTMLAttributes<HTMLIonxFormTooltipErrorPresenterElement>;
             "ionx-lazy-load": LocalJSX.IonxLazyLoad & JSXBase.HTMLAttributes<HTMLIonxLazyLoadElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
-            "ionx-masonry-grid": LocalJSX.IonxMasonryGrid & JSXBase.HTMLAttributes<HTMLIonxMasonryGridElement>;
+            "ionx-multi-grid": LocalJSX.IonxMultiGrid & JSXBase.HTMLAttributes<HTMLIonxMultiGridElement>;
             "ionx-select": LocalJSX.IonxSelect & JSXBase.HTMLAttributes<HTMLIonxSelectElement>;
             "ionx-select-orderable": LocalJSX.IonxSelectOrderable & JSXBase.HTMLAttributes<HTMLIonxSelectOrderableElement>;
             "ionx-select-overlay": LocalJSX.IonxSelectOverlay & JSXBase.HTMLAttributes<HTMLIonxSelectOverlayElement>;
+            "ionx-svg": LocalJSX.IonxSvg & JSXBase.HTMLAttributes<HTMLIonxSvgElement>;
             "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
             "ionx-test-date-time": LocalJSX.IonxTestDateTime & JSXBase.HTMLAttributes<HTMLIonxTestDateTimeElement>;
             "ionx-test-dialog": LocalJSX.IonxTestDialog & JSXBase.HTMLAttributes<HTMLIonxTestDialogElement>;
@@ -877,12 +942,13 @@ declare module "@stencil/core" {
             "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
             "ionx-test-lazy-load": LocalJSX.IonxTestLazyLoad & JSXBase.HTMLAttributes<HTMLIonxTestLazyLoadElement>;
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
-            "ionx-test-masonry-grid": LocalJSX.IonxTestMasonryGrid & JSXBase.HTMLAttributes<HTMLIonxTestMasonryGridElement>;
+            "ionx-test-multi-grid": LocalJSX.IonxTestMultiGrid & JSXBase.HTMLAttributes<HTMLIonxTestMultiGridElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;
             "ionx-test-select": LocalJSX.IonxTestSelect & JSXBase.HTMLAttributes<HTMLIonxTestSelectElement>;
             "ionx-test-tags-input": LocalJSX.IonxTestTagsInput & JSXBase.HTMLAttributes<HTMLIonxTestTagsInputElement>;
             "ionx-test-virtual-scroll": LocalJSX.IonxTestVirtualScroll & JSXBase.HTMLAttributes<HTMLIonxTestVirtualScrollElement>;
             "ionx-toggle-labels": LocalJSX.IonxToggleLabels & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsElement>;
+            "ionx-toolbar": LocalJSX.IonxToolbar & JSXBase.HTMLAttributes<HTMLIonxToolbarElement>;
             "ionx-virtual-scroll": LocalJSX.IonxVirtualScroll & JSXBase.HTMLAttributes<HTMLIonxVirtualScrollElement>;
         }
     }

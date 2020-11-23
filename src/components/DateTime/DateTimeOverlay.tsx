@@ -159,7 +159,7 @@ export class DateTimeOverlay {
             }
 
             return <ion-item>
-                <ion-label>{part}</ion-label>
+                <ion-label>{intl.message(`ionx/DateTime#${part}`)}</ion-label>
                 <ion-input
                     type="number"
                     name={part}
@@ -172,7 +172,7 @@ export class DateTimeOverlay {
         } else {
 
             return <ion-item>
-                <ion-label position="stacked">{part}</ion-label>
+                <ion-label position="stacked">{intl.message(`ionx/DateTime#${part}`)}</ion-label>
                 <ionx-select options={[{value: "", label: intl.message`No time zone`}]} value={""}/>
             </ion-item>
         }

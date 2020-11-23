@@ -9,7 +9,7 @@ const tests = [
     "form",
     "lazy-load",
     "loading",
-    "masonry-grid",
+    "multi-grid",
     "select",
     "tags-input",
     "virtual-scroll"

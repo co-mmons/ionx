@@ -1,4 +1,6 @@
 :host {
+    display: block;
+
     ion-input {
         text-align: right;
         --padding-end: 0px;
@@ -22,8 +24,6 @@
     }
 
     ion-footer {
-        position: sticky;
-        bottom: 0px;
         --border-width: 0px;
 
         &::before {

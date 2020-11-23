@@ -8,7 +8,7 @@ import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
 @Component({
     tag: "ionx-date-time",
     styleUrl: "DateTimeInput.scss",
-    shadow: true
+    scoped: true
 })
 export class Loading {
 
@@ -188,27 +188,45 @@ export class Loading {
         this.value = undefined;
     }
 
+    nativePicker: HTMLInputElement;
+
     overlayVisible: boolean;
 
     @Method()
     async open(event?: any): Promise<void> {
 
-        const overlayProps = {
-            value: this.value ?? new Date(),
-            dateOnly: !!this.dateOnly
-        };
+        if (!this.nativePicker) {
 
-        const popover = await popoverController.create({component: "ionx-date-time-overlay", componentProps: overlayProps, event, showBackdrop: true});
-        popover.present();
-        this.overlayVisible = true;
+            this.nativePicker = document.createElement("input");
+            this.nativePicker.type = "date";
+            document.body.appendChild(this.nativePicker);
+            this.nativePicker.click();
 
-        const result = await popover.onWillDismiss();
-        if (result.role === "ok") {
-            this.value = result.data;
+
+        } else if (!this.nativePicker) {
+
+            const overlayProps = {
+                value: this.value ?? new Date(),
+                dateOnly: !!this.dateOnly
+            };
+
+            const popover = await popoverController.create({
+                component: "ionx-date-time-overlay",
+                componentProps: overlayProps,
+                event,
+                showBackdrop: true
+            });
+            popover.present();
+            this.overlayVisible = true;
+
+            const result = await popover.onWillDismiss();
+            if (result.role === "ok") {
+                this.value = result.data;
+            }
+
+            this.overlayVisible = false;
+            this.setFocus({preventScroll: true});
         }
-
-        this.overlayVisible = false;
-        this.setFocus({preventScroll: true});
     }
 
     itemClickUnlisten: EventUnlisten;
