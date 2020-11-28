@@ -27,7 +27,7 @@ export class Block {
         const widths = defaultWidth ? {} as BlockWidthsMap : this.innerWidth as BlockWidthsMap;
 
         return <Host
-            class={{"ionx--margins": !!this.margins}}
+            class={{"ionx--margins": !!this.margins, "ionx--has-inner-width": !!this.innerWidth}}
             style={{
                 "--block-inner-width-xs": widths?.xs ? `${widths?.xs}` : defaultWidth,
                 "--block-inner-width-sm": widths?.sm ? `${widths?.sm}` : defaultWidth,

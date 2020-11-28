@@ -19,7 +19,11 @@
         }
     }
 
-    > [ionx--outer] > [ionx--inner] {
+    [ionx--inner] {
+        width: 100%;
+    }
+
+    &.ionx--has-inner-width > [ionx--outer] > [ionx--inner] {
         @include ionx-media-breakpoint-width("--block-inner-width", "100%");
     }
 }

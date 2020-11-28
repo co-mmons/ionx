@@ -84,7 +84,7 @@ class BreakpointMatcher implements ComponentDisconnectHook {
                     this.unlisten = [];
                 }
 
-                this.unlisten.push(addEventListener(media, "change", ev => this.onChange(ev as any)));
+                this.unlisten.push(addEventListener(media, "change", this.onChange.bind(this)));
             }
         }
     }
