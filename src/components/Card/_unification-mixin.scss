@@ -1,7 +1,7 @@
 @mixin ionx-card-unification() {
     margin: 16px;
     border-radius: var(--ionx-border-radius);
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 4px 8px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0 4px 8px;
 
     ion-card-title {
         font-size: 22px;
@@ -19,6 +19,12 @@
         &:first-of-type {
             margin-top: 4px;
         }
+    }
+
+    ion-card-content, ion-card-content p, ion-card-content.ios p, ion-card-content.md p {
+        color: var(--ion-card-content-color, var(--ion-card-color, var(--ion-text-color, #000)));
+        font-size: var(--ion-card-content-font-size, 14px);
+        line-height: var(--ion-card-content-line-height, 1.1);
     }
 
 }
