@@ -5,11 +5,11 @@
 
     ion-card-title {
         font-size: 22px;
-        line-height: 1;
+        line-height: 1.2;
     }
 
     ion-card-subtitle {
-        line-height: 1.1;
+        line-height: 1.3;
         font-size: 14px;
         text-transform: none;
         letter-spacing: initial;
@@ -24,7 +24,7 @@
     ion-card-content, ion-card-content p, ion-card-content.ios p, ion-card-content.md p {
         color: var(--ion-card-content-color, var(--ion-card-color, var(--ion-text-color, #000)));
         font-size: var(--ion-card-content-font-size, 14px);
-        line-height: var(--ion-card-content-line-height, 1.1);
+        line-height: var(--ion-card-content-line-height, 1.3);
     }
 
 }
