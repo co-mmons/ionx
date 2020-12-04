@@ -159,8 +159,24 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         return this.status?.dirty || false;
     }
 
+    get pristine() {
+        return this.status?.pristine || false;
+    }
+
+    get touched() {
+        return this.status?.touched || false;
+    }
+
+    get untouched() {
+        return this.status?.untouched || false;
+    }
+
     get valid() {
-        return this.status ? this.status.valid : false;
+        return this.status?.valid || false;
+    }
+
+    get invalid() {
+        return this.status?.invalid || false;
     }
 
     state(): FormState {
