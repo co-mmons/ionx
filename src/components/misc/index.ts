@@ -7,5 +7,6 @@ export {loadScript} from "./loadScript";
 export {markTagNameAsHydratable, markTagPrefixAsHydratable} from "./markAsHydratable";
 export {matchesMediaBreakpoints, matchesMediaBreakpoint} from "./matchesMediaBreakpoints";
 export {matchesMediaQuery} from "./matchesMediaQuery";
+export {prefetchComponent} from "./prefetchComponent";
 export {waitTillHydrated} from "./waitTillHydrated";
 export {windowSize, WindowSize, WindowSizeOptions, WindowOrientation} from "./windowSize";
