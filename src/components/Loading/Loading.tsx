@@ -34,7 +34,7 @@ export class Loading implements LoadingOptions {
      * @inheritDoc
      */
     @Prop()
-    type: "spinner" | "progress";
+    type: "spinner" | "progress" = "spinner";
 
     @Prop()
     progressMessage?: string;

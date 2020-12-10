@@ -1,142 +1,10 @@
 import {popoverController} from "@ionic/core";
 import {LoadingOptions} from "./LoadingOptions";
+import {LoadingProxy} from "./LoadingProxy";
 
-export class LoadingOverlayProxy implements LoadingOptions {
+export async function showLoadingOverlay(options?: LoadingOptions) {
 
-    constructor(private element: HTMLElement | HTMLIonxLoadingElement) {
-        this.loading = element.tagName === "IONX-LOADING" ? element as HTMLIonxLoadingElement : undefined;
-    }
-
-    private readonly loading: HTMLIonxLoadingElement;
-
-    async dismiss() {
-
-        if (this.loading) {
-            return this.loading.dismiss();
-        } else {
-            this.element.remove();
-        }
-    }
-
-    get backdropVisible() {
-        if (this.loading) {
-            return this.loading.backdropVisible;
-        } else {
-            return true;
-        }
-    }
-
-    set backdropVisible(visible: boolean) {
-        if (this.loading) {
-            this.loading.backdropVisible = visible;
-        }
-    }
-
-    get header() {
-        if (this.loading) {
-            return this.loading.header;
-        } else {
-            return undefined;
-        }
-    }
-
-    set header(header: string) {
-        if (this.loading) {
-            this.loading.header = header;
-        }
-    }
-
-    get message() {
-        if (this.loading) {
-            return this.loading.message;
-        } else {
-        }
-    }
-
-    set message(message: string) {
-        if (this.loading) {
-            this.loading.message = message;
-        } else {
-
-        }
-    }
-
-    get progressBuffer() {
-        if (this.loading) {
-            return this.loading.progressBuffer;
-        }
-    }
-
-    set progressBuffer(buffer: number) {
-        if (this.loading) {
-            this.loading.progressBuffer = buffer;
-        }
-    }
-
-    get progressMessage() {
-        if (this.loading) {
-            return this.loading.progressMessage;
-        }
-    }
-
-    set progressMessage(message: string) {
-        if (this.loading) {
-            this.loading.progressMessage = message;
-        }
-    }
-
-    get progressPercent() {
-        if (this.loading) {
-            return this.loading.progressPercent;
-        }
-    }
-
-    set progressPercent(progress: number) {
-        if (this.loading) {
-            this.loading.progressPercent = progress;
-        }
-    }
-
-    get progressType() {
-        if (this.loading) {
-            return this.loading.progressType;
-        }
-    }
-
-    set progressType(type) {
-        if (this.loading) {
-            this.loading.progressType = type;
-        }
-    }
-
-    get progressValue() {
-        if (this.loading) {
-            return this.loading.progressValue;
-        }
-    }
-
-    set progressValue(value) {
-        if (this.loading) {
-            this.loading.progressValue = value;
-        }
-    }
-
-    get type() {
-        if (this.loading) {
-            return this.loading.type;
-        }
-    }
-
-    set type(type) {
-        if (this.loading) {
-            this.loading.type = type;
-        }
-    }
-}
-
-export async function showLoadingOverlay(options: LoadingOptions) {
-
-    if (options.type === "spinner") {
+    if (!options?.type) {
 
         const app = document.querySelector("ion-app");
 
@@ -146,7 +14,7 @@ export async function showLoadingOverlay(options: LoadingOptions) {
         overlay.style.top = "0";
         overlay.style.width = "100%";
         overlay.style.height = "100%";
-        overlay.style.backgroundColor = "rgba(0, 0, 0, .3)";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, .32)";
         overlay.style.zIndex = "19999";
         overlay.style.display = "flex";
         overlay.style.flexDirection = "column";
@@ -159,7 +27,7 @@ export async function showLoadingOverlay(options: LoadingOptions) {
         spinner.style.color = "#fff";
         overlay.appendChild(spinner);
 
-        return new LoadingOverlayProxy(overlay);
+        return new LoadingProxy(overlay);
 
     } else {
 
@@ -178,6 +46,6 @@ export async function showLoadingOverlay(options: LoadingOptions) {
 
         await popover.present();
 
-        return new LoadingOverlayProxy(popover.querySelector("ionx-loading"));
+        return new LoadingProxy(popover.querySelector("ionx-loading"));
     }
 }
