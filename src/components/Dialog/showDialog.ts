@@ -23,3 +23,7 @@ export async function showDialog(options: DialogOptions & Exclude<Partial<ModalO
 
     return modal.querySelector<HTMLIonxDialogElement>("ionx-dialog");
 }
+
+export namespace showDialog {
+    export const prefetchComponents: ReadonlyArray<string> = ["ionx-dialog", "ion-modal"];
+}

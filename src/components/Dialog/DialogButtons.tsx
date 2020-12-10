@@ -1,5 +1,6 @@
 import {modalController} from "@ionic/core";
 import {Component, Element, h, Host, Prop} from "@stencil/core";
+import {prefetchComponent} from "../misc";
 import {DialogButton} from "./DialogButton";
 import {DialogValue, dialogValueAttribute} from "./DialogValue";
 
@@ -15,6 +16,12 @@ export class DialogButtons {
 
     @Prop()
     buttons!: DialogButton[];
+
+    /**
+     * @internal
+     */
+    @Prop()
+    prefetch: boolean;
 
     async buttonClicked(button: DialogButton) {
 
@@ -43,7 +50,18 @@ export class DialogButtons {
         }
     }
 
+    componentDidLoad() {
+        if (this.prefetch) {
+            prefetchComponent({delay: 0}, "ion-footer", "ion-toolbar", "ion-buttons", "ion-button", "ion-icon")
+        }
+    }
+
     render() {
+
+        if (this.prefetch) {
+            return;
+        }
+
         return <Host>
             <ion-footer>
                 <ion-toolbar>

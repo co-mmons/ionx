@@ -7,11 +7,11 @@ interface PrefetchComponentOptions {
     delay?: number;
 }
 
-export async function prefetchComponent(tagNames: string[], options: PrefetchComponentOptions);
+export async function prefetchComponent(tagNames: Array<string | string[] | ReadonlyArray<string>>, options: PrefetchComponentOptions);
 
-export async function prefetchComponent(options: PrefetchComponentOptions, ...tagName: string[]);
+export async function prefetchComponent(options: PrefetchComponentOptions, ...tagName: Array<string | string[] | ReadonlyArray<string>>);
 
-export async function prefetchComponent(...tagName: string[]);
+export async function prefetchComponent(...tagName: Array<string | string[] | ReadonlyArray<string>>);
 
 export async function prefetchComponent() {
 
@@ -21,7 +21,7 @@ export async function prefetchComponent() {
     for (let i = 0; i < arguments.length; i++) {
 
         if (Array.isArray(arguments[i])) {
-            tagNames = tagNames.concat((arguments[i] as string[]).filter(tagName => !fetched.includes(tagName)));
+            tagNames = tagNames.concat((arguments[i] as string[]).flat().filter(tagName => !fetched.includes(tagName)));
 
         } else if (typeof arguments[i] === "string") {
 
@@ -39,7 +39,7 @@ export async function prefetchComponent() {
     }
 
     if (typeof options?.delay !== "number" || (typeof options?.delay === "number" && options.delay > 0)) {
-        await sleep(options?.delay || 2000);
+        await sleep(options?.delay || 1000);
     }
 
     for (const tag of tagNames) {

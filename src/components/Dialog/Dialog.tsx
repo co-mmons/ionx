@@ -3,6 +3,7 @@ import {OverlayEventDetail} from "@ionic/core";
 import {Component, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
 import {Subject} from "rxjs";
 import {first} from "rxjs/operators";
+import {prefetchComponent} from "../misc";
 import {DialogButton} from "./DialogButton";
 import {DialogOptions} from "./DialogOptions";
 
@@ -62,6 +63,12 @@ export class Dialog implements DialogOptions {
     @Prop()
     buttons?: DialogButton[];
 
+    /**
+     * @internal
+     */
+    @Prop()
+    prefetch: boolean;
+
     #didEnter = new Subject<true>();
 
     /**
@@ -87,7 +94,17 @@ export class Dialog implements DialogOptions {
         return this.element.closest("ion-modal").onWillDismiss();
     }
 
+    componentDidLoad() {
+        if (this.prefetch) {
+            prefetchComponent({delay: 0},"ionx-dialog-content", "ionx-dialog-headers", "ionx-dialog-message", "ionx-dialog-buttons")
+        }
+    }
+
     render() {
+
+        if (this.prefetch) {
+            return;
+        }
 
         const Component = this.component;
         const Message = this.messageComponent;
