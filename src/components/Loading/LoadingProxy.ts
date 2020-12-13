@@ -14,7 +14,7 @@ export class LoadingProxy implements LoadingOptions {
             return this.loading.dismiss();
         } else {
 
-            if (this.element.style.opacity === "0") {
+            if (this.element.style.opacity === "0" || this.element.style.opacity.startsWith("-")) {
                 this.element.remove();
             } else {
                 this.element.style.opacity = `${parseFloat(this.element.style.opacity || "1.0") - .1}`;
