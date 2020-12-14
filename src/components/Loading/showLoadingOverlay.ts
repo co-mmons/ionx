@@ -14,7 +14,7 @@ export async function showLoadingOverlay(options?: LoadingOptions) {
         overlay.style.top = "0";
         overlay.style.width = "100%";
         overlay.style.height = "100%";
-        overlay.style.backgroundColor = "rgba(0, 0, 0, .32)";
+        overlay.style.backgroundColor = `rgba(${options?.backdropTheme === "light" ? "255,255,255, 0.5" : "0,0,0,.32"})`;
         overlay.style.zIndex = "19999";
         overlay.style.display = "flex";
         overlay.style.flexDirection = "column";
@@ -24,7 +24,7 @@ export async function showLoadingOverlay(options?: LoadingOptions) {
         app.appendChild(overlay);
 
         const spinner = document.createElement("ion-spinner");
-        spinner.style.color = "#fff";
+        spinner.style.color = options?.backdropTheme === "light" ? "#000" : "#fff";
         overlay.appendChild(spinner);
 
         return new LoadingProxy(overlay);
