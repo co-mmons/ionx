@@ -92,14 +92,14 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
             this.controls[controlName].onStateChange(() => this.fireStateChange());
         }
 
-        if (options?.validators) {
-            this.controls[controlName].setValidators(options.validators);
-        }
-
         if (options && "value" in options) {
             this.controls[controlName].setValue(options.value);
         } else if (!exists) {
             this.fireStateChange();
+        }
+
+        if (options?.validators) {
+            this.controls[controlName].setValidators(options.validators);
         }
 
         return this.controls[controlName];
@@ -290,22 +290,30 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
 
     async validate(options?: FormControllerValidateOptions): Promise<boolean> {
 
+        let firstErrorControl: FormControl;
+
         for (const control of this.orderedControls()) {
-            if (!(await control.validate()) && control.element) {
-
-                if (!options?.preventFocus) {
-                    control.focus({preventScroll: options?.preventScroll});
-                }
-
-                this.errorPresenter$?.present(this, control);
-
-                return false;
+            if (!(await control.validate()) && control.element && !firstErrorControl) {
+                firstErrorControl = control;
             }
         }
 
-        this.errorPresenter$?.dismiss(this);
+        if (firstErrorControl) {
 
-        return true;
+            if (!options?.preventFocus) {
+                firstErrorControl.focus({preventScroll: options?.preventScroll});
+            }
+
+            this.errorPresenter$?.present(this, firstErrorControl);
+
+            return false;
+
+        } else {
+
+            this.errorPresenter$?.dismiss(this);
+
+            return true;
+        }
     }
 
     /**
