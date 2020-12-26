@@ -322,6 +322,10 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private onElementChange(ev: CustomEvent) {
 
+        if (ev.target !== this.element$) {
+            return;
+        }
+
         const value = "checked" in ev.detail ? ev.detail.checked : ev.detail.value;
 
         this.applyState({dirty: true, value}, {trigger: "elementValueChange"});

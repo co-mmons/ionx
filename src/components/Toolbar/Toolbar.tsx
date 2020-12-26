@@ -148,7 +148,7 @@ export class Toolbar {
                 {(this.button === "back" || this.button === "close") && <ion-back-button
                     slot="start"
                     style={{display: this.button === "close" ? "inline-block" : null}}
-                    icon={matchesMediaBreakpoint(this, "md") ? "close" : undefined}
+                    icon={this.button === "close" && matchesMediaBreakpoint(this, "md") ? "close" : undefined}
                     onClick={ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
                     defaultHref={(this.button === "back" && this.defaultBackHref) || null}/>}
 

@@ -46,7 +46,7 @@ function disconnectHook(component: ComponentInterface, hookName: string) {
         return;
     }
 
-    const hook = component[hooksProperty][hookName];
+    const hook: ComponentDisconnectHook = component[hooksProperty][hookName];
     if (hook) {
         console.debug(`[ionx/componentDisconnectHooks] disconnected hook "${hookName}"`);
 
@@ -66,5 +66,5 @@ export function getComponentDisconnectHook<T extends ComponentDisconnectHook>(co
 }
 
 export function removeComponentDisconnectHook<T extends ComponentDisconnectHook>(component: ComponentInterface, hookName: string): T {
-    return disconnectHook(component, hookName);
+    return disconnectHook(component, hookName) as T;
 }

@@ -16,6 +16,9 @@ export class Block {
     innerAlignment: "start" | "end" | "center";
 
     @Prop()
+    innerStyle: {[key: string]: string};
+
+    @Prop()
     margins = true;
 
     @Prop()
@@ -37,7 +40,7 @@ export class Block {
             }}>
 
             <div ionx--outer ionx--inner-alignment={this.innerAlignment || null}>
-                <div ionx--inner>
+                <div ionx--inner style={this.innerStyle}>
                     <slot/>
                 </div>
             </div>
