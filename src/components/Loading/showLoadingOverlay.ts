@@ -41,6 +41,8 @@ export async function showLoadingOverlay(options?: LoadingOptions) {
             componentProps: Object.assign({type: "spinner"} as LoadingOptions, options, {backdropVisible: false})
         });
 
+        popover.style.setProperty("--width", "auto");
+
         const wrapper = popover.querySelector<HTMLElement>(".popover-content");
         wrapper.style.padding = "16px";
 

@@ -5,7 +5,7 @@ input:-webkit-autofill:active {
     background-color: transparent !important;
     animation-name: autofill;
     animation-fill-mode: both;
-    box-shadow: 0 0 0 10000px var(--input-background-color, #ffffff) inset;
+    box-shadow: 0 0 0 10000px var(--input-background-color, var(--ion-background-color, #ffffff)) inset;
 }
 
 ion-item.ion-focused {
@@ -13,6 +13,6 @@ ion-item.ion-focused {
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus,
     input:-webkit-autofill:active {
-        box-shadow: 0 0 0 10000px var(--input-focused-background-color, #ffffff) inset;
+        box-shadow: 0 0 0 10000px var(--input-focused-background-color, var(--ion-background-color, #ffffff)) inset;
     }
 }

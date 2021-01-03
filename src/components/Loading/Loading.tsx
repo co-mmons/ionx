@@ -98,7 +98,7 @@ export class Loading implements LoadingOptions {
 
                 {this.spinnerMode && <ion-spinner color={this.color} style={{marginRight: !!(this.header || this.message) && "8px"}}/>}
 
-                {!!(this.header || this.message) && <div style={{flexBasis: this.progressMode && "100%", display: "flex", flexDirection: "column", justifyItems: "center"}}>
+                {!!(this.header || this.message) && <div style={{flexBasis: this.progressMode && "100%", display: "flex", flexDirection: "column", justifyItems: "center", flex: "1"}}>
                     {this.header ? <h4 style={{"margin": "0px"}}>{this.header}</h4> : ""}
                     {this.message ? <ion-text color={this.color} innerHTML={this.message}/> : ""}
                 </div>}
