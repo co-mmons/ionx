@@ -1,5 +1,5 @@
 import {modalController} from "@ionic/core";
-import {Component, Element, h, Host, Prop} from "@stencil/core";
+import {Component, Element, h, Host, Method, Prop} from "@stencil/core";
 import {prefetchComponent} from "../misc";
 import {DialogButton} from "./DialogButton";
 import {DialogValue, dialogValueAttribute} from "./DialogValue";
@@ -23,6 +23,7 @@ export class DialogButtons {
     @Prop()
     prefetch: boolean;
 
+    @Method()
     async buttonClicked(button: DialogButton) {
 
         let value: any;

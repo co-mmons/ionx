@@ -7,9 +7,9 @@
 
 ## Properties
 
-| Property               | Attribute | Description | Type     | Default     |
-| ---------------------- | --------- | ----------- | -------- | ----------- |
-| `message` _(required)_ | `message` |             | `string` | `undefined` |
+| Property  | Attribute | Description | Type                   | Default     |
+| --------- | --------- | ----------- | ---------------------- | ----------- |
+| `message` | `message` |             | `HtmlString \| string` | `undefined` |
 
 
 ## Dependencies

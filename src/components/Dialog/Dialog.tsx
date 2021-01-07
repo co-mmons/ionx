@@ -63,6 +63,17 @@ export class Dialog implements DialogOptions {
     @Prop()
     buttons?: DialogButton[];
 
+    @Method()
+    async clickButton(role: string) {
+        const buttonsElem = this.element.querySelector<HTMLIonxDialogButtonsElement>("ionx-dialog-buttons");
+        if (buttonsElem) {
+            const button = buttonsElem.buttons?.find(button => button.role === role);
+            if (button) {
+                await buttonsElem.buttonClicked(button);
+            }
+        }
+    }
+
     /**
      * @internal
      */

@@ -10,6 +10,7 @@ import { BlockWidth } from "./components/Block/BlockWidth";
 import { BlockWidthsMap } from "./components/Block/BlockWidthsMap";
 import { HtmlString, TimeZoneDate } from "@co.mmons/js-utils/core";
 import { DialogButton } from "./components/Dialog/DialogButton";
+import { DialogValue } from "./components/Dialog/DialogValue";
 import { FormController } from "./components/forms/FormController";
 import { FormControlAttachOptions } from "./components/forms/FormControlAttachOptions";
 import { FormControllerValidateOptions } from "./components/forms/FormControllerPublicApi";
@@ -50,6 +51,7 @@ export namespace Components {
     }
     interface IonxBlock {
         "innerAlignment": "start" | "end" | "center";
+        "innerStyle": {[key: string]: string};
         "innerWidth": BlockWidth | BlockWidthsMap;
         "margins": boolean;
         "padding": boolean;
@@ -86,6 +88,7 @@ export namespace Components {
           * @inheritDoc
          */
         "buttons"?: DialogButton[];
+        "clickButton": (role: string) => Promise<void>;
         /**
           * Name of the tag, that should be displayed inside....
           * @inheritDoc
@@ -117,13 +120,16 @@ export namespace Components {
          */
         "onDidEnter": () => Promise<true>;
         "onWillDismiss": () => Promise<OverlayEventDetail<any>>;
+        "prefetch": boolean;
         /**
           * @inheritDoc
          */
         "subheader"?: string;
     }
     interface IonxDialogButtons {
+        "buttonClicked": (button: DialogButton) => Promise<void>;
         "buttons": DialogButton[];
+        "prefetch": boolean;
     }
     interface IonxDialogContent {
     }
@@ -166,6 +172,7 @@ export namespace Components {
     }
     interface IonxLoading {
         "backdropOpacity"?: number;
+        "backdropTheme"?: "light" | "dark";
         "backdropVisible"?: boolean;
         "color"?: string;
         /**
@@ -609,6 +616,7 @@ declare namespace LocalJSX {
     }
     interface IonxBlock {
         "innerAlignment"?: "start" | "end" | "center";
+        "innerStyle"?: {[key: string]: string};
         "innerWidth"?: BlockWidth | BlockWidthsMap;
         "margins"?: boolean;
         "padding"?: boolean;
@@ -673,6 +681,7 @@ declare namespace LocalJSX {
           * @inheritDoc
          */
         "messageComponentProps"?: {[prop: string]: any};
+        "prefetch"?: boolean;
         /**
           * @inheritDoc
          */
@@ -680,6 +689,7 @@ declare namespace LocalJSX {
     }
     interface IonxDialogButtons {
         "buttons": DialogButton[];
+        "prefetch"?: boolean;
     }
     interface IonxDialogContent {
     }
@@ -719,6 +729,7 @@ declare namespace LocalJSX {
     }
     interface IonxLoading {
         "backdropOpacity"?: number;
+        "backdropTheme"?: "light" | "dark";
         "backdropVisible"?: boolean;
         "color"?: string;
         /**
