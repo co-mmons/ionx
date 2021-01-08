@@ -11,9 +11,9 @@ import {EventUnlisten} from "./EventUnlisten";
 
 export type WindowOrientation = "portrait" | "landscape";
 
-export type WindowSize = {width: number, height: number, orientation: WindowOrientation};
+export type WindowSize = {width: number, height: number, breakpoint: "xs" | "sm" | "md" | "lg" | "xl", orientation: WindowOrientation};
 
-export type WindowSizeOptions = {orientationOnly?: boolean};
+export type WindowSizeOptions = {orientationOnly?: boolean, breakpointOnly?: boolean};
 
 export function windowSize(): WindowSize;
 
@@ -37,10 +37,10 @@ export function windowSize(componentOrWidth?: any | number, heightOrOptions?: nu
         return hook.size();
 
     } else if (typeof componentOrWidth === "number" && typeof heightOrOptions === "number") {
-        return {width: componentOrWidth, height: heightOrOptions, orientation: calcOrientation(componentOrWidth, heightOrOptions)};
+        return {width: componentOrWidth, height: heightOrOptions, breakpoint: calcBreakpoint(componentOrWidth), orientation: calcOrientation(componentOrWidth, heightOrOptions)};
     }
 
-    return {width: window.innerWidth, height: window.innerHeight, orientation: calcOrientation(window.innerWidth, window.innerHeight)};
+    return {width: window.innerWidth, height: window.innerHeight, breakpoint: calcBreakpoint(window.innerWidth), orientation: calcOrientation(window.innerWidth, window.innerHeight)};
 }
 
 class WindowSizeHook implements ComponentDisconnectHook {
@@ -61,12 +61,14 @@ class WindowSizeHook implements ComponentDisconnectHook {
 
     orientation: "landscape" | "portrait";
 
+    breakpoint: any;
+
     width: number;
 
     height: number;
 
-    size() {
-        return {width: this.width, height: this.height, orientation: this.orientation};
+    size(): WindowSize {
+        return {width: this.width, height: this.height, breakpoint: this.breakpoint, orientation: this.orientation};
     }
 
     async onResize(event: Event) {
@@ -89,11 +91,24 @@ class WindowSizeHook implements ComponentDisconnectHook {
             }
         }
 
+        const breakpoint = calcBreakpoint(width);
         const orientation = calcOrientation(width, height);
-        if (orientation !== this.orientation || (!this.options?.orientationOnly && (this.width !== width || this.height !== height))) {
-            console.debug("[ionx/misc/windowSize] change", this.width, this.height, this.orientation);
+
+        let changed = false;
+
+        if (this.options?.orientationOnly) {
+            changed = this.orientation !== orientation;
+        } else if (this.options?.breakpointOnly) {
+            changed = this.breakpoint !== breakpoint;
+        } else if (this.width !== width || this.height !== height) {
+            changed = true;
+        }
+
+        if (changed) {
+            console.debug("[ionx/misc/windowSize] change", this.width, this.height, this.breakpoint, this.orientation);
 
             this.orientation = orientation;
+            this.breakpoint = breakpoint;
             this.width = width;
             this.height = height;
 
@@ -118,4 +133,18 @@ class WindowSizeHook implements ComponentDisconnectHook {
 
 function calcOrientation(screenWidth: number, screenHeight: number): WindowOrientation {
     return (screenWidth <= 767 && screenWidth < screenHeight) || (screenHeight >= 1024 && screenWidth < screenHeight) ? "portrait" : "landscape";
+}
+
+function calcBreakpoint(screenWidth: number) {
+    if (screenWidth >= 1200) {
+        return "xl";
+    } else if (screenWidth >= 992) {
+        return "lg";
+    } else if (screenWidth >= 768) {
+        return "md";
+    } else if (screenWidth >= 576) {
+        return "sm";
+    } else {
+        return "xs";
+    }
 }
