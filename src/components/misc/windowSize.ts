@@ -50,6 +50,7 @@ class WindowSizeHook implements ComponentDisconnectHook {
         this.width = window.innerWidth;
         this.height = window.innerHeight;
         this.orientation = calcOrientation(this.width, this.height);
+        this.breakpoint = calcBreakpoint(this.width);
 
         this.unlisten = [
             addEventListener(window, "resize", ev => this.onResize(ev)),
