@@ -25,7 +25,6 @@
         "@stencil/forms": "github:adamdbradley/stencil-forms",
         "@stencil/sass": "^1.3.2",
         "@types/dragula": "^3.7.0",
-        "@types/jest": "^26.0.10",
         "bignumber.js": "^9.0.0",
         "dragula": "^3.7.3",
         "fast-equals": "^2.0.0",

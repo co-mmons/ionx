@@ -1,3 +1,4 @@
+import {isHydrated, waitTillHydrated} from "../misc";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";
 import {ExtendedContent} from "./ExtendedContent";
 import {ExtendedItemElement} from "./ExtendedItemElement";
@@ -164,6 +165,10 @@ export class LazyLoadController {
 
         for (let i = 0; i < this.items.length; i++) {
             this.intersectionObserver.observe(this.items[i]);
+        }
+
+        if (!isHydrated(this.content)) {
+            waitTillHydrated(this.content, {interval: 100, timeout: 10000}).then(() => this.ensureLoaded());
         }
     }
 

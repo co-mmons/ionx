@@ -15,12 +15,8 @@ export class MultiGrid implements ComponentInterface {
     @Element()
     element: HTMLElement;
 
-    /**
-     * If grid should behave as block element, where all its children
-     * are layed row by row in single column.
-     */
     @Prop({reflect: true})
-    layout: "masonry" | "block";
+    layout: "masonry" | "block" | "flex" = "masonry";
 
     busy: boolean;
 
@@ -46,9 +42,9 @@ export class MultiGrid implements ComponentInterface {
      */
     queuedLayout: boolean;
 
-    content: HTMLIonContentElement;
+    contentElement: HTMLIonContentElement;
 
-    parentView: HTMLElement;
+    parentViewElement: HTMLElement;
 
     paused: boolean = false;
 
@@ -59,15 +55,19 @@ export class MultiGrid implements ComponentInterface {
     viewDidEnterUnlisten: EventUnlisten;
 
     isParentViewActive() {
-        return !this.parentView?.classList.contains("ion-page-hidden");
+        return !this.parentViewElement?.classList.contains("ion-page-hidden");
     }
+
+    itemsElement: HTMLElement;
 
     items() {
         const items: Array<HTMLElement & ExtendedItemElement> = [];
 
-        const children = this.element.children;
-        for (let i = 0; i < children.length; i++) {
-            items.push(children[i] as HTMLElement);
+        const children = this.itemsElement?.children;
+        if (children) {
+            for (let i = 0; i < children.length; i++) {
+                items.push(children[i] as HTMLElement);
+            }
         }
 
         return items;
@@ -97,7 +97,7 @@ export class MultiGrid implements ComponentInterface {
         this.waiting = false;
         this.busy = true;
 
-        if (this.layout === "block") {
+        if (this.layout === "block" || this.layout === "flex") {
 
             const items = this.items();
 
@@ -172,7 +172,7 @@ export class MultiGrid implements ComponentInterface {
 
             // kolejkujemy renderowania jeżeli strona nie jest widoczna lub aplikacja w pauzie
             QUEUE: if (!this.isParentViewActive() || this.paused) {
-                this.queuedLayout = doLayout || this.element.getBoundingClientRect().width !== this.lastWidth;
+                this.queuedLayout = doLayout || this.itemsElement.getBoundingClientRect().width !== this.lastWidth;
 
                 // poczekajmy na skończenie animacji zmiany strony
                 // tak na wszelki wypadek, aby mieć pewność, że
@@ -195,17 +195,17 @@ export class MultiGrid implements ComponentInterface {
 
             // podczas przekręcania urządzenia iOS mamy opóźnienie w uzyskaniu nowego rozmiaru okna
             // todo zweryfikować jak to działa
-            if (Capacitor.platform === "ios" && items.length > 0 && !doLayout && options?.force && this.element.getBoundingClientRect().width === this.lastWidth) {
+            if (Capacitor.platform === "ios" && items.length > 0 && !doLayout && options?.force && this.itemsElement.getBoundingClientRect().width === this.lastWidth) {
                 for (let i = 0; i < 40; i++) {
                     await sleep(50);
-                    if (this.element.getBoundingClientRect().width !== this.lastWidth) {
+                    if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
                         break;
                     }
                 }
             }
 
             // zmienił się rozmiar kontenera, oznaczamy wszystkie itemy do renderu
-            if (this.element.getBoundingClientRect().width !== this.lastWidth) {
+            if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
                 doLayout = true;
                 for (const item of items) {
                     item.__ionxMultiGridReady = false;
@@ -214,12 +214,11 @@ export class MultiGrid implements ComponentInterface {
 
             // ok, możemy przystąpić do renderowania
             LAYOUT: if (doLayout) {
-                // console.log("rebuild grid", this.element.getBoundingClientRect().width, this.lastWidth, window.innerWidth);
-
+                // console.log("rebuild grid", this.itemsElement.getBoundingClientRect().width, this.lastWidth, window.innerWidth);
                 // upewniamy się, że możemy renderować - kontener musi mieć jakąś szerokość
-                if (this.element.getBoundingClientRect().width === 0) {
+                if (this.itemsElement.getBoundingClientRect().width === 0) {
                     try {
-                        await waitTill(() => this.element.getBoundingClientRect().width > 0, undefined, 5000);
+                        await waitTill(() => this.itemsElement.getBoundingClientRect().width > 0, undefined, 5000);
                     } catch {
                         break LAYOUT;
                     }
@@ -256,7 +255,7 @@ export class MultiGrid implements ComponentInterface {
 
                 const itemsPositions: {[index: number]: {left: number, top: number}} = {};
 
-                let gridRect = this.element.getBoundingClientRect();
+                let gridRect = this.itemsElement.getBoundingClientRect();
 
                 for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 
@@ -354,21 +353,21 @@ export class MultiGrid implements ComponentInterface {
                     // }
                 }
 
-                gridRect = this.element.getBoundingClientRect();
+                gridRect = this.itemsElement.getBoundingClientRect();
 
                 const lowestItem = (sectionItems.length && sectionItems[0]) || (items.length && items[items.length - 1]);
                 if (lowestItem) {
                     const rect = lowestItem.getBoundingClientRect();
-                    this.element.style.height = `${rect.top - gridRect.top + rect.height}px`;
+                    this.itemsElement.style.height = `${rect.top - gridRect.top + rect.height}px`;
                 } else {
-                    this.element.style.height = "0px";
+                    this.itemsElement.style.height = "0px";
                 }
 
                 this.lastWidth = gridRect.width;
                 this.lastItemsCount = items.length;
 
                 if (Capacitor.platform === "ios") {
-                    const scroll: HTMLElement = await this.content.getScrollElement();
+                    const scroll: HTMLElement = await this.contentElement.getScrollElement();
                     scroll.style.overflowY = "hidden";
                     await sleep(200);
                     scroll.style.overflowY = "auto";
@@ -469,28 +468,32 @@ export class MultiGrid implements ComponentInterface {
 
     init() {
 
-        this.content = this.element.closest("ion-content");
-        this.parentView = this.element.closest(".ion-page");
+        this.contentElement = this.element.closest("ion-content");
+        this.parentViewElement = this.element.closest(".ion-page");
 
-        if (!this.content || !this.parentView) {
+        if (!this.contentElement || !this.parentViewElement || !this.itemsElement) {
             setTimeout(() => this.init());
             return;
         }
 
         this.pauseUnlisten = addEventListener(document, "pause", () => this.viewPaused());
         this.resumeUnlisten = addEventListener(document, "resume", () => this.viewPaused());
-        this.viewDidEnterUnlisten = addEventListener(this.parentView, "ionViewDidEnter", () => this.viewDidEnter())
+        this.viewDidEnterUnlisten = addEventListener(this.parentViewElement, "ionViewDidEnter", () => this.viewDidEnter())
 
         this.observer = new MutationObserver(mutations => this.onMutation(mutations));
-        this.observer.observe(this.element, {childList: true});
+        this.observer.observe(this.itemsElement, {childList: true});
+
+        this.arrange();
     }
 
     disconnectedCallback() {
+
         this.observer.disconnect();
         this.observer = undefined;
 
-        this.content = undefined;
-        this.parentView = undefined;
+        this.contentElement = undefined;
+        this.parentViewElement = undefined;
+        this.itemsElement = undefined;
 
         this.pauseUnlisten();
         this.pauseUnlisten = undefined;
@@ -504,7 +507,9 @@ export class MultiGrid implements ComponentInterface {
 
     render() {
         return <Host>
-            <slot/>
+            <div ionx--grid-items ref={el => this.itemsElement = el}>
+                <slot/>
+            </div>
         </Host>;
     }
 

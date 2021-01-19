@@ -1,14 +1,25 @@
 :host {
     display: block;
     position: relative;
-    width: 100%;
 
-    &[layout=block] {
-        height: auto !important;
+    [ionx--grid-items] {
+        display: block;
+        position: relative;
+    }
+
+    &[layout=flex] [ionx--grid-items] {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    &[layout=block], &[layout=flex] {
+        [ionx--grid-items] {
+            height: auto !important;
+        }
     }
 }
 
-:host(:not([layout=block]))::slotted(*) {
+:host([layout=masonry]) [ionx--grid-items]::slotted(*) {
     position: absolute;
     display: none;
 }
