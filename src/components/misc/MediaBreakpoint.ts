@@ -3,7 +3,7 @@ import {Enum, EnumFromJSONValue, EnumValueName, EnumValueOfValue} from "@co.mmon
 export class MediaBreakpoint extends Enum {
 
     static readonly xs = new MediaBreakpoint("xs", 0);
-    static readonly sm = new MediaBreakpoint("xs", 576);
+    static readonly sm = new MediaBreakpoint("sm", 576);
     static readonly md = new MediaBreakpoint("md", 768);
     static readonly lg = new MediaBreakpoint("lg", 992);
     static readonly xl = new MediaBreakpoint("xl", 1200);

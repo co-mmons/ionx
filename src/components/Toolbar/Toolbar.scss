@@ -1,3 +1,5 @@
+@import "../styles/hide-when-mixin";
+
 :host {
     display: block;
 
@@ -32,7 +34,6 @@
             font-family: var(--ion-toolbar-title-font-family, var(--ion-font-family, inherit));
             font-weight: var(--ion-toolbar-title-font-weight, 500);
             font-size: 22px;
-            line-height: 1.1;
             display: block;
             margin: 0;
             padding: 0;
@@ -83,6 +84,22 @@
         margin-right: 0;
         --padding-start: 4px;
         --padding-end: 4px;
+    }
+
+    ::slotted([slot=title]) {
+        line-height: 1.1;
+    }
+
+    ::slotted([slot=subtitle]) {
+        font-size: 75%;
+        font-weight: 400;
+
+        &::before {
+            content: '\A';
+            white-space: pre;
+        }
+
+        @include ionx-hide-when("hide-when");
     }
 }
 

@@ -160,6 +160,7 @@ export class Toolbar {
 
                     <h1>
                         <slot name="title"/>
+                        <slot name="subtitle"/>
                     </h1>
 
                 </div>
