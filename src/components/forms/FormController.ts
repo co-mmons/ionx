@@ -179,6 +179,30 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         return this.status?.invalid || false;
     }
 
+    markAsDirty() {
+        for (const control of Object.values(this.controls)) {
+            control.markAsDirty();
+        }
+    }
+
+    markAsPristine() {
+        for (const control of Object.values(this.controls)) {
+            control.markAsPristine();
+        }
+    }
+
+    markAsTouched() {
+        for (const control of Object.values(this.controls)) {
+            control.markAsTouched();
+        }
+    }
+
+    markAsUntouched() {
+        for (const control of Object.values(this.controls)) {
+            control.markAsUntouched();
+        }
+    }
+
     state(): FormState {
 
         const state = {

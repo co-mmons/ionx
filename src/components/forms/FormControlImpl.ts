@@ -396,7 +396,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             } else {
 
                 if (state.valueChange) {
-                    if (tagName === "ion-input" || tagName === "ion-select" || tagName === "ion-textarea") {
+                    if (tagName === "ion-input" || tagName === "ion-select" || tagName === "ionx-select" || tagName === "ion-textarea") {
                         (this.element$ as HTMLIonInputElement | HTMLIonSelectElement | HTMLIonTextareaElement).value = this.value$ as any;
                     } else if (tagName === "ion-checkbox" || tagName === "ion-toggle") {
                         (this.element$ as HTMLIonCheckboxElement).checked = !!this.value$;
