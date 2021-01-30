@@ -96,7 +96,9 @@ export const matchesPath = (inputPath: string[], chain: RouteChain): RouteChain 
     return chain.map((route, i) => ({
         id: route.id,
         path: route.path,
-        params: {...(allparams ? mergeParams(route.params, allparams![i]) : route.params), ...matrixParams}
+        params: {...(allparams ? mergeParams(route.params, allparams![i]) : route.params), ...matrixParams},
+        beforeEnter: route.beforeEnter,
+        beforeLeave: route.beforeLeave
     }));
 };
 

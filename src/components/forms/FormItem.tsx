@@ -58,6 +58,11 @@ export class FormItem {
     @Prop()
     hint: string;
 
+    @Prop()
+    partProps: {
+        item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>
+    }
+
     render() {
         return <Host>
 
@@ -65,7 +70,7 @@ export class FormItem {
                 <slot name="buttons"/>
             </div>
 
-            <ion-item>
+            <ion-item {...this.partProps?.item}>
 
                 <slot name="start" slot="start"/>
 
