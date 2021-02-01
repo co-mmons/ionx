@@ -347,6 +347,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
                 const item = this.element$.closest("ion-item");
                 const formItem = this.element$.closest("ionx-form-item");
+                const formField = this.element$.closest("ionx-form-field");
 
                 for (const key of ["dirty", "touched", "valid"]) {
 
@@ -368,7 +369,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
                     }
 
                     if (classes.length > 0) {
-                        for (const el of [this.element$, item, formItem]) {
+                        for (const el of [this.element$, item, formItem, formField]) {
                             if (el) {
 
                                 if (key === "valid" && !this.validated$ && !state.status.dirty) {

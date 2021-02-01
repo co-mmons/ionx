@@ -3,7 +3,7 @@ import {Component, Element, h, Host, Prop} from "@stencil/core";
 @Component({
     tag: "ionx-toggle-labels",
     styleUrl: "ToggleLabels.scss",
-    shadow: true
+    scoped: true
 })
 export class ToggleLabels {
 

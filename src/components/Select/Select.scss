@@ -121,7 +121,7 @@
     --select-padding-end: 16px;
 }
 
-:host-context(.item-label-stacked) {
+:host-context(ionx-form-field), :host-context(.item-label-stacked) {
     align-self: flex-start;
     --select-padding-top: 8px;
     --select-padding-bottom: 8px;
@@ -136,4 +136,9 @@
     &.ionx--orderable .ionx--text {
         flex: 1;
     }
+}
+
+:host-context(ionx-form-field) {
+    --select-padding-start: 16px;
+    --select-padding-end: 16px;
 }

@@ -2,11 +2,6 @@
     display: flex;
     align-items: center;
 
-    ::slotted(ion-toggle) {
-        padding-inline-start: 2px;
-        padding-inline-end: 2px;
-    }
-
     .on {
         cursor: pointer;
         margin-left: 4px;
@@ -19,6 +14,11 @@
 
 }
 
+::slotted(ion-toggle) {
+    padding-inline-start: 2px;
+    padding-inline-end: 2px;
+}
+
 :host-context(.item-label-stacked) {
     align-self: flex-start;
 }
@@ -26,4 +26,9 @@
 :host-context(.ios .item-label-stacked) {
     margin-top: 2px;
     margin-bottom: 2px;
+}
+
+ionx-form-field [slot-container="default"] > :host {
+    margin-left: 16px;
+    margin-right: 16px;
 }

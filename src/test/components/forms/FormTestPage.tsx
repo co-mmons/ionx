@@ -1,6 +1,6 @@
 import {intl, pushMessages} from "@co.mmons/js-intl";
 import {Component, ComponentInterface, h, Host, State} from "@stencil/core";
-import {FormController, FormControlState, FormState} from "../../../components/forms";
+import {FormController, FormControlState, FormFieldLabelButton, formGrid, FormState} from "../../../components/forms";
 import {minLength, required} from "../../../components/forms/validators";
 
 @Component({
@@ -10,6 +10,7 @@ import {minLength, required} from "../../../components/forms/validators";
 export class FormTestPage implements ComponentInterface {
 
     form = new FormController({
+        text1: {value: null as string, validators: [required]},
         firstName: {value: null as string, validators: [minLength(3)]},
         lastName: {value: null as number}
     });
@@ -59,20 +60,86 @@ export class FormTestPage implements ComponentInterface {
 
                 <ionx-form-controller controller={this.form} disconnect={false}>
 
-                    <ionx-form-tooltip-error-presenter/>
+                    {/*<ionx-form-tooltip-error-presenter/>*/}
 
-                    <ion-grid>
+                    <ion-grid ref={formGrid}>
 
                         <ion-row>
 
                             <ion-col size-xs="12">
-                                <ionx-form-item>
+                                <ionx-form-field>
 
-                                    <ion-label position="stacked">First name</ion-label>
+                                    <span slot="label">Form field with nested fields</span>
+
+                                    <ion-grid>
+                                        <ion-row>
+                                            <ion-col size-md={6}>
+                                                <ionx-form-field label="Text input" error={this.form.controls.text1.error}>
+                                                    <div slot="description">A to jest podpowiedź!</div>
+                                                    <ion-input placeholder="sjdjsd" ref={this.form.attach("text1")}/>
+                                                </ionx-form-field>
+                                            </ion-col>
+                                            <ion-col size-md={6}>
+                                                <ionx-form-field label="Toogle">
+                                                    <ionx-toggle-labels on="Yes" off="No">
+                                                        <ion-toggle ref={this.form.attach("toggle1")}/>
+                                                    </ionx-toggle-labels>
+                                                </ionx-form-field>
+                                            </ion-col>
+                                            <ion-col size-xs={6}>
+                                                <ionx-form-field label="Checkbox">
+                                                    <ion-textarea autoGrow/>
+                                                </ionx-form-field>
+                                            </ion-col>
+                                            <ion-col size-xs={6}>
+                                                <ionx-form-field label="Select">
+                                                    <FormFieldLabelButton>
+                                                        <ion-icon name="list" slot="start"/>
+                                                        <span>Wybierz</span>
+                                                    </FormFieldLabelButton>
+
+                                                    <FormFieldLabelButton color="danger">
+                                                        <ion-icon name="trash" slot="start"/>
+                                                        <span>Usuń</span>
+                                                    </FormFieldLabelButton>
+
+                                                    <FormFieldLabelButton>
+                                                        <ion-icon name="help-circle" slot="icon-only"/>
+                                                    </FormFieldLabelButton>
+
+                                                    <FormFieldLabelButton>
+                                                        <ion-icon name="ellipsis-vertical" slot="icon-only"/>
+                                                    </FormFieldLabelButton>
+
+                                                    <ionx-select orderable={true} options={[{value: 1, label: "1"}]}/>
+                                                    <ion-button fill="clear" size="small" slot="end">
+                                                        <ion-icon name="close" slot="icon-only"/>
+                                                    </ion-button>
+                                                </ionx-form-field>
+                                            </ion-col>
+                                            <ion-col size-xs={6}>
+                                                <ionx-form-field label="List">
+                                                    <ion-list lines="full">
+                                                        {[1,2,3].map(v => <ion-item button>
+                                                            <ion-label>{v}</ion-label>
+                                                        </ion-item>)}
+                                                    </ion-list>
+                                                </ionx-form-field>
+                                            </ion-col>
+                                        </ion-row>
+                                    </ion-grid>
+
+                                </ionx-form-field>
+                            </ion-col>
+
+                            <ion-col size-xs="12">
+                                <ionx-form-field>
+
+                                    <span slot="label">First name</span>
 
                                     <ion-input ref={this.form.attach("firstName")}/>
 
-                                </ionx-form-item>
+                                </ionx-form-field>
                             </ion-col>
 
                             <ion-col size-xs="12">

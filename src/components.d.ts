@@ -155,6 +155,11 @@ export namespace Components {
         "disconnect"?: boolean;
         "validate": (options?: FormControllerValidateOptions) => Promise<boolean>;
     }
+    interface IonxFormField {
+        "control"?: FormControlState;
+        "error"?: string | FormValidationError | MessageRef | Error;
+        "label"?: string;
+    }
     interface IonxFormItem {
         "control"?: FormControlState;
         "error"?: string | FormValidationError | MessageRef | Error;
@@ -163,6 +168,9 @@ export namespace Components {
          */
         "fill": "clear" | "solid" | "outline";
         "hint": string;
+        "partProps": {
+        item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>
+    };
     }
     interface IonxFormTooltipErrorPresenter {
         "instance"?: TooltipErrorPresenterImpl | false;
@@ -195,10 +203,7 @@ export namespace Components {
     }
     interface IonxMultiGrid {
         "arrange": (options?: { force?: boolean; trigger?: "onresize"; }) => Promise<void>;
-        /**
-          * If grid should behave as block element, where all its children are layed row by row in single column.
-         */
-        "layout": "masonry" | "block";
+        "layout": "masonry" | "block" | "flex";
         "markItemAsDirty": (item: HTMLElement) => Promise<void>;
     }
     interface IonxSelect {
@@ -391,6 +396,12 @@ declare global {
         prototype: HTMLIonxFormControllerElement;
         new (): HTMLIonxFormControllerElement;
     };
+    interface HTMLIonxFormFieldElement extends Components.IonxFormField, HTMLStencilElement {
+    }
+    var HTMLIonxFormFieldElement: {
+        prototype: HTMLIonxFormFieldElement;
+        new (): HTMLIonxFormFieldElement;
+    };
     interface HTMLIonxFormItemElement extends Components.IonxFormItem, HTMLStencilElement {
     }
     var HTMLIonxFormItemElement: {
@@ -566,6 +577,7 @@ declare global {
         "ionx-expanding-searchbar": HTMLIonxExpandingSearchbarElement;
         "ionx-expanding-searchbar-parent": HTMLIonxExpandingSearchbarParentElement;
         "ionx-form-controller": HTMLIonxFormControllerElement;
+        "ionx-form-field": HTMLIonxFormFieldElement;
         "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-form-tooltip-error-presenter": HTMLIonxFormTooltipErrorPresenterElement;
         "ionx-lazy-load": HTMLIonxLazyLoadElement;
@@ -712,6 +724,11 @@ declare namespace LocalJSX {
          */
         "disconnect"?: boolean;
     }
+    interface IonxFormField {
+        "control"?: FormControlState;
+        "error"?: string | FormValidationError | MessageRef | Error;
+        "label"?: string;
+    }
     interface IonxFormItem {
         "control"?: FormControlState;
         "error"?: string | FormValidationError | MessageRef | Error;
@@ -720,6 +737,9 @@ declare namespace LocalJSX {
          */
         "fill"?: "clear" | "solid" | "outline";
         "hint"?: string;
+        "partProps"?: {
+        item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>
+    };
     }
     interface IonxFormTooltipErrorPresenter {
         "instance"?: TooltipErrorPresenterImpl | false;
@@ -750,10 +770,7 @@ declare namespace LocalJSX {
         "type"?: "spinner" | "progress";
     }
     interface IonxMultiGrid {
-        /**
-          * If grid should behave as block element, where all its children are layed row by row in single column.
-         */
-        "layout"?: "masonry" | "block";
+        "layout"?: "masonry" | "block" | "flex";
     }
     interface IonxSelect {
         /**
@@ -889,6 +906,7 @@ declare namespace LocalJSX {
         "ionx-expanding-searchbar": IonxExpandingSearchbar;
         "ionx-expanding-searchbar-parent": IonxExpandingSearchbarParent;
         "ionx-form-controller": IonxFormController;
+        "ionx-form-field": IonxFormField;
         "ionx-form-item": IonxFormItem;
         "ionx-form-tooltip-error-presenter": IonxFormTooltipErrorPresenter;
         "ionx-lazy-load": IonxLazyLoad;
@@ -934,6 +952,7 @@ declare module "@stencil/core" {
             "ionx-expanding-searchbar": LocalJSX.IonxExpandingSearchbar & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarElement>;
             "ionx-expanding-searchbar-parent": LocalJSX.IonxExpandingSearchbarParent & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarParentElement>;
             "ionx-form-controller": LocalJSX.IonxFormController & JSXBase.HTMLAttributes<HTMLIonxFormControllerElement>;
+            "ionx-form-field": LocalJSX.IonxFormField & JSXBase.HTMLAttributes<HTMLIonxFormFieldElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-form-tooltip-error-presenter": LocalJSX.IonxFormTooltipErrorPresenter & JSXBase.HTMLAttributes<HTMLIonxFormTooltipErrorPresenterElement>;
             "ionx-lazy-load": LocalJSX.IonxLazyLoad & JSXBase.HTMLAttributes<HTMLIonxLazyLoadElement>;

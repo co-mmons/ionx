@@ -21,8 +21,7 @@
         "@co.mmons/js-utils": "github:co-mmons/js-utils",
         "@co.mmons/rxjs-utils": "github:co-mmons/rxjs-utils",
         "@ionic/core": "^5.3.1",
-        "@stencil/core": "^2.0.1",
-        "@stencil/forms": "github:adamdbradley/stencil-forms",
+        "@stencil/core": "^2.3.0",
         "@stencil/sass": "^1.3.2",
         "@types/dragula": "^3.7.0",
         "bignumber.js": "^9.0.0",
@@ -33,7 +32,7 @@
         "scroll-into-view": "^1.15.0",
         "tippy.js": "^6.2.6",
         "ts-error": "^1.0.6",
-        "typescript": "^4.0.2"
+        "typescript": "^4.1.3"
     },
     "intlBundleItems": [
         {

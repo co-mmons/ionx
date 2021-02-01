@@ -10,3 +10,4 @@ export {FormState} from "./FormState";
 export {FormValidationErrorPresenter} from "./FormValidationErrorPresenter";
 export {FormValidationError} from "./FormValidationError";
 export {FormValidator, FormValidatorOptions} from "./FormValidator";
+export {FormFieldLabelButton} from "./FormFieldLabelButton"
