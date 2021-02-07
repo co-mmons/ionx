@@ -17,7 +17,7 @@ import { FormControllerValidateOptions } from "./components/forms/FormController
 import { FormControlState } from "./components/forms/FormControlState";
 import { FormValidationError } from "./components/forms/FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
-import { TooltipErrorPresenterImpl } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterImpl";
+import { TooltipErrorPresenter } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterImpl";
 import { TooltipErrorPresenterOptions } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterOptions";
 import { ExtendedItemElement } from "./components/MultiGrid/ExtendedItemElement";
 import { ValueComparator } from "./components/Select/ValueComparator";
@@ -173,7 +173,7 @@ export namespace Components {
     };
     }
     interface IonxFormTooltipErrorPresenter {
-        "instance"?: TooltipErrorPresenterImpl | false;
+        "instance"?: TooltipErrorPresenter | false;
         "options"?: TooltipErrorPresenterOptions;
     }
     interface IonxLazyLoad {
@@ -742,7 +742,7 @@ declare namespace LocalJSX {
     };
     }
     interface IonxFormTooltipErrorPresenter {
-        "instance"?: TooltipErrorPresenterImpl | false;
+        "instance"?: TooltipErrorPresenter | false;
         "options"?: TooltipErrorPresenterOptions;
     }
     interface IonxLazyLoad {

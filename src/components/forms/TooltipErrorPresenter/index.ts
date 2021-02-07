@@ -1,2 +1,2 @@
-export {TooltipErrorPresenterImpl as TooltipErrorPresenter} from "./TooltipErrorPresenterImpl";
+export {TooltipErrorPresenter} from "./TooltipErrorPresenter";
 export {TooltipErrorPresenterOptions} from "./TooltipErrorPresenterOptions";

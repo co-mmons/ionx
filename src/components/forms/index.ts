@@ -1,6 +1,6 @@
 export {attachControl} from "./attachControl";
 export {FormControlAttachOptions} from "./FormControlAttachOptions";
-export {FormControlElement} from "./FormControlElement";
+export {FormControlElement, ApplyFormControlState} from "./FormControlElement";
 export {FormController} from "./FormController";
 export {FormControlState, FormControlReadonlyState} from "./FormControlState";
 export {FormControlStatus, FormControlReadonlyStatus} from "./FormControlStatus";

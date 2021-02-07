@@ -80,8 +80,8 @@
     }
 
     ::slotted([ionx--inner] ion-button) {
-        margin-left: 0;
-        margin-right: 0;
+        margin-left: 4px;
+        margin-right: 4px;
         --padding-start: 4px;
         --padding-end: 4px;
     }

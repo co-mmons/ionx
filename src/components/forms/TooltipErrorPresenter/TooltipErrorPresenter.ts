@@ -6,7 +6,7 @@ import {FormController} from "../FormController";
 import {FormValidationErrorPresenter} from "../FormValidationErrorPresenter";
 import {TooltipErrorPresenterOptions} from "./TooltipErrorPresenterOptions";
 
-export class TooltipErrorPresenterImpl implements FormValidationErrorPresenter {
+export class TooltipErrorPresenter implements FormValidationErrorPresenter {
 
     constructor(private readonly options?: TooltipErrorPresenterOptions) {
     }

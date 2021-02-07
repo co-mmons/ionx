@@ -1,6 +1,6 @@
 import {FormControlReadonlyStatus} from "./FormControlStatus";
 
-export interface ApplyFormState {
+export interface ApplyFormControlState {
     value: any;
     valueChange: boolean;
     status: FormControlReadonlyStatus;
@@ -12,7 +12,7 @@ export interface ApplyFormState {
  */
 export interface FormControlElement {
 
-    applyFormState(state: ApplyFormState);
+    applyFormState(state: ApplyFormControlState): Promise<void>;
 
     setFocus?(options?: FocusOptions): Promise<void>;
 

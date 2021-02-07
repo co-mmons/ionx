@@ -1,5 +1,5 @@
 import {Component, ComponentInterface, Element, Prop} from "@stencil/core";
-import {TooltipErrorPresenterImpl} from "./TooltipErrorPresenterImpl";
+import {TooltipErrorPresenter} from "./TooltipErrorPresenter";
 import {TooltipErrorPresenterOptions} from "./TooltipErrorPresenterOptions";
 
 @Component({
@@ -8,15 +8,15 @@ import {TooltipErrorPresenterOptions} from "./TooltipErrorPresenterOptions";
     shadow: false,
     scoped: false
 })
-export class TooltipErrorPresenter implements ComponentInterface {
+export class TooltipErrorPresenterComponent implements ComponentInterface {
 
     @Element()
     element: HTMLElement;
 
     @Prop()
-    instance?: TooltipErrorPresenterImpl | false;
+    instance?: TooltipErrorPresenter | false;
 
-    private instance$: TooltipErrorPresenterImpl;
+    private instance$: TooltipErrorPresenter;
 
     @Prop()
     options?: TooltipErrorPresenterOptions;
@@ -24,7 +24,7 @@ export class TooltipErrorPresenter implements ComponentInterface {
     connectedCallback() {
 
         if (!this.instance$ && this.instance !== false) {
-            this.instance$ = this.instance ? this.instance : new TooltipErrorPresenterImpl();
+            this.instance$ = this.instance ? this.instance : new TooltipErrorPresenter();
         }
 
         if (this.instance$) {
