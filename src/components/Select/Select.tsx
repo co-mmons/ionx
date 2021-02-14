@@ -1,20 +1,8 @@
 import {modalController, OverlayEventDetail, popoverController, StyleEventDetail} from "@ionic/core";
-import {
-    Component,
-    Element,
-    Event,
-    EventEmitter,
-    Fragment,
-    h,
-    Host,
-    Listen,
-    Method,
-    Prop,
-    State,
-    Watch
-} from "@stencil/core";
+import {Component, Element, Event, EventEmitter, Fragment, FunctionalComponent, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
 import {deepEqual} from "fast-equals";
 import {indexAttribute} from "./indexAttribute";
+import {isEqualValue} from "./isEqualValue";
 import {SelectOption} from "./SelectOption";
 import {ValueComparator} from "./ValueComparator";
 import {valueLabel} from "./valueLabel";
@@ -92,7 +80,8 @@ export class Select {
     @Prop()
     lazyOptions: () => Promise<SelectOption[]>;
 
-    labelComponent?: string;
+    @Prop()
+    labelComponent?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number}>;
 
     @Prop()
     labelFormatter?: (value: any) => string;
@@ -131,7 +120,7 @@ export class Select {
     }
 
     @Event()
-    ionChange: EventEmitter<any>;
+    ionChange: EventEmitter<{value: any}>;
 
     @Event()
     ionFocus: EventEmitter<any>;
@@ -223,7 +212,6 @@ export class Select {
             multiple: !!this.multiple,
             overlayTitle: overlayTitle,
             comparator: this.comparator,
-            labelComponent: this.labelComponent,
             labelFormatter: this.labelFormatter,
             orderable: !!this.orderable,
             empty: !!this.empty,
@@ -251,6 +239,7 @@ export class Select {
 
         if (result.role === "ok") {
             this.changeValues(result.data);
+            this.ionChange.emit({value: this.value});
         }
 
         await didDismiss;
@@ -274,6 +263,10 @@ export class Select {
 
         const length = this.values.length;
 
+        // currently processed option whose value is selected
+        let currentOption: SelectOption;
+        let currentLabel: string;
+
         return <Host
             role="combobox"
             aria-haspopup="dialog"
@@ -295,10 +288,13 @@ export class Select {
 
                     {this.values.map((value, index) => <Fragment>
 
+                        {(currentOption = this.options.find(option => isEqualValue(value, option.value, this.comparator))) && <Fragment/>}
+                        {(currentLabel = valueLabel(this.options, value, {comparator: this.comparator, formatter: this.labelFormatter})) && <Fragment/>}
+
                         <ValueComponent key={value} outline={true} {...{[indexAttribute]: index}}>
 
-                            {!!LabelComponent ? <LabelComponent value={value} index={index}/> :
-                                <span>{valueLabel(this.options, value, {comparator: this.comparator, formatter: this.labelFormatter})}{!this.orderable && index < length - 1 ? this.separator : ""}</span>}
+                            {!!LabelComponent ? <LabelComponent value={value} option={currentOption} label={currentLabel} index={index}/> :
+                                <span>{currentLabel}{!this.orderable && index < length - 1 ? this.separator : ""}</span>}
 
                         </ValueComponent>
 

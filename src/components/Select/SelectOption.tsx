@@ -1,4 +1,5 @@
 export interface SelectOption {
+    icon?: string;
     label?: string;
     value: any;
     divider?: boolean;

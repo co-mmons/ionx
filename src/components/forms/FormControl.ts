@@ -32,7 +32,7 @@ export interface FormControl<Value = any> {
 
     readonly stateChanges: Observable<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>;
 
-    setValue(value: Value);
+    setValue(value: Value, options?: {dirty?: boolean, touched?: boolean});
 
     focus(options?: FocusOptions & {waitForElement?: boolean | number}): void;
 

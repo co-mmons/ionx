@@ -56,13 +56,17 @@ export class FormField {
                     <div slot-container="label">
                         <slot name="label">{this.label}</slot>
                     </div>
-                    <div slot-container="label-button">
-                        <slot name="label-button"/>
+                    <div slot-container="label-end">
+                        <slot name="label-end"/>
                     </div>
                 </legend>
 
                 <div slot-container="description">
                     <slot name="description"/>
+                </div>
+
+                <div slot-container="placeholder">
+                    <slot name="placeholder"/>
                 </div>
 
                 <div ionx--content>

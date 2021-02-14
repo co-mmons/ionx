@@ -26,18 +26,20 @@
             padding: 0 4px;
             display: flex;
             justify-items: center;
+            justify-content: center;
             align-content: center;
+            align-items: center;
 
             [slot-container=label] {
                 font-weight: var(--form-field-label-font-weight, 400);
                 font-size: var(--form-field--label-font-size);
             }
 
-            [slot-container=label-button] {
+            [slot-container=label-end] {
                 display: none;
 
                 &:not(:empty) {
-                    display: inline-flex;
+                    display: contents;
                     height: var(--form-field--label-height);
                     border-radius: var(--ionx-border-radius);
                 }
@@ -48,6 +50,14 @@
             margin: 4px 16px 0 16px;
             font-size: calc(var(--form-field--label-font-size) - 2px);
             line-height: 1.1;
+
+            &:empty {
+                display: none;
+            }
+        }
+
+        > [slot-container=placeholder] {
+            margin: 16px;
 
             &:empty {
                 display: none;
@@ -99,7 +109,11 @@
     }
 }
 
-::slotted(ion-button[slot=label-button]) {
+::slotted([slot=label-end]) {
+    margin: 0 4px;
+}
+
+::slotted(ion-button[slot=label-end]) {
     height: 16px;
     font-size: 12px;
     font-weight: 500;
@@ -129,11 +143,27 @@
     margin: 10px 0 16px 0;
     padding: 0;
 
-    &.list-lines-full :first-child {
+    &.list-lines-full ion-item:first-child {
         --border-width: var(--ionx-border-width) 0 var(--ionx-border-width) 0;
     }
 
-    &:not(.list-lines-full) :first-child {
-        --inner-border-width: var(--ionx-border-width) 0 var(--ionx-border-width) 0;
+    &:not(.list-lines-full) {
+        margin-left: 16px;
+        margin-right: 16px;
+
+        ion-item {
+            --inner-padding-start: 0¬;
+            --inner-padding-end: 0;
+            --padding-start: 0;
+            --padding-end: 0;
+        }
+
+        ion-item:first-child {
+            --inner-border-width: var(--ionx-border-width) 0 var(--ionx-border-width) 0;
+        }
     }
+}
+
+::slotted(ionx-form-field) {
+    margin: 16px;
 }

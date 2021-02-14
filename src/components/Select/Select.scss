@@ -126,7 +126,6 @@
     --select-padding-top: 8px;
     --select-padding-bottom: 8px;
     --select-padding-start: 0px;
-    width: 100%;
 
     .ionx--text {
         max-width: calc(100% - 16px);
@@ -136,6 +135,10 @@
     &.ionx--orderable .ionx--text {
         flex: 1;
     }
+}
+
+[slot-container=default] > :host, :host-context(.item-label-stacked) {
+    width: 100%;
 }
 
 :host-context(ionx-form-field) {

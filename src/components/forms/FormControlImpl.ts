@@ -140,8 +140,17 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         this.applyState({disabled: true});
     }
 
-    setValue(value: Value) {
-        this.applyState({value: value});
+    setValue(value: Value, options?: {dirty?: boolean, touched?: boolean}) {
+
+        const state: Partial<FormControlState> = {value: value};
+
+        if (typeof options?.dirty === "boolean") {
+            state.dirty = options.dirty;
+        } else if (typeof options?.touched === "boolean") {
+            state.dirty = options.touched;
+        }
+
+        this.applyState(state);
         this.validateImpl({trigger: "valueChange"});
     }
 
