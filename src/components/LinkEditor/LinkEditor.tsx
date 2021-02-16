@@ -77,7 +77,7 @@ export class LinkEditor implements LinkEditorProps {
         }));
 
         if (this.data.controls.scheme.value === unknownScheme) {
-            this.schemes.push({value: unknownScheme, label: intl.message(unknownScheme.label)});
+            schemes.push({value: unknownScheme, label: intl.message(unknownScheme.label)});
         }
 
         const scheme = this.data.controls.scheme.value;

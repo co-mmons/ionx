@@ -45,6 +45,11 @@
             "type": "message",
             "path": "./src/components/DateTime/intl/{{LOCALE}}.json",
             "module": "ionx/DateTime"
+        },
+        {
+            "type": "message",
+            "path": "./src/components/LinkEditor/intl/{{LOCALE}}.json",
+            "module": "ionx/LinkEditor"
         }
     ],
     "devDependencies": {
