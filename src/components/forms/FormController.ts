@@ -138,10 +138,6 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         // @ts-ignore
         const control = this.controls[name] ? this.controls[name] as FormControlImpl : this.add(name) as FormControlImpl;
 
-        if (control.element === el) {
-            return;
-        }
-
         control.attach(el);
 
         if (options && "validators" in options) {

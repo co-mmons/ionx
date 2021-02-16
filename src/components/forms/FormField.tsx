@@ -70,6 +70,11 @@ export class FormField {
                 </div>
 
                 <div ionx--content>
+
+                    <div slot-container="start">
+                        <slot name="start"/>
+                    </div>
+
                     <div slot-container="default">
                         <slot/>
                     </div>

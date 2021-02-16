@@ -37,8 +37,27 @@ export class DialogButtons {
             }
         }
 
+        if (button.valueHandler) {
+            try {
+                value = button.valueHandler();
+                if (value instanceof Promise) {
+                    value = await value;
+                }
+
+                modalController.dismiss(value, button.role);
+
+            } catch (error) {
+                console.debug("Dialog button aborted", error);
+            }
+
+            return;
+        }
+
         if (button.handler) {
-            const res = button.handler(value);
+            let res = button.handler(value);
+            if (res instanceof Promise) {
+                res = await res;
+            }
 
             if ((typeof res === "boolean" && res) || typeof res !== "boolean") {
                 modalController.dismiss(value, button.role);

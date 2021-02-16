@@ -176,6 +176,37 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         return this.mutableState();
     }
 
+    attach(): (element: HTMLElement) => void;
+
+    attach(element: HTMLElement);
+
+    attach() {
+
+        if (arguments.length === 0) {
+            return (element: HTMLElement) => this.attach(element);
+        } else if (arguments[0]) {
+            const element: HTMLElement = arguments[0];
+
+            if (this.element$ !== element) {
+
+                if (this.element$) {
+                    this.detach();
+                }
+
+                this.element$ = element;
+                this.element$.setAttribute("ionx-form-control", this.name);
+
+                this.unlistenOnChange = addEventListener(this.element$, this.element$.formValueChangeEventName || "ionChange", ev => this.onElementChange(ev as CustomEvent));
+
+                this.unlistenOnFocus = addEventListener(this.element$, this.element$.formTouchEventName || "ionFocus", () => this.markAsTouched());
+
+                this.applyElementState({value: this.value$, valueChange: true, status: this.status(), statusChange: true});
+            }
+        } else {
+            this.detach();
+        }
+    }
+
 
     //
     // ------------ INTERNAL API -----------
@@ -183,26 +214,6 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     mutableState(): FormControlState {
         return Object.assign({value: this.value}, this.status());
-    }
-
-    attach(element: HTMLElement) {
-
-        if (this.element$ !== element) {
-
-            if (this.element$) {
-                this.detach();
-            }
-
-            this.element$ = element;
-            this.element$.setAttribute("ionx-form-control", this.name);
-
-            this.unlistenOnChange = addEventListener(this.element$, this.element$.formValueChangeEventName || "ionChange", ev => this.onElementChange(ev as CustomEvent));
-
-            this.unlistenOnFocus = addEventListener(this.element$, this.element$.formTouchEventName || "ionFocus", () => this.markAsTouched());
-
-            this.applyElementState({value: this.value$, valueChange: true, status: this.status(), statusChange: true});
-        }
-
     }
 
     detach() {

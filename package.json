@@ -13,11 +13,12 @@
         "test": "stencil test --spec --e2e",
         "test.watch": "stencil test --spec --e2e --watchAll",
         "intl:DateTime": "js-intl-google-sheet-importer --output-path src/components/DateTime/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionic-extensions-datetime",
+        "intl:LinkEditor": "js-intl-google-sheet-importer --output-path src/components/LinkEditor/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionx/LinkEditor",
+        "intl:forms": "js-intl-google-sheet-importer --output-path src/components/forms/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionx/forms",
         "generate": "stencil generate"
     },
     "dependencies": {
         "@capacitor/core": "^2.4.1",
-        "@co.mmons/js-intl": "github:co-mmons/js-intl",
         "@co.mmons/js-utils": "github:co-mmons/js-utils",
         "@co.mmons/rxjs-utils": "github:co-mmons/rxjs-utils",
         "@ionic/core": "^5.3.1",
@@ -45,5 +46,8 @@
             "path": "./src/components/DateTime/intl/{{LOCALE}}.json",
             "module": "ionx/DateTime"
         }
-    ]
+    ],
+    "devDependencies": {
+        "@co.mmons/js-intl": "github:co-mmons/js-intl"
+    }
 }

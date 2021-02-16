@@ -71,8 +71,9 @@
                 flex: 1;
             }
 
-            > [slot-container=end] {
+            > [slot-container=start], > [slot-container=end] {
                 align-self: center;
+
                 &:empty {
                     display: none;
                 }

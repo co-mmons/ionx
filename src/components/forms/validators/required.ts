@@ -13,6 +13,6 @@ export async function required(control: FormControl) {
 
 export class RequiredError extends FormValidationError {
     constructor() {
-        super(intl.message`ionx/forms#validators/RequiredError`);
+        super(intl.message`ionx/forms#RequiredError|message`);
     }
 }

@@ -12,7 +12,8 @@ const tests = [
     "multi-grid",
     "select",
     "tags-input",
-    "virtual-scroll"
+    "virtual-scroll",
+    "link-editor"
 ];
 
 @Component({

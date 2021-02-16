@@ -6,5 +6,6 @@ export interface DialogButton {
     size?: "default" | "small" | "large";
     icon?: string;
     flex?: string | number;
-    handler?: (value: any) => boolean | void;
+    handler?: (value: any) => boolean | void | Promise<boolean | void>;
+    valueHandler?: () => any | Promise<any>;
 }

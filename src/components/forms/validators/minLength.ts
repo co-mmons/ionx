@@ -13,6 +13,6 @@ export function minLength(minLength: number) {
 
 export class MinLengthError extends FormValidationError {
     constructor(minLength: number) {
-        super(intl.message("ionx/forms#validators/MinLengthError", {length: minLength}));
+        super(intl.message("ionx/forms#MinLengthError|message", {length: minLength}));
     }
 }

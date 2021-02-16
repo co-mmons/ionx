@@ -17,14 +17,17 @@ import { FormControllerValidateOptions } from "./components/forms/FormController
 import { FormControlState } from "./components/forms/FormControlState";
 import { FormValidationError } from "./components/forms/FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
-import { TooltipErrorPresenter } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterImpl";
+import { TooltipErrorPresenter } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenter";
 import { TooltipErrorPresenterOptions } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterOptions";
+import { Link } from "./components/LinkEditor/Link";
+import { SelectOption } from "./components/Select/SelectOption";
+import { LinkNormalizeFn } from "./components/LinkEditor/LinkNormalizeFn";
+import { LinkEditorProps } from "./components/LinkEditor/LinkEditorProps";
 import { ExtendedItemElement } from "./components/MultiGrid/ExtendedItemElement";
 import { ValueComparator } from "./components/Select/ValueComparator";
-import { SelectOption } from "./components/Select/SelectOption";
+import { FunctionalComponent, VNode } from "@stencil/core";
 import { ToolbarButtonType } from "./components/Toolbar/ToolbarButtonType";
 import { ToolbarTitleWrap } from "./components/Toolbar/ToolbarTitleWrap";
-import { VNode } from "@stencil/core";
 export namespace Components {
     interface IonRouter {
         /**
@@ -176,7 +179,18 @@ export namespace Components {
         "instance"?: TooltipErrorPresenter | false;
         "options"?: TooltipErrorPresenterOptions;
     }
+    interface IonxInputGroup {
+    }
     interface IonxLazyLoad {
+    }
+    interface IonxLinkEditor {
+        "buildLink": () => Promise<Link>;
+        "link": string | Link;
+        "normalizeFn"?: LinkNormalizeFn;
+        "schemes"?: SelectOption[];
+    }
+    interface IonxLinkEditorDialog {
+        "editorProps": LinkEditorProps;
     }
     interface IonxLoading {
         "backdropOpacity"?: number;
@@ -215,6 +229,7 @@ export namespace Components {
         "comparator": ValueComparator;
         "disabled": boolean;
         "empty": boolean;
+        "labelComponent"?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number}>;
         "labelFormatter"?: (value: any) => string;
         "lazyOptions": () => Promise<SelectOption[]>;
         /**
@@ -292,6 +307,8 @@ export namespace Components {
     interface IonxTestHome {
     }
     interface IonxTestLazyLoad {
+    }
+    interface IonxTestLinkEditor {
     }
     interface IonxTestLoading {
     }
@@ -414,11 +431,29 @@ declare global {
         prototype: HTMLIonxFormTooltipErrorPresenterElement;
         new (): HTMLIonxFormTooltipErrorPresenterElement;
     };
+    interface HTMLIonxInputGroupElement extends Components.IonxInputGroup, HTMLStencilElement {
+    }
+    var HTMLIonxInputGroupElement: {
+        prototype: HTMLIonxInputGroupElement;
+        new (): HTMLIonxInputGroupElement;
+    };
     interface HTMLIonxLazyLoadElement extends Components.IonxLazyLoad, HTMLStencilElement {
     }
     var HTMLIonxLazyLoadElement: {
         prototype: HTMLIonxLazyLoadElement;
         new (): HTMLIonxLazyLoadElement;
+    };
+    interface HTMLIonxLinkEditorElement extends Components.IonxLinkEditor, HTMLStencilElement {
+    }
+    var HTMLIonxLinkEditorElement: {
+        prototype: HTMLIonxLinkEditorElement;
+        new (): HTMLIonxLinkEditorElement;
+    };
+    interface HTMLIonxLinkEditorDialogElement extends Components.IonxLinkEditorDialog, HTMLStencilElement {
+    }
+    var HTMLIonxLinkEditorDialogElement: {
+        prototype: HTMLIonxLinkEditorDialogElement;
+        new (): HTMLIonxLinkEditorDialogElement;
     };
     interface HTMLIonxLoadingElement extends Components.IonxLoading, HTMLStencilElement {
     }
@@ -510,6 +545,12 @@ declare global {
         prototype: HTMLIonxTestLazyLoadElement;
         new (): HTMLIonxTestLazyLoadElement;
     };
+    interface HTMLIonxTestLinkEditorElement extends Components.IonxTestLinkEditor, HTMLStencilElement {
+    }
+    var HTMLIonxTestLinkEditorElement: {
+        prototype: HTMLIonxTestLinkEditorElement;
+        new (): HTMLIonxTestLinkEditorElement;
+    };
     interface HTMLIonxTestLoadingElement extends Components.IonxTestLoading, HTMLStencilElement {
     }
     var HTMLIonxTestLoadingElement: {
@@ -580,7 +621,10 @@ declare global {
         "ionx-form-field": HTMLIonxFormFieldElement;
         "ionx-form-item": HTMLIonxFormItemElement;
         "ionx-form-tooltip-error-presenter": HTMLIonxFormTooltipErrorPresenterElement;
+        "ionx-input-group": HTMLIonxInputGroupElement;
         "ionx-lazy-load": HTMLIonxLazyLoadElement;
+        "ionx-link-editor": HTMLIonxLinkEditorElement;
+        "ionx-link-editor-dialog": HTMLIonxLinkEditorDialogElement;
         "ionx-loading": HTMLIonxLoadingElement;
         "ionx-multi-grid": HTMLIonxMultiGridElement;
         "ionx-select": HTMLIonxSelectElement;
@@ -596,6 +640,7 @@ declare global {
         "ionx-test-form": HTMLIonxTestFormElement;
         "ionx-test-home": HTMLIonxTestHomeElement;
         "ionx-test-lazy-load": HTMLIonxTestLazyLoadElement;
+        "ionx-test-link-editor": HTMLIonxTestLinkEditorElement;
         "ionx-test-loading": HTMLIonxTestLoadingElement;
         "ionx-test-multi-grid": HTMLIonxTestMultiGridElement;
         "ionx-test-root": HTMLIonxTestRootElement;
@@ -745,7 +790,17 @@ declare namespace LocalJSX {
         "instance"?: TooltipErrorPresenter | false;
         "options"?: TooltipErrorPresenterOptions;
     }
+    interface IonxInputGroup {
+    }
     interface IonxLazyLoad {
+    }
+    interface IonxLinkEditor {
+        "link"?: string | Link;
+        "normalizeFn"?: LinkNormalizeFn;
+        "schemes"?: SelectOption[];
+    }
+    interface IonxLinkEditorDialog {
+        "editorProps"?: LinkEditorProps;
     }
     interface IonxLoading {
         "backdropOpacity"?: number;
@@ -781,13 +836,14 @@ declare namespace LocalJSX {
         "comparator"?: ValueComparator;
         "disabled"?: boolean;
         "empty"?: boolean;
+        "labelComponent"?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number}>;
         "labelFormatter"?: (value: any) => string;
         "lazyOptions"?: () => Promise<SelectOption[]>;
         /**
           * If multiple value selection is allowed.
          */
         "multiple"?: boolean;
-        "onIonChange"?: (event: CustomEvent<any>) => void;
+        "onIonChange"?: (event: CustomEvent<{value: any}>) => void;
         "onIonFocus"?: (event: CustomEvent<any>) => void;
         /**
           * Emitted when the styles change.
@@ -864,6 +920,8 @@ declare namespace LocalJSX {
     }
     interface IonxTestLazyLoad {
     }
+    interface IonxTestLinkEditor {
+    }
     interface IonxTestLoading {
     }
     interface IonxTestMultiGrid {
@@ -909,7 +967,10 @@ declare namespace LocalJSX {
         "ionx-form-field": IonxFormField;
         "ionx-form-item": IonxFormItem;
         "ionx-form-tooltip-error-presenter": IonxFormTooltipErrorPresenter;
+        "ionx-input-group": IonxInputGroup;
         "ionx-lazy-load": IonxLazyLoad;
+        "ionx-link-editor": IonxLinkEditor;
+        "ionx-link-editor-dialog": IonxLinkEditorDialog;
         "ionx-loading": IonxLoading;
         "ionx-multi-grid": IonxMultiGrid;
         "ionx-select": IonxSelect;
@@ -925,6 +986,7 @@ declare namespace LocalJSX {
         "ionx-test-form": IonxTestForm;
         "ionx-test-home": IonxTestHome;
         "ionx-test-lazy-load": IonxTestLazyLoad;
+        "ionx-test-link-editor": IonxTestLinkEditor;
         "ionx-test-loading": IonxTestLoading;
         "ionx-test-multi-grid": IonxTestMultiGrid;
         "ionx-test-root": IonxTestRoot;
@@ -955,7 +1017,10 @@ declare module "@stencil/core" {
             "ionx-form-field": LocalJSX.IonxFormField & JSXBase.HTMLAttributes<HTMLIonxFormFieldElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
             "ionx-form-tooltip-error-presenter": LocalJSX.IonxFormTooltipErrorPresenter & JSXBase.HTMLAttributes<HTMLIonxFormTooltipErrorPresenterElement>;
+            "ionx-input-group": LocalJSX.IonxInputGroup & JSXBase.HTMLAttributes<HTMLIonxInputGroupElement>;
             "ionx-lazy-load": LocalJSX.IonxLazyLoad & JSXBase.HTMLAttributes<HTMLIonxLazyLoadElement>;
+            "ionx-link-editor": LocalJSX.IonxLinkEditor & JSXBase.HTMLAttributes<HTMLIonxLinkEditorElement>;
+            "ionx-link-editor-dialog": LocalJSX.IonxLinkEditorDialog & JSXBase.HTMLAttributes<HTMLIonxLinkEditorDialogElement>;
             "ionx-loading": LocalJSX.IonxLoading & JSXBase.HTMLAttributes<HTMLIonxLoadingElement>;
             "ionx-multi-grid": LocalJSX.IonxMultiGrid & JSXBase.HTMLAttributes<HTMLIonxMultiGridElement>;
             "ionx-select": LocalJSX.IonxSelect & JSXBase.HTMLAttributes<HTMLIonxSelectElement>;
@@ -971,6 +1036,7 @@ declare module "@stencil/core" {
             "ionx-test-form": LocalJSX.IonxTestForm & JSXBase.HTMLAttributes<HTMLIonxTestFormElement>;
             "ionx-test-home": LocalJSX.IonxTestHome & JSXBase.HTMLAttributes<HTMLIonxTestHomeElement>;
             "ionx-test-lazy-load": LocalJSX.IonxTestLazyLoad & JSXBase.HTMLAttributes<HTMLIonxTestLazyLoadElement>;
+            "ionx-test-link-editor": LocalJSX.IonxTestLinkEditor & JSXBase.HTMLAttributes<HTMLIonxTestLinkEditorElement>;
             "ionx-test-loading": LocalJSX.IonxTestLoading & JSXBase.HTMLAttributes<HTMLIonxTestLoadingElement>;
             "ionx-test-multi-grid": LocalJSX.IonxTestMultiGrid & JSXBase.HTMLAttributes<HTMLIonxTestMultiGridElement>;
             "ionx-test-root": LocalJSX.IonxTestRoot & JSXBase.HTMLAttributes<HTMLIonxTestRootElement>;

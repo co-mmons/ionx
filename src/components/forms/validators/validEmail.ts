@@ -30,7 +30,7 @@ const emailRegexp =
 export async function validEmail(control: FormControl) {
     const value = control.value;
     if (value !== null && value !== undefined) {
-        if (typeof value === "string" && (value.length === 0 || emailRegexp.test(control.value))) {
+        if (typeof value === "string" && (value.length === 0 || emailRegexp.test(value))) {
             return;
         }
 
