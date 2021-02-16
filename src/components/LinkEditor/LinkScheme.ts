@@ -1,6 +1,7 @@
 import {MessageRef} from "@co.mmons/js-intl";
 import {FunctionalComponent} from "@stencil/core";
 import {FormValidator} from "../forms";
+import {Link} from "./Link";
 import {LinkTarget} from "./LinkTarget";
 
 export interface LinkScheme {
@@ -17,8 +18,18 @@ export interface LinkScheme {
 
     readonly valueLabel?: MessageRef;
 
-    readonly targets?: LinkTarget[];
+    valueTargets?(value?: any): LinkTarget[];
 
     buildHref(value: any, params?: any): string;
+
+    parseLink(link: string | Link): LinkScheme.ParsedLink;
 }
 
+export namespace LinkScheme {
+
+    export interface ParsedLink {
+        scheme: LinkScheme;
+        value: any;
+        target?: LinkTarget;
+    }
+}

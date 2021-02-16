@@ -1,4 +1,5 @@
 import {MessageRef} from "@co.mmons/js-intl";
+import {Link} from "./Link";
 import {LinkScheme} from "./LinkScheme";
 
 export const unknownScheme = new class implements LinkScheme {
@@ -9,6 +10,11 @@ export const unknownScheme = new class implements LinkScheme {
 
     buildHref(value: any): string {
         return value;
+    }
+
+    parseLink(_link: string | Link): LinkScheme.ParsedLink {
+        // unknown cannot be parsed and this is why is unknown :-)
+        return undefined;
     }
 
 }

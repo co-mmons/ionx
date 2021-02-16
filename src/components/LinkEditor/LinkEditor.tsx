@@ -6,10 +6,8 @@ import {SelectOption} from "../Select/SelectOption";
 import {DefaultLinkScheme} from "./DefaultLinkScheme";
 import {Link} from "./Link";
 import {LinkEditorProps} from "./LinkEditorProps";
-import {LinkNormalizeFn} from "./LinkNormalizeFn";
 import {LinkScheme} from "./LinkScheme";
 import {LinkTarget} from "./LinkTarget";
-import {normalizeLink} from "./normalizeLink";
 import {unknownScheme} from "./unknownScheme";
 
 @Component({
@@ -23,10 +21,10 @@ export class LinkEditor implements LinkEditorProps {
     link: string | Link;
 
     @Prop()
-    schemes?: SelectOption[];
+    schemes?: SelectOption[] | LinkScheme[];
 
     @Prop()
-    normalizeFn?: LinkNormalizeFn;
+    targetVisible: boolean;
 
     async valueValidator(control: FormControl) {
 
@@ -47,17 +45,30 @@ export class LinkEditor implements LinkEditorProps {
     @Method()
     async buildLink(): Promise<Link> {
         if (await this.data.validate()) {
-            return {href: this.data.controls.value.value, target: this.data.controls.target.value?.target};
+            return {
+                href: this.data.controls.scheme.value.buildHref(this.data.controls.value.value),
+                target: this.data.controls.target.value?.target
+            }
         }
     }
 
     connectedCallback() {
 
         if (this.link) {
-            const normalized = this.normalizeFn ? this.normalizeFn(this.link) : normalizeLink(this.link);
+            let link: LinkScheme.ParsedLink;
+            for (const item of (this.schemes ?? DefaultLinkScheme.values())) {
+                const asOption = (item as SelectOption);
+                const scheme = asOption.value as LinkScheme ?? (item as LinkScheme);
+                if (scheme.parseLink) {
+                    link = scheme.parseLink(this.link);
+                    if (link) {
+                        break;
+                    }
+                }
+            }
 
-            this.data.controls.scheme.setValue(normalized.scheme || unknownScheme);
-            this.data.controls.value.setValue(normalized.value);
+            this.data.controls.scheme.setValue(link?.scheme || unknownScheme);
+            this.data.controls.value.setValue(link ? link.value : (typeof this.link === "string" ? this.link : this.link.href));
         }
 
         this.data.bindRenderer(this);
@@ -71,10 +82,15 @@ export class LinkEditor implements LinkEditorProps {
 
     render() {
 
-        const schemes: SelectOption[] = this.schemes?.slice() ?? DefaultLinkScheme.values().map(type => ({
-            value: type,
-            label: intl.message(type.label)
-        }));
+        let schemes: SelectOption[];
+        if (this.schemes) {
+            schemes = (this.schemes as []).map(scheme => (scheme as SelectOption).value ? scheme as SelectOption : {value: scheme, label: intl.message((scheme as LinkScheme).label)});
+        } else {
+            schemes = DefaultLinkScheme.values().map(type => ({
+                value: type,
+                label: intl.message(type.label)
+            }));
+        }
 
         if (this.data.controls.scheme.value === unknownScheme) {
             schemes.push({value: unknownScheme, label: intl.message(unknownScheme.label)});
@@ -82,6 +98,7 @@ export class LinkEditor implements LinkEditorProps {
 
         const scheme = this.data.controls.scheme.value;
         const ValueComponent: any = this.data.controls.scheme.value?.valueComponent;
+        const targets = scheme?.valueTargets?.(this.data.controls.value.value);
 
         return <ionx-form-controller controller={this.data}>
 
@@ -96,7 +113,7 @@ export class LinkEditor implements LinkEditorProps {
             </ionx-form-field>
 
             {ValueComponent && <ionx-form-field
-                label={intl.message(scheme.valueLabel)}>
+                label={scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message`ionx/LinkEditor#Link`}>
 
                 <ValueComponent
                     {...scheme.valueComponentProps}
@@ -106,12 +123,12 @@ export class LinkEditor implements LinkEditorProps {
 
             </ionx-form-field>}
 
-            {scheme?.targets?.length > 0 && <ionx-form-field label={intl.message`ionx/LinkEditor#Open in|link target`}>
+            {this.targetVisible !== false && targets?.length > 0 && <ionx-form-field label={intl.message`ionx/LinkEditor#Open in|link target`}>
                 <ionx-select
                     ref={this.data.controls.target.attach()}
                     empty={false}
                     placeholder={intl.message`ionx/LinkEditor#Choose...`}
-                    options={this.data.controls.scheme.value.targets.map(target => ({value: target, label: intl.message(target.label)}))}/>
+                    options={targets.map(target => ({value: target, label: intl.message(target.label)}))}/>
             </ionx-form-field>}
 
         </ionx-form-controller>;

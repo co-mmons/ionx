@@ -3,6 +3,7 @@ import {Enum, EnumFromJSONValue, EnumValueName, EnumValueOfValue} from "@co.mmon
 import {FormValidator} from "../forms";
 import {validEmail} from "../forms/validators";
 import {DefaultLinkTarget} from "./DefaultLinkTarget";
+import {Link} from "./Link";
 import {LinkScheme} from "./LinkScheme";
 import {LinkTarget} from "./LinkTarget";
 import {urlValidator} from "./urlValidator";
@@ -26,7 +27,7 @@ export class DefaultLinkScheme extends Enum implements LinkScheme {
         return super.fromJSON(value) as DefaultLinkScheme;
     }
 
-    constructor(public readonly name: EnumValueName<typeof DefaultLinkScheme>) {
+    private constructor(public readonly name: EnumValueName<typeof DefaultLinkScheme>) {
         super(name);
 
         this.label = new MessageRef("ionx/LinkEditor", `${name}SchemeLabel`);
@@ -54,10 +55,6 @@ export class DefaultLinkScheme extends Enum implements LinkScheme {
             this.valueLabel = new MessageRef("ionx/LinkEditor", "Phone number");
             this.valueHint = new MessageRef("ionx/LinkEditor", "phoneNumberHint");
         }
-
-        if (name === "www") {
-            this.targets = DefaultLinkTarget.values();
-        }
     }
 
     readonly label: MessageRef;
@@ -72,7 +69,11 @@ export class DefaultLinkScheme extends Enum implements LinkScheme {
 
     readonly valueHint: MessageRef;
 
-    readonly targets: LinkTarget[];
+    valueTargets() {
+        if (this.name === "www") {
+            return DefaultLinkTarget.values();
+        }
+    }
 
     buildHref(value: string) {
 
@@ -87,6 +88,47 @@ export class DefaultLinkScheme extends Enum implements LinkScheme {
         }
 
         return value;
+    }
+
+    parseLink(link: string | Link): LinkScheme.ParsedLink {
+
+        let scheme: LinkScheme;
+        let target: LinkTarget;
+        let value: string;
+
+        const href = typeof link === "string" ? link : link.href;
+
+        const prefixes = {
+            "http:": DefaultLinkScheme.www,
+            "https:": DefaultLinkScheme.www,
+            "tel:": DefaultLinkScheme.tel,
+            "sms:": DefaultLinkScheme.sms,
+            "mailto:": DefaultLinkScheme.email
+        };
+
+        const lowerCasedHref = href.trim().toLowerCase();
+
+        for (const prefix of Object.keys(prefixes)) {
+            if (prefixes[prefix] === this && lowerCasedHref.startsWith(prefix)) {
+
+                scheme = prefixes[prefix];
+                value = href.trim();
+
+                if (prefixes[prefix] !== DefaultLinkScheme.www) {
+                    value = value.substring(prefix.length).trim();
+                }
+            }
+        }
+
+        if (typeof link === "object" && link.target && scheme === DefaultLinkScheme.www) {
+            if (link.target === "_blank") {
+                target = DefaultLinkTarget.blank;
+            }
+        }
+
+        if (scheme) {
+            return {scheme, target, value};
+        }
     }
 
 }
