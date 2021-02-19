@@ -69,6 +69,7 @@ export class LinkEditor implements LinkEditorProps {
 
             this.data.controls.scheme.setValue(link?.scheme || unknownScheme);
             this.data.controls.value.setValue(link ? link.value : (typeof this.link === "string" ? this.link : this.link.href));
+            this.data.controls.target.setValue(link?.target);
         }
 
         this.data.bindRenderer(this);
@@ -126,7 +127,6 @@ export class LinkEditor implements LinkEditorProps {
             {this.targetVisible !== false && targets?.length > 0 && <ionx-form-field label={intl.message`ionx/LinkEditor#Open in|link target`}>
                 <ionx-select
                     ref={this.data.controls.target.attach()}
-                    empty={false}
                     placeholder={intl.message`ionx/LinkEditor#Choose...`}
                     options={targets.map(target => ({value: target, label: intl.message(target.label)}))}/>
             </ionx-form-field>}

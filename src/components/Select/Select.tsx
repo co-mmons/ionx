@@ -288,7 +288,7 @@ export class Select {
 
                     {this.values.map((value, index) => <Fragment>
 
-                        {(currentOption = this.options.find(option => isEqualValue(value, option.value, this.comparator))) && <Fragment/>}
+                        {(currentOption = this.options?.find(option => isEqualValue(value, option.value, this.comparator))) && <Fragment/>}
                         {(currentLabel = valueLabel(this.options, value, {comparator: this.comparator, formatter: this.labelFormatter})) && <Fragment/>}
 
                         <ValueComponent key={value} outline={true} {...{[indexAttribute]: index}}>

@@ -23,3 +23,8 @@
     position: absolute;
     display: none;
 }
+
+:host(:not([layout=masonry])) [ionx--grid-items]::slotted(*) {
+    left: unset;
+    top: unset;
+}

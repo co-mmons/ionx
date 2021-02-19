@@ -1,5 +1,5 @@
 import {Capacitor} from "@capacitor/core";
-import {intl} from "@co.mmons/js-intl";
+import {intl, MessageRef} from "@co.mmons/js-intl";
 import {sleep} from "@co.mmons/js-utils/core";
 import {isPlatform} from "@ionic/core";
 import {Component, ComponentInterface, Element, h, Host, Listen, Prop, State} from "@stencil/core";
@@ -73,7 +73,7 @@ export class SelectOverlay implements ComponentInterface {
             for (let i = 0; i < this.options.length; i++) {
                 if (!this.options[i].divider) {
 
-                    const label = this.options[i].label || (this.labelFormatter ? this.labelFormatter(this.options[i].value) : `${this.options[i].value}`);
+                    const label = (this.options[i].label instanceof MessageRef ? intl.message(this.options[i].label) : this.options[i].label) || (this.labelFormatter ? this.labelFormatter(this.options[i].value) : `${this.options[i].value}`);
 
                     if (this.searchTest) {
                         if (!this.searchTest(query, this.options[i].value, label)) {

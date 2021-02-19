@@ -111,7 +111,7 @@
 }
 
 ::slotted([slot=label-end]) {
-    margin: 0 4px;
+    margin: 0 8px;
 }
 
 ::slotted(ion-button[slot=label-end]) {
@@ -167,4 +167,22 @@
 
 ::slotted(ionx-form-field) {
     margin: 16px;
+}
+
+::slotted(ion-toggle[slot=label-end]) {
+    padding: 2px;
+    height: 12px;
+    width: 24px;
+    --handle-width: 12px;
+    --handle-height: 12px;
+    --handle-max-height: 12px;
+
+    &.ios {
+        padding: 0px;
+        height: 16px;
+        width: 32px;
+        --handle-width: 10px;
+        --handle-height: 10px;
+        --handle-max-height: 10px;
+    }
 }
