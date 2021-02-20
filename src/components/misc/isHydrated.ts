@@ -5,6 +5,10 @@ const notHydratedSelector = ":not(.hydrated):not(div):not(span):not(slot):not(a)
 
 export function isHydrated(element: Element, options?: IsHydratedOptions) {
 
+    if (!element) {
+        return true;
+    }
+
     if (isHydratable(element) && !element.classList.contains("hydrated")) {
         return false;
     }
@@ -17,6 +21,10 @@ export function isHydrated(element: Element, options?: IsHydratedOptions) {
 }
 
 export function isChildrenHydrated(element: Element, options?: {noShadowCheck?: boolean}) {
+
+    if (!element) {
+        return true;
+    }
 
     const children = element.querySelectorAll(notHydratedSelector);
 
@@ -63,6 +71,11 @@ function checkShadowHydrated(element: Element) {
 }
 
 function isHydratable(element: Element) {
+
+    if (!element) {
+        return false;
+    }
+
     const tagName = element.tagName;
     if (hydratableTagNames.includes(tagName)) {
         return true;
