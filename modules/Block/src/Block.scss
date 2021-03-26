@@ -1,0 +1,28 @@
+
+:host {
+    display: block;
+
+    &.ionx--margins {
+        margin: 16px;
+    }
+
+    [ionx--outer] {
+        display: flex;
+
+        &[ionx--inner-alignment=center] {
+            justify-content: center;
+        }
+
+        &[ionx--inner-alignment=end] {
+            justify-content: flex-end;
+        }
+    }
+
+    [ionx--inner] {
+        width: 100%;
+    }
+
+    &.ionx--has-inner-width > [ionx--outer] > [ionx--inner] {
+        //@include ionx-media-breakpoint-width("--block-inner-width", "100%");
+    }
+}

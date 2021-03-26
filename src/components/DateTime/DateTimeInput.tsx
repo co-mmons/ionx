@@ -10,7 +10,7 @@ import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
     styleUrl: "DateTimeInput.scss",
     scoped: true
 })
-export class Loading {
+export class DateTimeInput   {
 
     @Element()
     element: HTMLElement;
@@ -195,7 +195,7 @@ export class Loading {
     @Method()
     async open(event?: any): Promise<void> {
 
-        if (!this.nativePicker) {
+        if (this.nativePicker) {
 
             this.nativePicker = document.createElement("input");
             this.nativePicker.type = "date";

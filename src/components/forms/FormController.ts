@@ -105,8 +105,8 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         return this.controls[controlName];
     }
 
-    remove(controlName: (keyof Controls) & string) {
-        const control = this.controls[controlName] as FormControlImpl;
+    remove(controlName: (keyof Controls) | string) {
+        const control = this.controls[controlName as any] as FormControlImpl;
         if (control) {
             control.disconnect();
             delete this.controls[controlName];
