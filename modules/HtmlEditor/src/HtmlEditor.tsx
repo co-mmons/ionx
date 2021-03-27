@@ -1,10 +1,7 @@
-import {setMessages} from "@co.mmons/js-intl";
 import {Component, Element, h, Host} from "@stencil/core";
-import {defineCustomElements} from "ionx/Block";
+import {defineCustomElements as defineIonxBlock} from "ionx/Block";
 
-defineCustomElements();
-
-let ulalala: string;
+defineIonxBlock();
 
 @Component({
     tag: "ionx-html-editor",
@@ -17,12 +14,6 @@ export class HtmlEditor {
     element: HTMLElement;
 
     async loadIntl() {
-        ulalala = window["INTL_LOCALE"];
-
-        if (ulalala === "pl") {
-            setMessages("@ionx/html-editor", ulalala, (await import("./intl/pl.json")) as any);
-        }
-
     }
 
     connectedCallback() {

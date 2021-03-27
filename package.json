@@ -7,7 +7,8 @@
         "src/"
     ],
     "scripts": {
-        "build": "stencil build --docs",
+        "build": "node-utils-file-system-glob-delete dist/**/* && npx ts-node build.ts",
+        "build:module": "npx ts-node build.ts",
         "start": "stencil build --dev --watch --serve",
         "serve": "stencil serve --root www",
         "test": "stencil test --spec --e2e",

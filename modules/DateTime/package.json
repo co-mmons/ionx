@@ -1,0 +1,7 @@
+{
+    "name": "ionx/DateTime",
+    "scripts": {
+        "build": "stencil build"
+    },
+    "types": "../../dist/DateTime/index.d.ts"
+}

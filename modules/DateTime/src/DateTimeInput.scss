@@ -1,0 +1,59 @@
+:host {
+    --date-time-placeholder-opacity: .5;
+
+    position: relative;
+    display: inline-flex;
+    font-family: var(--ion-font-family, inherit);
+    max-width: 100%;
+    padding: var(--date-time-padding-top, 8px) var(--date-time-padding-end, 0px) var(--date-time-padding-bottom, 8px) var(--date-time-padding-start, 0px);
+    user-select: none;
+
+    outline: none;
+    cursor: pointer;
+
+    &::-moz-focus-inner {
+        border: 0;
+    }
+
+    .ionx--text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.ionx--placeholder-visible {
+            opacity: var(--date-time-placeholder-opacity, .5);
+        }
+    }
+
+    &.ionx--disabled {
+        opacity: var(--date-time-disabled-opacity, .5);
+        pointer-events: none;
+    }
+
+    &.ionx--readonly {
+        opacity: 1;
+        pointer-events: none;
+    }
+
+    ion-button {
+        --border-radius: 100%;
+        --padding-start: 4px;
+        --padding-end: 4px;
+        margin: 0px;
+        position: absolute;
+        height: 100%;
+        right: 0px;
+        top: 0px;
+    }
+}
+
+:host-context(.item-label-stacked) {
+    align-self: flex-start;
+    --date-time-padding-start: 0px;
+    width: 100%;
+
+    .ionx--text {
+        max-width: calc(100% - 16px);
+        flex: initial;
+    }
+}

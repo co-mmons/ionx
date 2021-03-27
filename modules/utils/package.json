@@ -1,0 +1,6 @@
+{
+    "name": "ionx/utils",
+    "scripts": {
+        "build": "tsc --declaration true --outDir ../../dist/utils"
+    }
+}
