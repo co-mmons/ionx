@@ -176,6 +176,11 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         return this.mutableState();
     }
 
+    /**
+     * Potrzebujemy wiedzieć czy ilość wywołan attach z elementem zgadza sie z iloscia wywolan bez elementu.
+     */
+    private attachCount = 0;
+
     attach(): (element: HTMLElement) => void;
 
     attach(element: HTMLElement);
@@ -186,12 +191,15 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             return (element: HTMLElement) => this.attach(element);
         } else if (arguments[0]) {
             const element: HTMLElement = arguments[0];
+            this.attachCount++;
 
             if (this.element$ !== element) {
 
                 if (this.element$) {
                     this.detach();
                 }
+
+                console.debug(`[ionx-form-control] attach control ${this.name}`);
 
                 this.element$ = element;
                 this.element$.setAttribute("ionx-form-control", this.name);
@@ -203,7 +211,10 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
                 this.applyElementState({value: this.value$, valueChange: true, status: this.status(), statusChange: true});
             }
         } else {
-            this.detach();
+            this.attachCount--;
+            if (this.attachCount === 0) {
+                this.detach();
+            }
         }
     }
 
@@ -218,7 +229,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     detach() {
         if (this.element$) {
-            console.debug(`[ionx-form] detach control "${this.name}"`);
+            console.debug(`[ionx-form-control] detach control "${this.name}"`);
 
             this.unlistenOnChange?.();
             this.unlistenOnChange = undefined;

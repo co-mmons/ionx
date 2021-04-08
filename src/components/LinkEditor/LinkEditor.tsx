@@ -82,6 +82,7 @@ export class LinkEditor implements LinkEditorProps {
     }
 
     render() {
+        console.log(this.data.controls.value.value);
 
         let schemes: SelectOption[];
         if (this.schemes) {

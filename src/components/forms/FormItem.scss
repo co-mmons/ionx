@@ -27,6 +27,11 @@
         --inner-padding-end: 0px;
     }
 
+    &[fill=clear] > ion-item {
+        --inner-border-width: 0;
+        --full-highlight-height: 0;
+    }
+
     &[fill=outline] > ion-item {
         --padding-start: 16px;
         --padding-end: 16px;
