@@ -63,7 +63,7 @@ export class TagsInput {
     }
 
     @Event()
-    ionxChange: EventEmitter<string[]>;
+    ionChange: EventEmitter<{value: string[]}>;
 
     setBlur() {
 
@@ -146,7 +146,7 @@ export class TagsInput {
         this.value.push(tagStr.trim());
         this.sortTags();
 
-        this.ionxChange.emit(this.value.slice());
+        this.ionChange.emit({value: this.value.slice()});
         this.currentTag = "";
     }
 
@@ -211,11 +211,11 @@ export class TagsInput {
         if (this.value && this.value.length > 0) {
             if (index === -1) {
                 this.value = this.value.splice(0, this.value.length - 1);
-                this.ionxChange.emit(this.value.slice());
+                this.ionChange.emit({value: this.value.slice()});
             } else if (index > -1) {
                 this.value = this.value.slice();
                 this.value.splice(index, 1);
-                this.ionxChange.emit(this.value.slice());
+                this.ionChange.emit({value: this.value.slice()});
             }
         }
     }
