@@ -2,19 +2,32 @@
     display: flex;
     align-items: center;
 
-    .on {
-        cursor: pointer;
+    &.ionx--readonly {
+        .ionx--on, .ionx--off, .ionx--default-toggle {
+            display: none;
+        }
+    }
+
+    .ionx--on {
         margin-left: 4px;
     }
 
-    .off {
-        cursor: pointer;
+    .ionx--off {
         margin-right: 4px;
     }
 
+    &.ionx--interactive {
+        .ionx--on {
+            cursor: pointer;
+        }
+
+        .ionx--off {
+            cursor: pointer;
+        }
+    }
 }
 
-::slotted(ion-toggle) {
+::slotted(ion-toggle), :host ion-toggle {
     padding-inline-start: 2px;
     padding-inline-end: 2px;
 }
