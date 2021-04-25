@@ -1,10 +1,14 @@
 import {Config} from "@stencil/core";
 import {sass} from "@stencil/sass";
-import {resolveIonxPlugin} from "../../resolveIonxPlugin";
+import {intlMessagesLoaderGeneratorPlugin} from "../intlMessagesLoaderGeneratorPlugin";
+import {resolveIonxPlugin} from "../resolveIonxPlugin";
 
 export const config: Config = {
     namespace: "App",
-    plugins: [sass()],
+    plugins: [sass(), intlMessagesLoaderGeneratorPlugin()],
+    srcIndexHtml: "src/test/index.html",
+    globalScript: "src/test/global.ts",
+    globalStyle: "src/test/global.scss",
     devServer: {
         openBrowser: false,
         reloadStrategy: "pageReload",

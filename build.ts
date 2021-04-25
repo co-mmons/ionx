@@ -7,6 +7,7 @@ const path = require("path");
 const modules = [
     "utils",
 
+    "Popover",
     "Block",
     "Card",
     "DateTime",

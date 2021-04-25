@@ -81,7 +81,7 @@ export class Select {
     lazyOptions: () => Promise<SelectOption[]>;
 
     @Prop()
-    labelComponent?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number}>;
+    labelComponent?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number, readonly?: boolean}>;
 
     @Prop()
     labelFormatter?: (value: any) => string;
@@ -293,7 +293,7 @@ export class Select {
 
                         <ValueComponent key={value} outline={true} {...{[indexAttribute]: index}}>
 
-                            {!!LabelComponent ? <LabelComponent value={value} option={currentOption} label={currentLabel} index={index}/> :
+                            {!!LabelComponent ? <LabelComponent value={value} option={currentOption} label={currentLabel} index={index} readonly={this.readonly}/> :
                                 <span>{currentLabel}{!this.orderable && index < length - 1 ? this.separator : ""}</span>}
 
                         </ValueComponent>

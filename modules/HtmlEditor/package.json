@@ -1,8 +1,9 @@
 {
     "name": "ionx/HtmlEditor",
     "scripts": {
-        "build": "stencil build",
-        "start": "cd test && npm run start"
+        "build": "stencil build --ts",
+        "start": "stencil build --dev --watch --serve --config stencil.config.test.ts",
+        "intl": "js-intl-google-sheet-importer --output-path src/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionx/HtmlEditor"
     },
     "types": "../../dist/HtmlEditor/index.d.ts",
     "dependencies": {

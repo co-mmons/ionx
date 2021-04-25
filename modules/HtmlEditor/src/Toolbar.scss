@@ -1,0 +1,43 @@
+:host {
+    outline: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    background-color: var(--background);
+    z-index: 1;
+
+    ion-button {
+        margin: 0 4px;
+        --padding-end: 2px;
+        --padding-start: 4px;
+    }
+
+    ion-button.active-feature span {
+        font-weight: 800;
+    }
+
+    ion-icon[slot="end"] {
+        margin: 0;
+        font-size: 1em;
+    }
+
+    ion-button[disabled] {
+        opacity: 0.5;
+    }
+
+    [ionx--buttons-group] {
+        display: flex;
+    }
+
+    .buttons-group ion-button:not(:last-child) {
+        margin-right: 0;
+    }
+
+}
+
+:host-context(.ion-focused) {
+    background-color: var(--background-focused);
+}
