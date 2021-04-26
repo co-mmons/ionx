@@ -33,8 +33,10 @@ export class Toolbar {
         list?: boolean
     } = {};
 
+    @State()
     private canUndo: boolean;
 
+    @State()
     private canRedo: boolean;
 
     private get editor() {
@@ -42,18 +44,26 @@ export class Toolbar {
     }
 
     private async undo() {
+
         const view = await this.editor.getView();
-        undo(view.state, (transaction) => view.updateState(view.state.apply(transaction)));
+
+        undo(view.state, t => view.updateState(view.state.apply(t)));
+
         this.canUndo = undoDepth(view.state) > 0;
         this.canRedo = redoDepth(view.state) > 0;
-        this.editor.focus();
+
+        this.editor.setFocus();
     }
 
     private async redo() {
+
         const view = await this.editor.getView();
-        redo(view.state, (transaction) => view.updateState(view.state.apply(transaction)));
+
+        redo(view.state, t => view.updateState(view.state.apply(t)));
+
         this.canUndo = undoDepth(view.state) > 0;
         this.canRedo = redoDepth(view.state) > 0;
+
         this.editor.setFocus();
     }
 
@@ -73,6 +83,7 @@ export class Toolbar {
         });
 
         await popover.present();
+        popover.animated = false;
     }
 
     async editorSelectionChanged() {
@@ -106,7 +117,7 @@ export class Toolbar {
                 size="small"
                 fill="clear"
                 class={{"active-feature": this.activeFeatures.text}}
-                onClick={ev => this.showMenu(ev, "Text")}>
+                onClick={ev => this.showMenu(ev, "text")}>
                 <ion-icon name="caret-down" slot="end"/>
                 <span>{intl.message`ionx/HtmlEditor#Text`}</span>
             </ion-button>
@@ -124,7 +135,7 @@ export class Toolbar {
                 size="small"
                 fill="clear"
                 class={{"active-feature": this.activeFeatures.heading}}
-                onClick={ev => this.showMenu(ev, "Heading")}>
+                onClick={ev => this.showMenu(ev, "heading")}>
                 <ion-icon name="caret-down" slot="end"/>
                 <span>{intl.message`ionx/HtmlEditor#Heading`}</span>
             </ion-button>}
@@ -133,7 +144,7 @@ export class Toolbar {
                 size="small"
                 fill="clear"
                 class={{"active-feature": this.activeFeatures.list}}
-                onClick={ev => this.showMenu(ev, "List")}>
+                onClick={ev => this.showMenu(ev, "list")}>
                 <ion-icon name="caret-down" slot="end"/>
                 <span>{intl.message`ionx/HtmlEditor#listMenu/List`}</span>
             </ion-button>}
@@ -141,7 +152,7 @@ export class Toolbar {
             {this.features?.link !== false && <ion-button
                 size="small"
                 fill="clear"
-                onClick={ev => this.showMenu(ev, "Insert")}>
+                onClick={ev => this.showMenu(ev, "insert")}>
                 <ion-icon name="caret-down" slot="end"/>
                 <span>{intl.message`ionx/HtmlEditor#Insert`}</span>
             </ion-button>}

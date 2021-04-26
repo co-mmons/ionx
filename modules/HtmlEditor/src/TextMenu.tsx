@@ -69,6 +69,11 @@ export class TextMenu {
         popoverController.dismiss();
     }
 
+    @Listen("ionViewDidLeave")
+    didDismiss() {
+        this.editor.setFocus();
+    }
+
     connectedCallback() {
 
         this.editor.getView().then(view => {
@@ -95,32 +100,31 @@ export class TextMenu {
         });
     }
 
-    @Listen("ionViewWillLeave")
-    willLeave() {
-        this.editor.focus();
-    }
-
     render() {
         return <ion-list lines="full">
 
             <ion-item button detail={false} onClick={() => this.toggle("bold")}>
-                <ion-label style={{fontWeight: "bold"}}>{intl.message`ionx#textMenu/Bold`}</ion-label>
+                <ion-label style={{fontWeight: "bold"}}>{intl.message`ionx/HtmlEditor#textMenu/Bold`}</ion-label>
                 {this.boldActivated && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>
 
             <ion-item button detail={false} onClick={() => this.toggle("italic")}>
-                <ion-label style={{fontStyle: "italic"}}>{intl.message`ionx#textMenu/Italic`}</ion-label>
+                <ion-label style={{fontStyle: "italic"}}>{intl.message`ionx/HtmlEditor#textMenu/Italic`}</ion-label>
                 {this.italicActivated && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>
 
             <ion-item button detail={false} onClick={() => this.toggle("underline")}>
-                <ion-label style={{textDecoration: "underrline"}}>{intl.message`ionx#textMenu/Underline`}</ion-label>
+                <ion-label style={{textDecoration: "underline"}}>{intl.message`ionx/HtmlEditor#textMenu/Underline`}</ion-label>
                 {this.underlineActivated && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>
 
             <ion-item-divider>
-                <ion-label>{intl.message`ionx#textMenu/fontSize/Text size`}</ion-label>
+                <ion-label>{intl.message`ionx/HtmlEditor#textMenu/fontSize/Text size`}</ion-label>
             </ion-item-divider>
+
+            {this.activeFontSize && <ion-item button={true} detail={false} onClick={() => this.resetFontSize()}>
+                <ion-label>{intl.message`ionx/HtmlEditor#textMenu/fontSize/Default`}</ion-label>
+            </ion-item>}
 
             {FontSize.values().map(size => <ion-item button detail={false} onClick={() => this.toggleFontSize(size)}>
                 <ion-label style={{fontSize: size.name}}>{intl.message(size.label)}</ion-label>

@@ -49,9 +49,9 @@ export class AlignmentMenu {
         });
     }
 
-    @Listen("ionViewWillLeave")
-    willLeave() {
-        this.editor.focus();
+    @Listen("ionViewDidLeave")
+    didDismiss() {
+        this.editor.setFocus();
     }
 
     render() {
