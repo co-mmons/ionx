@@ -9,9 +9,16 @@ import { EditorView } from "prosemirror-view";
 import { HtmlEditorFeatures } from "./HtmlEditorFeatures";
 export namespace Components {
     interface IonxHtmlEditor {
+        "disabled": boolean;
         "getView": () => Promise<EditorView<any>>;
+        "readonly": boolean;
+        "setFocus": () => Promise<void>;
+        "value": string;
     }
     interface IonxHtmlEditorAlignmentMenu {
+        "editor": HTMLIonxHtmlEditorElement;
+    }
+    interface IonxHtmlEditorTextMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
     interface IonxHtmlEditorToolbar {
@@ -31,6 +38,12 @@ declare global {
         prototype: HTMLIonxHtmlEditorAlignmentMenuElement;
         new (): HTMLIonxHtmlEditorAlignmentMenuElement;
     };
+    interface HTMLIonxHtmlEditorTextMenuElement extends Components.IonxHtmlEditorTextMenu, HTMLStencilElement {
+    }
+    var HTMLIonxHtmlEditorTextMenuElement: {
+        prototype: HTMLIonxHtmlEditorTextMenuElement;
+        new (): HTMLIonxHtmlEditorTextMenuElement;
+    };
     interface HTMLIonxHtmlEditorToolbarElement extends Components.IonxHtmlEditorToolbar, HTMLStencilElement {
     }
     var HTMLIonxHtmlEditorToolbarElement: {
@@ -40,13 +53,22 @@ declare global {
     interface HTMLElementTagNameMap {
         "ionx-html-editor": HTMLIonxHtmlEditorElement;
         "ionx-html-editor-alignment-menu": HTMLIonxHtmlEditorAlignmentMenuElement;
+        "ionx-html-editor-text-menu": HTMLIonxHtmlEditorTextMenuElement;
         "ionx-html-editor-toolbar": HTMLIonxHtmlEditorToolbarElement;
     }
 }
 declare namespace LocalJSX {
     interface IonxHtmlEditor {
+        "disabled"?: boolean;
+        "onEditorSelectionChange"?: (event: CustomEvent<any>) => void;
+        "onIonChange"?: (event: CustomEvent<{value: string}>) => void;
+        "readonly"?: boolean;
+        "value"?: string;
     }
     interface IonxHtmlEditorAlignmentMenu {
+        "editor": HTMLIonxHtmlEditorElement;
+    }
+    interface IonxHtmlEditorTextMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
     interface IonxHtmlEditorToolbar {
@@ -55,6 +77,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "ionx-html-editor": IonxHtmlEditor;
         "ionx-html-editor-alignment-menu": IonxHtmlEditorAlignmentMenu;
+        "ionx-html-editor-text-menu": IonxHtmlEditorTextMenu;
         "ionx-html-editor-toolbar": IonxHtmlEditorToolbar;
     }
 }
@@ -64,6 +87,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ionx-html-editor": LocalJSX.IonxHtmlEditor & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorElement>;
             "ionx-html-editor-alignment-menu": LocalJSX.IonxHtmlEditorAlignmentMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorAlignmentMenuElement>;
+            "ionx-html-editor-text-menu": LocalJSX.IonxHtmlEditorTextMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorTextMenuElement>;
             "ionx-html-editor-toolbar": LocalJSX.IonxHtmlEditorToolbar & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorToolbarElement>;
         }
     }

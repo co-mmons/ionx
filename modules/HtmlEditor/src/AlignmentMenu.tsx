@@ -4,7 +4,7 @@ import {Component, h, Listen, Prop} from "@stencil/core";
 import {Alignment} from "./Alignment";
 import {changeAlignment} from "./prosemirror/alignment/commands";
 import {schema} from "./prosemirror/schema";
-import {findBlockMarks} from "./prosemirror/utils/selection/find-block-marks";
+import {findBlockMarks} from "./prosemirror/utils/selection/findBlockMarks";
 
 @Component({
     tag: "ionx-html-editor-alignment-menu",
@@ -55,8 +55,8 @@ export class AlignmentMenu {
     }
 
     render() {
-        return <ion-list>
-            {Alignment.values().map(alignment => <ion-item button onClick={() => this.toggleAlignment(alignment)}>
+        return <ion-list lines="full">
+            {Alignment.values().map(alignment => <ion-item button detail={false} onClick={() => this.toggleAlignment(alignment)}>
                 <ion-label>{intl.message(alignment.label)}</ion-label>
                 {this.active === alignment.name && <ion-icon name="checkmark" slot="end"/>}
                 <ion-icon src={`/assets/ionx.HtmlEditor/icons/align-${alignment.name}.svg`} slot="start"/>

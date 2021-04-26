@@ -1,13 +1,12 @@
 @import "~prosemirror-view/style/prosemirror";
 
-:host {
+ionx-html-editor {
     display: block;
 }
 
-.ProseMirror {
+ionx-html-editor > [ionx--prosemirror] > .ProseMirror {
     outline: none;
     user-select: text;
-    -webkit-user-select: text;
 
     &[contenteditable=true] {
         min-height: 60px;

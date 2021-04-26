@@ -1,6 +1,7 @@
 import {intl} from "@co.mmons/js-intl";
 import {isPlatform, popoverController} from "@ionic/core";
-import {Component, Element, h, Host, Prop} from "@stencil/core";
+import {Component, Element, h, Host, Prop, State} from "@stencil/core";
+import {addEventListener, EventUnlisten} from "ionx/utils";
 import {redo, redoDepth, undo, undoDepth} from "prosemirror-history";
 import {findParentNode, findParentNodeOfType} from "prosemirror-utils";
 import {HtmlEditorFeatures} from "./HtmlEditorFeatures";
@@ -21,7 +22,10 @@ export class Toolbar {
     @Prop()
     features: HtmlEditorFeatures;
 
-    activeFeatures: {
+    private selectionUnlisten: EventUnlisten;
+
+    @State()
+    private activeFeatures: {
         link?: boolean,
         text?: boolean,
         alignment?: boolean,
@@ -29,24 +33,28 @@ export class Toolbar {
         list?: boolean
     } = {};
 
-    get editor() {
+    private canUndo: boolean;
+
+    private canRedo: boolean;
+
+    private get editor() {
         return this.element.parentElement as HTMLIonxHtmlEditorElement;
     }
 
-    canUndo: boolean;
-
-    canRedo: boolean;
-
-    async undo() {
+    private async undo() {
         const view = await this.editor.getView();
         undo(view.state, (transaction) => view.updateState(view.state.apply(transaction)));
+        this.canUndo = undoDepth(view.state) > 0;
+        this.canRedo = redoDepth(view.state) > 0;
         this.editor.focus();
     }
 
-    async redo() {
+    private async redo() {
         const view = await this.editor.getView();
         redo(view.state, (transaction) => view.updateState(view.state.apply(transaction)));
-        this.editor.focus();
+        this.canUndo = undoDepth(view.state) > 0;
+        this.canRedo = redoDepth(view.state) > 0;
+        this.editor.setFocus();
     }
 
     editLink() {
@@ -83,9 +91,12 @@ export class Toolbar {
     }
 
     connectedCallback() {
-        // this.selectionSubscription = this.editor.selectionChange.subscribe(() => this.editorSelectionChanged());
-        //
-        // this.editorSelectionChanged();
+        this.selectionUnlisten = addEventListener(this.editor, "editorSelectionChange", () => this.editorSelectionChanged());
+        this.editorSelectionChanged();
+    }
+
+    disconnectedCallback() {
+        this.selectionUnlisten?.();
     }
 
     render() {

@@ -1,4 +1,4 @@
-export function intlMessagesLoaderGeneratorPlugin(loaderPath: string = "src/intl/intlMessagesLoader.ts") {
+export function intlMessagesLoaderGeneratorPlugin(loaderPath: string = "src/intl/loadIntlMessages.ts") {
     return {
         name: "intlMessagesLoaderGenerator",
         transform: (_sourceText: string, sourcePath: string) => {
