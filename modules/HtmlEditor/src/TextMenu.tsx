@@ -61,7 +61,7 @@ export class TextMenu {
 
         const view = await this.editor.getView();
 
-        const command = toggleInlineMark(schema.marks.fontSize, {fontSize: size.name});
+        const command = toggleInlineMark(schema.marks.fontSize, {fontSize: size.css});
         if (command(view.state)) {
             command(view.state, t => view.dispatch(t));
         }
@@ -85,7 +85,7 @@ export class TextMenu {
             MARKS: for (const mark of findMarksInSelection(view.state, schema.marks.fontSize)) {
 
                 for (const size of FontSize.values()) {
-                    if (size.name === mark.attrs.fontSize) {
+                    if (size.css === mark.attrs.fontSize) {
 
                         // ups, mamy różne rozmiary w zaznaczeniu
                         if (this.activeFontSize && size !== this.activeFontSize) {
@@ -127,7 +127,7 @@ export class TextMenu {
             </ion-item>}
 
             {FontSize.values().map(size => <ion-item button detail={false} onClick={() => this.toggleFontSize(size)}>
-                <ion-label style={{fontSize: size.name}}>{intl.message(size.label)}</ion-label>
+                <ion-label style={{fontSize: size.css}}>{intl.message(size.label)}</ion-label>
                 {this.activeFontSize === size && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>)}
 

@@ -30,6 +30,8 @@
         "dragula": "^3.7.3",
         "fast-equals": "^2.0.0",
         "imask": "^6.0.5",
+        "ionicons": "^5.5.1",
+        "rollup-plugin-visualizer": "^5.4.1",
         "rxjs": "^6.6.2",
         "scroll-into-view": "^1.15.0",
         "tippy.js": "^6.2.6",

@@ -1,0 +1,114 @@
+:host {
+    --form-item-solid-background-color: var(--ion-color-light);
+    --form-item-focused-background-color: var(--ion-color-light-shade);
+
+    position: relative;
+    display: block;
+
+    [ionx--buttons] {
+        display: none;
+
+        &:not(:empty) {
+            display: inline-flex;
+            z-index: 2;
+            position: absolute;
+            top: -9px;
+            left: 16px;
+            height: 20px;
+            background: var(--ion-item-background, var(--ion-background-color, #fff));
+            border-radius: var(--ionx-border-radius, 4px);
+        }
+    }
+
+    > ion-item {
+        --padding-top: 8px;
+        --padding-start: 0px;
+        --padding-end: 0px;
+        --inner-padding-end: 0px;
+    }
+
+    &[fill=clear] > ion-item {
+        --inner-border-width: 0;
+        --full-highlight-height: 0;
+    }
+
+    &[fill=outline] > ion-item {
+        --padding-start: 16px;
+        --padding-end: 16px;
+        --border-width: var(--ionx-border-width, 1px);
+        --border-radius: var(--ionx-border-radius, 4px) var(--ionx-border-radius, 4px) 0px 0px;
+        --inner-border-width: 0px;
+        --full-highlight-height: 2px;
+    }
+
+    &[fill=solid] > ion-item {
+        --padding-start: var(--item-padding-start, 16px);
+        --padding-end: var(--item-padding-end, 16px);
+        --inner-padding-start: var(--item-inner-padding-start, 0px);
+        --inner-padding-end: var(--item-inner-padding-end, 0px);
+        --background: var(--form-item-solid-background-color);
+        --background-focused: var(--form-item-focused-background-color);
+        --background-focused-opacity: 1;
+        --input-background-color: var(--form-item-solid-background-color);
+        --input-focused-background-color: var(--form-item-focused-background-color);
+        --border-width: 0px 0px var(--ionx-border-width, 1px) 0px;
+        --border-radius: var(--ionx-border-radius, 4px) var(--ionx-border-radius, 4px) 0px 0px;
+        --inner-border-width: 0px;
+        --full-highlight-height: 2px;
+    }
+}
+
+::slotted(ion-label) {
+    padding-left: var(--label-padding-start, 0px);
+    padding-right: var(--label-padding-end, 0px);
+
+    &.label-floating, &.label-stacked {
+        z-index: 1;
+    }
+}
+
+::slotted(ion-input) {
+    --padding-end: 0px;
+    --padding-start: 0px;
+    z-index: 0;
+}
+
+::slotted([slot=end]) {
+    margin-left: 0px;
+}
+
+::slotted([slot=end]:last-child) {
+    margin-right: 0px;
+}
+
+:host[fill=solid]::slotted([slot=error]),
+:host[fill=solid]::slotted([slot=hint]),
+:host[fill=solid] > [ionx--error],
+:host[fill=solid] > [ionx--hint],
+:host[fill=outline]::slotted([slot=error]),
+:host[fill=outline]::slotted([slot=hint]),
+:host[fill=outline] > [ionx--error],
+:host[fill=outline] > [ionx--hint] {
+    margin-left: 16px;
+    margin-right: 16px;
+}
+
+::slotted([slot=error]), ::slotted([slot=hint]), :host > [ionx--error], :host > [ionx--hint] {
+    margin-top: 8px;
+    font-size: small;
+}
+
+::slotted([slot=error]), :host > [ionx--error] {
+    color: var(--ion-color-danger);
+}
+
+::slotted([slot=hint]), :host > [ionx--hint] {
+    color: rgba(var(--ion-text-color-rgb), .5);
+}
+
+::slotted(ion-button[slot=buttons]), ::slotted([slot=buttons]) ion-button {
+    margin: 0px;
+    height: 20px;
+    font-size: 11px;
+    letter-spacing: initial;
+}

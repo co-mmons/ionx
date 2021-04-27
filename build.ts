@@ -11,6 +11,13 @@ const modules = [
     "Block",
     "Card",
     "DateTime",
+
+    "forms",
+    "forms/TooltipErrorPresenter",
+
+    "Dialog",
+    "Select",
+    "LinkEditor",
     "HtmlEditor",
 ];
 

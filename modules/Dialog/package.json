@@ -1,0 +1,14 @@
+{
+    "name": "ionx/Dialog",
+    "scripts": {
+        "build": "stencil build --ts --config stencil.config.build.ts",
+        "start": "stencil build --dev --watch --serve --config stencil.config.test.ts"
+    },
+    "types": "../../dist/Dialog/index.d.ts",
+    "dependencies": {
+        "rxjs": "^6.6.7"
+    },
+    "devDependencies": {
+        "rxjs": "^6.6.7"
+    }
+}

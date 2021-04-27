@@ -1,0 +1,11 @@
+{
+    "blankTargetLabel": "New window",
+    "emailSchemeLabel": "E-mail",
+    "InvalidUrlError|message": "Provided url is incorrect. Remember that url must be complete and contain http:// or https://.",
+    "otherSchemeLabel": "Other",
+    "phoneNumberHint": "Remember to enter the national prefix (e.g., +48) so that you can make a call from any country.",
+    "selfTargetLabel": "Current window",
+    "smsSchemeLabel": "SMS",
+    "telSchemeLabel": "Phone call",
+    "wwwSchemeLabel": "Web page"
+}

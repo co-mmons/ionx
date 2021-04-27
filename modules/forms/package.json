@@ -1,0 +1,19 @@
+{
+    "name": "ionx/forms",
+    "scripts": {
+        "build": "stencil build --ts --config stencil.config.build.ts",
+        "start": "stencil build --dev --watch --serve --config stencil.config.test.ts",
+        "intl": "js-intl-google-sheet-importer --output-path src/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionx/forms"
+    },
+    "peerDependencies": {
+        "rxjs": "^6.6.7",
+        "scroll-into-view": "^1.15.0",
+        "ts-error": "^1.0.6"
+    },
+    "devDependencies": {
+        "rxjs": "^6.6.7",
+        "scroll-into-view": "^1.15.0",
+        "ts-error": "^1.0.6"
+    },
+    "types": "../../dist/forms/index.d.ts"
+}

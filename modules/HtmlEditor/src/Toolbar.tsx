@@ -29,7 +29,7 @@ export class Toolbar {
         link?: boolean,
         text?: boolean,
         alignment?: boolean,
-        heading?: boolean;
+        paragraph?: boolean;
         list?: boolean
     } = {};
 
@@ -78,7 +78,7 @@ export class Toolbar {
             componentProps: {
                 editor: this.editor
             },
-            event: event as any,
+            event,
             showBackdrop: isPlatform("ios")
         });
 
@@ -97,7 +97,7 @@ export class Toolbar {
         this.activeFeatures.text = anyMarkActive(view.state, [schema.marks.strong, schema.marks.em, schema.marks.underline, schema.marks.fontSize]);
         this.activeFeatures.list = !!findParentNode(predicate => predicate.hasMarkup(schema.nodes.orderedList) || predicate.hasMarkup(schema.nodes.bulletList))(view.state.selection);
         this.activeFeatures.alignment = isBlockMarkActive(view.state, schema.marks.alignment);
-        this.activeFeatures.heading = !!findParentNodeOfType(schema.nodes.heading)(view.state.selection);
+        this.activeFeatures.paragraph = !!findParentNodeOfType(schema.nodes.heading)(view.state.selection);
         this.activeFeatures.link = isMarkActive(view.state, schema.marks.link);
     }
 
@@ -115,8 +115,7 @@ export class Toolbar {
 
             <ion-button
                 size="small"
-                fill="clear"
-                class={{"active-feature": this.activeFeatures.text}}
+                fill={this.activeFeatures.text ? "outline" : "clear"}
                 onClick={ev => this.showMenu(ev, "text")}>
                 <ion-icon name="caret-down" slot="end"/>
                 <span>{intl.message`ionx/HtmlEditor#Text`}</span>
@@ -124,8 +123,7 @@ export class Toolbar {
 
             {this.features?.alignment !== false && <ion-button
                 size="small"
-                fill="clear"
-                class={{"active-feature": this.activeFeatures.alignment}}
+                fill={this.activeFeatures.alignment ? "outline" : "clear"}
                 onClick={ev => this.showMenu(ev, "alignment")}>
                 <ion-icon name="caret-down" slot="end"/>
                 <span>{intl.message`ionx/HtmlEditor#Alignment`}</span>
@@ -133,17 +131,15 @@ export class Toolbar {
 
             {this.features?.heading !== false && <ion-button
                 size="small"
-                fill="clear"
-                class={{"active-feature": this.activeFeatures.heading}}
-                onClick={ev => this.showMenu(ev, "heading")}>
+                fill={this.activeFeatures.paragraph ? "outline" : "clear"}
+                onClick={ev => this.showMenu(ev, "paragraph")}>
                 <ion-icon name="caret-down" slot="end"/>
-                <span>{intl.message`ionx/HtmlEditor#Heading`}</span>
+                <span>{intl.message`ionx/HtmlEditor#Paragraph`}</span>
             </ion-button>}
 
             {this.features?.list !== false && <ion-button
                 size="small"
-                fill="clear"
-                class={{"active-feature": this.activeFeatures.list}}
+                fill={this.activeFeatures.list ? "outline" : "clear"}
                 onClick={ev => this.showMenu(ev, "list")}>
                 <ion-icon name="caret-down" slot="end"/>
                 <span>{intl.message`ionx/HtmlEditor#listMenu/List`}</span>
@@ -159,9 +155,9 @@ export class Toolbar {
 
             {this.activeFeatures.link && <ion-button
                 size="small"
-                fill="clear"
-                class="active-feature"
-                onClick={() => this.editLink()}>
+                fill="outline"
+                onClick={ev => this.showMenu(ev, "link")}>
+                <ion-icon name="caret-down" slot="end"/>
                 <span>{intl.message`ionx/HtmlEditor#link/Link`}</span>
             </ion-button>}
 

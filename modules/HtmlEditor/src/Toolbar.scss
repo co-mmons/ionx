@@ -15,8 +15,12 @@
         --padding-start: 4px;
     }
 
-    ion-button.active-feature span {
-        font-weight: 600;
+    ion-button:not(.button-outline) {
+        border: 1px solid transparent;
+    }
+
+    ion-button.button-outline {
+        --border-width: 1px;
     }
 
     ion-icon[slot="end"] {

@@ -1,8 +1,8 @@
 import {MarkSpec, NodeSpec, Schema} from "prosemirror-model";
 import {marks as basicMarks, nodes as basicNodes} from "prosemirror-schema-basic";
 import {bulletList, listItem, orderedList} from "prosemirror-schema-list";
-import {fontSize} from "./marks/font-size";
 import {alignment} from "./marks/alignment";
+import {fontSize} from "./marks/font-size";
 import {youtube} from "./nodes/youtube";
 
 export const nodes = {
@@ -44,7 +44,26 @@ export const nodes = {
 };
 
 export const marks = {
-    link: basicMarks.link,
+    link: {
+        attrs: {
+            href: {},
+            target: {default: null},
+            title: {default: null}
+        },
+        inclusive: false,
+        parseDOM: [{
+            tag: "a[href]",
+            getAttrs(dom: HTMLElement | string) {
+                if (dom instanceof HTMLElement) {
+                    return {href: dom.getAttribute("href"), target: dom.getAttribute("target"), title: dom.getAttribute("title")}
+                }
+            }
+        }],
+        toDOM(node) {
+            const {href, title, target} = node.attrs;
+            return ["a", {href, title, target}, 0]
+        }
+    } as MarkSpec,
     em: basicMarks.em,
     strong: basicMarks.strong,
     alignment,

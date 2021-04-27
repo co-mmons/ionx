@@ -11,7 +11,7 @@ import {schema} from "./prosemirror/schema";
     styleUrl: "ListMenu.scss",
     shadow: true
 })
-export class HeadingMenu {
+export class ListMenu {
 
     @Prop()
     editor!: HTMLIonxHtmlEditorElement;

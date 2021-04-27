@@ -21,7 +21,7 @@ import { TooltipErrorPresenter } from "./components/forms/TooltipErrorPresenter/
 import { TooltipErrorPresenterOptions } from "./components/forms/TooltipErrorPresenter/TooltipErrorPresenterOptions";
 import { Link } from "./components/LinkEditor/Link";
 import { SelectOption } from "./components/Select/SelectOption";
-import { LinkNormalizeFn } from "./components/LinkEditor/LinkNormalizeFn";
+import { LinkScheme } from "./components/LinkEditor/LinkScheme";
 import { LinkEditorProps } from "./components/LinkEditor/LinkEditorProps";
 import { ExtendedItemElement } from "./components/MultiGrid/ExtendedItemElement";
 import { ValueComparator } from "./components/Select/ValueComparator";
@@ -143,6 +143,8 @@ export namespace Components {
     interface IonxDialogMessage {
         "message"?: string | HtmlString;
     }
+    interface IonxDragulaStyles {
+    }
     interface IonxExpandingSearchbar {
         "expand": () => Promise<void>;
         "expanded": boolean;
@@ -186,8 +188,8 @@ export namespace Components {
     interface IonxLinkEditor {
         "buildLink": () => Promise<Link>;
         "link": string | Link;
-        "normalizeFn"?: LinkNormalizeFn;
-        "schemes"?: SelectOption[];
+        "schemes"?: SelectOption[] | LinkScheme[];
+        "targetVisible": boolean;
     }
     interface IonxLinkEditorDialog {
         "editorProps": LinkEditorProps;
@@ -229,7 +231,7 @@ export namespace Components {
         "comparator": ValueComparator;
         "disabled": boolean;
         "empty": boolean;
-        "labelComponent"?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number}>;
+        "labelComponent"?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number, readonly?: boolean}>;
         "labelFormatter"?: (value: any) => string;
         "lazyOptions": () => Promise<SelectOption[]>;
         /**
@@ -323,8 +325,11 @@ export namespace Components {
     interface IonxTestVirtualScroll {
     }
     interface IonxToggleLabels {
+        "disabled": boolean;
         "off": string;
         "on": string;
+        "readonly": boolean;
+        "value": boolean;
     }
     interface IonxToolbar {
         "button": ToolbarButtonType;
@@ -394,6 +399,12 @@ declare global {
     var HTMLIonxDialogMessageElement: {
         prototype: HTMLIonxDialogMessageElement;
         new (): HTMLIonxDialogMessageElement;
+    };
+    interface HTMLIonxDragulaStylesElement extends Components.IonxDragulaStyles, HTMLStencilElement {
+    }
+    var HTMLIonxDragulaStylesElement: {
+        prototype: HTMLIonxDragulaStylesElement;
+        new (): HTMLIonxDragulaStylesElement;
     };
     interface HTMLIonxExpandingSearchbarElement extends Components.IonxExpandingSearchbar, HTMLStencilElement {
     }
@@ -615,6 +626,7 @@ declare global {
         "ionx-dialog-content": HTMLIonxDialogContentElement;
         "ionx-dialog-headers": HTMLIonxDialogHeadersElement;
         "ionx-dialog-message": HTMLIonxDialogMessageElement;
+        "ionx-dragula-styles": HTMLIonxDragulaStylesElement;
         "ionx-expanding-searchbar": HTMLIonxExpandingSearchbarElement;
         "ionx-expanding-searchbar-parent": HTMLIonxExpandingSearchbarParentElement;
         "ionx-form-controller": HTMLIonxFormControllerElement;
@@ -757,6 +769,8 @@ declare namespace LocalJSX {
     interface IonxDialogMessage {
         "message"?: string | HtmlString;
     }
+    interface IonxDragulaStyles {
+    }
     interface IonxExpandingSearchbar {
         "expanded"?: boolean;
     }
@@ -796,8 +810,8 @@ declare namespace LocalJSX {
     }
     interface IonxLinkEditor {
         "link"?: string | Link;
-        "normalizeFn"?: LinkNormalizeFn;
-        "schemes"?: SelectOption[];
+        "schemes"?: SelectOption[] | LinkScheme[];
+        "targetVisible"?: boolean;
     }
     interface IonxLinkEditorDialog {
         "editorProps"?: LinkEditorProps;
@@ -836,7 +850,7 @@ declare namespace LocalJSX {
         "comparator"?: ValueComparator;
         "disabled"?: boolean;
         "empty"?: boolean;
-        "labelComponent"?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number}>;
+        "labelComponent"?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number, readonly?: boolean}>;
         "labelFormatter"?: (value: any) => string;
         "lazyOptions"?: () => Promise<SelectOption[]>;
         /**
@@ -892,7 +906,7 @@ declare namespace LocalJSX {
         "canEnterAdd"?: boolean;
         "hideRemove"?: boolean;
         "maxTags"?: number;
-        "onIonxChange"?: (event: CustomEvent<string[]>) => void;
+        "onIonChange"?: (event: CustomEvent<{value: string[]}>) => void;
         "placeholder"?: string;
         "readonly"?: boolean;
         "required"?: boolean;
@@ -935,8 +949,12 @@ declare namespace LocalJSX {
     interface IonxTestVirtualScroll {
     }
     interface IonxToggleLabels {
+        "disabled"?: boolean;
         "off"?: string;
         "on"?: string;
+        "onIonChange"?: (event: CustomEvent<{value: boolean}>) => void;
+        "readonly"?: boolean;
+        "value"?: boolean;
     }
     interface IonxToolbar {
         "button": ToolbarButtonType;
@@ -961,6 +979,7 @@ declare namespace LocalJSX {
         "ionx-dialog-content": IonxDialogContent;
         "ionx-dialog-headers": IonxDialogHeaders;
         "ionx-dialog-message": IonxDialogMessage;
+        "ionx-dragula-styles": IonxDragulaStyles;
         "ionx-expanding-searchbar": IonxExpandingSearchbar;
         "ionx-expanding-searchbar-parent": IonxExpandingSearchbarParent;
         "ionx-form-controller": IonxFormController;
@@ -1011,6 +1030,7 @@ declare module "@stencil/core" {
             "ionx-dialog-content": LocalJSX.IonxDialogContent & JSXBase.HTMLAttributes<HTMLIonxDialogContentElement>;
             "ionx-dialog-headers": LocalJSX.IonxDialogHeaders & JSXBase.HTMLAttributes<HTMLIonxDialogHeadersElement>;
             "ionx-dialog-message": LocalJSX.IonxDialogMessage & JSXBase.HTMLAttributes<HTMLIonxDialogMessageElement>;
+            "ionx-dragula-styles": LocalJSX.IonxDragulaStyles & JSXBase.HTMLAttributes<HTMLIonxDragulaStylesElement>;
             "ionx-expanding-searchbar": LocalJSX.IonxExpandingSearchbar & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarElement>;
             "ionx-expanding-searchbar-parent": LocalJSX.IonxExpandingSearchbarParent & JSXBase.HTMLAttributes<HTMLIonxExpandingSearchbarParentElement>;
             "ionx-form-controller": LocalJSX.IonxFormController & JSXBase.HTMLAttributes<HTMLIonxFormControllerElement>;

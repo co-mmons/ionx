@@ -6,11 +6,11 @@ import {findParentNodeOfType} from "prosemirror-utils";
 import {schema} from "./prosemirror/schema";
 
 @Component({
-    tag: "ionx-html-editor-heading-menu",
-    styleUrl: "HeadingMenu.scss",
+    tag: "ionx-html-editor-paragraph-menu",
+    styleUrl: "ParagraphMenu.scss",
     shadow: true
 })
-export class HeadingMenu {
+export class ParagraphMenu {
 
     @Prop()
     editor!: HTMLIonxHtmlEditorElement;

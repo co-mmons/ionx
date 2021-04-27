@@ -15,12 +15,16 @@ export class FontSize extends Enum {
         return super.fromJSON(value) as FontSize;
     }
 
-    static readonly small = new FontSize("small");
-    static readonly large = new FontSize("large");
+    static readonly xxSmall = new FontSize("xxSmall", "xx-small");
+    static readonly xSmall = new FontSize("xSmall", "x-small");
+    static readonly small = new FontSize("small", "small");
+    static readonly large = new FontSize("large", "large");
+    static readonly xLarge = new FontSize("xLarge", "x-large");
+    static readonly xxLarge = new FontSize("xxLarge", "xx-large");
 
-    private constructor(public readonly name: EnumValueName<typeof FontSize>) {
+    private constructor(public readonly name: EnumValueName<typeof FontSize>, public readonly css: string) {
         super(name);
-        this.label = new MessageRef("ionx/HtmlEditor", "textMenu/fontSize/" + name.toUpperCase()[0] + name.substring(1));
+        this.label = new MessageRef("ionx/HtmlEditor", `textMenu/fontSize/${name}`);
     }
 
     readonly label: MessageRef;

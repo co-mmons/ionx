@@ -1,0 +1,16 @@
+{
+    "name": "ionx/forms/TooltipErrorPresenter",
+    "scripts": {
+        "build": "stencil build --ts --config stencil.config.build.ts",
+        "start": "stencil build --dev --watch --serve --config stencil.config.test.ts"
+    },
+    "peerDependencies": {
+        "rxjs": "^6.6.7",
+        "tippy.js": "^6.3.1"
+    },
+    "devDependencies": {
+        "rxjs": "^6.6.7",
+        "tippy.js": "^6.3.1"
+    },
+    "types": "../../../dist/forms/TooltipErrorPresenter/index.d.ts"
+}

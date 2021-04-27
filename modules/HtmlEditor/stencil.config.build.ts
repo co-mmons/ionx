@@ -10,6 +10,8 @@ export const config: Config = {
         {type: "docs-readme"},
         {
             type: "dist-custom-elements-bundle",
+            defineFunctionName: "defineIonxHtmlEditor",
+            includeGlobalScripts: false,
             dir: "../../dist/HtmlEditor",
             external: [/@ionic\/.*/, "ionicons", /@co.mmons\/.*/, /@stencil\/.*/, /ionx\/(?!modules\/HtmlEditor)/],
             empty: true

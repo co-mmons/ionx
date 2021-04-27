@@ -1,0 +1,12 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    background: var(--dialog--background-color, #ffffff);
+    color: var(--dialog--foreground-color);
+    max-height: 90vh;
+}
+
+::slotted([slot=message]) {
+    margin: 16px 16px 24px 16px;
+}
+
