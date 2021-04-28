@@ -1,0 +1,27 @@
+:host {
+
+    /**
+     * @prop --loading-backdrop-color: RGB color for backdrop. By default --ion-background-color-rgb is used.
+     * @prop --loading-backdrop-opacity: numeric value, from 0 to 1. By default 0.8.
+     */
+
+    display: flex;
+    align-items: center;
+    --loading-backdrop-opacity: 0.8;
+
+    &[cover] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        align-content: center;
+        justify-items: center;
+        justify-content: center;
+        top: 0px;
+        left: 0px;
+    }
+
+    &.ionx--backdrop-visible {
+        background-color: rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity));
+    }
+}

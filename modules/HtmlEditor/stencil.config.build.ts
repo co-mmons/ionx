@@ -1,5 +1,6 @@
 import {Config} from "@stencil/core";
 import {sass} from "@stencil/sass";
+import {defaultExternals} from "../defaultExternals";
 import {intlMessagesLoaderGeneratorPlugin} from "../intlMessagesLoaderGeneratorPlugin";
 
 export const config: Config = {
@@ -13,7 +14,7 @@ export const config: Config = {
             defineFunctionName: "defineIonxHtmlEditor",
             includeGlobalScripts: false,
             dir: "../../dist/HtmlEditor",
-            external: [/@ionic\/.*/, "ionicons", /@co.mmons\/.*/, /@stencil\/.*/, /ionx\/(?!modules\/HtmlEditor)/],
+            external: [...defaultExternals, /ionx\/(?!modules\/HtmlEditor)/],
             empty: true
         }
     ]

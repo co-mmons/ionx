@@ -14,10 +14,7 @@ export const config: Config = {
             defineFunctionName: "defineIonxLinkEditor",
             dir: "../../dist/LinkEditor",
             includeGlobalScripts: false,
-            external: [
-                ...defaultExternals,
-                /ionx\/(?!modules\/LinkEditor)/
-            ],
+            external: [...defaultExternals, /ionx\/(?!modules\/LinkEditor)/],
             empty: true
         }
     ]

@@ -7,16 +7,30 @@ const path = require("path");
 const modules = [
     "utils",
 
+    "Dialog",
+    "Select",
     "Popover",
     "Block",
     "Card",
     "DateTime",
+    "Dragula",
+    "ExpandingSearchbar",
+    "Input",
+    "InputGroup",
+    "LazyLoad",
+    "Loading",
+    "LoadingSkeleton",
+    "MasonryGrid",
+    "Router",
+    "Searchbar",
+    "styles",
+    "Svg",
+    "TagsInput",
+    "Textarea",
 
     "forms",
     "forms/TooltipErrorPresenter",
 
-    "Dialog",
-    "Select",
     "LinkEditor",
     "HtmlEditor",
 ];

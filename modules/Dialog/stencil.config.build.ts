@@ -1,5 +1,6 @@
 import {Config} from "@stencil/core";
 import {sass} from "@stencil/sass";
+import {defaultExternals} from "../defaultExternals";
 
 export const config: Config = {
     namespace: "ionx",
@@ -10,14 +11,11 @@ export const config: Config = {
         {
             type: "dist-custom-elements-bundle",
             dir: "../../dist/Dialog",
+            includeGlobalScripts: false,
             defineFunctionName: "defineIonxDialog",
             external: [
-                "ionicons",
-                /@co.mmons\/.*/,
-                /@ionic\/.*/,
-                /@stencil\/.*/,
-                /ionx\/(?!modules\/Dialog)/,
-                /rxjs/
+                ...defaultExternals,
+                /ionx\/(?!modules\/Dialog)/
             ],
             empty: true
         }

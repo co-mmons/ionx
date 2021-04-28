@@ -1,5 +1,6 @@
 import {Config} from "@stencil/core";
 import {sass} from "@stencil/sass";
+import {defaultExternals} from "../defaultExternals";
 
 export const config: Config = {
     namespace: "ionx",
@@ -12,16 +13,7 @@ export const config: Config = {
             dir: "../../dist/Select",
             defineFunctionName: "defineIonxSelect",
             includeGlobalScripts: false,
-            external: [
-                "dragula",
-                "fast-equals",
-                "ionicons",
-                /@capacitor\/.*/,
-                /@co.mmons\/.*/,
-                /@ionic\/.*/,
-                /@stencil\/.*/,
-                /ionx\/(?!modules\/Select)/
-            ],
+            external: ["dragula", ...defaultExternals, /ionx\/(?!modules\/Select)/],
             empty: true
         }
     ]

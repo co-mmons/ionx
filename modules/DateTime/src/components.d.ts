@@ -20,6 +20,7 @@ export namespace Components {
         "disabled": boolean;
         "formatOptions": Intl.DateTimeFormatOptions;
         "open": (event?: any) => Promise<void>;
+        "placeholder": string;
         "readonly": boolean;
         "setBlur": () => Promise<void>;
         "setFocus": (options?: FocusOptions) => Promise<void>;
@@ -28,7 +29,6 @@ export namespace Components {
          */
         "timeZoneDisabled": boolean;
         "value": TimeZoneDate;
-        "w": any;
     }
     interface IonxDateTimeOverlay {
         "dateOnly": boolean;
@@ -72,13 +72,13 @@ declare namespace LocalJSX {
           * Emitted when the styles change.
          */
         "onIonStyle"?: (event: CustomEvent<StyleEventDetail>) => void;
+        "placeholder"?: string;
         "readonly"?: boolean;
         /**
           * Whether timezone cannot be changed.
          */
         "timeZoneDisabled"?: boolean;
         "value"?: TimeZoneDate;
-        "w"?: any;
     }
     interface IonxDateTimeOverlay {
         "dateOnly"?: boolean;

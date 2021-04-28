@@ -15,7 +15,7 @@ export class DateTimeInput   {
     @Element()
     element: HTMLElement;
 
-    @Prop()w
+    @Prop()
     placeholder: string;
 
     @Prop()

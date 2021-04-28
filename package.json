@@ -7,16 +7,9 @@
         "src/"
     ],
     "scripts": {
+        "install": "node-utils-npm-install-dist",
         "build": "node-utils-file-system-glob-delete dist/**/* && npx ts-node build.ts",
-        "build:module": "npx ts-node build.ts",
-        "start": "stencil build --dev --watch --serve",
-        "serve": "stencil serve --root www",
-        "test": "stencil test --spec --e2e",
-        "test.watch": "stencil test --spec --e2e --watchAll",
-        "intl:DateTime": "js-intl-google-sheet-importer --output-path src/components/DateTime/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionic-extensions-datetime",
-        "intl:LinkEditor": "js-intl-google-sheet-importer --output-path src/components/LinkEditor/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionx/LinkEditor",
-        "intl:forms": "js-intl-google-sheet-importer --output-path src/components/forms/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionx/forms",
-        "generate": "stencil generate"
+        "build:module": "npx ts-node build.ts"
     },
     "dependencies": {
         "@capacitor/core": "^2.4.1",

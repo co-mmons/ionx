@@ -1,0 +1,25 @@
+:host {
+    display: block;
+    position: relative;
+
+    [ionx--grid-items] {
+        display: block;
+        position: relative;
+    }
+
+    &.ionx--block {
+        [ionx--grid-items] {
+            height: auto !important;
+        }
+    }
+}
+
+:host(:not(.ionx--block)) [ionx--grid-items]::slotted(*) {
+    position: absolute;
+    display: none;
+}
+
+:host(.ionx--block) [ionx--grid-items]::slotted(*) {
+    left: unset;
+    top: unset;
+}

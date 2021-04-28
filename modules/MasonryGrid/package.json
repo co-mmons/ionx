@@ -1,0 +1,9 @@
+{
+    "name": "ionx/MasonryGrid",
+    "scripts": {
+        "build": "stencil build --ts --config stencil.config.build.ts",
+        "start": "stencil build --dev --watch --serve --config stencil.config.test.ts",
+        "intl": "js-intl-google-sheet-importer --output-path src/intl --output-type json --document 1lTpcwU0ubFX7bJFCt8zeHYrwbDaoxNcjzpjUVdmiY_w --worksheet 1 --filterTags ionx/MasonryGrid"
+    },
+    "types": "../../dist/MasonryGrid/index.d.ts"
+}

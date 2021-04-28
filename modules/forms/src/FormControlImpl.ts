@@ -8,6 +8,7 @@ import {FormControlElement} from "./FormControlElement";
 import {FormControlReadonlyState, FormControlState} from "./FormControlState";
 import {FormControlReadonlyStatus} from "./FormControlStatus";
 import {FormValidator} from "./FormValidator";
+import {loadIntlMessages} from "./intl/loadIntlMessages";
 
 interface ApplyState<Value = any> {
     touched?: boolean;
@@ -250,6 +251,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     }
 
     async validateImpl(options: {trigger: "valueChange" | "validate"}): Promise<boolean> {
+
+        await loadIntlMessages();
 
         this.validated$ = true;
 

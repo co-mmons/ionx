@@ -1,7 +1,7 @@
 {
     "name": "ionx/Block",
     "scripts": {
-        "build": "stencil build"
+        "build": "stencil build --ts --config stencil.config.build.ts"
     },
     "types": "../../dist/Block/index.d.ts"
 }

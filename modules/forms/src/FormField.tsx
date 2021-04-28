@@ -1,14 +1,15 @@
 import {intl, MessageRef} from "@co.mmons/js-intl";
-import {Component, h, Host, Prop, State, Watch} from "@stencil/core";
+import {Component, ComponentInterface, h, Host, Prop, State, Watch} from "@stencil/core";
 import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
+import {loadIntlMessages} from "./intl/loadIntlMessages";
 
 @Component({
     tag: "ionx-form-field",
     scoped: true,
     styleUrl: "FormField.scss"
 })
-export class FormField {
+export class FormField implements ComponentInterface {
 
     @Prop()
     label?: string;
@@ -45,6 +46,10 @@ export class FormField {
         } else {
             this.errorMessage = undefined;
         }
+    }
+
+    async componentWillLoad() {
+        await loadIntlMessages();
     }
 
     render() {

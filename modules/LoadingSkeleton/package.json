@@ -1,0 +1,6 @@
+{
+    "name": "ionx/LoadingSkeleton",
+    "scripts": {
+        "build": "node-utils-file-system-copy-directory src ../../dist/LoadingSkeleton"
+    }
+}

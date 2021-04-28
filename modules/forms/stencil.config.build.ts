@@ -1,5 +1,6 @@
 import {Config} from "@stencil/core";
 import {sass} from "@stencil/sass";
+import {defaultExternals} from "../defaultExternals";
 import {intlMessagesLoaderGeneratorPlugin} from "../intlMessagesLoaderGeneratorPlugin";
 
 export const config: Config = {
@@ -14,14 +15,8 @@ export const config: Config = {
             defineFunctionName: "defineIonxForms",
             includeGlobalScripts: false,
             external: [
-                "fast-equals",
-                "ionicons",
-                "rxjs",
                 "scroll-into-view",
-                "ts-error",
-                /@co.mmons\/.*/,
-                /@ionic\/.*/,
-                /@stencil\/.*/,
+                ...defaultExternals,
                 /ionx\/(?!modules\/forms)/
             ],
             empty: true

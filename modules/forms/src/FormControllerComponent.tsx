@@ -2,6 +2,7 @@ import {Component, ComponentInterface, h, Host, Method, Prop} from "@stencil/cor
 import {FormControlAttachOptions} from "./FormControlAttachOptions";
 import {FormController} from "./FormController";
 import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormControllerPublicApi";
+import {loadIntlMessages} from "./intl/loadIntlMessages";
 
 @Component({
     tag: "ionx-form-controller"
@@ -27,6 +28,10 @@ export class FormControllerComponent implements ComponentInterface, FormControll
     @Method()
     validate(options?: FormControllerValidateOptions) {
         return this.controller.validate(options);
+    }
+
+    async componentWillLoad() {
+        await loadIntlMessages();
     }
 
     render() {

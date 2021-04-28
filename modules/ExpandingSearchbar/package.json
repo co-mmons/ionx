@@ -1,0 +1,8 @@
+{
+    "name": "ionx/ExpandingSearchbar",
+    "scripts": {
+        "build": "stencil build --ts --config stencil.config.build.ts",
+        "start": "stencil build --dev --watch --serve --config stencil.config.test.ts"
+    },
+    "types": "../../dist/ExpandingSearchbar/index.d.ts"
+}

@@ -16,3 +16,4 @@ export {requiredTrue} from "./validators/requiredTrue";
 export {minLength} from "./validators/minLength";
 export {validEmail} from "./validators/validEmail";
 export {matchPattern} from "./validators/matchPattern";
+export {loadIntlMessages as loadIonxFormsIntl} from "./intl/loadIntlMessages";

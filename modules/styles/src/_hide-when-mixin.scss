@@ -1,0 +1,51 @@
+@mixin ionx-hide-when($attr-name) {
+
+    &[#{$attr-name}=">xs"] {
+        @media (min-width: 576px) {
+            display: none;
+        }
+    }
+
+    &[#{$attr-name}=">sm"] {
+        @media (min-width: 768px) {
+            display: none;
+        }
+    }
+
+    &[#{$attr-name}=">md"] {
+        @media (min-width: 992px) {
+            display: none;
+        }
+    }
+
+    &[#{$attr-name}=">lg"] {
+        @media (min-width: 1200px) {
+            display: none;
+        }
+    }
+
+    &[#{$attr-name}="<sm"] {
+        @media (max-width: 575px) {
+            display: none;
+        }
+    }
+
+    &[#{$attr-name}="<md"] {
+        @media (max-width: 767px) {
+            display: none;
+        }
+    }
+
+    &[#{$attr-name}="<lg"] {
+        @media (max-width: 991px) {
+            display: none;
+        }
+    }
+
+    &[#{$attr-name}="<xl"] {
+        @media (max-width: 1199px) {
+            display: none;
+        }
+    }
+
+}

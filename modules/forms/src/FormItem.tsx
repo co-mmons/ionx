@@ -2,6 +2,7 @@ import {intl, MessageRef} from "@co.mmons/js-intl";
 import {Component, h, Host, Prop, State, Watch} from "@stencil/core";
 import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
+import {loadIntlMessages} from "./intl/loadIntlMessages";
 
 @Component({
     tag: "ionx-form-item",
@@ -61,6 +62,10 @@ export class FormItem {
     @Prop()
     partProps: {
         item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>
+    }
+
+    async componentWillLoad() {
+        await loadIntlMessages();
     }
 
     render() {
