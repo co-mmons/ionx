@@ -2,11 +2,8 @@
     "name": "ionx",
     "version": "1.0.0",
     "description": "Components and extensions for Ionic",
-    "sourceDependencyDir": "src/components",
-    "files": [
-        "src/"
-    ],
     "scripts": {
+        "install": "node-utils-npm-install-dist",
         "build": "node-utils-file-system-glob-delete dist/**/* && npx ts-node build.ts",
         "build:module": "npx ts-node build.ts"
     },
@@ -30,23 +27,6 @@
         "ts-error": "^1.0.6",
         "typescript": "^4.1.3"
     },
-    "intlBundleItems": [
-        {
-            "type": "message",
-            "path": "./src/components/forms/intl/{{LOCALE}}.json",
-            "module": "ionx/forms"
-        },
-        {
-            "type": "message",
-            "path": "./src/components/DateTime/intl/{{LOCALE}}.json",
-            "module": "ionx/DateTime"
-        },
-        {
-            "type": "message",
-            "path": "./src/components/LinkEditor/intl/{{LOCALE}}.json",
-            "module": "ionx/LinkEditor"
-        }
-    ],
     "devDependencies": {
         "@co.mmons/js-intl": "github:co-mmons/js-intl"
     }
