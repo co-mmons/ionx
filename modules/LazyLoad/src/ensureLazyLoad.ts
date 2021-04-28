@@ -1,3 +1,4 @@
+import type {Components as ionic} from "@ionic/core";
 import {ExtendedContent} from "./ExtendedContent";
 
 export interface EnsureLazyLoadOptions {
@@ -6,11 +7,11 @@ export interface EnsureLazyLoadOptions {
 
 export function ensureLazyLoad(options?: EnsureLazyLoadOptions);
 
-export function ensureLazyLoad(content: HTMLIonContentElement, options?: EnsureLazyLoadOptions);
+export function ensureLazyLoad(content: HTMLElement & ionic.IonContent, options?: EnsureLazyLoadOptions);
 
-export function ensureLazyLoad(contentOrOptions: HTMLIonContentElement | EnsureLazyLoadOptions, options?: EnsureLazyLoadOptions) {
+export function ensureLazyLoad(contentOrOptions: (HTMLElement & ionic.IonContent) | EnsureLazyLoadOptions, options?: EnsureLazyLoadOptions) {
 
-    const contentElements: Array<HTMLElement & ExtendedContent> | NodeListOf<HTMLElement & ExtendedContent> = contentOrOptions instanceof HTMLElement ? [contentOrOptions] : document.body.querySelectorAll<HTMLIonContentElement>("ion-content");
+    const contentElements: Array<HTMLElement & ExtendedContent> | NodeListOf<HTMLElement & ExtendedContent> = contentOrOptions instanceof HTMLElement ? [contentOrOptions] : document.body.querySelectorAll<HTMLElement & ionic.IonContent>("ion-content");
 
     if (!(contentOrOptions instanceof HTMLElement)) {
         options = contentOrOptions;

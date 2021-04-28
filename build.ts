@@ -7,6 +7,9 @@ const path = require("path");
 const modules = [
     "utils",
 
+    "forms",
+    "forms/TooltipErrorPresenter",
+
     "Dialog",
     "Select",
     "Popover",
@@ -27,9 +30,6 @@ const modules = [
     "Svg",
     "TagsInput",
     "Textarea",
-
-    "forms",
-    "forms/TooltipErrorPresenter",
 
     "LinkEditor",
     "HtmlEditor",

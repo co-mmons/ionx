@@ -1,3 +1,4 @@
+import type {Components as ionic} from "@ionic/core";
 import {Capacitor} from "@capacitor/core";
 import {sleep, waitTill} from "@co.mmons/js-utils/core";
 import {Component, ComponentInterface, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
@@ -42,7 +43,7 @@ export class MasonryGrid implements ComponentInterface {
      */
     queuedLayout: boolean;
 
-    contentElement: HTMLIonContentElement;
+    contentElement: HTMLElement & ionic.IonContent;
 
     parentViewElement: HTMLElement;
 

@@ -1,3 +1,4 @@
+import type {Components as ionic} from "@ionic/core";
 import {Component, Element, h, Host} from "@stencil/core";
 import {ExtendedContent} from "./ExtendedContent";
 import {LazyLoadController} from "./LazyLoadController";
@@ -21,7 +22,7 @@ export class LazyLoad {
 
     initContent() {
 
-        const content = this.element.closest<HTMLIonContentElement & ExtendedContent>("ion-content");
+        const content = this.element.closest<HTMLElement & ionic.IonContent & ExtendedContent>("ion-content");
 
         if (!content) {
             setTimeout(() => this.initContent(), 100);
@@ -36,7 +37,7 @@ export class LazyLoad {
     }
 
     onMutation(_mutations: MutationRecord[]) {
-        const content = this.element.closest<HTMLIonContentElement & ExtendedContent>("ion-content");
+        const content = this.element.closest<HTMLElement & ionic.IonContent & ExtendedContent>("ion-content");
         if (content && content.__ionxLazyLoad) {
             content.__ionxLazyLoad.ensureLoaded();
         }
@@ -46,7 +47,7 @@ export class LazyLoad {
         this.observer.disconnect();
         this.observer = undefined;
 
-        const content = this.element.closest<HTMLIonContentElement & ExtendedContent>("ion-content");
+        const content = this.element.closest<HTMLElement & ionic.IonContent & ExtendedContent>("ion-content");
         if (content && content.__ionxLazyLoad) {
             content.__ionxLazyLoad.disconnectContainer(this.element);
         }

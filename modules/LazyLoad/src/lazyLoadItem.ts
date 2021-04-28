@@ -1,3 +1,4 @@
+import type {Components as ionic} from "@ionic/core";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";
 import {ensureLazyLoad} from "./ensureLazyLoad";
 import {ExtendedItemElement} from "./ExtendedItemElement";
@@ -23,7 +24,7 @@ export function lazyLoadItem<T extends HTMLElement = HTMLElement>(elementOrOptio
         (elementOrOptions as HTMLElement & ExtendedItemElement).__lazyLoadOptions = Object.assign({}, options);
 
         if (wasLoaded) {
-            ensureLazyLoad(elementOrOptions.closest<HTMLIonContentElement>("ion-content"));
+            ensureLazyLoad(elementOrOptions.closest<HTMLElement & ionic.IonContent>("ion-content"));
         }
 
     } else if (arguments.length === 1) {

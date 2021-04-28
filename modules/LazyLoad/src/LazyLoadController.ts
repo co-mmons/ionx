@@ -1,3 +1,4 @@
+import type {Components as ionic} from "@ionic/core";
 import {isHydrated, waitTillHydrated} from "ionx/utils";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";
 import {ExtendedContent} from "./ExtendedContent";
@@ -9,12 +10,12 @@ const srcSupportedTagNames = ["IMG", "VIDEO", "IFRAME"];
 
 export class LazyLoadController {
 
-    constructor(content: HTMLIonContentElement) {
+    constructor(content: HTMLElement & ionic.IonContent) {
         this.content = content;
         this.init();
     }
 
-    private content: HTMLIonContentElement & ExtendedContent;
+    private content: HTMLElement & ionic.IonContent & ExtendedContent;
 
     private intersectionObserver: IntersectionObserver;
 

@@ -10,7 +10,7 @@ import {readRedirects, readRoutes} from "./utils/parser";
 import {chainToPath, generatePath, parsePath, readPath, writePath} from "./utils/path";
 
 @Component({
-    tag: "ion-router"
+    tag: "ionx-router"
 })
 export class Router implements ComponentInterface {
 

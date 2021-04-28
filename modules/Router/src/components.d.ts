@@ -7,7 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AnimationBuilder, RouterDirection, RouterEventDetail } from "@ionic/core";
 export namespace Components {
-    interface IonRouter {
+    interface IonxRouter {
         /**
           * Go back to previous page in the window.history.
          */
@@ -32,18 +32,18 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLIonRouterElement extends Components.IonRouter, HTMLStencilElement {
+    interface HTMLIonxRouterElement extends Components.IonxRouter, HTMLStencilElement {
     }
-    var HTMLIonRouterElement: {
-        prototype: HTMLIonRouterElement;
-        new (): HTMLIonRouterElement;
+    var HTMLIonxRouterElement: {
+        prototype: HTMLIonxRouterElement;
+        new (): HTMLIonxRouterElement;
     };
     interface HTMLElementTagNameMap {
-        "ion-router": HTMLIonRouterElement;
+        "ionx-router": HTMLIonxRouterElement;
     }
 }
 declare namespace LocalJSX {
-    interface IonRouter {
+    interface IonxRouter {
         /**
           * Emitted when the route had changed
          */
@@ -62,14 +62,14 @@ declare namespace LocalJSX {
         "useHash"?: boolean;
     }
     interface IntrinsicElements {
-        "ion-router": IonRouter;
+        "ionx-router": IonxRouter;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "ion-router": LocalJSX.IonRouter & JSXBase.HTMLAttributes<HTMLIonRouterElement>;
+            "ionx-router": LocalJSX.IonxRouter & JSXBase.HTMLAttributes<HTMLIonxRouterElement>;
         }
     }
 }
