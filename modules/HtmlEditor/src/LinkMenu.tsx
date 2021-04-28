@@ -39,30 +39,6 @@ export class LinkMenu {
                             tr.addMark(start, end, schema.mark(schema.marks.link, link));
                         }
                     });
-                    //
-                    // if (selection.empty) {
-                    //
-                    //     tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-                    //
-                    //         if (node.isText) {
-                    //             const {start, end} = findNodeStartEnd(tr.doc, pos);
-                    //             tr.addMark(start, end, schema.mark(schema.marks.link, link));
-                    //         }
-                    //     });
-                    //
-                    // } else {
-                    //
-                    //     // usuwamy poprzedni link
-                    //     tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-                    //
-                    //         if (node.isText) {
-                    //             const {start, end} = findNodeStartEnd(tr.doc, pos);
-                    //             tr.removeMark(start, end, schema.marks.link);
-                    //         }
-                    //     });
-                    //
-                    //     tr.addMark(selection.from, selection.to, schema.mark(schema.marks.link, {link}));
-                    // }
 
                     view.dispatch(tr);
 
@@ -106,23 +82,17 @@ export class LinkMenu {
         this.editor.setFocus();
     }
 
-    connectedCallback() {
-
-        this.editor.getView().then(_view => {
-        });
-    }
-
     render() {
         return <ion-list lines="full">
 
             <ion-item button detail={false} onClick={() => this.edit()}>
                 <ion-icon name="link-outline" slot="start"/>
-                <ion-label>{intl.message`ionx/HtmlEditor#linkMenu/Edit`}</ion-label>
+                <ion-label>{intl.message`@co.mmons/js-intl#Edit|command`}</ion-label>
             </ion-item>
 
             <ion-item button detail={false} onClick={() => this.unlink()}>
                 <ion-icon name="unlink-outline" slot="start"/>
-                <ion-label>{intl.message`ionx/HtmlEditor#linkMenu/Unlink`}</ion-label>
+                <ion-label>{intl.message`@co.mmons/js-intl#Delete|command`}</ion-label>
             </ion-item>
 
         </ion-list>

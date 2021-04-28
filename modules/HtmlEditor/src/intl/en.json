@@ -2,5 +2,12 @@
     "alignmentMenu/center": "Center",
     "alignmentMenu/justify": "Justified",
     "alignmentMenu/left": "Left",
-    "alignmentMenu/right": "Right"
+    "alignmentMenu/right": "Right",
+    "largeFontSizeLabel": "Large",
+    "selectTextToInsertLink": "First, select the text that will activate the link",
+    "smallFontSizeLabel": "Small",
+    "xLargeFontSizeLabel": "Extra large",
+    "xSmallFontSizeLabel": "Extra small",
+    "xxLargeFontSizeLabel": "Extra extra large",
+    "xxSmallFontSizeLabel": "Extra extra small"
 }

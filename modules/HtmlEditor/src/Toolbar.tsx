@@ -158,7 +158,7 @@ export class Toolbar {
                 fill="outline"
                 onClick={ev => this.showMenu(ev, "link")}>
                 <ion-icon name="caret-down" slot="end"/>
-                <span>{intl.message`ionx/HtmlEditor#link/Link`}</span>
+                <span>{intl.message`ionx/LinkEditor#Link`}</span>
             </ion-button>}
 
             <div class="buttons-group">

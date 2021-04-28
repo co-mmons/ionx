@@ -1,5 +1,6 @@
 import {sleep} from "@co.mmons/js-utils/core";
 import {Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Method, Prop, Watch} from "@stencil/core";
+import {loadIonxLinkEditorIntl} from "ionx/LinkEditor";
 import {baseKeymap} from "prosemirror-commands";
 import {gapCursor} from "prosemirror-gapcursor";
 import {history} from "prosemirror-history";
@@ -207,6 +208,7 @@ export class HtmlEditor implements ComponentInterface {
 
     async componentWillLoad() {
         await loadIntlMessages();
+        await loadIonxLinkEditorIntl();
     }
 
     connectedCallback() {

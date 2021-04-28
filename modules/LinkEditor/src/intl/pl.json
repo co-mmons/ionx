@@ -1,10 +1,11 @@
 {
     "blankTargetLabel": "Nowym oknie",
+    "defaultTargetLabel": "Domyślne ustawienia",
     "E-mail address": "Adres e-mail",
     "emailSchemeLabel": "E-mail",
     "InvalidUrlError|message": "Podany adres jest niepoprawny. Pamiętaj, że adres musi być kompletny i zawierać http:// lub https://.",
-    "Link": "Odnośnik",
-    "Link type": "Rodzaj odnośnika",
+    "Link": "Łącze",
+    "Link type": "Rodzaj łącza",
     "Open in|link target": "Otwórz w",
     "otherSchemeLabel": "Inny",
     "Phone number": "Numer telefonu",
@@ -12,7 +13,7 @@
     "selfTargetLabel": "Bieżącym oknie",
     "smsSchemeLabel": "SMS",
     "telSchemeLabel": "Telefon",
-    "Unlink": "Usuń odnośnik",
+    "Unlink": "Usuń łącze",
     "Web page url": "Adres strony www",
     "wwwSchemeLabel": "Strona www"
 }

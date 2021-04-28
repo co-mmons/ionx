@@ -104,26 +104,26 @@ export class TextMenu {
         return <ion-list lines="full">
 
             <ion-item button detail={false} onClick={() => this.toggle("bold")}>
-                <ion-label style={{fontWeight: "bold"}}>{intl.message`ionx/HtmlEditor#textMenu/Bold`}</ion-label>
+                <ion-label style={{fontWeight: "bold"}}>{intl.message`ionx/HtmlEditor#Bold|text`}</ion-label>
                 {this.boldActivated && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>
 
             <ion-item button detail={false} onClick={() => this.toggle("italic")}>
-                <ion-label style={{fontStyle: "italic"}}>{intl.message`ionx/HtmlEditor#textMenu/Italic`}</ion-label>
+                <ion-label style={{fontStyle: "italic"}}>{intl.message`ionx/HtmlEditor#Italic|text`}</ion-label>
                 {this.italicActivated && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>
 
             <ion-item button detail={false} onClick={() => this.toggle("underline")}>
-                <ion-label style={{textDecoration: "underline"}}>{intl.message`ionx/HtmlEditor#textMenu/Underline`}</ion-label>
+                <ion-label style={{textDecoration: "underline"}}>{intl.message`ionx/HtmlEditor#Underline|text`}</ion-label>
                 {this.underlineActivated && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>
 
             <ion-item-divider>
-                <ion-label>{intl.message`ionx/HtmlEditor#textMenu/fontSize/Text size`}</ion-label>
+                <ion-label>{intl.message`ionx/HtmlEditor#Text size`}</ion-label>
             </ion-item-divider>
 
-            {this.activeFontSize && <ion-item button={true} detail={false} onClick={() => this.resetFontSize()}>
-                <ion-label>{intl.message`ionx/HtmlEditor#textMenu/fontSize/Default`}</ion-label>
+            {<ion-item button={true} detail={false} onClick={() => this.resetFontSize()}>
+                <ion-label>{intl.message`ionx/HtmlEditor#Default|text size`}</ion-label>
             </ion-item>}
 
             {FontSize.values().map(size => <ion-item button detail={false} onClick={() => this.toggleFontSize(size)}>

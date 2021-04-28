@@ -24,7 +24,7 @@ export class FontSize extends Enum {
 
     private constructor(public readonly name: EnumValueName<typeof FontSize>, public readonly css: string) {
         super(name);
-        this.label = new MessageRef("ionx/HtmlEditor", `textMenu/fontSize/${name}`);
+        this.label = new MessageRef("ionx/HtmlEditor", `${name}FontSizeLabel`);
     }
 
     readonly label: MessageRef;

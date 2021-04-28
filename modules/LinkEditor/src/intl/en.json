@@ -1,5 +1,6 @@
 {
     "blankTargetLabel": "New window",
+    "defaultTargetLabel": "Default settings",
     "emailSchemeLabel": "E-mail",
     "InvalidUrlError|message": "Provided url is incorrect. Remember that url must be complete and contain http:// or https://.",
     "otherSchemeLabel": "Other",
