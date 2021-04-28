@@ -29,6 +29,8 @@ const modules = [
     "styles",
     "Svg",
     "TagsInput",
+    "ToggleLabels",
+    "Toolbar",
     "Textarea",
 
     "LinkEditor",
