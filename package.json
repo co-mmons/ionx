@@ -7,7 +7,6 @@
         "src/"
     ],
     "scripts": {
-        "install": "node-utils-npm-install-dist",
         "build": "node-utils-file-system-glob-delete dist/**/* && npx ts-node build.ts",
         "build:module": "npx ts-node build.ts"
     },
