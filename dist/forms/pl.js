@@ -1,0 +1,7 @@
+const pl = {
+	"InvalidValueError|message": "Wartość jest nieprawidłowa.",
+	"MinLengthError|message": "{length, plural, =0 {Wartość ma za mało znaków.} =1 {Wartość musi mieć co najmniej jeden znak.} few {Wartość musi zawierać co najmniej # znaki.} other {Wartość musi zawierać co najmniej # znaków.}}",
+	"RequiredError|message": "Wartość jest wymagana."
+};
+
+export default pl;

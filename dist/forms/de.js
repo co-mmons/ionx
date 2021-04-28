@@ -1,0 +1,7 @@
+const de = {
+	"InvalidValueError|message": "Der Wert ist ungültig.",
+	"MinLengthError|message": "{length, plural, =0 {Der Wert hat zu wenige Zeichen.} =1 {Der Wert muss mindestens ein Zeichen haben.} other {Der Wert muss mindestens # Zeichen enthalten.}}",
+	"RequiredError|message": "Der Wert ist erforderlich."
+};
+
+export default de;

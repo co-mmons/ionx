@@ -1,0 +1,13 @@
+ion-searchbar[ionx-searchbar-flat], .ionx-searchbar-flat {
+    background: transparent;
+    color: var(--ion-toolbar-color);
+    --icon-color: var(--ion-toolbar-color);
+    --clear-button-color: var(--ion-toolbar-color);
+
+    input.searchbar-input {
+        background-color: transparent;
+        box-shadow: none;
+        border-radius: 0px;
+        border: none;
+    }
+}

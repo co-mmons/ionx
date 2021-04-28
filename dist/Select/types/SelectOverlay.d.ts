@@ -1,0 +1,31 @@
+import { ComponentInterface } from "@stencil/core";
+import { SelectOption } from "./SelectOption";
+import { ValueComparator } from "./ValueComparator";
+export declare class SelectOverlay implements ComponentInterface {
+  element: HTMLElement;
+  overlay: "modal" | "popover";
+  overlayTitle: string;
+  orderable: boolean;
+  searchTest: (query: string, value: any, label: string) => boolean;
+  options: SelectOption[];
+  visibleOptions: SelectOption[];
+  multiple: boolean;
+  values: any[];
+  empty: boolean;
+  comparator: ValueComparator;
+  checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+  labelFormatter?: (value: any) => string;
+  virtualItemHeight: number;
+  useVirtualScroll: boolean;
+  didEnter: boolean;
+  search(ev: CustomEvent): Promise<void>;
+  onDidEnter(): Promise<void>;
+  scrollToIndex(index: number): Promise<void>;
+  onClick(ev: MouseEvent, option: SelectOption): void;
+  onCheck(option: SelectOption, checked: boolean): void;
+  cancel(): void;
+  ok(): void;
+  connectedCallback(): void;
+  renderItem(option: SelectOption, index: number): any;
+  render(): any;
+}

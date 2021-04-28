@@ -1,0 +1,9 @@
+@mixin ionx-popover-context-menu-list {
+    margin: 0;
+    padding: 0;
+
+    & > ion-item.item:last-child, & > *:last-child > ion-item.item:last-child {
+        --border-width: 0;
+        --inner-border-width: 0;
+    }
+}
