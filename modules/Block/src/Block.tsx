@@ -1,6 +1,6 @@
 import {Component, h, Host, Prop} from "@stencil/core";
-import {BlockWidthsMap} from "./BlockWidthsMap";
 import {BlockWidth} from "./BlockWidth";
+import {BlockWidthsMap} from "./BlockWidthsMap";
 
 @Component({
     tag: "ionx-block",

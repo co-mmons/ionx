@@ -1,5 +1,5 @@
 import {intl} from "@co.mmons/js-intl";
-import {Component, ComponentInterface, h, Method, Prop} from "@stencil/core";
+import {Component, ComponentInterface, h, Host, Method, Prop} from "@stencil/core";
 import {defineIonxForms, FormControl, FormController, required} from "ionx/forms";
 import {defineIonxFormsTooltipErrorPresenter} from "ionx/forms/TooltipErrorPresenter";
 import {defineIonxSelect, SelectOption} from "ionx/Select";
@@ -120,37 +120,40 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
         const ValueComponent: any = this.data.controls.scheme.value?.valueComponent;
         const targets = scheme?.valueTargets?.(this.data.controls.value.value);
 
-        return <ionx-form-controller controller={this.data}>
+        return <Host>
 
-            <ionx-form-tooltip-error-presenter/>
+            <ionx-form-controller controller={this.data}>
 
-            <ionx-form-field label={intl.message`ionx/LinkEditor#Link type`}>
-                <ionx-select
-                    ref={this.data.controls.scheme.attach()}
-                    empty={false}
-                    placeholder={intl.message`ionx/LinkEditor#Choose...`}
-                    options={schemes}/>
-            </ionx-form-field>
+                <ionx-form-tooltip-error-presenter/>
 
-            {ValueComponent && <ionx-form-field
-                label={scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message`ionx/LinkEditor#Link`}>
+                <ionx-form-field label={intl.message`ionx/LinkEditor#Link type`}>
+                    <ionx-select
+                        ref={this.data.controls.scheme.attach()}
+                        empty={false}
+                        placeholder={intl.message`ionx/LinkEditor#Choose...`}
+                        options={schemes}/>
+                </ionx-form-field>
 
-                <ValueComponent
-                    {...scheme.valueComponentProps}
-                    ref={this.data.controls.value.attach()}/>
+                {ValueComponent && <ionx-form-field
+                    label={scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message`ionx/LinkEditor#Link`}>
 
-                {scheme.valueHint && <span slot="hint">{intl.message(scheme.valueHint)}</span>}
+                    <ValueComponent
+                        {...scheme.valueComponentProps}
+                        ref={this.data.controls.value.attach()}/>
 
-            </ionx-form-field>}
+                    {scheme.valueHint && <span slot="hint">{intl.message(scheme.valueHint)}</span>}
 
-            {this.targetVisible !== false && targets?.length > 0 && <ionx-form-field
-                label={intl.message`ionx/LinkEditor#Open in|link target`}>
-                <ionx-select
-                    ref={this.data.controls.target.attach()}
-                    placeholder={intl.message`ionx/LinkEditor#defaultTargetLabel`}
-                    options={targets.map(target => ({value: target, label: intl.message(target.label)}))}/>
-            </ionx-form-field>}
+                </ionx-form-field>}
 
-        </ionx-form-controller>;
+                {this.targetVisible !== false && targets?.length > 0 && <ionx-form-field
+                    label={intl.message`ionx/LinkEditor#Open in|link target`}>
+                    <ionx-select
+                        ref={this.data.controls.target.attach()}
+                        placeholder={intl.message`ionx/LinkEditor#defaultTargetLabel`}
+                        options={targets.map(target => ({value: target, label: intl.message(target.label)}))}/>
+                </ionx-form-field>}
+
+            </ionx-form-controller>
+        </Host>;
     }
 }
