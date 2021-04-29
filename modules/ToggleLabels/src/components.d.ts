@@ -17,8 +17,6 @@ export namespace Components {
         "readonly": boolean;
         "value": boolean;
     }
-    interface IonxToggleLabelsTest {
-    }
 }
 declare global {
     interface HTMLIonxToggleLabelsElement extends Components.IonxToggleLabels, HTMLStencilElement {
@@ -27,15 +25,8 @@ declare global {
         prototype: HTMLIonxToggleLabelsElement;
         new (): HTMLIonxToggleLabelsElement;
     };
-    interface HTMLIonxToggleLabelsTestElement extends Components.IonxToggleLabelsTest, HTMLStencilElement {
-    }
-    var HTMLIonxToggleLabelsTestElement: {
-        prototype: HTMLIonxToggleLabelsTestElement;
-        new (): HTMLIonxToggleLabelsTestElement;
-    };
     interface HTMLElementTagNameMap {
         "ionx-toggle-labels": HTMLIonxToggleLabelsElement;
-        "ionx-toggle-labels-test": HTMLIonxToggleLabelsTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -51,11 +42,8 @@ declare namespace LocalJSX {
         "readonly"?: boolean;
         "value"?: boolean;
     }
-    interface IonxToggleLabelsTest {
-    }
     interface IntrinsicElements {
         "ionx-toggle-labels": IonxToggleLabels;
-        "ionx-toggle-labels-test": IonxToggleLabelsTest;
     }
 }
 export { LocalJSX as JSX };
@@ -63,7 +51,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ionx-toggle-labels": LocalJSX.IonxToggleLabels & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsElement>;
-            "ionx-toggle-labels-test": LocalJSX.IonxToggleLabelsTest & JSXBase.HTMLAttributes<HTMLIonxToggleLabelsTestElement>;
         }
     }
 }
