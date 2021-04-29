@@ -37,7 +37,7 @@ const ToggleLabels = class extends HTMLElement {
     this.initialToggleState = { checked: this.value, disabled: this.readonly || this.disabled };
   }
   render() {
-    return h(Host, { class: { "ionx--interactive": !this.disabled && !this.readonly, "ionx--readonly": this.readonly } }, this.readonly && h("span", null, this.value ? this.on : this.off), h("span", { class: "ionx--off", onClick: () => this.switchToggle("off") }, this.off && h("span", null, this.off), h("slot", { name: "off" })), h("slot", null, h("ion-toggle", Object.assign({ class: "ionx--default-toggle" }, this.initialToggleState))), h("span", { class: "ionx--on", onClick: () => this.switchToggle("on") }, this.on && h("span", null, this.on), h("slot", { name: "on" })));
+    return h(Host, { class: { "ionx--interactive": !this.disabled && !this.readonly, "ionx--readonly": this.readonly } }, this.readonly && h("span", null, this.value ? this.on : this.off), h("span", { class: "ionx--off", onClick: () => this.switchToggle("off") }, this.off && h("span", null, this.off), h("slot", { name: "off" })), this.defaultToggle && h("ion-toggle", Object.assign({ class: "ionx--default-toggle" }, this.initialToggleState)), h("slot", null), h("span", { class: "ionx--on", onClick: () => this.switchToggle("on") }, this.on && h("span", null, this.on), h("slot", { name: "on" })));
   }
   get element() { return this; }
   static get watchers() { return {
@@ -48,7 +48,7 @@ const ToggleLabels = class extends HTMLElement {
   static get style() { return toggleLabelsCss; }
 };
 
-const IonxToggleLabels = /*@__PURE__*/proxyCustomElement(ToggleLabels, [6,"ionx-toggle-labels",{"on":[1],"off":[1],"readonly":[4],"disabled":[4],"value":[1028]},[[0,"ionChange","toggleChanged"]]]);
+const IonxToggleLabels = /*@__PURE__*/proxyCustomElement(ToggleLabels, [6,"ionx-toggle-labels",{"on":[1],"off":[1],"defaultToggle":[4,"default-toggle"],"readonly":[4],"disabled":[4],"value":[1028]},[[0,"ionChange","toggleChanged"]]]);
 const defineIonxToggleLabels = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

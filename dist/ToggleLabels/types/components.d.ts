@@ -7,6 +7,10 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface IonxToggleLabels {
+        /**
+          * If default toggle should be created instead of user-defined.
+         */
+        "defaultToggle": boolean;
         "disabled": boolean;
         "off": string;
         "on": string;
@@ -27,6 +31,10 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxToggleLabels {
+        /**
+          * If default toggle should be created instead of user-defined.
+         */
+        "defaultToggle"?: boolean;
         "disabled"?: boolean;
         "off"?: string;
         "on"?: string;

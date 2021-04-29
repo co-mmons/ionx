@@ -3,6 +3,10 @@ export declare class ToggleLabels {
   element: HTMLElement;
   on: string;
   off: string;
+  /**
+   * If default toggle should be created instead of user-defined.
+   */
+  defaultToggle: boolean;
   readonly: boolean;
   disabled: boolean;
   value: boolean;

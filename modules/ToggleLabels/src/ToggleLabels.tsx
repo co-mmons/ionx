@@ -1,4 +1,5 @@
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Prop, Watch} from "@stencil/core";
+import type {Components as ionic} from "@ionic/core";
 
 @Component({
     tag: "ionx-toggle-labels",
@@ -16,6 +17,12 @@ export class ToggleLabels {
     @Prop()
     off: string;
 
+    /**
+     * If default toggle should be created instead of user-defined.
+     */
+    @Prop()
+    defaultToggle: boolean;
+
     @Prop()
     readonly: boolean;
 
@@ -31,7 +38,7 @@ export class ToggleLabels {
     initialToggleState: {checked: boolean, disabled: boolean};
 
     private get toggle() {
-        return this.element.querySelector<HTMLIonToggleElement>("ion-toggle");
+        return this.element.querySelector<HTMLElement & ionic.IonToggle>("ion-toggle");
     }
 
     switchToggle(state: "on" | "off") {
@@ -79,9 +86,9 @@ export class ToggleLabels {
                 <slot name="off"/>
             </span>
 
-            <slot>
-                <ion-toggle class="ionx--default-toggle" {...this.initialToggleState}/>
-            </slot>
+            {this.defaultToggle && <ion-toggle class="ionx--default-toggle" {...this.initialToggleState}/>}
+
+            <slot/>
 
             <span class="ionx--on" onClick={() => this.switchToggle("on")}>
                 {this.on && <span>{this.on}</span>}
