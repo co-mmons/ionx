@@ -89,7 +89,7 @@ export class Toolbar {
     async editorSelectionChanged() {
 
         const view = await this.editor.getView();
-        if (!view.state) {
+        if (!view) {
             return;
         }
 

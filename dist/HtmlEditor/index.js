@@ -19671,7 +19671,7 @@ const Toolbar = class extends HTMLElement {
   }
   async editorSelectionChanged() {
     const view = await this.editor.getView();
-    if (!view.state) {
+    if (!view) {
       return;
     }
     this.canUndo = undoDepth(view.state) > 0;
