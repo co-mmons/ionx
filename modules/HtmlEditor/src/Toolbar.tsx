@@ -89,6 +89,9 @@ export class Toolbar {
     async editorSelectionChanged() {
 
         const view = await this.editor.getView();
+        if (!view.state) {
+            return;
+        }
 
         this.canUndo = undoDepth(view.state) > 0;
         this.canRedo = redoDepth(view.state) > 0;
