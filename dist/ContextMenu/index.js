@@ -25,7 +25,7 @@ const ContextMenu = class extends HTMLElement {
     }
   }
   render() {
-    return h("ion-list", null, this.items.map(item => h("ion-item", { button: true, detail: false, onClick: () => this.itemClicked(item) }, h("ion-icon", { name: item.iconName, src: item.iconSrc, slot: "start" }), h("ion-label", null, item.label))));
+    return h("ion-list", null, this.items.map(item => h("ion-item", { button: true, detail: false, onClick: () => this.itemClicked(item) }, (item.iconSrc || item.iconName) && h("ion-icon", { name: item.iconName, src: item.iconSrc, slot: "start" }), h("ion-label", null, item.label))));
   }
   get element() { return this; }
   static get style() { return contextMenuCss; }
