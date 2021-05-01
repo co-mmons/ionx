@@ -1,3 +1,4 @@
+import type {Components as ionic} from "@ionic/core";
 import {waitTill} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten, matchesMediaBreakpoint} from "ionx/utils";
@@ -43,7 +44,7 @@ export class Toolbar {
     toolbarElement: HTMLElement;
 
     get contentElement() {
-        return this.element.closest("ion-header")?.parentElement?.querySelector<HTMLIonContentElement>("ion-content");
+        return this.element.closest("ion-header")?.parentElement?.querySelector<HTMLElement & ionic.IonContent>("ion-content");
     }
 
     unlistenScroll: EventUnlisten;
@@ -82,7 +83,7 @@ export class Toolbar {
 
         if (!this.unlistenScroll) {
 
-            let content: HTMLIonContentElement;
+            let content: HTMLElement & ionic.IonContent;
             try {
                 await waitTill(() => !!(content = this.contentElement), undefined, 10000);
             } catch {

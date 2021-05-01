@@ -760,7 +760,7 @@ class FormValidationError extends ExtendableError {
 }
 
 const FormFieldLabelButton = (props, children) => {
-  return h("ion-button", Object.assign({}, props, { size: "small", fill: "clear", slot: "label-button" }), children);
+  return h("ion-button", Object.assign({}, props, { size: "small", fill: "clear", slot: "label-end" }), children);
 };
 
 async function required(control) {
