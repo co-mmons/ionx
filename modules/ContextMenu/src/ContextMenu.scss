@@ -1,0 +1,7 @@
+@import "../Popover/src/context-menu-list";
+
+:host {
+    ion-list {
+        @include ionx-popover-context-menu-list;
+    }
+}

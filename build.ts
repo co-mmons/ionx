@@ -11,6 +11,7 @@ const modules = [
     "forms/TooltipErrorPresenter",
 
     "Dialog",
+    "ContextMenu",
     "Select",
     "Popover",
     "Block",
