@@ -72,6 +72,5 @@ ionx-html-editor > [ionx--prosemirror] > .ProseMirror {
 }
 
 ionx-form-field [slot-container="default"] > ionx-html-editor{
-    margin-left: 16px;
-    margin-right: 16px;
+    margin: 8px 16px;
 }
