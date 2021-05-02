@@ -1,4 +1,3 @@
 import { ContextMenuItem } from "./ContextMenuItem";
-export declare function showContextMenu(target: HTMLElement | Event, items: ContextMenuItem[], options?: {
-  showBackdrop?: boolean;
-}): Promise<void>;
+import { ShowContextMenuOptions } from "./ShowContextMenuOptions";
+export declare function showContextMenu(target: HTMLElement | Event, items: ContextMenuItem[], options?: ShowContextMenuOptions): Promise<void>;

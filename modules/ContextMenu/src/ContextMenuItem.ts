@@ -3,4 +3,5 @@ export interface ContextMenuItem {
     iconName?: string;
     iconSrc?: string;
     handler: () => void;
+    disabled?: boolean;
 }

@@ -26,11 +26,11 @@ ionx-html-editor > [ionx--prosemirror] > .ProseMirror {
     }
 
     p {
-        margin: 16px 0px 0px 0px;
+        margin: 16px 0 0 0;
     }
 
     p:first-child {
-        margin-top: 0px;
+        margin-top: 0;
     }
 
     h1 {
@@ -63,10 +63,15 @@ ionx-html-editor > [ionx--prosemirror] > .ProseMirror {
     }
 
     h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child {
-        margin-top: 0px;
+        margin-top: 0;
     }
 
     ul:first-child {
-        margin-top: 0px;
+        margin-top: 0;
     }
+}
+
+ionx-form-field [slot-container="default"] > ionx-html-editor{
+    margin-left: 16px;
+    margin-right: 16px;
 }
