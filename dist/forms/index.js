@@ -5,7 +5,7 @@ import { forceUpdate, h } from '@stencil/core';
 import { deepEqual } from 'fast-equals';
 import { Subject, BehaviorSubject } from 'rxjs';
 import scrollIntoView from 'scroll-into-view';
-import { addEventListener } from 'ionx/utils';
+import { isHydrated, addEventListener } from 'ionx/utils';
 import { intl, setMessages, MessageRef } from '@co.mmons/js-intl';
 import ExtendableError from 'ts-error';
 
@@ -105,7 +105,7 @@ class FormControlImpl {
   async focus(options) {
     if (!this.element$ && ((options === null || options === void 0 ? void 0 : options.waitForElement) === true || (typeof (options === null || options === void 0 ? void 0 : options.waitForElement) === "number" && options.waitForElement > 0))) {
       try {
-        await waitTill(() => !!this.element$, undefined, typeof options.waitForElement === "number" ? options.waitForElement : 1000);
+        await waitTill(() => !!this.element$ && isHydrated(this.element$), undefined, typeof options.waitForElement === "number" ? options.waitForElement : 1000);
       }
       catch (_a) {
       }

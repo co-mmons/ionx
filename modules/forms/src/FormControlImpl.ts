@@ -2,7 +2,7 @@ import {waitTill} from "@co.mmons/js-utils/core";
 import {deepEqual} from "fast-equals";
 import {Observable, Subject} from "rxjs";
 import scrollIntoView from "scroll-into-view";
-import {addEventListener, EventUnlisten} from "ionx/utils";
+import {addEventListener, EventUnlisten, isHydrated} from "ionx/utils";
 import {FormControl} from "./FormControl";
 import {FormControlElement} from "./FormControlElement";
 import {FormControlReadonlyState, FormControlState} from "./FormControlState";
@@ -84,7 +84,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
         if (!this.element$ && (options?.waitForElement === true || (typeof options?.waitForElement === "number" && options.waitForElement > 0))) {
             try {
-                await waitTill(() => !!this.element$, undefined, typeof options.waitForElement === "number" ? options.waitForElement : 1000);
+                await waitTill(() => !!this.element$ && isHydrated(this.element$),  undefined, typeof options.waitForElement === "number" ? options.waitForElement : 1000);
             } catch {
             }
         }
