@@ -321,6 +321,18 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         if (firstErrorControl) {
 
             if (!options?.preventFocus) {
+
+                if (options?.beforeFocus) {
+                    try {
+                        const res = options.beforeFocus(firstErrorControl);
+                        if (res instanceof Promise) {
+                            await res;
+                        }
+                    } catch (e) {
+                        console.warn(e);
+                    }
+                }
+
                 firstErrorControl.focus({preventScroll: options?.preventScroll});
             }
 

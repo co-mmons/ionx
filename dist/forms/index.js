@@ -625,6 +625,17 @@ class FormController {
     }
     if (firstErrorControl) {
       if (!(options === null || options === void 0 ? void 0 : options.preventFocus)) {
+        if (options === null || options === void 0 ? void 0 : options.beforeFocus) {
+          try {
+            const res = options.beforeFocus(firstErrorControl);
+            if (res instanceof Promise) {
+              await res;
+            }
+          }
+          catch (e) {
+            console.warn(e);
+          }
+        }
         firstErrorControl.focus({ preventScroll: options === null || options === void 0 ? void 0 : options.preventScroll });
       }
       (_a = this.errorPresenter$) === null || _a === void 0 ? void 0 : _a.present(this, firstErrorControl);

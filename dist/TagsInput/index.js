@@ -1,7 +1,7 @@
 import { createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
-const tagsInputCss = ".sc-ionx-tags-input-h{display:block}.sc-ionx-tags-input-h ion-chip.sc-ionx-tags-input{margin-left:0px}.item-label-stacked.sc-ionx-tags-input-h,.item-label-stacked .sc-ionx-tags-input-h{width:100%}";
+const tagsInputCss = ".sc-ionx-tags-input-h{display:block}.sc-ionx-tags-input-h ion-chip.sc-ionx-tags-input{margin-left:0px}.item-label-stacked.sc-ionx-tags-input-h,.item-label-stacked .sc-ionx-tags-input-h{width:100%}ionx-form-field [slot-container=default]>.sc-ionx-tags-input-h{margin-left:16px;margin-right:16px}";
 
 var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, privateMap) {
   if (!privateMap.has(receiver)) {
@@ -57,7 +57,8 @@ const TagsInput = class extends HTMLElement {
     }
   }
   isUnique(tag) {
-    if (this.value.length === 0) {
+    var _a;
+    if (!((_a = this.value) === null || _a === void 0 ? void 0 : _a.length)) {
       return true;
     }
     return !this.value.includes(tag);
@@ -161,7 +162,8 @@ const TagsInput = class extends HTMLElement {
     }
   }
   render() {
-    return h(Host, null, h("div", { class: "ionx-tags-input-wrapper" }, this.value.map((tag, index) => h("ion-chip", { outline: true, class: { "ion-activatable": false } }, h("div", null, tag), !this.hideRemove && !this.readonly && h("ion-icon", { name: "close", class: { "ion-activatable": !this.readonly }, onClick: () => this.removeTag(index) })))), !this.readonly && h("ion-input", { disabled: this.readonly, required: this.required, class: { "ionx-tags-input-input": true }, type: this.type, value: this.currentTag, placeholder: this.placeholder, onKeyUp: ev => this.onKeyUp(ev) }));
+    var _a;
+    return h(Host, null, h("div", { class: "ionx-tags-input-wrapper" }, (_a = this.value) === null || _a === void 0 ? void 0 : _a.map((tag, index) => h("ion-chip", { outline: true, class: { "ion-activatable": false } }, h("div", null, tag), !this.hideRemove && !this.readonly && h("ion-icon", { name: "close", class: { "ion-activatable": !this.readonly }, onClick: () => this.removeTag(index) })))), !this.readonly && h("ion-input", { disabled: this.readonly, required: this.required, class: { "ionx-tags-input-input": true }, type: this.type, value: this.currentTag, placeholder: this.placeholder, onKeyUp: ev => this.onKeyUp(ev) }));
   }
   get element() { return this; }
   static get style() { return tagsInputCss; }

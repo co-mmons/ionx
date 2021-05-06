@@ -26,7 +26,7 @@ const ExpandingSearchbar = class extends HTMLElement {
   applyState() {
     if (this.expanded) {
       this.element.parentElement.setAttribute("ionx-expanding-searchbar-parent", "");
-      setTimeout(() => this.searchbar.querySelector("input").focus(), 50);
+      setTimeout(() => this.searchbar.setFocus(), 50);
     }
     else {
       this.element.parentElement.removeAttribute("ionx-expanding-searchbar-parent");

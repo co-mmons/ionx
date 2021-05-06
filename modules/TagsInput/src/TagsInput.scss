@@ -9,3 +9,8 @@
 :host-context(.item-label-stacked) {
     width: 100%;
 }
+
+ionx-form-field [slot-container="default"] > :host {
+    margin-left: 16px;
+    margin-right: 16px;
+}

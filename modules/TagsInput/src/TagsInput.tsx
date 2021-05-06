@@ -91,7 +91,7 @@ export class TagsInput {
 
     isUnique(tag: string) {
 
-        if (this.value.length === 0) {
+        if (!this.value?.length) {
             return true;
         }
 
@@ -224,7 +224,7 @@ export class TagsInput {
         return <Host>
 
             <div class="ionx-tags-input-wrapper">
-                {this.value.map((tag, index) => <ion-chip outline={true} class={{"ion-activatable": false}}>
+                {this.value?.map((tag, index) => <ion-chip outline={true} class={{"ion-activatable": false}}>
                     <div>{tag}</div>
                     {!this.hideRemove && !this.readonly && <ion-icon
                         name="close"
