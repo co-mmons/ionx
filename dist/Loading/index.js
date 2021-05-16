@@ -144,7 +144,7 @@ async function showLoadingOverlay(options) {
   else {
     const popover = await popoverController.create({
       animated: false,
-      cssClass: "ionx-popover-flex",
+      cssClass: "ionx-loading-popover",
       showBackdrop: typeof (options === null || options === void 0 ? void 0 : options.backdropVisible) === "boolean" ? options.backdropVisible : true,
       backdropDismiss: false,
       keyboardClose: false,
@@ -159,7 +159,7 @@ async function showLoadingOverlay(options) {
   }
 }
 
-const loadingCss = ".sc-ionx-loading-h{display:flex;align-items:center;--loading-backdrop-opacity:0.8}[cover].sc-ionx-loading-h{position:absolute;width:100%;height:100%;align-items:center;align-content:center;justify-items:center;justify-content:center;top:0px;left:0px}.ionx--backdrop-visible.sc-ionx-loading-h{background-color:rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity))}";
+const loadingCss = "ionx-loading{display:flex;align-items:center;--loading-backdrop-opacity:0.8}ionx-loading[cover]{position:absolute;width:100%;height:100%;align-items:center;align-content:center;justify-items:center;justify-content:center;top:0px;left:0px}ionx-loading.ionx--backdrop-visible{background-color:rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity))}.ionx-loading-popover .popover-wrapper{display:flex;align-content:center;justify-content:center;align-items:center;justify-items:center}.ionx-loading-popover .popover-content{position:initial}";
 
 const Loading = class extends HTMLElement {
   constructor() {
@@ -202,7 +202,7 @@ const Loading = class extends HTMLElement {
   static get style() { return loadingCss; }
 };
 
-const IonxLoading = /*@__PURE__*/proxyCustomElement(Loading, [2,"ionx-loading",{"cover":[516],"backdropVisible":[4,"backdrop-visible"],"backdropTheme":[1,"backdrop-theme"],"backdropOpacity":[2,"backdrop-opacity"],"header":[1],"message":[1],"type":[1],"progressMessage":[1,"progress-message"],"progressType":[1,"progress-type"],"progressValue":[2,"progress-value"],"progressBuffer":[2,"progress-buffer"],"progressPercent":[2,"progress-percent"],"color":[1]}]);
+const IonxLoading = /*@__PURE__*/proxyCustomElement(Loading, [0,"ionx-loading",{"cover":[516],"backdropVisible":[4,"backdrop-visible"],"backdropTheme":[1,"backdrop-theme"],"backdropOpacity":[2,"backdrop-opacity"],"header":[1],"message":[1],"type":[1],"progressMessage":[1,"progress-message"],"progressType":[1,"progress-type"],"progressValue":[2,"progress-value"],"progressBuffer":[2,"progress-buffer"],"progressPercent":[2,"progress-percent"],"color":[1]}]);
 const defineIonxLoading = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

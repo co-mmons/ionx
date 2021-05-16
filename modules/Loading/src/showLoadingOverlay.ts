@@ -33,7 +33,7 @@ export async function showLoadingOverlay(options?: LoadingOptions) {
 
         const popover = await popoverController.create({
             animated: false,
-            cssClass: "ionx-popover-flex",
+            cssClass: "ionx-loading-popover",
             showBackdrop: typeof options?.backdropVisible === "boolean" ? options.backdropVisible : true,
             backdropDismiss: false,
             keyboardClose: false,
