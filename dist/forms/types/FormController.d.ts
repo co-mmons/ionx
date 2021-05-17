@@ -51,9 +51,7 @@ export declare class FormController<Controls extends {
     validators?: FormValidator[];
   }): FormControl<any> & FormControl<Controls[string]["value"]>;
   remove(controlName: (keyof Controls) | string): void;
-  attach(el: HTMLElement, name: (keyof Controls) | string, options?: FormControlAttachOptions): void;
   attach(name: (keyof Controls) | string, options?: FormControlAttachOptions): (el: HTMLElement) => void;
-  private attachImpl;
   onStateChange(observer: (event: {
     current: FormState;
     previous: FormState;

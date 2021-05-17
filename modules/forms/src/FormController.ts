@@ -114,37 +114,15 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         }
     }
 
-    attach(el: HTMLElement, name: (keyof Controls) | string, options?: FormControlAttachOptions): void;
+    attach(name: (keyof Controls) | string, options?: FormControlAttachOptions): (el: HTMLElement) => void {
 
-    attach(name: (keyof Controls) | string, options?: FormControlAttachOptions): (el: HTMLElement) => void;
-
-    attach(elOrName: HTMLElement | ((keyof Controls) | string), nameOrOptions?: ((keyof Controls) | string) | FormControlAttachOptions, options?: FormControlAttachOptions) {
-        const form = this;
-
-        if (typeof elOrName === "string") {
-            return (el: HTMLElement) => form.attachImpl(el, elOrName, nameOrOptions as FormControlAttachOptions);
-        } else if (elOrName instanceof HTMLElement) {
-            this.attachImpl(elOrName, nameOrOptions as string, options);
-        }
-    }
-
-    private attachImpl(el: HTMLElement, name: string, options?: FormControlAttachOptions) {
-
-        if (!el) {
-            (this.controls[name] as FormControlImpl)?.detach();
-            return;
-        }
-
-        // @ts-ignore
-        const control = this.controls[name] ? this.controls[name] as FormControlImpl : this.add(name) as FormControlImpl;
-
-        control.attach(el);
+        const control = this.controls[name] ? this.controls[name] as unknown as FormControlImpl : this.add(name as string) as FormControlImpl;
 
         if (options && "validators" in options) {
             control.setValidators(Array.isArray(options.validators) ? options.validators : [options.validators]);
         }
-        //
-        // this.fireStateChange();
+
+        return control.attach();
     }
 
     onStateChange(observer: (event: {current: FormState, previous: FormState, value: boolean, status: boolean}) => void): Subscription {

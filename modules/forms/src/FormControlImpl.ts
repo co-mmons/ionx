@@ -1,8 +1,8 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import {deepEqual} from "fast-equals";
+import {addEventListener, EventUnlisten, isHydrated} from "ionx/utils";
 import {Observable, Subject} from "rxjs";
 import scrollIntoView from "scroll-into-view";
-import {addEventListener, EventUnlisten, isHydrated} from "ionx/utils";
 import {FormControl} from "./FormControl";
 import {FormControlElement} from "./FormControlElement";
 import {FormControlReadonlyState, FormControlState} from "./FormControlState";
@@ -177,46 +177,49 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         return this.mutableState();
     }
 
-    /**
-     * Potrzebujemy wiedzieć czy ilość wywołan attach z elementem zgadza sie z iloscia wywolan bez elementu.
-     */
-    private attachCount = 0;
+    attach(): (element: HTMLElement) => void {
 
-    attach(): (element: HTMLElement) => void;
+        const internalProp = "__ionxFormControlAttach"
 
-    attach(element: HTMLElement);
+        const control = this;
+        const func = function (el: HTMLElement) {
 
-    attach() {
+            if (!el) {
+                this[internalProp]?.();
 
-        if (arguments.length === 0) {
-            return (element: HTMLElement) => this.attach(element);
-        } else if (arguments[0]) {
-            const element: HTMLElement = arguments[0];
-            this.attachCount++;
+            } else {
 
-            if (this.element$ !== element) {
-
-                if (this.element$) {
-                    this.detach();
+                // already initialized by other ref call
+                if (typeof el[internalProp] === "function") {
+                    el[internalProp]();
+                    delete el[internalProp];
                 }
 
-                console.debug(`[ionx-form-control] attach control ${this.name}`);
+                // detach callback
+                this[internalProp] = el[internalProp] = () => {
 
-                this.element$ = element;
-                this.element$.setAttribute("ionx-form-control", this.name);
+                    if (this[internalProp] === el[internalProp]) {
+                        control.detach();
+                        delete el[internalProp];
+                    }
 
-                this.unlistenOnChange = addEventListener(this.element$, this.element$.formValueChangeEventName || "ionChange", ev => this.onElementChange(ev as CustomEvent));
+                    delete this[internalProp];
+                }
 
-                this.unlistenOnFocus = addEventListener(this.element$, this.element$.formTouchEventName || "ionFocus", () => this.markAsTouched());
+                if (control.element$ !== el) {
 
-                this.applyElementState({value: this.value$, valueChange: true, status: this.status(), statusChange: true});
-            }
-        } else {
-            this.attachCount--;
-            if (this.attachCount === 0) {
-                this.detach();
+                    console.debug(`[ionx-form-control] attach control ${control.name}`);
+
+                    control.element$ = el;
+                    control.element$.setAttribute("ionx-form-control", control.name);
+                    control.unlistenOnChange = addEventListener(control.element$, control.element$.formValueChangeEventName || "ionChange", ev => control.onElementChange(ev as CustomEvent));
+                    control.unlistenOnFocus = addEventListener(control.element$, control.element$.formTouchEventName || "ionFocus", () => control.markAsTouched());
+                    control.applyElementState({value: control.value$, valueChange: true, status: control.status(), statusChange: true});
+                }
             }
         }
+
+        return func.bind(func);
     }
 
 

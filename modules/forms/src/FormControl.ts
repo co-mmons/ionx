@@ -50,8 +50,6 @@ export interface FormControl<Value = any> {
 
     attach(): (element: HTMLElement) => void;
 
-    attach(element: HTMLElement);
-
     validate(): Promise<boolean>;
 
     setValidators(validators: FormValidator | FormValidator[]);

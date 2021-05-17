@@ -4,8 +4,8 @@ import { waitTill } from '@co.mmons/js-utils/core';
 import { forceUpdate, h } from '@stencil/core';
 import { deepEqual } from 'fast-equals';
 import { Subject, BehaviorSubject } from 'rxjs';
-import scrollIntoView from 'scroll-into-view';
 import { isHydrated, addEventListener } from 'ionx/utils';
+import scrollIntoView from 'scroll-into-view';
 import { intl, setMessages, MessageRef } from '@co.mmons/js-intl';
 import ExtendableError from 'ts-error';
 
@@ -50,10 +50,6 @@ async function loadIntlMessages() {
 class FormControlImpl {
   constructor(name) {
     this.name = name;
-    /**
-     * Potrzebujemy wiedzieć czy ilość wywołan attach z elementem zgadza sie z iloscia wywolan bez elementu.
-     */
-    this.attachCount = 0;
     this.touched$ = false;
     this.dirty$ = false;
     this.disabled$ = false;
@@ -182,30 +178,38 @@ class FormControlImpl {
     return this.mutableState();
   }
   attach() {
-    if (arguments.length === 0) {
-      return (element) => this.attach(element);
-    }
-    else if (arguments[0]) {
-      const element = arguments[0];
-      this.attachCount++;
-      if (this.element$ !== element) {
-        if (this.element$) {
-          this.detach();
+    const internalProp = "__ionxFormControlAttach";
+    const control = this;
+    const func = function (el) {
+      var _a;
+      if (!el) {
+        (_a = this[internalProp]) === null || _a === void 0 ? void 0 : _a.call(this);
+      }
+      else {
+        // already initialized by other ref call
+        if (typeof el[internalProp] === "function") {
+          el[internalProp]();
+          delete el[internalProp];
         }
-        console.debug(`[ionx-form-control] attach control ${this.name}`);
-        this.element$ = element;
-        this.element$.setAttribute("ionx-form-control", this.name);
-        this.unlistenOnChange = addEventListener(this.element$, this.element$.formValueChangeEventName || "ionChange", ev => this.onElementChange(ev));
-        this.unlistenOnFocus = addEventListener(this.element$, this.element$.formTouchEventName || "ionFocus", () => this.markAsTouched());
-        this.applyElementState({ value: this.value$, valueChange: true, status: this.status(), statusChange: true });
+        // detach callback
+        this[internalProp] = el[internalProp] = () => {
+          if (this[internalProp] === el[internalProp]) {
+            control.detach();
+            delete el[internalProp];
+          }
+          delete this[internalProp];
+        };
+        if (control.element$ !== el) {
+          console.debug(`[ionx-form-control] attach control ${control.name}`);
+          control.element$ = el;
+          control.element$.setAttribute("ionx-form-control", control.name);
+          control.unlistenOnChange = addEventListener(control.element$, control.element$.formValueChangeEventName || "ionChange", ev => control.onElementChange(ev));
+          control.unlistenOnFocus = addEventListener(control.element$, control.element$.formTouchEventName || "ionFocus", () => control.markAsTouched());
+          control.applyElementState({ value: control.value$, valueChange: true, status: control.status(), statusChange: true });
+        }
       }
-    }
-    else {
-      this.attachCount--;
-      if (this.attachCount === 0) {
-        this.detach();
-      }
-    }
+    };
+    return func.bind(func);
   }
   //
   // ------------ INTERNAL API -----------
@@ -464,29 +468,12 @@ class FormController {
       this.fireStateChange();
     }
   }
-  attach(elOrName, nameOrOptions, options) {
-    const form = this;
-    if (typeof elOrName === "string") {
-      return (el) => form.attachImpl(el, elOrName, nameOrOptions);
-    }
-    else if (elOrName instanceof HTMLElement) {
-      this.attachImpl(elOrName, nameOrOptions, options);
-    }
-  }
-  attachImpl(el, name, options) {
-    var _a;
-    if (!el) {
-      (_a = this.controls[name]) === null || _a === void 0 ? void 0 : _a.detach();
-      return;
-    }
-    // @ts-ignore
+  attach(name, options) {
     const control = this.controls[name] ? this.controls[name] : this.add(name);
-    control.attach(el);
     if (options && "validators" in options) {
       control.setValidators(Array.isArray(options.validators) ? options.validators : [options.validators]);
     }
-    //
-    // this.fireStateChange();
+    return control.attach();
   }
   onStateChange(observer) {
     return this.stateChanged.subscribe(event => observer(event));

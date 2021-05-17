@@ -34,7 +34,6 @@ export interface FormControl<Value = any> {
   markAsTouched(): void;
   markAsUntouched(): void;
   attach(): (element: HTMLElement) => void;
-  attach(element: HTMLElement): any;
   validate(): Promise<boolean>;
   setValidators(validators: FormValidator | FormValidator[]): any;
   clearValidators(): void;

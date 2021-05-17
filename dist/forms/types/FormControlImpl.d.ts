@@ -45,12 +45,7 @@ export declare class FormControlImpl<Value = any> implements FormControl<Value> 
   validate(): Promise<boolean>;
   status(): FormControlReadonlyStatus;
   state(): FormControlReadonlyState;
-  /**
-   * Potrzebujemy wiedzieć czy ilość wywołan attach z elementem zgadza sie z iloscia wywolan bez elementu.
-   */
-  private attachCount;
   attach(): (element: HTMLElement) => void;
-  attach(element: HTMLElement): any;
   mutableState(): FormControlState;
   detach(): void;
   /**
