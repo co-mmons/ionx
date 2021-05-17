@@ -21,8 +21,8 @@ export class FormControllerComponent implements ComponentInterface, FormControll
     disconnect?: boolean = true;
 
     @Method()
-    async attach(element: HTMLElement, name: string, options?: FormControlAttachOptions) {
-        this.controller.attach(element, name, options);
+    async attach(name: string, options?: FormControlAttachOptions) {
+        this.controller.attach(name, options);
     }
 
     @Method()

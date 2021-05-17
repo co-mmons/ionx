@@ -1,4 +1,4 @@
-export {attachControl} from "./attachControl";
+// export {attachControl} from "./attachControl";
 export {FormControlAttachOptions} from "./FormControlAttachOptions";
 export {FormControlElement, ApplyFormControlState} from "./FormControlElement";
 export {FormController} from "./FormController";

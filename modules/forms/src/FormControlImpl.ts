@@ -18,6 +18,8 @@ interface ApplyState<Value = any> {
     value?: Value;
 }
 
+const detachFunctionName = "__ionxFormControlDetach";
+
 export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     constructor(public readonly name: string) {
@@ -179,36 +181,42 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     attach(): (element: HTMLElement) => void {
 
-        const internalProp = "__ionxFormControlAttach"
+        const detachFunctionName = "__ionxFormControlDetach"
 
         const control = this;
         const func = function (el: HTMLElement) {
 
             if (!el) {
-                this[internalProp]?.();
+                this[detachFunctionName]?.();
 
             } else {
 
-                // already initialized by other ref call
-                if (typeof el[internalProp] === "function") {
-                    el[internalProp]();
-                    delete el[internalProp];
+                // do nothing, as nothing really changed
+                if (el[detachFunctionName] === this[detachFunctionName] && el === control.element$) {
+                    return;
                 }
 
-                // detach callback
-                this[internalProp] = el[internalProp] = () => {
+                // detach previously attached element
+                if (el !== control.element$ && control.element$) {
+                    control.detach();
+                }
 
-                    if (this[internalProp] === el[internalProp]) {
+                // detach function if given element was already attached somewhere
+                el[detachFunctionName]?.(control);
+
+                // define detach function
+                // returns true if control was detached or false if it wasn't needed
+                this[detachFunctionName] = el[detachFunctionName] = (newControl?: FormControl) => {
+
+                    if (control !== newControl && el[detachFunctionName] === this[detachFunctionName]) {
                         control.detach();
-                        delete el[internalProp];
                     }
 
-                    delete this[internalProp];
+                    delete this[detachFunctionName];
                 }
 
                 if (control.element$ !== el) {
-
-                    console.debug(`[ionx-form-control] attach control ${control.name}`);
+                    console.debug(`[ionx-form-control] attach control ${control.name}`, el);
 
                     control.element$ = el;
                     control.element$.setAttribute("ionx-form-control", control.name);
@@ -233,13 +241,15 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     detach() {
         if (this.element$) {
-            console.debug(`[ionx-form-control] detach control "${this.name}"`);
+            console.debug(`[ionx-form-control] detach control ${this.name}`, this.element$);
 
             this.unlistenOnChange?.();
             this.unlistenOnChange = undefined;
 
             this.unlistenOnFocus?.();
             this.unlistenOnFocus = undefined;
+
+            delete this.element$[detachFunctionName];
 
             this.element$.removeAttribute("ionx-form-control");
             this.element$ = undefined;
@@ -365,7 +375,12 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
         const value = "checked" in ev.detail ? ev.detail.checked : ev.detail.value;
 
-        this.applyState({dirty: true, value}, {trigger: "elementValueChange"});
+        const state: ApplyState = {value};
+        if (!deepEqual(this.value$, value)) {
+            state.dirty = true;
+        }
+
+        this.applyState(state, {trigger: "elementValueChange"});
         this.validateImpl({trigger: "valueChange"});
     }
 

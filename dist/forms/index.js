@@ -1,27 +1,13 @@
 import { h as h$1, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { waitTill } from '@co.mmons/js-utils/core';
 import { forceUpdate, h } from '@stencil/core';
 import { deepEqual } from 'fast-equals';
 import { Subject, BehaviorSubject } from 'rxjs';
+import { waitTill } from '@co.mmons/js-utils/core';
 import { isHydrated, addEventListener } from 'ionx/utils';
 import scrollIntoView from 'scroll-into-view';
 import { intl, setMessages, MessageRef } from '@co.mmons/js-intl';
 import ExtendableError from 'ts-error';
-
-function attachControl(elOrName, nameOrOptions, options) {
-  if (elOrName !== null && elOrName !== undefined) {
-    if (typeof elOrName === "string") {
-      return (el) => attachControl(el, elOrName, nameOrOptions);
-    }
-    else if (elOrName instanceof HTMLElement) {
-      let form;
-      waitTill(() => !!(form = elOrName.closest("ionx-form-controller")), 1, 10000)
-        .then(() => form.attach(elOrName, nameOrOptions, options))
-        .catch(e => console.error("Not able to attach control to form, no ionx-form-controller found", elOrName, e));
-    }
-  }
-}
 
 let loaded = [];
 async function importJson() {
@@ -47,6 +33,7 @@ async function loadIntlMessages() {
   loaded.push(intl.locale);
 }
 
+const detachFunctionName = "__ionxFormControlDetach";
 class FormControlImpl {
   constructor(name) {
     this.name = name;
@@ -178,29 +165,34 @@ class FormControlImpl {
     return this.mutableState();
   }
   attach() {
-    const internalProp = "__ionxFormControlAttach";
+    const detachFunctionName = "__ionxFormControlDetach";
     const control = this;
     const func = function (el) {
-      var _a;
+      var _a, _b;
       if (!el) {
-        (_a = this[internalProp]) === null || _a === void 0 ? void 0 : _a.call(this);
+        (_a = this[detachFunctionName]) === null || _a === void 0 ? void 0 : _a.call(this);
       }
       else {
-        // already initialized by other ref call
-        if (typeof el[internalProp] === "function") {
-          el[internalProp]();
-          delete el[internalProp];
+        // do nothing, as nothing really changed
+        if (el[detachFunctionName] === this[detachFunctionName] && el === control.element$) {
+          return;
         }
-        // detach callback
-        this[internalProp] = el[internalProp] = () => {
-          if (this[internalProp] === el[internalProp]) {
+        // detach previously attached element
+        if (el !== control.element$ && control.element$) {
+          control.detach();
+        }
+        // detach function if given element was already attached somewhere
+        (_b = el[detachFunctionName]) === null || _b === void 0 ? void 0 : _b.call(el, control);
+        // define detach function
+        // returns true if control was detached or false if it wasn't needed
+        this[detachFunctionName] = el[detachFunctionName] = (newControl) => {
+          if (control !== newControl) {
             control.detach();
-            delete el[internalProp];
           }
-          delete this[internalProp];
+          delete this[detachFunctionName];
         };
         if (control.element$ !== el) {
-          console.debug(`[ionx-form-control] attach control ${control.name}`);
+          console.debug(`[ionx-form-control] attach control ${control.name}`, el);
           control.element$ = el;
           control.element$.setAttribute("ionx-form-control", control.name);
           control.unlistenOnChange = addEventListener(control.element$, control.element$.formValueChangeEventName || "ionChange", ev => control.onElementChange(ev));
@@ -220,11 +212,12 @@ class FormControlImpl {
   detach() {
     var _a, _b;
     if (this.element$) {
-      console.debug(`[ionx-form-control] detach control "${this.name}"`);
+      console.debug(`[ionx-form-control] detach control ${this.name}`, this.element$);
       (_a = this.unlistenOnChange) === null || _a === void 0 ? void 0 : _a.call(this);
       this.unlistenOnChange = undefined;
       (_b = this.unlistenOnFocus) === null || _b === void 0 ? void 0 : _b.call(this);
       this.unlistenOnFocus = undefined;
+      delete this.element$[detachFunctionName];
       this.element$.removeAttribute("ionx-form-control");
       this.element$ = undefined;
     }
@@ -301,7 +294,11 @@ class FormControlImpl {
       return;
     }
     const value = "checked" in ev.detail ? ev.detail.checked : ev.detail.value;
-    this.applyState({ dirty: true, value }, { trigger: "elementValueChange" });
+    const state = { value };
+    if (!deepEqual(this.value$, value)) {
+      state.dirty = true;
+    }
+    this.applyState(state, { trigger: "elementValueChange" });
     this.validateImpl({ trigger: "valueChange" });
   }
   applyElementState(state) {
@@ -853,8 +850,8 @@ const FormControllerComponent = class extends HTMLElement {
      */
     this.disconnect = true;
   }
-  async attach(element, name, options) {
-    this.controller.attach(element, name, options);
+  async attach(name, options) {
+    this.controller.attach(name, options);
   }
   validate(options) {
     return this.controller.validate(options);
@@ -987,4 +984,4 @@ const defineIonxForms = (opts) => {
   }
 };
 
-export { FormController, FormFieldLabelButton, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, attachControl, defineIonxForms, formGrid, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };
+export { FormController, FormFieldLabelButton, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, defineIonxForms, formGrid, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };

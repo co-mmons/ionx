@@ -13,7 +13,7 @@ import { FormValidationError } from "./FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
 export namespace Components {
     interface IonxFormController {
-        "attach": (element: HTMLElement, name: string, options?: FormControlAttachOptions) => Promise<void>;
+        "attach": (name: string, options?: FormControlAttachOptions) => Promise<void>;
         "controller": FormController;
         /**
           * If controller should be disconnected when component is disconnected from the DOM. By default is true, but you can set to false when you expect that form controller component can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).

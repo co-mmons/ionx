@@ -10,7 +10,7 @@ export declare class FormControllerComponent implements ComponentInterface, Form
    * can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).
    */
   disconnect?: boolean;
-  attach(element: HTMLElement, name: string, options?: FormControlAttachOptions): Promise<void>;
+  attach(name: string, options?: FormControlAttachOptions): Promise<void>;
   validate(options?: FormControllerValidateOptions): Promise<boolean>;
   componentWillLoad(): Promise<void>;
   render(): any;

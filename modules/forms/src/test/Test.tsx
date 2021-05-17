@@ -7,8 +7,9 @@ import {FormController} from "../FormController";
 export class Test {
 
     data = new FormController({
-        test: {value: null as string}
-    })
+        test: {value: null as string},
+        otherValue: {value: null as string}
+    }).bindRenderer(this);
 
     @State()
     readonly = true;
@@ -16,6 +17,7 @@ export class Test {
     render() {
         return <Host>
             <ion-button onClick={() => this.readonly = !this.readonly}>toggle readonly</ion-button>
+            <ion-input ref={this.data.controls.otherValue.attach()}/>
             {!this.readonly && <ionx-form-field label="Test">
                 <ion-input ref={this.data.controls.test.attach()}/>
             </ionx-form-field>}
