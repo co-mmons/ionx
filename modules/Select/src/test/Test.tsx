@@ -3,16 +3,20 @@ import {FormController} from "ionx/forms";
 import {SelectOption} from "../SelectOption";
 
 @Component({
-    tag: "ionx-select-test"
+    tag: "ionx-test"
 })
-export class SelectTest {
+export class Test {
 
     data = new FormController({
         select: {value: null as number}
     }).bindRenderer(this)
 
     render() {
-        const options: SelectOption[] = [{label: "test", value: 1}];
+        const options: SelectOption[] = [
+            {label: "test", value: 1},
+            {label: "aloha", value: "ksdksd", divider: true},
+            {label: "city", value: 2}
+        ];
         return <ionx-select options={options} ref={this.data.controls.select.attach()}/>
     }
 }

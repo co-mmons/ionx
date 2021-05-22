@@ -16,6 +16,14 @@
         margin-right: 16px;
         margin-left: 0px;
     }
+
+    ion-item.ionx--divider {
+        ion-label {
+            margin-top: 32px;
+            font-weight: 500;
+            font-size: small;
+        }
+    }
 }
 
 :host-context(ion-popover) {

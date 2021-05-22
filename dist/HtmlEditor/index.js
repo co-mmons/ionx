@@ -1,6 +1,6 @@
 import { createEvent, h, Host, attachShadow, Fragment as Fragment$1, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { waitTill, sleep, Enum } from '@co.mmons/js-utils/core';
+import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { loadIonxLinkEditorIntl, defineIonxLinkEditor, showLinkEditor } from 'ionx/LinkEditor';
 import { intl, setMessages, MessageRef } from '@co.mmons/js-intl';
 import { popoverController, isPlatform } from '@ionic/core';
@@ -13857,7 +13857,7 @@ function scrollToCaret(parent) {
   }
 }
 
-const htmlEditorCss = ".ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}ionx-html-editor{display:block}ionx-html-editor>[ionx--prosemirror]>.ProseMirror{outline:none;user-select:text}ionx-html-editor>[ionx--prosemirror]>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>[ionx--prosemirror]>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>[ionx--prosemirror]>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>[ionx--prosemirror]>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>[ionx--prosemirror]>.ProseMirror p:first-child{margin-top:0}ionx-html-editor>[ionx--prosemirror]>.ProseMirror h1{font-size:130%}ionx-html-editor>[ionx--prosemirror]>.ProseMirror h2{font-size:125%}ionx-html-editor>[ionx--prosemirror]>.ProseMirror h3{font-size:120%}ionx-html-editor>[ionx--prosemirror]>.ProseMirror h4{font-size:115%}ionx-html-editor>[ionx--prosemirror]>.ProseMirror h5{font-size:110%}ionx-html-editor>[ionx--prosemirror]>.ProseMirror h6{font-size:105%}ionx-html-editor>[ionx--prosemirror]>.ProseMirror h1,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h2,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h3,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h4,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h5,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>[ionx--prosemirror]>.ProseMirror h1:first-child,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h2:first-child,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h3:first-child,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h4:first-child,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h5:first-child,ionx-html-editor>[ionx--prosemirror]>.ProseMirror h6:first-child{margin-top:0}ionx-html-editor>[ionx--prosemirror]>.ProseMirror ul:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
+const htmlEditorCss = ".ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}ionx-html-editor{display:block}ionx-html-editor>.ionx--prosemirror>.ProseMirror{outline:none;user-select:text}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>.ionx--prosemirror>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>.ionx--prosemirror>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>.ionx--prosemirror>.ProseMirror p:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1{font-size:130%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h2{font-size:125%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h3{font-size:120%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h4{font-size:115%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h5{font-size:110%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{font-size:105%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror ul:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
 
 const HtmlEditor = class extends HTMLElement {
   constructor() {
@@ -13904,6 +13904,8 @@ const HtmlEditor = class extends HTMLElement {
     }
   }
   async initEditor() {
+    const container = this.element.getElementsByClassName("ionx--prosemirror");
+    await waitTill(() => container.length > 0, 1);
     this.schema = schema;
     this.plugins = [
       keymap(buildKeymap(schema)),
@@ -13916,11 +13918,7 @@ const HtmlEditor = class extends HTMLElement {
       plugins: this.plugins,
       doc: this.editorDocument(this.value ? this.value : "<div></div>")
     });
-    let container;
-    while (!(container = this.element.querySelector("[ionx--prosemirror]"))) {
-      await sleep(50);
-    }
-    this.view = new EditorView(container, {
+    this.view = new EditorView(container[0], {
       state,
       dispatchTransaction: transaction => this.onEditorTransaction(transaction),
       handleScrollToSelection: view => this.handleEditorScroll(view)
@@ -13992,7 +13990,7 @@ const HtmlEditor = class extends HTMLElement {
     this.view = undefined;
   }
   render() {
-    return h(Host, null, !this.readonly && h("ionx-html-editor-toolbar", null), h("div", { "ionx--prosemirror": true }));
+    return h(Host, null, !this.readonly && h("ionx-html-editor-toolbar", null), h("div", { class: "ionx--prosemirror" }));
   }
   static get assetsDirs() { return ["assets"]; }
   get element() { return this; }

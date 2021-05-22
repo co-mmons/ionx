@@ -248,13 +248,13 @@ export class SelectOverlay implements ComponentInterface {
             return;
         }
 
-        return <ion-item key={index} {...{[indexAttribute]: index}}>
+        return <ion-item key={index} {...{[indexAttribute]: index}} class={{"ionx--divider": option.divider}}>
 
-            <ion-checkbox
+            {!option.divider && <ion-checkbox
                 class="sc-ionx-select-overlay"
                 slot="start"
                 checked={this.values.findIndex(v => isEqualValue(v, option.value, this.comparator)) > -1}
-                onClick={ev => this.onClick(ev, option)}/>
+                onClick={ev => this.onClick(ev, option)}/>}
 
             <ion-label>{option.label ?? (this.labelFormatter ? this.labelFormatter(option.value) : `${option.value}`)}</ion-label>
 

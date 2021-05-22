@@ -1,6 +1,6 @@
-import {sleep} from "@co.mmons/js-utils/core";
+import {waitTill} from "@co.mmons/js-utils/core";
 import {Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Method, Prop, Watch} from "@stencil/core";
-import {loadIonxLinkEditorIntl} from "ionx/LinkEditor";
+import {LinkScheme, loadIonxLinkEditorIntl} from "ionx/LinkEditor";
 import {baseKeymap} from "prosemirror-commands";
 import {gapCursor} from "prosemirror-gapcursor";
 import {history} from "prosemirror-history";
@@ -34,6 +34,9 @@ export class HtmlEditor implements ComponentInterface {
 
     @Prop({mutable: true})
     value: string;
+
+    @Prop()
+    linkSchemes: LinkScheme[];
 
     /**
      * @internal
@@ -114,6 +117,9 @@ export class HtmlEditor implements ComponentInterface {
 
     private async initEditor() {
 
+        const container = this.element.getElementsByClassName("ionx--prosemirror");
+        await waitTill(() => container.length > 0, 1);
+
         this.schema = schema;
 
         this.plugins = [
@@ -129,12 +135,7 @@ export class HtmlEditor implements ComponentInterface {
             doc: this.editorDocument(this.value ? this.value : "<div></div>")
         });
 
-        let container: HTMLElement;
-        while (!(container = this.element.querySelector("[ionx--prosemirror]"))) {
-            await sleep(50);
-        }
-
-        this.view = new EditorView(container, {
+        this.view = new EditorView(container[0], {
             state,
             dispatchTransaction: transaction => this.onEditorTransaction(transaction),
             handleScrollToSelection: view => this.handleEditorScroll(view)
@@ -224,7 +225,7 @@ export class HtmlEditor implements ComponentInterface {
     render() {
         return <Host>
             {!this.readonly && <ionx-html-editor-toolbar/>}
-            <div ionx--prosemirror/>
+            <div class="ionx--prosemirror"/>
         </Host>
     }
 

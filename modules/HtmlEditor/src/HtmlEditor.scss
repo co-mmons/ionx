@@ -4,7 +4,7 @@ ionx-html-editor {
     display: block;
 }
 
-ionx-html-editor > [ionx--prosemirror] > .ProseMirror {
+ionx-html-editor > .ionx--prosemirror > .ProseMirror {
     outline: none;
     user-select: text;
 
