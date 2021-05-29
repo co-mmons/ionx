@@ -1,9 +1,11 @@
-import {modalController, OverlayEventDetail, popoverController, StyleEventDetail} from "@ionic/core";
+import {StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, Fragment, FunctionalComponent, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
 import {deepEqual} from "fast-equals";
 import {indexAttribute} from "./indexAttribute";
 import {isEqualValue} from "./isEqualValue";
 import {SelectOption} from "./SelectOption";
+import {SelectOverlayProps} from "./SelectOverlayProps";
+import {showSelectOverlay} from "./showSelectOverlay";
 import {ValueComparator} from "./ValueComparator";
 import {valueLabel} from "./valueLabel";
 
@@ -200,7 +202,7 @@ export class Select {
             overlayTitle = this.placeholder;
         }
 
-        const overlayData = {
+        const overlayProps: SelectOverlayProps = {
             overlay,
             options: this.options,
             values: this.values.slice(),
@@ -215,23 +217,9 @@ export class Select {
             checkValidator: this.checkValidator
         };
 
-        let result: OverlayEventDetail<any[]>;
-        let didDismiss: Promise<any>;
+        const {willDismiss, didDismiss} = await showSelectOverlay(overlayProps, {target: this.element} as any);
 
-        if (overlay === "popover") {
-            const popover = await popoverController.create({component: "ionx-select-overlay", componentProps: overlayData, event: {target: this.element} as any});
-            popover.present();
-
-            result = await popover.onWillDismiss();
-            didDismiss = popover.onDidDismiss();
-
-        } else {
-            const modal = await modalController.create({component: "ionx-select-overlay", componentProps: overlayData});
-            modal.present();
-            result = await modal.onWillDismiss();
-            didDismiss = modal.onDidDismiss();
-        }
-
+        const result = await willDismiss;
         if (result.role === "ok") {
             this.changeValues(result.data);
             this.ionChange.emit({value: this.value});

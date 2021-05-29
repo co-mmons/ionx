@@ -1,0 +1,58 @@
+import {intl} from "@co.mmons/js-intl";
+import {popoverController} from "@ionic/core";
+import {Component, Element, h, Host, Listen, Prop} from "@stencil/core";
+
+@Component({
+    tag: "ionx-data-table-search-filter",
+    shadow: true,
+    styleUrl: "SearchPopover.scss"
+})
+export class SearchPopover {
+
+    @Element()
+    element: HTMLElement;
+
+    @Prop()
+    value: string;
+
+    cancel() {
+        popoverController.dismiss();
+    }
+
+    ok() {
+        popoverController.dismiss(this.element.shadowRoot.querySelector("ion-searchbar").value, "ok");
+    }
+
+    @Listen("ionViewDidEnter")
+    didEnter() {
+        this.element.shadowRoot.querySelector("ion-searchbar").setFocus();
+    }
+
+    render() {
+        return <Host>
+
+            <ion-searchbar
+                type="text"
+                value={this.value}
+                enterkeyhint="search"
+                inputmode="search"
+                spellcheck={false}
+                placeholder={intl.message`@co.mmons/js-intl#Search for...`}
+                onKeyDown={ev => ev.key === "Enter" ? this.ok() : undefined}/>
+
+            <ion-footer>
+                <ion-toolbar>
+
+                    <div>
+
+                        <ion-button size="small" fill="clear" onClick={() => this.cancel()}>{intl.message`@co.mmons/js-intl#Cancel`}</ion-button>
+
+                        <ion-button size="small" fill="clear" onClick={() => this.ok()}>{intl.message`@co.mmons/js-intl#Ok`}</ion-button>
+
+                    </div>
+
+                </ion-toolbar>
+            </ion-footer>
+        </Host>
+    }
+}

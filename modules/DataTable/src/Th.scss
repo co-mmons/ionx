@@ -1,0 +1,28 @@
+:host {
+    display: table-cell;
+    position: sticky;
+    top: 0;
+    background-color: var(--data-table-background-color, var(--ion-background-color, #fff));
+    box-shadow: 0 1px 0 0 var(--ion-border-color);
+    border-color: var(--ion-border-color);
+    border-style: solid;
+    border-width: 0 var(--ionx-border-width) 0 var(--ionx-border-width);
+    padding: 8px;
+    font-weight: 500;
+
+    &:first-child {
+        border-left: 0;
+    }
+
+    &:last-child {
+        border-right: 0;
+    }
+
+    .ionx--outer {
+        display: flex;
+
+        ion-button {
+            margin: 0;
+        }
+    }
+}

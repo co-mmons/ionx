@@ -33,6 +33,7 @@ const modules = [
     "ToggleLabels",
     "Toolbar",
     "Textarea",
+    "DataTable",
 
     "LinkEditor",
     "HtmlEditor",

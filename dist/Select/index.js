@@ -8,6 +8,24 @@ import { Capacitor } from '@capacitor/core';
 import { sleep } from '@co.mmons/js-utils/core';
 import { matchesMediaBreakpoint } from 'ionx/utils';
 
+async function showSelectOverlay(overlay, event) {
+  let willDismiss;
+  let didDismiss;
+  if (overlay.overlay === "popover") {
+    const popover = await popoverController.create({ component: "ionx-select-overlay", componentProps: overlay, event });
+    popover.present();
+    willDismiss = popover.onWillDismiss();
+    didDismiss = popover.onDidDismiss();
+  }
+  else {
+    const modal = await modalController.create({ component: "ionx-select-overlay", componentProps: overlay });
+    modal.present();
+    willDismiss = modal.onWillDismiss();
+    didDismiss = modal.onDidDismiss();
+  }
+  return { willDismiss, didDismiss };
+}
+
 const indexAttribute = "__ionx-select-idx";
 
 function isEqualValue(a, b, comparator) {
@@ -127,7 +145,7 @@ const Select = class extends HTMLElement {
     if (!overlayTitle && this.placeholder) {
       overlayTitle = this.placeholder;
     }
-    const overlayData = {
+    const overlayProps = {
       overlay,
       options: this.options,
       values: this.values.slice(),
@@ -141,20 +159,8 @@ const Select = class extends HTMLElement {
       // whiteSpace: this.overlayWhiteSpace,
       checkValidator: this.checkValidator
     };
-    let result;
-    let didDismiss;
-    if (overlay === "popover") {
-      const popover = await popoverController.create({ component: "ionx-select-overlay", componentProps: overlayData, event: { target: this.element } });
-      popover.present();
-      result = await popover.onWillDismiss();
-      didDismiss = popover.onDidDismiss();
-    }
-    else {
-      const modal = await modalController.create({ component: "ionx-select-overlay", componentProps: overlayData });
-      modal.present();
-      result = await modal.onWillDismiss();
-      didDismiss = modal.onDidDismiss();
-    }
+    const { willDismiss, didDismiss } = await showSelectOverlay(overlayProps, { target: this.element });
+    const result = await willDismiss;
     if (result.role === "ok") {
       this.changeValues(result.data);
       this.ionChange.emit({ value: this.value });
@@ -439,4 +445,4 @@ const defineIonxSelect = (opts) => {
   }
 };
 
-export { IonxSelect, IonxSelectOrderable, IonxSelectOverlay, defineIonxSelect };
+export { IonxSelect, IonxSelectOrderable, IonxSelectOverlay, defineIonxSelect, showSelectOverlay };
