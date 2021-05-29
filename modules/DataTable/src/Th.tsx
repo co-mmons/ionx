@@ -1,5 +1,5 @@
 import {popoverController} from "@ionic/core";
-import {Component, Element, h, Host, Prop} from "@stencil/core";
+import {Component, Element, h, Host, Prop, State} from "@stencil/core";
 import {defineIonxSelect, SelectOption, showSelectOverlay} from "ionx/Select";
 import {DataTableColumnFilterOptions} from "./DataTableColumnFilterOptions";
 import {Filter} from "./filter/Filter";
@@ -36,6 +36,9 @@ export class Th implements DataTableColumnFilterOptions {
     @Prop()
     filterCurrent: () => Filter;
 
+    @State()
+    filterActive: boolean;
+
     dataTable() {
         return this.element.closest("ionx-data-table");
     }
@@ -65,7 +68,9 @@ export class Th implements DataTableColumnFilterOptions {
 
         const result = await popover.onWillDismiss();
         if (result.role === "ok") {
-            this.filterApply(result.data ? new MatchStringFilter(result.data) : undefined);
+            const value = (result.data as string)?.trim();
+            this.filterApply(value ? new MatchStringFilter(value) : undefined);
+            this.filterActive = !!value;
         }
     }
 
@@ -88,17 +93,24 @@ export class Th implements DataTableColumnFilterOptions {
         const result = await willDismiss;
         if (result.role === "ok") {
             this.filterApply(result.data.length === 0 ? undefined : new HasOneOfFilter(result.data));
+            this.filterActive = result.data.length > 0;
         }
     }
 
     render() {
         return <Host>
             <div class="ionx--outer">
+
                 <div slot-container="label">
                     <slot/>
                 </div>
 
-                {this.filterEnabled && <ion-button fill="clear" size="small" shape="round" onClick={() => this.filterClicked()}>
+                {this.filterEnabled && <ion-button
+                    fill="clear"
+                    size="small"
+                    shape="round"
+                    color={this.filterActive ? "success" : "primary"}
+                    onClick={() => this.filterClicked()}>
                     <ion-icon name={this.filterType === "search" ? "search" : "filter"}/>
                 </ion-button>}
 

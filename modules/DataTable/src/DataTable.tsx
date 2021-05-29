@@ -44,7 +44,7 @@ export class DataTable {
             const data = [];
             const columnsIdIndex = {};
 
-            for (const row of this.data) {
+            ROWS: for (const row of this.data) {
 
                 for (const columnId in this.filters) {
 
@@ -58,11 +58,12 @@ export class DataTable {
                         value = row[columnId];
                     }
 
-                    if (this.filters[columnId].test(value)) {
-                        data.push(row);
+                    if (!this.filters[columnId].test(value)) {
+                        continue ROWS;
                     }
                 }
 
+                data.push(row);
             }
 
             this.visibleData = data;
@@ -73,6 +74,11 @@ export class DataTable {
 
     connectedCallback() {
         this.visibleData = this.data?.slice();
+    }
+
+    renderCell(column: DataTableColumn, columnIndex: number, row: any, accessByIndex: boolean) {
+        const value = row[accessByIndex ? columnIndex : column.id];
+        return <td>{column.formatter ? column.formatter(value) : value}</td>
     }
 
     render() {
@@ -90,7 +96,7 @@ export class DataTable {
                 </thead>
                 <tbody>
                     {this.visibleData?.map(row => <tr>
-                        {Array.isArray(row) && row.map(cell => <td>{cell}</td>)}
+                        {this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row)))}
                     </tr>)}
                 </tbody>
             </table>

@@ -12,5 +12,6 @@ export declare class DataTable {
   setColumnFilter(column: DataTableColumn, value: any): void;
   applyFilters(): void;
   connectedCallback(): void;
+  renderCell(column: DataTableColumn, columnIndex: number, row: any, accessByIndex: boolean): any;
   render(): any;
 }

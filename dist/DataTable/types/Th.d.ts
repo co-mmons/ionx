@@ -10,6 +10,7 @@ export declare class Th implements DataTableColumnFilterOptions {
    * Returns currently applied filter for given column.
    */
   filterCurrent: () => Filter;
+  filterActive: boolean;
   dataTable(): HTMLIonxDataTableElement;
   filterClicked(): Promise<void>;
   filterSearch(): Promise<void>;

@@ -7,7 +7,7 @@ export class MatchStringFilter extends Filter {
     }
 
     test(value: any) {
-        if (typeof value === "string" && value.indexOf(this.value) > -1) {
+        if (typeof value === "string" && value.toLocaleLowerCase().indexOf(this.value.toLocaleLowerCase()) > -1) {
             return true;
         }
 

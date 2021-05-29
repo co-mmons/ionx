@@ -33,7 +33,7 @@ const DataTable = class extends HTMLElement {
     else {
       const data = [];
       const columnsIdIndex = {};
-      for (const row of this.data) {
+      ROWS: for (const row of this.data) {
         for (const columnId in this.filters) {
           const columnIndex = (_a = columnsIdIndex[columnId]) !== null && _a !== void 0 ? _a : (columnsIdIndex[columnId] = this.columns.findIndex(column => column.id === columnId));
           let value;
@@ -43,10 +43,11 @@ const DataTable = class extends HTMLElement {
           else {
             value = row[columnId];
           }
-          if (this.filters[columnId].test(value)) {
-            data.push(row);
+          if (!this.filters[columnId].test(value)) {
+            continue ROWS;
           }
         }
+        data.push(row);
       }
       this.visibleData = data;
     }
@@ -56,9 +57,13 @@ const DataTable = class extends HTMLElement {
     var _a;
     this.visibleData = (_a = this.data) === null || _a === void 0 ? void 0 : _a.slice();
   }
+  renderCell(column, columnIndex, row, accessByIndex) {
+    const value = row[accessByIndex ? columnIndex : column.id];
+    return h("td", null, column.formatter ? column.formatter(value) : value);
+  }
   render() {
     var _a, _b;
-    return h(Host, null, h("table", null, h("thead", null, h("tr", null, (_a = this.columns) === null || _a === void 0 ? void 0 : _a.map((column, columnIndex) => h("ionx-data-table-th", { filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled }, column.label)))), h("tbody", null, (_b = this.visibleData) === null || _b === void 0 ? void 0 : _b.map(row => h("tr", null, Array.isArray(row) && row.map(cell => h("td", null, cell)))))));
+    return h(Host, null, h("table", null, h("thead", null, h("tr", null, (_a = this.columns) === null || _a === void 0 ? void 0 : _a.map((column, columnIndex) => h("ionx-data-table-th", { filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled }, column.label)))), h("tbody", null, (_b = this.visibleData) === null || _b === void 0 ? void 0 : _b.map(row => h("tr", null, this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row))))))));
   }
   static get style() { return dataTableCss; }
 };
@@ -111,14 +116,14 @@ class MatchStringFilter extends Filter {
     this.value = value;
   }
   test(value) {
-    if (typeof value === "string" && value.indexOf(this.value) > -1) {
+    if (typeof value === "string" && value.toLocaleLowerCase().indexOf(this.value.toLocaleLowerCase()) > -1) {
       return true;
     }
     return false;
   }
 }
 
-const thCss = ".sc-ionx-data-table-th-h{display:table-cell;position:sticky;top:0;background-color:var(--data-table-background-color, var(--ion-background-color, #fff));box-shadow:0 1px 0 0 var(--ion-border-color);border-color:var(--ion-border-color);border-style:solid;border-width:0 var(--ionx-border-width) 0 var(--ionx-border-width);padding:8px;font-weight:500}.sc-ionx-data-table-th-h:first-child{border-left:0}.sc-ionx-data-table-th-h:last-child{border-right:0}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th{display:flex}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th{margin:0}";
+const thCss = ".sc-ionx-data-table-th-h{display:table-cell;position:sticky;top:0;background-color:var(--data-table-background-color, var(--ion-background-color, #fff));box-shadow:0 1px 0 0 var(--ion-border-color);border-color:var(--ion-border-color);border-style:solid;border-width:0 var(--ionx-border-width) 0 var(--ionx-border-width);padding:8px;font-weight:500}.sc-ionx-data-table-th-h:first-child{border-left:0}.sc-ionx-data-table-th-h:last-child{border-right:0}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th{display:flex;align-items:center}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th{margin:0 4px;--padding-start:4px;--padding-end:4px}";
 
 defineIonxSelect();
 const Th = class extends HTMLElement {
@@ -138,6 +143,7 @@ const Th = class extends HTMLElement {
     }
   }
   async filterSearch() {
+    var _a;
     const current = this.filterCurrent();
     const popover = await popoverController.create({
       component: "ionx-data-table-search-filter",
@@ -149,7 +155,9 @@ const Th = class extends HTMLElement {
     await popover.present();
     const result = await popover.onWillDismiss();
     if (result.role === "ok") {
-      this.filterApply(result.data ? new MatchStringFilter(result.data) : undefined);
+      const value = (_a = result.data) === null || _a === void 0 ? void 0 : _a.trim();
+      this.filterApply(value ? new MatchStringFilter(value) : undefined);
+      this.filterActive = !!value;
     }
   }
   async filterSelect() {
@@ -167,10 +175,11 @@ const Th = class extends HTMLElement {
     const result = await willDismiss;
     if (result.role === "ok") {
       this.filterApply(result.data.length === 0 ? undefined : new HasOneOfFilter(result.data));
+      this.filterActive = result.data.length > 0;
     }
   }
   render() {
-    return h(Host, null, h("div", { class: "ionx--outer" }, h("div", { "slot-container": "label" }, h("slot", null)), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", onClick: () => this.filterClicked() }, h("ion-icon", { name: this.filterType === "search" ? "search" : "filter" }))));
+    return h(Host, null, h("div", { class: "ionx--outer" }, h("div", { "slot-container": "label" }, h("slot", null)), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.filterClicked() }, h("ion-icon", { name: this.filterType === "search" ? "search" : "filter" }))));
   }
   get element() { return this; }
   static get style() { return thCss; }
@@ -178,7 +187,7 @@ const Th = class extends HTMLElement {
 
 const IonxDataTable = /*@__PURE__*/proxyCustomElement(DataTable, [0,"ionx-data-table",{"columns":[16],"data":[16]}]);
 const IonxDataTableSearchFilter = /*@__PURE__*/proxyCustomElement(SearchPopover, [1,"ionx-data-table-search-filter",{"value":[1]},[[0,"ionViewDidEnter","didEnter"]]]);
-const IonxDataTableTh = /*@__PURE__*/proxyCustomElement(Th, [6,"ionx-data-table-th",{"filterEnabled":[4,"filter-enabled"],"filterType":[1,"filter-type"],"filterData":[16],"filterApply":[16],"filterCurrent":[16]}]);
+const IonxDataTableTh = /*@__PURE__*/proxyCustomElement(Th, [6,"ionx-data-table-th",{"filterEnabled":[4,"filter-enabled"],"filterType":[1,"filter-type"],"filterData":[16],"filterApply":[16],"filterCurrent":[16],"filterActive":[32]}]);
 const defineIonxDataTable = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

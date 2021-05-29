@@ -20,9 +20,12 @@
 
     .ionx--outer {
         display: flex;
+        align-items: center;
 
         ion-button {
-            margin: 0;
+            margin: 0 4px;
+            --padding-start: 4px;
+            --padding-end: 4px;
         }
     }
 }
