@@ -59,10 +59,19 @@ export class FormItem {
     @Prop()
     hint: string;
 
+    /**
+     * @deprecated
+     */
     @Prop()
     partProps: {
         item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>
     }
+
+    @Prop()
+    itemProps: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>;
+
+    @Prop()
+    itemStyle?: {[key: string]: string};
 
     async componentWillLoad() {
         await loadIntlMessages();
@@ -75,7 +84,7 @@ export class FormItem {
                 <slot name="buttons"/>
             </div>
 
-            <ion-item {...this.partProps?.item}>
+            <ion-item style={this.itemStyle} {...this.partProps?.item} {...this.itemProps}>
 
                 <slot name="start" slot="start"/>
 

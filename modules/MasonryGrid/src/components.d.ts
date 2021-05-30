@@ -12,8 +12,6 @@ export namespace Components {
         "block": boolean;
         "markItemAsDirty": (item: HTMLElement) => Promise<void>;
     }
-    interface IonxTest {
-    }
 }
 declare global {
     interface HTMLIonxMasonryGridElement extends Components.IonxMasonryGrid, HTMLStencilElement {
@@ -22,26 +20,16 @@ declare global {
         prototype: HTMLIonxMasonryGridElement;
         new (): HTMLIonxMasonryGridElement;
     };
-    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
-    }
-    var HTMLIonxTestElement: {
-        prototype: HTMLIonxTestElement;
-        new (): HTMLIonxTestElement;
-    };
     interface HTMLElementTagNameMap {
         "ionx-masonry-grid": HTMLIonxMasonryGridElement;
-        "ionx-test": HTMLIonxTestElement;
     }
 }
 declare namespace LocalJSX {
     interface IonxMasonryGrid {
         "block"?: boolean;
     }
-    interface IonxTest {
-    }
     interface IntrinsicElements {
         "ionx-masonry-grid": IonxMasonryGrid;
-        "ionx-test": IonxTest;
     }
 }
 export { LocalJSX as JSX };
@@ -49,7 +37,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ionx-masonry-grid": LocalJSX.IonxMasonryGrid & JSXBase.HTMLAttributes<HTMLIonxMasonryGridElement>;
-            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
         }
     }
 }

@@ -14,7 +14,7 @@ function lineBreak(beforeOrAfter = "before") {
   }
 }
 
-const masonryGridCss = ".sc-ionx-masonry-grid-h{display:block;position:relative}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{display:block;position:relative}.ionx--block.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{height:auto !important}.sc-ionx-masonry-grid-h:not(.ionx--block) [ionx--grid-items].sc-ionx-masonry-grid-s>*{position:absolute;display:none}.sc-ionx-masonry-grid-h.ionx--block [ionx--grid-items].sc-ionx-masonry-grid-s>*{left:unset;top:unset}";
+const masonryGridCss = ".sc-ionx-masonry-grid-h{display:block;position:relative;margin:8px}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{display:block;position:relative}.ionx--block.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{height:auto !important}.sc-ionx-masonry-grid-h:not(.ionx--block) [ionx--grid-items].sc-ionx-masonry-grid-s>*{position:absolute;display:none}.sc-ionx-masonry-grid-h.ionx--block [ionx--grid-items].sc-ionx-masonry-grid-s>*{left:unset;top:unset}";
 
 const MasonryGrid = class extends HTMLElement {
   constructor() {

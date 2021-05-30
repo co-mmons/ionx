@@ -34,6 +34,11 @@ export namespace Components {
          */
         "fill": "clear" | "solid" | "outline";
         "hint": string;
+        "itemProps": Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>;
+        "itemStyle"?: {[key: string]: string};
+        /**
+          * @deprecated
+         */
         "partProps": {
         item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>
     };
@@ -85,6 +90,11 @@ declare namespace LocalJSX {
          */
         "fill"?: "clear" | "solid" | "outline";
         "hint"?: string;
+        "itemProps"?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>;
+        "itemStyle"?: {[key: string]: string};
+        /**
+          * @deprecated
+         */
         "partProps"?: {
         item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>
     };

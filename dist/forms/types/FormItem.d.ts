@@ -14,8 +14,15 @@ export declare class FormItem {
   watchError(): void;
   buildErrorMessage(): void;
   hint: string;
+  /**
+   * @deprecated
+   */
   partProps: {
     item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>;
+  };
+  itemProps: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>;
+  itemStyle?: {
+    [key: string]: string;
   };
   componentWillLoad(): Promise<void>;
   render(): any;

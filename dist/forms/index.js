@@ -186,7 +186,7 @@ class FormControlImpl {
         // define detach function
         // returns true if control was detached or false if it wasn't needed
         this[detachFunctionName] = el[detachFunctionName] = (newControl) => {
-          if (control !== newControl) {
+          if (control !== newControl && el[detachFunctionName] === this[detachFunctionName]) {
             control.detach();
           }
           delete this[detachFunctionName];
@@ -958,7 +958,7 @@ const FormItem = class extends HTMLElement {
   }
   render() {
     var _a;
-    return h$1(Host, null, h$1("div", { "ionx--buttons": true }, h$1("slot", { name: "buttons" })), h$1("ion-item", Object.assign({}, (_a = this.partProps) === null || _a === void 0 ? void 0 : _a.item), h$1("slot", { name: "start", slot: "start" }), h$1("slot", null), h$1("slot", { name: "end", slot: "end" })), h$1("slot", { name: "error" }), !!this.errorMessage && h$1("div", { "ionx--error": true }, this.errorMessage), h$1("slot", { name: "hint" }), !!this.hint && h$1("div", { "ionx--hint": true }, this.hint));
+    return h$1(Host, null, h$1("div", { "ionx--buttons": true }, h$1("slot", { name: "buttons" })), h$1("ion-item", Object.assign({ style: this.itemStyle }, (_a = this.partProps) === null || _a === void 0 ? void 0 : _a.item, this.itemProps), h$1("slot", { name: "start", slot: "start" }), h$1("slot", null), h$1("slot", { name: "end", slot: "end" })), h$1("slot", { name: "error" }), !!this.errorMessage && h$1("div", { "ionx--error": true }, this.errorMessage), h$1("slot", { name: "hint" }), !!this.hint && h$1("div", { "ionx--hint": true }, this.hint));
   }
   static get watchers() { return {
     "control": ["watchControl"],
@@ -969,7 +969,7 @@ const FormItem = class extends HTMLElement {
 
 const IonxFormController = /*@__PURE__*/proxyCustomElement(FormControllerComponent, [4,"ionx-form-controller",{"controller":[16],"disconnect":[4]}]);
 const IonxFormField = /*@__PURE__*/proxyCustomElement(FormField, [6,"ionx-form-field",{"label":[1],"control":[16],"error":[1],"errorMessage":[32]}]);
-const IonxFormItem = /*@__PURE__*/proxyCustomElement(FormItem, [6,"ionx-form-item",{"fill":[513],"control":[16],"error":[1],"hint":[1],"partProps":[16],"errorMessage":[32]}]);
+const IonxFormItem = /*@__PURE__*/proxyCustomElement(FormItem, [6,"ionx-form-item",{"fill":[513],"control":[16],"error":[1],"hint":[1],"partProps":[16],"itemProps":[16],"itemStyle":[16],"errorMessage":[32]}]);
 const defineIonxForms = (opts) => {
   if (typeof customElements !== 'undefined') {
     [
