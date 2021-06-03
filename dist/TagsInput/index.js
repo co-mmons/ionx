@@ -92,6 +92,9 @@ const TagsInput = class extends HTMLElement {
     }
   }
   pushTag(tagStr) {
+    if (!tagStr) {
+      return;
+    }
     if (!this.value) {
       this.value = [];
     }
@@ -163,7 +166,7 @@ const TagsInput = class extends HTMLElement {
   }
   render() {
     var _a;
-    return h(Host, null, h("div", { class: "ionx-tags-input-wrapper" }, (_a = this.value) === null || _a === void 0 ? void 0 : _a.map((tag, index) => h("ion-chip", { outline: true, class: { "ion-activatable": false } }, h("div", null, tag), !this.hideRemove && !this.readonly && h("ion-icon", { name: "close", class: { "ion-activatable": !this.readonly }, onClick: () => this.removeTag(index) })))), !this.readonly && h("ion-input", { disabled: this.readonly, required: this.required, class: { "ionx-tags-input-input": true }, type: this.type, value: this.currentTag, placeholder: this.placeholder, onKeyUp: ev => this.onKeyUp(ev) }));
+    return h(Host, null, h("div", { class: "ionx-tags-input-wrapper" }, (_a = this.value) === null || _a === void 0 ? void 0 : _a.map((tag, index) => h("ion-chip", { outline: true, class: { "ion-activatable": false } }, h("div", null, tag), !this.hideRemove && !this.readonly && h("ion-icon", { name: "close", class: { "ion-activatable": !this.readonly }, onClick: () => this.removeTag(index) })))), !this.readonly && h("ion-input", { disabled: this.readonly, required: this.required, class: { "ionx-tags-input-input": true }, type: this.type, value: this.currentTag, placeholder: this.placeholder, onBlur: () => { var _a; return this.pushTag((_a = this.currentTag) === null || _a === void 0 ? void 0 : _a.trim()); }, onKeyUp: ev => this.onKeyUp(ev) }));
   }
   get element() { return this; }
   static get style() { return tagsInputCss; }

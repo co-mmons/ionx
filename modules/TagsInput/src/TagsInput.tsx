@@ -129,6 +129,10 @@ export class TagsInput {
 
     pushTag(tagStr: string): any {
 
+        if (!tagStr) {
+            return;
+        }
+
         if (!this.value) {
             this.value = [];
         }
@@ -153,7 +157,6 @@ export class TagsInput {
     onKeyUp(ev: KeyboardEvent) {
 
         this.currentTag = (ev.target as HTMLInputElement).value;
-
 
         if (this.separator && this.currentTag.indexOf(this.separator) > -1) {
 
@@ -240,6 +243,7 @@ export class TagsInput {
                 type={this.type}
                 value={this.currentTag}
                 placeholder={this.placeholder}
+                onBlur={() => this.pushTag(this.currentTag?.trim())}
                 onKeyUp={ev => this.onKeyUp(ev)}/>}
 
         </Host>
