@@ -243,7 +243,7 @@ export class TagsInput {
                 type={this.type}
                 value={this.currentTag}
                 placeholder={this.placeholder}
-                onBlur={() => this.pushTag(this.currentTag?.trim())}
+                onIonBlur={() => this.pushTag(this.currentTag?.trim())}
                 onKeyUp={ev => this.onKeyUp(ev)}/>}
 
         </Host>

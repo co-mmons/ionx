@@ -23,6 +23,8 @@ export namespace Components {
         "value": string[];
         "verifyFn": (tagSrt: string) => boolean;
     }
+    interface IonxTest {
+    }
 }
 declare global {
     interface HTMLIonxTagsInputElement extends Components.IonxTagsInput, HTMLStencilElement {
@@ -31,8 +33,15 @@ declare global {
         prototype: HTMLIonxTagsInputElement;
         new (): HTMLIonxTagsInputElement;
     };
+    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
+    }
+    var HTMLIonxTestElement: {
+        prototype: HTMLIonxTestElement;
+        new (): HTMLIonxTestElement;
+    };
     interface HTMLElementTagNameMap {
         "ionx-tags-input": HTMLIonxTagsInputElement;
+        "ionx-test": HTMLIonxTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -53,8 +62,11 @@ declare namespace LocalJSX {
         "value"?: string[];
         "verifyFn"?: (tagSrt: string) => boolean;
     }
+    interface IonxTest {
+    }
     interface IntrinsicElements {
         "ionx-tags-input": IonxTagsInput;
+        "ionx-test": IonxTest;
     }
 }
 export { LocalJSX as JSX };
@@ -62,6 +74,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ionx-tags-input": LocalJSX.IonxTagsInput & JSXBase.HTMLAttributes<HTMLIonxTagsInputElement>;
+            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
         }
     }
 }
