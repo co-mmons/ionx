@@ -12,9 +12,9 @@ import { LinkEditorProps } from "./LinkEditorProps";
 export namespace Components {
     interface IonxLinkEditor {
         "buildLink": () => Promise<Link>;
-        "link": string | Link;
         "schemes"?: SelectOption[] | LinkScheme[];
         "targetVisible": boolean;
+        "value": string | Link;
     }
     interface IonxLinkEditorDialog {
         "editorProps": LinkEditorProps;
@@ -40,9 +40,10 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxLinkEditor {
-        "link"?: string | Link;
+        "onIonChange"?: (event: CustomEvent<{value: Link}>) => void;
         "schemes"?: SelectOption[] | LinkScheme[];
         "targetVisible"?: boolean;
+        "value"?: string | Link;
     }
     interface IonxLinkEditorDialog {
         "editorProps"?: LinkEditorProps;

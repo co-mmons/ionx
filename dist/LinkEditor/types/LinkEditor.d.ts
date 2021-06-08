@@ -1,4 +1,4 @@
-import { ComponentInterface } from "@stencil/core";
+import { ComponentInterface, EventEmitter } from "@stencil/core";
 import { FormControl, FormController, required } from "ionx/forms";
 import { SelectOption } from "ionx/Select";
 import { Link } from "./Link";
@@ -6,9 +6,14 @@ import { LinkEditorProps } from "./LinkEditorProps";
 import { LinkScheme } from "./LinkScheme";
 import { LinkTarget } from "./LinkTarget";
 export declare class LinkEditor implements LinkEditorProps, ComponentInterface {
-  link: string | Link;
+  #private;
+  element: HTMLElement;
+  value: string | Link;
   schemes?: SelectOption[] | LinkScheme[];
   targetVisible: boolean;
+  ionChange: EventEmitter<{
+    value: Link;
+  }>;
   valueValidator(control: FormControl): Promise<void>;
   data: FormController<{
     scheme: {
@@ -24,6 +29,8 @@ export declare class LinkEditor implements LinkEditorProps, ComponentInterface {
     };
   }>;
   buildLink(): Promise<Link>;
+  onChanges(ev: CustomEvent): void;
+  prepare(): void;
   componentWillLoad(): Promise<void>;
   connectedCallback(): void;
   render(): any;

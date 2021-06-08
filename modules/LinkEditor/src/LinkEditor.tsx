@@ -1,5 +1,5 @@
 import {intl} from "@co.mmons/js-intl";
-import {Component, ComponentInterface, h, Host, Method, Prop} from "@stencil/core";
+import {Component, ComponentInterface, Element, Event, EventEmitter, forceUpdate, h, Host, Listen, Method, Prop} from "@stencil/core";
 import {defineIonxForms, FormControl, FormController, required} from "ionx/forms";
 import {defineIonxFormsTooltipErrorPresenter} from "ionx/forms/TooltipErrorPresenter";
 import {defineIonxSelect, SelectOption} from "ionx/Select";
@@ -22,14 +22,20 @@ defineIonxFormsTooltipErrorPresenter();
 })
 export class LinkEditor implements LinkEditorProps, ComponentInterface {
 
-    @Prop()
-    link: string | Link;
+    @Element()
+    element: HTMLElement;
+
+    @Prop({mutable: true})
+    value: string | Link;
 
     @Prop()
     schemes?: SelectOption[] | LinkScheme[];
 
     @Prop()
     targetVisible: boolean;
+
+    @Event()
+    ionChange: EventEmitter<{value: Link}>;
 
     async valueValidator(control: FormControl) {
 
@@ -47,39 +53,56 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
         target: {value: null as LinkTarget}
     });
 
-    @Method()
-    async buildLink(): Promise<Link> {
-        if (await this.data.validate()) {
-            return {
-                href: this.data.controls.scheme.value.buildHref(this.data.controls.value.value),
-                target: this.data.controls.target.value?.target
-            }
+    /**
+     * Builds a link without validation. Returns undefined if invalid link.
+     */
+    #buildLink = () => {
+
+        const href = this.data.controls.scheme.value?.buildHref(this.data.controls.value.value);
+        const target = this.data.controls.target.value?.target;
+
+        if (href) {
+            return {href, target};
         }
     }
 
-    async componentWillLoad() {
-        await loadIntlMessages();
+    @Method()
+    async buildLink(): Promise<Link> {
+        if (await this.data.validate()) {
+            return this.#buildLink();
+        }
     }
 
-    connectedCallback() {
+    @Listen("ionChange")
+    onChanges(ev: CustomEvent) {
 
-        if (this.link) {
-            let link: LinkScheme.ParsedLink;
+        if (ev.target !== this.element) {
+            ev.stopPropagation();
+            ev.stopImmediatePropagation();
+            ev.preventDefault();
+        }
+    }
+
+    prepare() {
+
+        let link: LinkScheme.ParsedLink;
+
+        if (this.value) {
             for (const item of (this.schemes ?? DefaultLinkScheme.values())) {
                 const asOption = (item as SelectOption);
                 const scheme = asOption.value as LinkScheme ?? (item as LinkScheme);
                 if (scheme.parseLink) {
-                    link = scheme.parseLink(this.link);
+                    link = scheme.parseLink(this.value);
                     if (link) {
                         break;
                     }
                 }
             }
-
-            this.data.controls.scheme.setValue(link?.scheme || unknownScheme);
-            this.data.controls.value.setValue(link ? link.value : (typeof this.link === "string" ? this.link : this.link.href));
-            this.data.controls.target.setValue(link?.target);
         }
+
+        this.data.controls.scheme.setValue(link?.scheme);
+        this.data.controls.value.setValue(link ? link.value : (typeof this.value === "string" ? this.value : this.value?.href));
+        this.data.controls.target.setValue(link?.target);
 
         this.data.bindRenderer(this);
 
@@ -98,6 +121,24 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
                 }
             }
         });
+
+        this.data.onStateChange(({value, current}) => {
+            if (value) {
+                const link = this.#buildLink();
+                if (JSON.stringify(this.value || null) !== JSON.stringify(link || null)) {
+                    this.value = link;
+                    this.ionChange.emit({value: link});
+                }
+            }
+        })
+    }
+
+    async componentWillLoad() {
+        await loadIntlMessages();
+    }
+
+    connectedCallback() {
+        this.prepare();
     }
 
     render() {
@@ -135,6 +176,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
                 </ionx-form-field>
 
                 {ValueComponent && <ionx-form-field
+                    error={this.data.controls.value.error}
                     label={scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message`ionx/LinkEditor#Link`}>
 
                     <ValueComponent

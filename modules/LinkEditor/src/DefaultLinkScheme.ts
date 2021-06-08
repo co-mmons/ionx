@@ -76,6 +76,10 @@ export class DefaultLinkScheme extends Enum implements LinkScheme {
 
     buildHref(value: string) {
 
+        if (!value) {
+            return;
+        }
+
         if (this.name === "www") {
             return value;
         } else if (this.name === "tel") {

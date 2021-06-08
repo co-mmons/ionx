@@ -10,11 +10,11 @@ export class LinkEditorTest {
         return <Host>
 
             <ionx-form-field label="Inline editor">
-                <ionx-link-editor style={{margin: "16px"}}/>
+                <ionx-link-editor style={{margin: "16px"}} onIonChange={ev => console.log(ev)}/>
             </ionx-form-field>
 
             <ionx-form-field label="Dialog editor">
-                <ion-button onClick={() => showLinkEditor({link: undefined})}>open dialog</ion-button>
+                <ion-button onClick={() => showLinkEditor({value: undefined})}>open dialog</ion-button>
             </ionx-form-field>
 
         </Host>

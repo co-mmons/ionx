@@ -1,4 +1,4 @@
-import { h, Host, proxyCustomElement } from '@stencil/core/internal/client';
+import { createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { MessageRef, intl, setMessages } from '@co.mmons/js-intl';
 import { Enum } from '@co.mmons/js-utils/core';
@@ -89,6 +89,9 @@ class DefaultLinkScheme extends Enum {
     }
   }
   buildHref(value) {
+    if (!value) {
+      return;
+    }
     if (this.name === "www") {
       return value;
     }
@@ -200,6 +203,13 @@ const unknownScheme = new class {
 
 const linkEditorCss = ".sc-ionx-link-editor-h{display:block}.sc-ionx-link-editor-h ionx-form-field.sc-ionx-link-editor:not(:first-child){margin-top:16px}";
 
+var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, privateMap) {
+  if (!privateMap.has(receiver)) {
+    throw new TypeError("attempted to get private field on non-instance");
+  }
+  return privateMap.get(receiver);
+};
+var _buildLink;
 defineIonxForms();
 defineIonxSelect();
 defineIonxFormsTooltipErrorPresenter();
@@ -207,10 +217,22 @@ const LinkEditor = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
+    this.ionChange = createEvent(this, "ionChange", 7);
     this.data = new FormController({
       scheme: { value: null, validators: [required] },
       value: { value: null, validators: [required, this.valueValidator.bind(this)] },
       target: { value: null }
+    });
+    /**
+     * Builds a link without validation. Returns undefined if invalid link.
+     */
+    _buildLink.set(this, () => {
+      var _a, _b;
+      const href = (_a = this.data.controls.scheme.value) === null || _a === void 0 ? void 0 : _a.buildHref(this.data.controls.value.value);
+      const target = (_b = this.data.controls.target.value) === null || _b === void 0 ? void 0 : _b.target;
+      if (href) {
+        return { href, target };
+      }
     });
   }
   async valueValidator(control) {
@@ -222,35 +244,35 @@ const LinkEditor = class extends HTMLElement {
     }
   }
   async buildLink() {
-    var _a;
     if (await this.data.validate()) {
-      return {
-        href: this.data.controls.scheme.value.buildHref(this.data.controls.value.value),
-        target: (_a = this.data.controls.target.value) === null || _a === void 0 ? void 0 : _a.target
-      };
+      return __classPrivateFieldGet(this, _buildLink).call(this);
     }
   }
-  async componentWillLoad() {
-    await loadIntlMessages();
+  onChanges(ev) {
+    if (ev.target !== this.element) {
+      ev.stopPropagation();
+      ev.stopImmediatePropagation();
+      ev.preventDefault();
+    }
   }
-  connectedCallback() {
-    var _a, _b;
-    if (this.link) {
-      let link;
+  prepare() {
+    var _a, _b, _c;
+    let link;
+    if (this.value) {
       for (const item of ((_a = this.schemes) !== null && _a !== void 0 ? _a : DefaultLinkScheme.values())) {
         const asOption = item;
         const scheme = (_b = asOption.value) !== null && _b !== void 0 ? _b : item;
         if (scheme.parseLink) {
-          link = scheme.parseLink(this.link);
+          link = scheme.parseLink(this.value);
           if (link) {
             break;
           }
         }
       }
-      this.data.controls.scheme.setValue((link === null || link === void 0 ? void 0 : link.scheme) || unknownScheme);
-      this.data.controls.value.setValue(link ? link.value : (typeof this.link === "string" ? this.link : this.link.href));
-      this.data.controls.target.setValue(link === null || link === void 0 ? void 0 : link.target);
     }
+    this.data.controls.scheme.setValue(link === null || link === void 0 ? void 0 : link.scheme);
+    this.data.controls.value.setValue(link ? link.value : (typeof this.value === "string" ? this.value : (_c = this.value) === null || _c === void 0 ? void 0 : _c.href));
+    this.data.controls.target.setValue(link === null || link === void 0 ? void 0 : link.target);
     this.data.bindRenderer(this);
     this.data.controls.scheme.onStateChange(state => {
       var _a;
@@ -268,6 +290,21 @@ const LinkEditor = class extends HTMLElement {
         }
       }
     });
+    this.data.onStateChange(({ value, current }) => {
+      if (value) {
+        const link = __classPrivateFieldGet(this, _buildLink).call(this);
+        if (JSON.stringify(this.value || null) !== JSON.stringify(link || null)) {
+          this.value = link;
+          this.ionChange.emit({ value: link });
+        }
+      }
+    });
+  }
+  async componentWillLoad() {
+    await loadIntlMessages();
+  }
+  connectedCallback() {
+    this.prepare();
   }
   render() {
     var _a, _b;
@@ -287,10 +324,12 @@ const LinkEditor = class extends HTMLElement {
     const scheme = this.data.controls.scheme.value;
     const ValueComponent = (_a = this.data.controls.scheme.value) === null || _a === void 0 ? void 0 : _a.valueComponent;
     const targets = (_b = scheme === null || scheme === void 0 ? void 0 : scheme.valueTargets) === null || _b === void 0 ? void 0 : _b.call(scheme, this.data.controls.value.value);
-    return h(Host, null, h("ionx-form-controller", { controller: this.data }, h("ionx-form-tooltip-error-presenter", null), h("ionx-form-field", { label: intl.message `ionx/LinkEditor#Link type` }, h("ionx-select", { ref: this.data.controls.scheme.attach(), empty: false, placeholder: intl.message `ionx/LinkEditor#Choose...`, options: schemes })), ValueComponent && h("ionx-form-field", { label: scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message `ionx/LinkEditor#Link` }, h(ValueComponent, Object.assign({}, scheme.valueComponentProps, { ref: this.data.controls.value.attach() })), scheme.valueHint && h("span", { slot: "hint" }, intl.message(scheme.valueHint))), this.targetVisible !== false && (targets === null || targets === void 0 ? void 0 : targets.length) > 0 && h("ionx-form-field", { label: intl.message `ionx/LinkEditor#Open in|link target` }, h("ionx-select", { ref: this.data.controls.target.attach(), placeholder: intl.message `ionx/LinkEditor#defaultTargetLabel`, options: targets.map(target => ({ value: target, label: intl.message(target.label) })) }))));
+    return h(Host, null, h("ionx-form-controller", { controller: this.data }, h("ionx-form-tooltip-error-presenter", null), h("ionx-form-field", { label: intl.message `ionx/LinkEditor#Link type` }, h("ionx-select", { ref: this.data.controls.scheme.attach(), empty: false, placeholder: intl.message `ionx/LinkEditor#Choose...`, options: schemes })), ValueComponent && h("ionx-form-field", { error: this.data.controls.value.error, label: scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message `ionx/LinkEditor#Link` }, h(ValueComponent, Object.assign({}, scheme.valueComponentProps, { ref: this.data.controls.value.attach() })), scheme.valueHint && h("span", { slot: "hint" }, intl.message(scheme.valueHint))), this.targetVisible !== false && (targets === null || targets === void 0 ? void 0 : targets.length) > 0 && h("ionx-form-field", { label: intl.message `ionx/LinkEditor#Open in|link target` }, h("ionx-select", { ref: this.data.controls.target.attach(), placeholder: intl.message `ionx/LinkEditor#defaultTargetLabel`, options: targets.map(target => ({ value: target, label: intl.message(target.label) })) }))));
   }
+  get element() { return this; }
   static get style() { return linkEditorCss; }
 };
+_buildLink = new WeakMap();
 
 const LinkEditorDialog = class extends HTMLElement {
   constructor() {
@@ -316,7 +355,7 @@ const LinkEditorDialog = class extends HTMLElement {
   get element() { return this; }
 };
 
-const IonxLinkEditor = /*@__PURE__*/proxyCustomElement(LinkEditor, [2,"ionx-link-editor",{"link":[1],"schemes":[16],"targetVisible":[4,"target-visible"]}]);
+const IonxLinkEditor = /*@__PURE__*/proxyCustomElement(LinkEditor, [2,"ionx-link-editor",{"value":[1025],"schemes":[16],"targetVisible":[4,"target-visible"]},[[0,"ionChange","onChanges"]]]);
 const IonxLinkEditorDialog = /*@__PURE__*/proxyCustomElement(LinkEditorDialog, [2,"ionx-link-editor-dialog",{"editorProps":[16]}]);
 const defineIonxLinkEditor = (opts) => {
   if (typeof customElements !== 'undefined') {
