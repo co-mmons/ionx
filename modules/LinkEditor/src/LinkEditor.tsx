@@ -34,6 +34,9 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
     @Prop()
     targetVisible: boolean;
 
+    @Prop()
+    readonly: boolean;
+
     @Event()
     ionChange: EventEmitter<{value: Link}>;
 
@@ -115,7 +118,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
 
         this.data.controls.value.onStateChange(state => {
             if (state.current.value !== state.previous?.value) {
-                const targets = this.data.controls.scheme.value.valueTargets(state.current.value);
+                const targets = this.data.controls.scheme.value?.valueTargets?.(state.current.value);
                 if (!targets?.includes(this.data.controls.target.value)) {
                     this.data.controls.target.setValue(undefined);
                 }
@@ -169,6 +172,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
 
                 <ionx-form-field label={intl.message`ionx/LinkEditor#Link type`}>
                     <ionx-select
+                        readonly={this.readonly}
                         ref={this.data.controls.scheme.attach()}
                         empty={false}
                         placeholder={intl.message`ionx/LinkEditor#Choose...`}
@@ -176,11 +180,13 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
                 </ionx-form-field>
 
                 {ValueComponent && <ionx-form-field
+                    readonly={this.readonly}
                     error={this.data.controls.value.error}
                     label={scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message`ionx/LinkEditor#Link`}>
 
                     <ValueComponent
                         {...scheme.valueComponentProps}
+                        readonly={this.readonly}
                         ref={this.data.controls.value.attach()}/>
 
                     {scheme.valueHint && <span slot="hint">{intl.message(scheme.valueHint)}</span>}
@@ -190,6 +196,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
                 {this.targetVisible !== false && targets?.length > 0 && <ionx-form-field
                     label={intl.message`ionx/LinkEditor#Open in|link target`}>
                     <ionx-select
+                        readonly={this.readonly}
                         ref={this.data.controls.target.attach()}
                         placeholder={intl.message`ionx/LinkEditor#defaultTargetLabel`}
                         options={targets.map(target => ({value: target, label: intl.message(target.label)}))}/>

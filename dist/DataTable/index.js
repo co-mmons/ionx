@@ -2,6 +2,7 @@ import { forceUpdate, h, Host, attachShadow, proxyCustomElement } from '@stencil
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { intl } from '@co.mmons/js-intl';
 import { popoverController } from '@ionic/core';
+import { toString } from '@co.mmons/js-utils/core';
 import { defineIonxSelect, showSelectOverlay } from 'ionx/Select';
 
 const dataTableCss = "ionx-data-table{display:block;overflow:auto;max-height:100%;border:var(--ionx-border-width) solid var(--ion-border-color);border-radius:var(--ionx-border-radius)}ionx-data-table>table{width:100%}ionx-data-table>table>tbody>tr>td{padding:8px;border:var(--ionx-border-width) solid var(--ion-border-color)}ionx-data-table>table>tbody>tr>td:first-child{border-left:0}ionx-data-table>table>tbody>tr>td:last-child{border-right:0}ionx-data-table>table>tbody>tr:last-child>td{border-bottom:0}";
@@ -163,7 +164,10 @@ const Th = class extends HTMLElement {
   async filterSelect() {
     const current = this.filterCurrent();
     const overlayTitle = this.element.querySelector("[slot-container=label]").innerText || this.element.title;
-    const options = this.filterData().map(data => ({ label: data, value: data }));
+    const options = this.filterData()
+      .filter((v, i, a) => !a.includes(v, i + 1))
+      .map(data => ({ label: toString(data), value: data }))
+      .sort((a, b) => (a.label || "").localeCompare(b.label || ""));
     const { willDismiss } = await showSelectOverlay({
       overlay: "modal",
       multiple: true,

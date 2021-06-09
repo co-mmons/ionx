@@ -1,4 +1,4 @@
-import {Component, ComponentInterface, h, Host} from "@stencil/core";
+import {Component, ComponentInterface, h} from "@stencil/core";
 import {DataTableColumn} from "../DataTableColumn";
 
 @Component({
@@ -26,7 +26,7 @@ export class Test implements ComponentInterface {
         for (let i = 0; i < 100; i++) {
             const row = [];
             for (let c = 0; c < 10; c++) {
-                row.push(`${i}${c}`);
+                row.push(c === 3 ? (Math.ceil(i / 10)) : `${i}${c}`);
             }
             this.rows.push(row);
         }
@@ -34,8 +34,8 @@ export class Test implements ComponentInterface {
     }
 
     render() {
-        return <Host>
+        return <ion-content>
             <ionx-data-table columns={this.columns} data={this.rows} style={{"margin": "16px"}}/>
-        </Host>
+        </ion-content>
     }
 }

@@ -16,6 +16,8 @@ export interface FormControlElement {
 
     setFocus?(options?: FocusOptions): Promise<void>;
 
+    validate?(): Promise<void>;
+
     readonly formValueChangeEventName?: string;
 
     readonly formTouchEventName?: string;

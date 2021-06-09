@@ -1,3 +1,4 @@
+import {toString} from "@co.mmons/js-utils/core";
 import {popoverController} from "@ionic/core";
 import {Component, Element, h, Host, Prop, State} from "@stencil/core";
 import {defineIonxSelect, SelectOption, showSelectOverlay} from "ionx/Select";
@@ -79,7 +80,10 @@ export class Th implements DataTableColumnFilterOptions {
         const current = this.filterCurrent();
 
         const overlayTitle = this.element.querySelector<HTMLElement>("[slot-container=label]").innerText || this.element.title;
-        const options: SelectOption[] = this.filterData().map(data => ({label: data, value: data}));
+        const options: SelectOption[] = this.filterData()
+            .filter((v, i, a) => !a.includes(v, i + 1))
+            .map(data => ({label: toString(data), value: data}))
+            .sort((a, b) => (a.label || "").localeCompare(b.label || ""));
 
         const {willDismiss} = await showSelectOverlay({
             overlay: "modal",

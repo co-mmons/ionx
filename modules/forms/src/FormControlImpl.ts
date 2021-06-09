@@ -271,6 +271,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
         let error: Error;
 
+        this.element$?.validate?.();
+
         if (this.validators$) {
             VALIDATORS: for (const validator of this.validators$) {
                 try {

@@ -5,3 +5,7 @@
         margin-top: 16px;
     }
 }
+
+:host-context(ionx-form-field) {
+    margin: 16px;
+}
