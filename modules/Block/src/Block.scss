@@ -1,3 +1,4 @@
+@import "../styles/src/media-breakpoint-width-mixin";
 
 :host {
     display: block;
@@ -23,6 +24,6 @@
     }
 
     &.ionx--has-inner-width > [ionx--outer] > [ionx--inner] {
-        //@include ionx-media-breakpoint-width("--block-inner-width", "100%");
+        @include ionx-media-breakpoint-width("--block-inner-width", "100%");
     }
 }

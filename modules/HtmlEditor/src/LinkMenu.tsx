@@ -27,7 +27,7 @@ export class LinkMenu {
             const target = mark.attrs.target;
             if (href) {
                 await popoverController.dismiss();
-                const link = await showLinkEditor({link: {href, target}});
+                const link = await showLinkEditor({value: {href, target}});
                 if (link) {
 
                     const selection = view.state.selection;

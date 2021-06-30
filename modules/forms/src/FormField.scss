@@ -17,6 +17,7 @@
         border-radius: var(--ionx-border-radius);
         border-style: solid;
         position: relative;
+        min-width: auto;
         margin: 0;
         padding: 0;
 
@@ -69,6 +70,7 @@
 
             > [slot-container=default] {
                 flex: 1;
+                overflow: hidden;
             }
 
             > [slot-container=start], > [slot-container=end] {

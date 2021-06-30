@@ -5,12 +5,14 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { LinkScheme } from "ionx/LinkEditor";
 import { EditorView } from "prosemirror-view";
 import { HtmlEditorFeatures } from "./HtmlEditorFeatures";
 export namespace Components {
     interface IonxHtmlEditor {
         "disabled": boolean;
         "getView": () => Promise<EditorView<any>>;
+        "linkSchemes": LinkScheme[];
         "readonly": boolean;
         "setFocus": () => Promise<void>;
         "value": string;
@@ -100,6 +102,7 @@ declare global {
 declare namespace LocalJSX {
     interface IonxHtmlEditor {
         "disabled"?: boolean;
+        "linkSchemes"?: LinkScheme[];
         "onEditorSelectionChange"?: (event: CustomEvent<any>) => void;
         "onIonChange"?: (event: CustomEvent<{value: string}>) => void;
         "readonly"?: boolean;

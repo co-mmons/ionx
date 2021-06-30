@@ -1,5 +1,4 @@
 {
-    "name": "MasonryGrid",
     "scripts": {
         "build": "../../node_modules/.bin/stencil build --ts --config stencil.config.build.ts",
         "start": "../../node_modules/.bin/stencil build --dev --watch --serve --config stencil.config.test.ts",

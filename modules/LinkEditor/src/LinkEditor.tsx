@@ -1,6 +1,6 @@
 import {intl} from "@co.mmons/js-intl";
-import {Component, ComponentInterface, Element, Event, EventEmitter, forceUpdate, h, Host, Listen, Method, Prop} from "@stencil/core";
-import {defineIonxForms, FormControl, FormController, required} from "ionx/forms";
+import {Component, ComponentInterface, Element, Event, EventEmitter, FunctionalComponent, h, Host, Listen, Method, Prop} from "@stencil/core";
+import {defineIonxForms, FormControl, FormControlElement, FormController, FormValidationError, required} from "ionx/forms";
 import {defineIonxFormsTooltipErrorPresenter} from "ionx/forms/TooltipErrorPresenter";
 import {defineIonxSelect, SelectOption} from "ionx/Select";
 import {DefaultLinkScheme} from "./DefaultLinkScheme";
@@ -20,7 +20,7 @@ defineIonxFormsTooltipErrorPresenter();
     scoped: true,
     styleUrl: "LinkEditor.scss"
 })
-export class LinkEditor implements LinkEditorProps, ComponentInterface {
+export class LinkEditor implements LinkEditorProps, ComponentInterface, FormControlElement {
 
     @Element()
     element: HTMLElement;
@@ -37,8 +37,34 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
     @Prop()
     readonly: boolean;
 
+    @Prop()
+    disabled: boolean;
+
     @Event()
     ionChange: EventEmitter<{value: Link}>;
+
+    errorPresenter: string | FunctionalComponent;
+
+    async formValidate() {
+
+        // we assume, that any inner validation is required, when scheme is chosen
+        // if not chosen, than it means undefined is returned by editor
+        if (this.data.controls.scheme.value) {
+            await this.data.validate({preventFocus: true, preventScroll: true});
+            if (this.data.invalid) {
+                throw new FormValidationError();
+            }
+        }
+
+    }
+
+    async setFocus(options?: FocusOptions) {
+        if (this.data.invalid) {
+            await this.data.validate();
+        } else {
+            this.element.focus(options);
+        }
+    }
 
     async valueValidator(control: FormControl) {
 
@@ -91,7 +117,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
         let link: LinkScheme.ParsedLink;
 
         if (this.value) {
-            for (const item of (this.schemes ?? DefaultLinkScheme.values())) {
+            for (const item of ((this.schemes ?? DefaultLinkScheme.values()) as Array<LinkScheme | SelectOption>).concat(unknownScheme)) {
                 const asOption = (item as SelectOption);
                 const scheme = asOption.value as LinkScheme ?? (item as LinkScheme);
                 if (scheme.parseLink) {
@@ -125,7 +151,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
             }
         });
 
-        this.data.onStateChange(({value, current}) => {
+        this.data.onStateChange(({value}) => {
             if (value) {
                 const link = this.#buildLink();
                 if (JSON.stringify(this.value || null) !== JSON.stringify(link || null)) {
@@ -142,6 +168,11 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
 
     connectedCallback() {
         this.prepare();
+
+
+        if (this.element.closest("ionx-link-editor-dialog")) {
+            this.errorPresenter = "ionx-form-tooltip-error-presenter";
+        }
     }
 
     render() {
@@ -150,7 +181,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
         if (this.schemes) {
             schemes = (this.schemes as []).map(scheme => (scheme as SelectOption).value ? scheme as SelectOption : {value: scheme, label: intl.message((scheme as LinkScheme).label)});
         } else {
-            schemes = DefaultLinkScheme.values().map(type => ({
+            schemes = (DefaultLinkScheme.values() as LinkScheme[]).concat(unknownScheme).map(type => ({
                 value: type,
                 label: intl.message(type.label)
             }));
@@ -164,14 +195,19 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
         const ValueComponent: any = this.data.controls.scheme.value?.valueComponent;
         const targets = scheme?.valueTargets?.(this.data.controls.value.value);
 
+        const ErrorPresenter = this.errorPresenter;
+
         return <Host>
 
             <ionx-form-controller controller={this.data}>
 
-                <ionx-form-tooltip-error-presenter/>
+                {ErrorPresenter && <ErrorPresenter/>}
 
-                <ionx-form-field label={intl.message`ionx/LinkEditor#Link type`}>
+                <ionx-form-field
+                    error={!this.errorPresenter && this.data.controls.scheme.error}
+                    label={intl.message`ionx/LinkEditor#Link type`}>
                     <ionx-select
+                        disabled={this.disabled}
                         readonly={this.readonly}
                         ref={this.data.controls.scheme.attach()}
                         empty={false}
@@ -180,12 +216,12 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
                 </ionx-form-field>
 
                 {ValueComponent && <ionx-form-field
-                    readonly={this.readonly}
-                    error={this.data.controls.value.error}
+                    error={!this.errorPresenter && this.data.controls.value.error}
                     label={scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message`ionx/LinkEditor#Link`}>
 
                     <ValueComponent
                         {...scheme.valueComponentProps}
+                        disabled={this.disabled}
                         readonly={this.readonly}
                         ref={this.data.controls.value.attach()}/>
 
@@ -193,9 +229,11 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface {
 
                 </ionx-form-field>}
 
-                {this.targetVisible !== false && targets?.length > 0 && <ionx-form-field
+                {this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && <ionx-form-field
+                    error={!this.errorPresenter && this.data.controls.target.error}
                     label={intl.message`ionx/LinkEditor#Open in|link target`}>
                     <ionx-select
+                        disabled={this.disabled}
                         readonly={this.readonly}
                         ref={this.data.controls.target.attach()}
                         placeholder={intl.message`ionx/LinkEditor#defaultTargetLabel`}

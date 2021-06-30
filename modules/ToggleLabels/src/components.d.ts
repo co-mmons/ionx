@@ -14,6 +14,7 @@ export namespace Components {
         "disabled": boolean;
         "off": string;
         "on": string;
+        "prefetch": boolean;
         "readonly": boolean;
         "value": boolean;
     }
@@ -39,6 +40,7 @@ declare namespace LocalJSX {
         "off"?: string;
         "on"?: string;
         "onIonChange"?: (event: CustomEvent<{value: boolean}>) => void;
+        "prefetch"?: boolean;
         "readonly"?: boolean;
         "value"?: boolean;
     }

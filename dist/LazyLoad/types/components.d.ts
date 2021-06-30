@@ -7,6 +7,8 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface IonxLazyLoad {
+        "container"?: "parent" | "self" | "content";
+        "observeShadow"?: boolean;
     }
 }
 declare global {
@@ -22,6 +24,8 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxLazyLoad {
+        "container"?: "parent" | "self" | "content";
+        "observeShadow"?: boolean;
     }
     interface IntrinsicElements {
         "ionx-lazy-load": IonxLazyLoad;

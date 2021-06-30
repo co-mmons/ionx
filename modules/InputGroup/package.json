@@ -1,5 +1,4 @@
 {
-    "name": "ionx/InputGroup",
     "scripts": {
         "build": "stencil build --ts --config stencil.config.build.ts"
     },

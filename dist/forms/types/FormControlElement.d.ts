@@ -9,8 +9,12 @@ export interface ApplyFormControlState {
  * Defines an interface that acts as a bridge between the forms API and an element in the DOM.
  */
 export interface FormControlElement {
-  applyFormState(state: ApplyFormControlState): Promise<void>;
+  applyFormState?(state: ApplyFormControlState): Promise<void>;
   setFocus?(options?: FocusOptions): Promise<void>;
+  /**
+   * @throws {@link FormValidationError}
+   */
+  formValidate?(): Promise<void>;
   readonly formValueChangeEventName?: string;
   readonly formTouchEventName?: string;
 }

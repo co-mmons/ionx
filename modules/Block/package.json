@@ -1,5 +1,4 @@
 {
-    "name": "ionx/Block",
     "scripts": {
         "build": "stencil build --ts --config stencil.config.build.ts"
     },

@@ -1,5 +1,4 @@
 {
-    "name": "ionx/Searchbar",
     "scripts": {
         "build": "node-utils-file-system-copy-directory src ../../dist/Searchbar"
     }

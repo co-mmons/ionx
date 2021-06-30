@@ -10,6 +10,10 @@ export declare class ToggleLabels {
   readonly: boolean;
   disabled: boolean;
   value: boolean;
+  /**
+   * @internal
+   */
+  prefetch: boolean;
   ionChange: EventEmitter<{
     value: boolean;
   }>;
@@ -22,6 +26,7 @@ export declare class ToggleLabels {
   toggleChanged(): void;
   valueChanged(): void;
   syncToggle(): void;
+  componentDidLoad(): void;
   connectedCallback(): void;
   render(): any;
 }

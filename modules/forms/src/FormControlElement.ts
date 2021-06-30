@@ -12,11 +12,14 @@ export interface ApplyFormControlState {
  */
 export interface FormControlElement {
 
-    applyFormState(state: ApplyFormControlState): Promise<void>;
+    applyFormState?(state: ApplyFormControlState): Promise<void>;
 
     setFocus?(options?: FocusOptions): Promise<void>;
 
-    validate?(): Promise<void>;
+    /**
+     * @throws {@link FormValidationError}
+     */
+    formValidate?(): Promise<void>;
 
     readonly formValueChangeEventName?: string;
 

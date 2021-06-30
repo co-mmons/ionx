@@ -1,6 +1,7 @@
 import { h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { isHydrated, waitTillHydrated } from 'ionx/utils';
+import { waitTill } from '@co.mmons/js-utils/core';
 
 function ensureLazyLoad(contentOrOptions, options) {
   const contentElements = contentOrOptions instanceof HTMLElement ? [contentOrOptions] : document.body.querySelectorAll("ion-content");
@@ -19,6 +20,18 @@ const itemPendingCssClass = `${itemCssClassPrefix}-pending`;
 const itemErrorCssClass = `${itemCssClassPrefix}-error`;
 const itemLoadingCssClass = `${itemCssClassPrefix}-loading`;
 const itemLoadedCssClass = `${itemCssClassPrefix}-loaded`;
+
+function realContainerElement(lazy) {
+  if (lazy.container === "parent") {
+    if (lazy.parentNode instanceof ShadowRoot) {
+      return lazy.parentNode.host;
+    }
+    return lazy.parentElement;
+  }
+  else if (lazy.container === "self") {
+    return lazy;
+  }
+}
 
 function styleParents(element, parents) {
   if (!parents) {
@@ -130,14 +143,21 @@ class LazyLoadController {
     }
     load(false);
   }
-  connectContainer(container) {
-    if (!this.containers.includes(container)) {
-      this.containers.push(container);
+  connectContainer(containerElement) {
+    if (!this.containers.find(c => c.element === containerElement)) {
+      const element = realContainerElement(containerElement);
+      this.containers.push({
+        element: containerElement,
+        items: element === null || element === void 0 ? void 0 : element.getElementsByClassName("ionx-lazy-load-pending"),
+        errors: element === null || element === void 0 ? void 0 : element.getElementsByClassName(itemErrorCssClass),
+        shadowItems: () => containerElement.observeShadow && element.shadowRoot.querySelectorAll(`.${itemPendingCssClass}`),
+        shadowErrors: () => containerElement.observeShadow && element.shadowRoot.querySelectorAll(`.${itemErrorCssClass}`)
+      });
     }
     this.ensureLoaded();
   }
   disconnectContainer(container) {
-    const idx = this.containers.indexOf(container);
+    const idx = this.containers.findIndex(c => c.element === container);
     if (idx > -1) {
       this.containers.splice(idx, 1);
     }
@@ -145,17 +165,24 @@ class LazyLoadController {
       this.disconnect();
     }
   }
-  ensureLoaded(options) {
+  async ensureLoaded(options) {
     if (options === null || options === void 0 ? void 0 : options.retryError) {
-      const errors = this.content.getElementsByClassName(itemErrorCssClass);
-      for (let i = 0; i < errors.length; i++) {
-        const item = errors[i];
-        item.classList.add(itemPendingCssClass);
-        item.classList.remove(itemErrorCssClass);
+      for (const errors of [this.errors, ...this.containers.map(c => c.errors), ...this.containers.map(c => c.shadowErrors())]) {
+        if (errors) {
+          for (let i = 0; i < errors.length; i++) {
+            const item = errors[i];
+            item.classList.add(itemPendingCssClass);
+            item.classList.remove(itemErrorCssClass);
+          }
+        }
       }
     }
-    for (let i = 0; i < this.items.length; i++) {
-      this.intersectionObserver.observe(this.items[i]);
+    for (const items of [this.items, ...this.containers.map(c => c.items), ...this.containers.map(c => c.shadowItems())]) {
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          this.intersectionObserver.observe(items[i]);
+        }
+      }
     }
     if (!isHydrated(this.content)) {
       waitTillHydrated(this.content, { interval: 100, timeout: 10000 }).then(() => this.ensureLoaded());
@@ -168,7 +195,8 @@ class LazyLoadController {
       root: this.content,
       threshold: 0,
     });
-    this.items = this.content.getElementsByClassName("ionx-lazy-load-pending");
+    this.items = this.content.getElementsByClassName(itemPendingCssClass);
+    this.errors = this.content.getElementsByClassName(itemErrorCssClass);
   }
   disconnect() {
     console.debug("[ionx-lazy-load] disconnect controller");
@@ -197,18 +225,47 @@ function lazyLoadItem(elementOrOptions, options) {
   }
 }
 
+function closestElement(node, selector) {
+  if (!node) {
+    return;
+  }
+  if (node instanceof ShadowRoot) {
+    return closestElement(node.host, selector);
+  }
+  if (node instanceof HTMLElement) {
+    if (node.matches(selector)) {
+      return node;
+    }
+    else {
+      return closestElement(node.parentNode, selector);
+    }
+  }
+  return closestElement(node.parentNode, selector);
+}
+
 const LazyLoad = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
   }
   connectedCallback() {
-    this.observer = new MutationObserver(mutations => this.onMutation(mutations));
-    this.observer.observe(this.element, { childList: true, subtree: true });
     this.initContent();
+    this.initObservers();
+  }
+  async initObservers() {
+    const container = realContainerElement(this.element);
+    if (container) {
+      this.observers = [new MutationObserver(mutations => this.onMutation(mutations))];
+      this.observers[0].observe(container, { childList: true, subtree: true });
+      if (this.observeShadow) {
+        await waitTill(() => !!container.shadowRoot);
+        this.observers.push(new MutationObserver(mutations => this.onMutation(mutations)));
+        this.observers[1].observe(container.shadowRoot, { childList: true, subtree: true });
+      }
+    }
   }
   initContent() {
-    const content = this.element.closest("ion-content");
+    const content = closestElement(this.element, "ion-content");
     if (!content) {
       setTimeout(() => this.initContent(), 100);
     }
@@ -220,15 +277,16 @@ const LazyLoad = class extends HTMLElement {
     }
   }
   onMutation(_mutations) {
-    const content = this.element.closest("ion-content");
+    const content = closestElement(this.element, "ion-content");
     if (content && content.__ionxLazyLoad) {
       content.__ionxLazyLoad.ensureLoaded();
     }
   }
   disconnectedCallback() {
-    this.observer.disconnect();
-    this.observer = undefined;
-    const content = this.element.closest("ion-content");
+    for (const observer of this.observers.splice(0, this.observers.length)) {
+      observer.disconnect();
+    }
+    const content = closestElement(this.element, "ion-content");
     if (content && content.__ionxLazyLoad) {
       content.__ionxLazyLoad.disconnectContainer(this.element);
     }
@@ -239,7 +297,7 @@ const LazyLoad = class extends HTMLElement {
   get element() { return this; }
 };
 
-const IonxLazyLoad = /*@__PURE__*/proxyCustomElement(LazyLoad, [4,"ionx-lazy-load"]);
+const IonxLazyLoad = /*@__PURE__*/proxyCustomElement(LazyLoad, [4,"ionx-lazy-load",{"container":[1],"observeShadow":[4,"observe-shadow"]}]);
 const defineIonxLazyLoad = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

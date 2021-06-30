@@ -1,5 +1,4 @@
 {
-    "name": "ionx/Dragula",
     "scripts": {
         "build": "stencil build --ts --config stencil.config.build.ts"
     },

@@ -38,7 +38,7 @@ export class InsertMenu implements ComponentInterface {
             }
         }
 
-        const link = await showLinkEditor({link: href ? {href, target} : undefined});
+        const link = await showLinkEditor({value: href ? {href, target} : undefined});
         if (link) {
 
             const selection = view.state.selection;

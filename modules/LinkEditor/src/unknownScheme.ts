@@ -12,9 +12,8 @@ export const unknownScheme = new class implements LinkScheme {
         return value;
     }
 
-    parseLink(_link: string | Link): LinkScheme.ParsedLink {
-        // unknown cannot be parsed and this is why is unknown :-)
-        return undefined;
+    parseLink(link: string | Link): LinkScheme.ParsedLink {
+        return {scheme: this, value: typeof link === "string"  ? link : link.href};
     }
 
 }

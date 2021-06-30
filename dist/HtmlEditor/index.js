@@ -14171,7 +14171,7 @@ const InsertMenu = class extends HTMLElement {
         break;
       }
     }
-    const link = await showLinkEditor({ link: href ? { href, target } : undefined });
+    const link = await showLinkEditor({ value: href ? { href, target } : undefined });
     if (link) {
       const selection = view.state.selection;
       const tr = view.state.tr;
@@ -14213,7 +14213,7 @@ const LinkMenu = class extends HTMLElement {
       const target = mark.attrs.target;
       if (href) {
         await popoverController.dismiss();
-        const link = await showLinkEditor({ link: { href, target } });
+        const link = await showLinkEditor({ value: { href, target } });
         if (link) {
           const selection = view.state.selection;
           const tr = view.state.tr;
@@ -19697,7 +19697,7 @@ const Toolbar = class extends HTMLElement {
   static get style() { return toolbarCss; }
 };
 
-const IonxHtmlEditor = /*@__PURE__*/proxyCustomElement(HtmlEditor, [0,"ionx-html-editor",{"readonly":[4],"disabled":[4],"value":[1025]}]);
+const IonxHtmlEditor = /*@__PURE__*/proxyCustomElement(HtmlEditor, [0,"ionx-html-editor",{"readonly":[4],"disabled":[4],"value":[1025],"linkSchemes":[16]}]);
 const IonxHtmlEditorAlignmentMenu = /*@__PURE__*/proxyCustomElement(AlignmentMenu, [1,"ionx-html-editor-alignment-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
 const IonxHtmlEditorInsertMenu = /*@__PURE__*/proxyCustomElement(InsertMenu, [1,"ionx-html-editor-insert-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
 const IonxHtmlEditorLinkMenu = /*@__PURE__*/proxyCustomElement(LinkMenu, [1,"ionx-html-editor-link-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);

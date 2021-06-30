@@ -1,7 +1,10 @@
+import {waitTill} from "@co.mmons/js-utils/core";
 import type {Components as ionic} from "@ionic/core";
-import {Component, Element, h, Host} from "@stencil/core";
+import {Component, Element, h, Host, Prop} from "@stencil/core";
+import {closestElement} from "./closestElement";
 import {ExtendedContent} from "./ExtendedContent";
 import {LazyLoadController} from "./LazyLoadController";
+import {realContainerElement} from "./realContainerElement";
 
 @Component({
     tag: "ionx-lazy-load",
@@ -12,17 +15,39 @@ export class LazyLoad {
     @Element()
     element: HTMLIonxLazyLoadElement;
 
-    observer: MutationObserver;
+    @Prop()
+    container?: "parent" | "self" | "content";
+
+    @Prop()
+    observeShadow?: boolean;
+
+    observers: MutationObserver[];
 
     connectedCallback() {
-        this.observer = new MutationObserver(mutations => this.onMutation(mutations));
-        this.observer.observe(this.element, {childList: true, subtree: true});
         this.initContent();
+        this.initObservers();
+    }
+
+    async initObservers() {
+
+        const container = realContainerElement(this.element);
+        if (container) {
+            this.observers = [new MutationObserver(mutations => this.onMutation(mutations))];
+            this.observers[0].observe(container, {childList: true, subtree: true});
+
+            if (this.observeShadow) {
+                await waitTill(() => !!container.shadowRoot);
+
+                this.observers.push(new MutationObserver(mutations => this.onMutation(mutations)));
+                this.observers[1].observe(container.shadowRoot, {childList: true, subtree: true});
+            }
+        }
+
     }
 
     initContent() {
 
-        const content = this.element.closest<HTMLElement & ionic.IonContent & ExtendedContent>("ion-content");
+        const content = closestElement<HTMLElement & ionic.IonContent & ExtendedContent>(this.element, "ion-content");
 
         if (!content) {
             setTimeout(() => this.initContent(), 100);
@@ -37,17 +62,19 @@ export class LazyLoad {
     }
 
     onMutation(_mutations: MutationRecord[]) {
-        const content = this.element.closest<HTMLElement & ionic.IonContent & ExtendedContent>("ion-content");
+        const content = closestElement<HTMLElement & ionic.IonContent & ExtendedContent>(this.element, "ion-content");
         if (content && content.__ionxLazyLoad) {
             content.__ionxLazyLoad.ensureLoaded();
         }
     }
 
     disconnectedCallback() {
-        this.observer.disconnect();
-        this.observer = undefined;
 
-        const content = this.element.closest<HTMLElement & ionic.IonContent & ExtendedContent>("ion-content");
+        for (const observer of this.observers.splice(0, this.observers.length)) {
+            observer.disconnect();
+        }
+
+        const content = closestElement<HTMLElement & ionic.IonContent & ExtendedContent>(this.element, "ion-content");
         if (content && content.__ionxLazyLoad) {
             content.__ionxLazyLoad.disconnectContainer(this.element);
         }

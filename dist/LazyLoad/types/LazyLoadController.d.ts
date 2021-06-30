@@ -5,14 +5,15 @@ export declare class LazyLoadController {
   private intersectionObserver;
   private mutationObserver;
   private items;
+  private errors;
   private containers;
   private callback;
   private loadItem;
-  connectContainer(container: HTMLIonxLazyLoadElement): void;
+  connectContainer(containerElement: HTMLIonxLazyLoadElement): void;
   disconnectContainer(container: HTMLIonxLazyLoadElement): void;
   ensureLoaded(options?: {
     retryError?: boolean;
-  }): void;
+  }): Promise<void>;
   private init;
   disconnect(): void;
 }

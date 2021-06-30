@@ -6,5 +6,5 @@ export declare const unknownScheme: {
   readonly valueComponent: "ion-input";
   readonly valueLabel: MessageRef;
   buildHref(value: any): string;
-  parseLink(_link: string | Link): LinkScheme.ParsedLink;
+  parseLink(link: string | Link): LinkScheme.ParsedLink;
 };

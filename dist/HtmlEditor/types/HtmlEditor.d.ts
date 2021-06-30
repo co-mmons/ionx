@@ -1,10 +1,12 @@
 import { ComponentInterface, EventEmitter } from "@stencil/core";
+import { LinkScheme } from "ionx/LinkEditor";
 import { EditorView } from "prosemirror-view";
 export declare class HtmlEditor implements ComponentInterface {
   element: HTMLElement;
   readonly: boolean;
   disabled: boolean;
   value: string;
+  linkSchemes: LinkScheme[];
   /**
    * @internal
    */

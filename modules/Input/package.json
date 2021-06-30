@@ -1,5 +1,4 @@
 {
-    "name": "ionx/Input",
     "scripts": {
         "build": "node-utils-file-system-copy-directory src ../../dist/Input"
     }

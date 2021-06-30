@@ -3,6 +3,7 @@ import {isHydrated, waitTillHydrated} from "ionx/utils";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";
 import {ExtendedContent} from "./ExtendedContent";
 import {ExtendedItemElement} from "./ExtendedItemElement";
+import {realContainerElement} from "./realContainerElement";
 import {LazyLoadableCustomElement} from "./LazyLoadableCustomElement";
 import {styleParents} from "./styleParents";
 
@@ -23,7 +24,14 @@ export class LazyLoadController {
 
     private items: HTMLCollectionOf<Element>;
 
-    private containers: HTMLIonxLazyLoadElement[] = [];
+    private errors: HTMLCollectionOf<Element>;
+
+    private containers: {
+        element: HTMLIonxLazyLoadElement,
+        items: HTMLCollectionOf<Element>,
+        errors: HTMLCollectionOf<Element>,
+        shadowItems: () => NodeListOf<Element>,
+        shadowErrors: () => NodeListOf<Element>}[] = [];
 
     private callback(entries: IntersectionObserverEntry[]) {
         for (const entry of entries) {
@@ -132,10 +140,17 @@ export class LazyLoadController {
         load(false);
     }
 
-    connectContainer(container: HTMLIonxLazyLoadElement) {
+    connectContainer(containerElement: HTMLIonxLazyLoadElement) {
 
-        if (!this.containers.includes(container)) {
-            this.containers.push(container);
+        if (!this.containers.find(c => c.element === containerElement)) {
+            const element = realContainerElement(containerElement);
+            this.containers.push({
+                element: containerElement,
+                items: element?.getElementsByClassName("ionx-lazy-load-pending"),
+                errors: element?.getElementsByClassName(itemErrorCssClass),
+                shadowItems: () => containerElement.observeShadow && element.shadowRoot.querySelectorAll(`.${itemPendingCssClass}`),
+                shadowErrors: () => containerElement.observeShadow && element.shadowRoot.querySelectorAll(`.${itemErrorCssClass}`)
+            });
         }
 
         this.ensureLoaded();
@@ -143,7 +158,7 @@ export class LazyLoadController {
 
     disconnectContainer(container: HTMLIonxLazyLoadElement) {
 
-        const idx = this.containers.indexOf(container);
+        const idx = this.containers.findIndex(c => c.element === container);
         if (idx > -1) {
             this.containers.splice(idx, 1);
         }
@@ -153,19 +168,26 @@ export class LazyLoadController {
         }
     }
 
-    ensureLoaded(options?: {retryError?: boolean}) {
+    async ensureLoaded(options?: {retryError?: boolean}) {
 
         if (options?.retryError) {
-            const errors = this.content.getElementsByClassName(itemErrorCssClass);
-            for (let i = 0; i < errors.length; i++) {
-                const item = errors[i];
-                item.classList.add(itemPendingCssClass);
-                item.classList.remove(itemErrorCssClass);
+            for (const errors of [this.errors, ...this.containers.map(c => c.errors), ...this.containers.map(c => c.shadowErrors())]) {
+                if (errors) {
+                    for (let i = 0; i < errors.length; i++) {
+                        const item = errors[i];
+                        item.classList.add(itemPendingCssClass);
+                        item.classList.remove(itemErrorCssClass);
+                    }
+                }
             }
         }
 
-        for (let i = 0; i < this.items.length; i++) {
-            this.intersectionObserver.observe(this.items[i]);
+        for (const items of [this.items, ...this.containers.map(c => c.items), ...this.containers.map(c => c.shadowItems())]) {
+            if (items) {
+                for (let i = 0; i < items.length; i++) {
+                    this.intersectionObserver.observe(items[i]);
+                }
+            }
         }
 
         if (!isHydrated(this.content)) {
@@ -183,7 +205,8 @@ export class LazyLoadController {
             threshold: 0,
         });
 
-        this.items = this.content.getElementsByClassName("ionx-lazy-load-pending");
+        this.items = this.content.getElementsByClassName(itemPendingCssClass);
+        this.errors = this.content.getElementsByClassName(itemErrorCssClass);
     }
 
     disconnect() {
