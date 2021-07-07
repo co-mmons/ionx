@@ -256,7 +256,7 @@ export class SelectOverlay implements ComponentInterface {
                 checked={this.values.findIndex(v => isEqualValue(v, option.value, this.comparator)) > -1}
                 onClick={ev => this.onClick(ev, option)}/>}
 
-            <ion-label>{option.label ?? (this.labelFormatter ? this.labelFormatter(option.value) : `${option.value}`)}</ion-label>
+            <ion-label>{(option.label ? (option.label instanceof MessageRef ? intl.message(option.label) : option.label) : undefined ) ?? (this.labelFormatter ? this.labelFormatter(option.value) : `${option.value}`)}</ion-label>
 
         </ion-item>
     }

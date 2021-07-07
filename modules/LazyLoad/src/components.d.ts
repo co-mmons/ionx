@@ -10,6 +10,10 @@ export namespace Components {
         "container"?: "parent" | "self" | "content";
         "observeShadow"?: boolean;
     }
+    interface IonxTest {
+    }
+    interface IonxTestShadow {
+    }
 }
 declare global {
     interface HTMLIonxLazyLoadElement extends Components.IonxLazyLoad, HTMLStencilElement {
@@ -18,8 +22,22 @@ declare global {
         prototype: HTMLIonxLazyLoadElement;
         new (): HTMLIonxLazyLoadElement;
     };
+    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
+    }
+    var HTMLIonxTestElement: {
+        prototype: HTMLIonxTestElement;
+        new (): HTMLIonxTestElement;
+    };
+    interface HTMLIonxTestShadowElement extends Components.IonxTestShadow, HTMLStencilElement {
+    }
+    var HTMLIonxTestShadowElement: {
+        prototype: HTMLIonxTestShadowElement;
+        new (): HTMLIonxTestShadowElement;
+    };
     interface HTMLElementTagNameMap {
         "ionx-lazy-load": HTMLIonxLazyLoadElement;
+        "ionx-test": HTMLIonxTestElement;
+        "ionx-test-shadow": HTMLIonxTestShadowElement;
     }
 }
 declare namespace LocalJSX {
@@ -27,8 +45,14 @@ declare namespace LocalJSX {
         "container"?: "parent" | "self" | "content";
         "observeShadow"?: boolean;
     }
+    interface IonxTest {
+    }
+    interface IonxTestShadow {
+    }
     interface IntrinsicElements {
         "ionx-lazy-load": IonxLazyLoad;
+        "ionx-test": IonxTest;
+        "ionx-test-shadow": IonxTestShadow;
     }
 }
 export { LocalJSX as JSX };
@@ -36,6 +60,8 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ionx-lazy-load": LocalJSX.IonxLazyLoad & JSXBase.HTMLAttributes<HTMLIonxLazyLoadElement>;
+            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
+            "ionx-test-shadow": LocalJSX.IonxTestShadow & JSXBase.HTMLAttributes<HTMLIonxTestShadowElement>;
         }
     }
 }
