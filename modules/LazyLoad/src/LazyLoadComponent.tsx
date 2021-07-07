@@ -70,8 +70,10 @@ export class LazyLoad {
 
     disconnectedCallback() {
 
-        for (const observer of this.observers.splice(0, this.observers.length)) {
-            observer.disconnect();
+        if (this.observers) {
+            for (const observer of this.observers.splice(0, this.observers.length)) {
+                observer.disconnect();
+            }
         }
 
         const content = closestElement<HTMLElement & ionic.IonContent & ExtendedContent>(this.element, "ion-content");

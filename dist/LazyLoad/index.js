@@ -283,8 +283,10 @@ const LazyLoad = class extends HTMLElement {
     }
   }
   disconnectedCallback() {
-    for (const observer of this.observers.splice(0, this.observers.length)) {
-      observer.disconnect();
+    if (this.observers) {
+      for (const observer of this.observers.splice(0, this.observers.length)) {
+        observer.disconnect();
+      }
     }
     const content = closestElement(this.element, "ion-content");
     if (content && content.__ionxLazyLoad) {
