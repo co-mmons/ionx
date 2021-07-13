@@ -10,7 +10,7 @@ export interface ComponentDisconnectHook {
     disconnect: () => void;
 }
 
-export function addComponentDisconnectHook(component: any, hookName: string, hook: ComponentDisconnectHook, options?: DisconnectHookOptions) {
+export function addComponentDisconnectHook(component: ComponentInterface, hookName: string, hook: ComponentDisconnectHook, options?: DisconnectHookOptions) {
 
     const existing = component[hooksProperty]?.[hookName];
 
@@ -23,7 +23,7 @@ export function addComponentDisconnectHook(component: any, hookName: string, hoo
     if (!component[hooksProperty]) {
         Object.defineProperty(component, hooksProperty, {value: {}, enumerable: false});
 
-        const callback: () => void = typeof component.disconnectCallback === "function" ? component.disconnectCallback : undefined;
+        const callback: () => void = typeof component.disconnectedCallback === "function" ? component.disconnectedCallback : undefined;
 
         component.disconnectedCallback = () => {
 

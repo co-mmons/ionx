@@ -10,7 +10,7 @@ export function addComponentDisconnectHook(component, hookName, hook, options) {
     }
     if (!component[hooksProperty]) {
         Object.defineProperty(component, hooksProperty, { value: {}, enumerable: false });
-        const callback = typeof component.disconnectCallback === "function" ? component.disconnectCallback : undefined;
+        const callback = typeof component.disconnectedCallback === "function" ? component.disconnectedCallback : undefined;
         component.disconnectedCallback = () => {
             if (callback) {
                 callback.call(component);
