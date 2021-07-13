@@ -101,7 +101,7 @@
         color: rgba(var(--ion-text-color-rgb), .5);
     }
 
-    &.ion-invalid > {
+    &.ion-invalid >, &.ionx--has-error > {
         fieldset {
             border-color: var(--form-field-invalid-border-color, var(--form-field--invalid-color));
         }

@@ -293,7 +293,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             }
         }
 
-        if (error) {
+        if (error && (this.dirty || options.trigger !== "valueChange")) {
             this.error$ = error;
             this.applyState({valid: false});
             return false;

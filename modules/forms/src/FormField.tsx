@@ -54,7 +54,7 @@ export class FormField implements ComponentInterface {
 
     render() {
 
-        return <Host>
+        return <Host class={{"ionx--has-error": !!this.errorMessage}}>
             <fieldset>
 
                 <legend>
