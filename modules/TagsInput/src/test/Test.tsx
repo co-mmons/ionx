@@ -6,6 +6,6 @@ import {Component, h} from "@stencil/core";
 export class Test {
 
     render() {
-        return <ionx-tags-input/>
+        return <ionx-tags-input onIonChange={ev => console.log(ev)}/>
     }
 }

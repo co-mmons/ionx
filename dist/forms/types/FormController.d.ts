@@ -30,6 +30,7 @@ export declare class FormController<Controls extends {
   private status;
   set errorPresenter(presenter: FormValidationErrorPresenter);
   setErrorPresenter(errorHandler: FormValidationErrorPresenter): this;
+  entries(): Array<[name: keyof Controls | string, control: Controls[keyof Controls]["value"] | any]>;
   /**
    * Returns list of controls.
    */

@@ -9,6 +9,7 @@ export async function showLoadingOverlay(options?: LoadingOptions) {
         const app = document.querySelector("ion-app");
 
         const overlay = document.createElement("div");
+        overlay.className = "ionx-loading-overlay";
         overlay.style.position = "absolute";
         overlay.style.left = "0";
         overlay.style.top = "0";

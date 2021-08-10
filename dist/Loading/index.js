@@ -124,6 +124,7 @@ async function showLoadingOverlay(options) {
   if (!(options === null || options === void 0 ? void 0 : options.type)) {
     const app = document.querySelector("ion-app");
     const overlay = document.createElement("div");
+    overlay.className = "ionx-loading-overlay";
     overlay.style.position = "absolute";
     overlay.style.left = "0";
     overlay.style.top = "0";
@@ -157,6 +158,10 @@ async function showLoadingOverlay(options) {
     await popover.present();
     return new LoadingProxy(popover.querySelector("ionx-loading"));
   }
+}
+
+function isShowingLoadingOverlay() {
+  return document.getElementsByClassName("ionx-loading-overlay").length > 0 || document.getElementsByClassName(".ionx-loading-popover").length > 0;
 }
 
 const loadingCss = "ionx-loading{display:flex;align-items:center;--loading-backdrop-opacity:0.8}ionx-loading[cover]{position:absolute;width:100%;height:100%;align-items:center;align-content:center;justify-items:center;justify-content:center;top:0px;left:0px}ionx-loading.ionx--backdrop-visible{background-color:rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity))}.ionx-loading-popover .popover-wrapper{display:flex;align-content:center;justify-content:center;align-items:center;justify-items:center}.ionx-loading-popover .popover-content{position:initial !important}";
@@ -215,4 +220,4 @@ const defineIonxLoading = (opts) => {
   }
 };
 
-export { IonxLoading, defineIonxLoading, showLoadingOverlay };
+export { IonxLoading, defineIonxLoading, isShowingLoadingOverlay, showLoadingOverlay };

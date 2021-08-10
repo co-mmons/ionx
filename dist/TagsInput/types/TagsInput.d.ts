@@ -27,7 +27,7 @@ export declare class TagsInput {
   isUnique(tag: string): boolean;
   verifyTag(tagStr: string): boolean;
   sortTags(): void;
-  pushTag(tagStr: string): any;
+  pushTag(tag: string): any;
   onKeyUp(ev: KeyboardEvent): void;
   removeTag(index: number): any;
   render(): any;

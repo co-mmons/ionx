@@ -127,9 +127,13 @@ export class TagsInput {
         }
     }
 
-    pushTag(tagStr: string): any {
+    pushTag(tag: string): any {
 
-        if (!tagStr) {
+        if (tag) {
+            tag = tag.trim();
+        }
+
+        if (!tag) {
             return;
         }
 
@@ -137,7 +141,7 @@ export class TagsInput {
             this.value = [];
         }
 
-        if (this.value.indexOf(tagStr) > -1) {
+        if (this.unique && !this.isUnique(tag)) {
             return;
         }
 
@@ -146,12 +150,14 @@ export class TagsInput {
             return;
         }
 
+        const value = this.value.slice();
+        value.push(tag);
 
-        this.value.push(tagStr.trim());
+        this.value = value;
         this.sortTags();
 
-        this.ionChange.emit({value: this.value.slice()});
         this.currentTag = "";
+        this.ionChange.emit({value});
     }
 
     onKeyUp(ev: KeyboardEvent) {
@@ -244,6 +250,7 @@ export class TagsInput {
                 value={this.currentTag}
                 placeholder={this.placeholder}
                 onIonBlur={() => this.pushTag(this.currentTag?.trim())}
+                onIonChange={ev => [ev.stopPropagation(), ev.stopImmediatePropagation()]}
                 onKeyUp={ev => this.onKeyUp(ev)}/>}
 
         </Host>

@@ -427,6 +427,9 @@ class FormController {
     this.errorPresenter$ = errorHandler;
     return this;
   }
+  entries() {
+    return Object.entries(this.controls);
+  }
   /**
    * Returns list of controls.
    */

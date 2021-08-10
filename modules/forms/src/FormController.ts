@@ -56,6 +56,10 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         return this;
     }
 
+    entries(): Array<[name: keyof Controls | string, control: Controls[keyof Controls]["value"] | any]> {
+        return Object.entries(this.controls);
+    }
+
     /**
      * Returns list of controls.
      */
