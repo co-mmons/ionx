@@ -1,7 +1,6 @@
 import {MarkSpec} from "prosemirror-model";
 
 export const textColor: MarkSpec = {
-    group: "inline",
     attrs: {
         color: {},
     },

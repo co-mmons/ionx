@@ -5,6 +5,7 @@ import {alignment} from "./marks/alignment";
 import {fontSize} from "./marks/font-size";
 import {textColor} from "./marks/textColor";
 import {youtube} from "./nodes/youtube";
+import {paragraph} from "./nodes/paragraph";
 
 export const nodes = {
     doc: {
@@ -12,14 +13,7 @@ export const nodes = {
         marks: "alignment",
     },
 
-    paragraph: {
-        content: "inline*",
-        marks: "alignment strong underline em fontSize link textColor",
-        group: "block",
-        parseDOM: [{tag: "p"}],
-        toDOM() { return ["p", 0]; }
-    } as NodeSpec,
-
+    paragraph,
     blockquote: basicNodes.blockquote,
     horizontalRule: basicNodes.horizontal_rule,
     heading: basicNodes.heading,

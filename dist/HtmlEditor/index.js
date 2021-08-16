@@ -13664,7 +13664,6 @@ const fontSize = {
 };
 
 const textColor = {
-  group: "inline",
   attrs: {
     color: {},
   },
@@ -13711,18 +13710,40 @@ const youtube = {
   ]
 };
 
+const paragraph = {
+  attrs: {
+    indent: { default: null }
+  },
+  content: "inline*",
+  marks: "alignment strong underline em fontSize link textColor",
+  group: "block",
+  parseDOM: [{
+      tag: "p",
+      getAttrs(node) {
+        const indent = node.style.textIndent || null;
+        return { indent };
+      }
+    }],
+  toDOM(node) {
+    const { indent } = node.attrs;
+    const attrs = {};
+    const style = [];
+    if (indent) {
+      style.push(`text-indent: ${indent}`);
+    }
+    if (style.length) {
+      attrs["style"] = style.join(";");
+    }
+    return ["p", attrs, 0];
+  }
+};
+
 const nodes = {
   doc: {
     content: "block+",
     marks: "alignment",
   },
-  paragraph: {
-    content: "inline*",
-    marks: "alignment strong underline em fontSize link textColor",
-    group: "block",
-    parseDOM: [{ tag: "p" }],
-    toDOM() { return ["p", 0]; }
-  },
+  paragraph,
   blockquote: nodes$1.blockquote,
   horizontalRule: nodes$1.horizontal_rule,
   heading: nodes$1.heading,
@@ -19420,13 +19441,24 @@ const ListMenu = class extends HTMLElement {
   static get style() { return listMenuCss; }
 };
 
-const paragraphMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}";
+const paragraphMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
 const ParagraphMenu = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
     attachShadow(this);
+  }
+  async indentLevel(move) {
+    const view = await this.editor.getView();
+    const selection = view.state.selection;
+    const paragraph = dist.findParentNodeOfType(schema.nodes.paragraph)(selection);
+    if (paragraph) {
+      const currentLevel = parseInt((paragraph.node.attrs["indent"] || "0").replace("px", ""), 10) / 32;
+      const newLevel = currentLevel === 1 && move === -1 ? 0 : currentLevel + move;
+      view.dispatch(view.state.tr.setNodeMarkup(paragraph.pos, null, { indent: newLevel > 0 ? `${newLevel * 32}px` : null }));
+    }
+    popoverController.dismiss();
   }
   async toggleHeading(heading) {
     const view = await this.editor.getView();
@@ -19453,7 +19485,7 @@ const ParagraphMenu = class extends HTMLElement {
     });
   }
   render() {
-    return h("ion-list", { lines: "full" }, this.activeHeading > 0 && h("ion-item", { button: true, detail: false, onClick: () => this.toggleHeading(0) }, h("ion-label", null, intl.message `ionx/HtmlEditor#Plain text`)), [1, 2, 3, 4, 5, 6].map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleHeading(size) }, h("ion-label", { style: { fontWeight: "500", fontSize: `${130 - ((size - 1) * 5)}%` } }, intl.message `ionx/HtmlEditor#Heading`, " ", size), this.activeHeading === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
+    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.indentLevel(-1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Decrease indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-decrease.svg", slot: "start" })), h("ion-item", { button: true, detail: false, onClick: () => this.indentLevel(1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Increase indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-increase.svg", slot: "start" })), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Heading`)), this.activeHeading > 0 && h("ion-item", { button: true, detail: false, onClick: () => this.toggleHeading(0) }, h("ion-label", null, intl.message `ionx/HtmlEditor#Plain text`)), [1, 2, 3, 4, 5, 6].map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleHeading(size) }, h("ion-label", { style: { fontWeight: "500", fontSize: `${130 - ((size - 1) * 5)}%` } }, intl.message `ionx/HtmlEditor#Heading`, " ", size), this.activeHeading === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
   }
   static get style() { return paragraphMenuCss; }
 };
