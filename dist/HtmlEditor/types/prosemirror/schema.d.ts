@@ -21,6 +21,7 @@ export declare const marks: {
   strong: MarkSpec;
   alignment: MarkSpec;
   fontSize: MarkSpec;
+  textColor: MarkSpec;
   underline: MarkSpec;
 };
-export declare const schema: Schema<"text" | "paragraph" | "heading" | "doc" | "blockquote" | "horizontalRule" | "hardBreak" | "bulletList" | "orderedList" | "listItem" | "youtube", "alignment" | "link" | "em" | "strong" | "fontSize" | "underline">;
+export declare const schema: Schema<"text" | "paragraph" | "heading" | "doc" | "blockquote" | "horizontalRule" | "hardBreak" | "bulletList" | "orderedList" | "listItem" | "youtube", "alignment" | "link" | "em" | "strong" | "fontSize" | "textColor" | "underline">;

@@ -97,7 +97,7 @@ export class Toolbar {
         this.canRedo = redoDepth(view.state) > 0;
 
         this.activeFeatures = {};
-        this.activeFeatures.text = anyMarkActive(view.state, [schema.marks.strong, schema.marks.em, schema.marks.underline, schema.marks.fontSize]);
+        this.activeFeatures.text = anyMarkActive(view.state, [schema.marks.strong, schema.marks.em, schema.marks.underline, schema.marks.fontSize, schema.marks.textColor]);
         this.activeFeatures.list = !!findParentNode(predicate => predicate.hasMarkup(schema.nodes.orderedList) || predicate.hasMarkup(schema.nodes.bulletList))(view.state.selection);
         this.activeFeatures.alignment = isBlockMarkActive(view.state, schema.marks.alignment);
         this.activeFeatures.paragraph = !!findParentNodeOfType(schema.nodes.heading)(view.state.selection);

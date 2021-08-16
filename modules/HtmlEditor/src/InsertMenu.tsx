@@ -2,9 +2,9 @@ import {intl} from "@co.mmons/js-intl";
 import {popoverController} from "@ionic/core";
 import {Component, ComponentInterface, h, Listen, Prop} from "@stencil/core";
 import {defineIonxLinkEditor, showLinkEditor} from "ionx/LinkEditor";
+import {toggleMark} from "prosemirror-commands";
 import {schema} from "./prosemirror/schema";
 import {findMarksInSelection} from "./prosemirror/utils/findMarksInSelection";
-import {findNodeStartEnd} from "./prosemirror/utils/findNodeStartEnd";
 
 @Component({
     tag: "ionx-html-editor-insert-menu",
@@ -40,18 +40,7 @@ export class InsertMenu implements ComponentInterface {
 
         const link = await showLinkEditor({value: href ? {href, target} : undefined});
         if (link) {
-
-            const selection = view.state.selection;
-            const tr = view.state.tr;
-
-            tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-                if (node.isText) {
-                    const {start, end} = findNodeStartEnd(tr.doc, pos);
-                    tr.addMark(start, end, schema.mark(schema.marks.link, link));
-                }
-            });
-
-            view.dispatch(tr);
+            toggleMark(schema.marks.link, link)(view.state, view.dispatch);
         }
     }
 

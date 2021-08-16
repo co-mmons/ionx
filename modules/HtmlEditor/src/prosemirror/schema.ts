@@ -3,6 +3,7 @@ import {marks as basicMarks, nodes as basicNodes} from "prosemirror-schema-basic
 import {bulletList, listItem, orderedList} from "prosemirror-schema-list";
 import {alignment} from "./marks/alignment";
 import {fontSize} from "./marks/font-size";
+import {textColor} from "./marks/textColor";
 import {youtube} from "./nodes/youtube";
 
 export const nodes = {
@@ -13,7 +14,7 @@ export const nodes = {
 
     paragraph: {
         content: "inline*",
-        marks: "alignment strong underline em fontSize link",
+        marks: "alignment strong underline em fontSize link textColor",
         group: "block",
         parseDOM: [{tag: "p"}],
         toDOM() { return ["p", 0]; }
@@ -67,7 +68,8 @@ export const marks = {
     em: basicMarks.em,
     strong: basicMarks.strong,
     alignment,
-    fontSize: fontSize,
+    fontSize,
+    textColor,
 
     underline: {
         parseDOM: [{tag: "u"}, {style: "text-decoration=underline"}],
@@ -77,5 +79,5 @@ export const marks = {
     } as MarkSpec
 };
 
-export const schema = new Schema<keyof typeof nodes, keyof typeof marks>({nodes: nodes, marks: marks});
+export const schema = new Schema<keyof typeof nodes, keyof typeof marks>({nodes, marks});
 

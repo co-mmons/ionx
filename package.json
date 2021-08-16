@@ -28,6 +28,7 @@
         "typescript": "^4.1.3"
     },
     "devDependencies": {
+        "@types/node": "^16.6.1",
         "@co.mmons/js-intl": "github:co-mmons/js-intl"
     }
 }

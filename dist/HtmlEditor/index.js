@@ -13663,6 +13663,28 @@ const fontSize = {
   },
 };
 
+const textColor = {
+  group: "inline",
+  attrs: {
+    color: {},
+  },
+  parseDOM: [
+    {
+      style: "color",
+      getAttrs: color => {
+        return { color };
+      },
+    },
+  ],
+  toDOM(mark) {
+    return [
+      "span",
+      { style: `color: ${mark.attrs.color}` },
+      0
+    ];
+  },
+};
+
 const youtube = {
   attrs: { id: { default: "" }, start: { default: 0 } },
   inline: false,
@@ -13696,7 +13718,7 @@ const nodes = {
   },
   paragraph: {
     content: "inline*",
-    marks: "alignment strong underline em fontSize link",
+    marks: "alignment strong underline em fontSize link textColor",
     group: "block",
     parseDOM: [{ tag: "p" }],
     toDOM() { return ["p", 0]; }
@@ -13744,7 +13766,8 @@ const marks = {
   em: marks$1.em,
   strong: marks$1.strong,
   alignment,
-  fontSize: fontSize,
+  fontSize,
+  textColor,
   underline: {
     parseDOM: [{ tag: "u" }, { style: "text-decoration=underline" }],
     toDOM() {
@@ -13752,7 +13775,7 @@ const marks = {
     }
   }
 };
-const schema = new Schema({ nodes: nodes, marks: marks });
+const schema = new Schema({ nodes, marks });
 
 function findScrollParent(element) {
   if (!element) {
@@ -14141,13 +14164,6 @@ function findMarksInSelection(state, markType, attrs) {
   return findMarks(doc, from, to, markType, attrs);
 }
 
-function findNodeStartEnd(doc, pos) {
-  const $pos = doc.resolve(pos);
-  const start = pos - $pos.textOffset;
-  const end = start + $pos.parent.child($pos.index()).nodeSize;
-  return { start, end };
-}
-
 const insertMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
 const InsertMenu = class extends HTMLElement {
@@ -14173,15 +14189,7 @@ const InsertMenu = class extends HTMLElement {
     }
     const link = await showLinkEditor({ value: href ? { href, target } : undefined });
     if (link) {
-      const selection = view.state.selection;
-      const tr = view.state.tr;
-      tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-        if (node.isText) {
-          const { start, end } = findNodeStartEnd(tr.doc, pos);
-          tr.addMark(start, end, schema.mark(schema.marks.link, link));
-        }
-      });
-      view.dispatch(tr);
+      toggleMark(schema.marks.link, link)(view.state, view.dispatch);
     }
   }
   didDismiss() {
@@ -14196,6 +14204,13 @@ const InsertMenu = class extends HTMLElement {
   }
   static get style() { return insertMenuCss; }
 };
+
+function findNodeStartEnd(doc, pos) {
+  const $pos = doc.resolve(pos);
+  const start = pos - $pos.textOffset;
+  const end = start + $pos.parent.child($pos.index()).nodeSize;
+  return { start, end };
+}
 
 const linkMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
@@ -19547,7 +19562,7 @@ function toggleInlineMark(markType, attrs) {
   };
 }
 
-const textMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
+const textMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}:host input[type=color]{width:20px;height:20px;border:1px solid var(--ion-border-color);background-color:transparent;margin:0 0 0 8px;outline:none}:host ion-button[slot=end]{margin:0}";
 
 const TextMenu = class extends HTMLElement {
   constructor() {
@@ -19585,6 +19600,17 @@ const TextMenu = class extends HTMLElement {
     }
     popoverController.dismiss();
   }
+  async toggleColor(color) {
+    this.activeColor = color;
+    const view = await this.editor.getView();
+    if (color) {
+      toggleInlineMark(schema.marks.textColor, { color })(view.state, view.dispatch);
+    }
+    else {
+      toggleMark(schema.marks.textColor)(view.state, view.dispatch);
+      popoverController.dismiss();
+    }
+  }
   didDismiss() {
     this.editor.setFocus();
   }
@@ -19593,6 +19619,8 @@ const TextMenu = class extends HTMLElement {
       this.boldActivated = isMarkActive(view.state, schema.marks.strong);
       this.italicActivated = isMarkActive(view.state, schema.marks.em);
       this.underlineActivated = isMarkActive(view.state, schema.marks.underline);
+      this.activeColor = findMarksInSelection(view.state, schema.marks.textColor).map(mark => mark.attrs.color)
+        .find(color => !!color);
       this.activeFontSize = undefined;
       MARKS: for (const mark of findMarksInSelection(view.state, schema.marks.fontSize)) {
         for (const size of FontSize.values()) {
@@ -19609,7 +19637,7 @@ const TextMenu = class extends HTMLElement {
     });
   }
   render() {
-    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggle("bold") }, h("ion-label", { style: { fontWeight: "bold" } }, intl.message `ionx/HtmlEditor#Bold|text`), this.boldActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("italic") }, h("ion-label", { style: { fontStyle: "italic" } }, intl.message `ionx/HtmlEditor#Italic|text`), this.italicActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("underline") }, h("ion-label", { style: { textDecoration: "underline" } }, intl.message `ionx/HtmlEditor#Underline|text`), this.underlineActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.resetFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
+    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggle("bold") }, h("ion-label", { style: { fontWeight: "bold" } }, intl.message `ionx/HtmlEditor#Bold|text`), this.boldActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("italic") }, h("ion-label", { style: { fontStyle: "italic" } }, intl.message `ionx/HtmlEditor#Italic|text`), this.italicActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("underline") }, h("ion-label", { style: { textDecoration: "underline" } }, intl.message `ionx/HtmlEditor#Underline|text`), this.underlineActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeColor || "#000000", onInput: ev => this.toggleColor(ev.target.value) }), this.activeColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor() }, h("ion-icon", { name: "close", slot: "icon-only" }))), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.resetFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
   }
   static get style() { return textMenuCss; }
 };
@@ -19675,7 +19703,7 @@ const Toolbar = class extends HTMLElement {
     this.canUndo = undoDepth(view.state) > 0;
     this.canRedo = redoDepth(view.state) > 0;
     this.activeFeatures = {};
-    this.activeFeatures.text = anyMarkActive(view.state, [schema.marks.strong, schema.marks.em, schema.marks.underline, schema.marks.fontSize]);
+    this.activeFeatures.text = anyMarkActive(view.state, [schema.marks.strong, schema.marks.em, schema.marks.underline, schema.marks.fontSize, schema.marks.textColor]);
     this.activeFeatures.list = !!dist.findParentNode(predicate => predicate.hasMarkup(schema.nodes.orderedList) || predicate.hasMarkup(schema.nodes.bulletList))(view.state.selection);
     this.activeFeatures.alignment = isBlockMarkActive(view.state, schema.marks.alignment);
     this.activeFeatures.paragraph = !!dist.findParentNodeOfType(schema.nodes.heading)(view.state.selection);
@@ -19703,7 +19731,7 @@ const IonxHtmlEditorInsertMenu = /*@__PURE__*/proxyCustomElement(InsertMenu, [1,
 const IonxHtmlEditorLinkMenu = /*@__PURE__*/proxyCustomElement(LinkMenu, [1,"ionx-html-editor-link-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
 const IonxHtmlEditorListMenu = /*@__PURE__*/proxyCustomElement(ListMenu, [1,"ionx-html-editor-list-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
 const IonxHtmlEditorParagraphMenu = /*@__PURE__*/proxyCustomElement(ParagraphMenu, [1,"ionx-html-editor-paragraph-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
-const IonxHtmlEditorTextMenu = /*@__PURE__*/proxyCustomElement(TextMenu, [1,"ionx-html-editor-text-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
+const IonxHtmlEditorTextMenu = /*@__PURE__*/proxyCustomElement(TextMenu, [1,"ionx-html-editor-text-menu",{"editor":[16],"activeColor":[32]},[[0,"ionViewDidLeave","didDismiss"]]]);
 const IonxHtmlEditorToolbar = /*@__PURE__*/proxyCustomElement(Toolbar, [2,"ionx-html-editor-toolbar",{"features":[16],"activeFeatures":[32],"canUndo":[32],"canRedo":[32]}]);
 const defineIonxHtmlEditor = (opts) => {
   if (typeof customElements !== 'undefined') {
