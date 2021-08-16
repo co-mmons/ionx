@@ -194,7 +194,7 @@ export class HtmlEditor implements ComponentInterface {
 
         this.view.updateState(this.view.state.apply(transaction));
 
-        this.setFocus();
+        // this.setFocus();
         this.editorSelectionChange.emit();
 
         if (transaction.docChanged) {
