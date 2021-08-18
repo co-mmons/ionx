@@ -14235,6 +14235,7 @@ function findNodeStartEnd(doc, pos) {
 
 const linkMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
+defineIonxLinkEditor();
 const LinkMenu = class extends HTMLElement {
   constructor() {
     super();
@@ -14242,14 +14243,13 @@ const LinkMenu = class extends HTMLElement {
     attachShadow(this);
   }
   async edit() {
-    defineIonxLinkEditor();
     const view = await this.editor.getView();
     MARKS: for (const mark of findMarksInSelection(view.state, schema.marks.link)) {
       const href = mark.attrs.href;
       const target = mark.attrs.target;
       if (href) {
         await popoverController.dismiss();
-        const link = await showLinkEditor({ value: { href, target } });
+        const link = await showLinkEditor({ value: { href, target }, schemes: this.editor.linkSchemes });
         if (link) {
           const selection = view.state.selection;
           const tr = view.state.tr;

@@ -7,6 +7,8 @@ import {schema} from "./prosemirror/schema";
 import {findMarksInSelection} from "./prosemirror/utils/findMarksInSelection";
 import {findNodeStartEnd} from "./prosemirror/utils/findNodeStartEnd";
 
+defineIonxLinkEditor();
+
 @Component({
     tag: "ionx-html-editor-link-menu",
     styleUrl: "LinkMenu.scss",
@@ -19,15 +21,13 @@ export class LinkMenu {
 
     async edit() {
 
-        defineIonxLinkEditor();
-
         const view = await this.editor.getView();
         MARKS: for (const mark of findMarksInSelection(view.state, schema.marks.link)) {
             const href = mark.attrs.href;
             const target = mark.attrs.target;
             if (href) {
                 await popoverController.dismiss();
-                const link = await showLinkEditor({value: {href, target}});
+                const link = await showLinkEditor({value: {href, target}, schemes: this.editor.linkSchemes});
                 if (link) {
 
                     const selection = view.state.selection;
