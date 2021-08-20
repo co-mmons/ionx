@@ -14208,7 +14208,7 @@ const InsertMenu = class extends HTMLElement {
         break;
       }
     }
-    const link = await showLinkEditor({ value: href ? { href, target } : undefined });
+    const link = await showLinkEditor({ value: href ? { href, target } : undefined, schemes: this.editor.linkSchemes });
     if (link) {
       toggleMark(schema.marks.link, link)(view.state, view.dispatch);
     }
