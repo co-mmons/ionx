@@ -70,6 +70,7 @@
 
             > [slot-container=default] {
                 flex: 1;
+                overflow: var(--form-field-container-overflow);
             }
 
             > [slot-container=start], > [slot-container=end] {

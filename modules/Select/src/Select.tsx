@@ -1,7 +1,7 @@
-import {StyleEventDetail} from "@ionic/core";
+import {ItemReorderEventDetail, StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, forceUpdate, Fragment, FunctionalComponent, h, Host, Listen, Method, Prop, Watch} from "@stencil/core";
 import {deepEqual} from "fast-equals";
-import type Sortable from "sortablejs";
+import {prefetchComponent} from "ionx/utils";
 import {findValueItem} from "./findValueItem";
 import {LazyItemsFn} from "./LazyItemsFn";
 import {SelectLazyGroupItem} from "./SelectGroupItem";
@@ -9,7 +9,6 @@ import {SelectItem} from "./SelectItem";
 import {SelectOverlayProps} from "./SelectOverlayProps";
 import {SelectValueItem} from "./SelectValueItem";
 import {showSelectOverlay} from "./showSelectOverlay";
-import {sortableItemClass} from "./sortableItemClass";
 import {ValueComparator} from "./ValueComparator";
 import {valueLabel} from "./valueLabel";
 
@@ -114,6 +113,12 @@ export class Select {
     ionFocus: EventEmitter<any>;
 
     /**
+     * @internal
+     */
+    @Prop()
+    prefetch: boolean;
+
+    /**
      * Emitted when the styles change.
      * @internal
      */
@@ -127,8 +132,6 @@ export class Select {
     focused: boolean;
 
     loading: boolean;
-
-    sortableInstance: Sortable;
 
     readonly internalId = ++instanceCounter;
 
@@ -312,23 +315,23 @@ export class Select {
         this.setFocus();
     }
 
-    @Watch("sortable")
-    @Watch("multiple")
-    async configureSortable() {
+    valuesReorder(ev: CustomEvent<ItemReorderEventDetail>) {
+        ev.preventDefault();
 
-        if (this.sortable && this.multiple) {
-            const prevInstance = this.sortableInstance;
-            this.sortableInstance = (await import("./initSortable")).initSortable.call(this);
+        const values = this.valueAsArray.slice();
+        const value = values[ev.detail.from];
 
-            if (prevInstance && prevInstance !== this.sortableInstance) {
-                prevInstance.destroy();
-            }
+        values.splice(ev.detail.from, 1);
+        values.splice(ev.detail.to, 0, value);
 
-        } else if (this.sortableInstance) {
-            this.sortableInstance.destroy();
-            this.sortableInstance = undefined;
-        }
+        this.valueChanging = true;
+        this.value = values;
 
+        ev.detail.complete(true);
+    }
+
+    componentDidLoad() {
+        prefetchComponent({delay: 0}, "ion-reorder-group", "ion-item", "ion-label", "ion-spinner", "ion-reorder");
     }
 
     connectedCallback() {
@@ -343,21 +346,21 @@ export class Select {
         if (!this.element.hasAttribute("tabIndex")) {
             this.element.setAttribute("tabIndex", "0");
         }
-
-        this.configureSortable();
     }
 
     renderValue(values: any[], value: any, index: number) {
 
+        const sortable = this.sortable && this.multiple;
         const LabelComponent = this.labelComponent;
-        const ValueComponent = this.sortable ? "ion-chip" : "span";
+        const DefaultLabelComponent = sortable ? "ion-label" : "span";
+        const ValueComponent = sortable ? "ion-item" : "span";
 
         const item = findValueItem(this.visibleItems, value, this.comparator);
         const label = valueLabel(this.visibleItems, value, {comparator: this.comparator, formatter: this.labelFormatter});
 
         return <Fragment>
 
-            <ValueComponent key={value} {...(ValueComponent === "ion-chip" ? {outline: true} : {})} class={{[sortableItemClass]: true}}>
+            <ValueComponent key={value}>
 
                 {!!LabelComponent && <LabelComponent
                     value={value}
@@ -366,21 +369,24 @@ export class Select {
                     index={index}
                     readonly={this.readonly}/>}
 
-                {!LabelComponent && <span>{label}{!this.sortable && index < values.length - 1 ? this.separator : ""}</span>}
+                {!LabelComponent && <DefaultLabelComponent>{label}{!sortable && index < values.length - 1 ? this.separator : ""}</DefaultLabelComponent>}
+
+                {sortable && !this.readonly && !this.disabled && <ion-reorder slot="end"/>}
 
             </ValueComponent>
-
-            {!this.readonly && !this.disabled && this.multiple && this.sortable && index === values.length - 1 && <ion-chip key="more">
-                <ion-icon name="ellipsis-horizontal" style={{margin: "0px"}}/>
-            </ion-chip>}
 
         </Fragment>
     }
 
     render() {
 
+        if (this.prefetch) {
+            return;
+        }
+
         const values = this.valueAsArray;
         const empty = values.length === 0;
+        const sortable = this.sortable && this.multiple;
 
         return <Host
             role="combobox"
@@ -398,7 +404,7 @@ export class Select {
 
                 {!this.loading && <Fragment>
 
-                    <div class={{
+                    {(!sortable || empty) && <div class={{
                         "ionx--text": true,
                         "ionx--placeholder-visible": empty && !!this.placeholder
                     }}>
@@ -407,15 +413,15 @@ export class Select {
 
                         {values.map((value, index) => this.renderValue(values, value, index))}
 
-                    </div>
+                    </div>}
 
-                    {!this.readonly && !this.disabled && <Fragment>
+                    {!this.readonly && !this.disabled && (!sortable || empty) && <div class="ionx--icon" role="presentation">
+                        <div class="ionx--icon-inner"/>
+                    </div>}
 
-                        {(!this.sortable || empty) && <div class="ionx--icon" role="presentation">
-                            <div class="ionx--icon-inner"/>
-                        </div>}
-
-                    </Fragment>}
+                    {sortable && !empty && <ion-reorder-group onIonItemReorder={ev => this.valuesReorder(ev)} disabled={this.readonly || this.disabled}>
+                        {values.map((value, index) => this.renderValue(values, value, index))}
+                    </ion-reorder-group>}
 
                 </Fragment>}
 

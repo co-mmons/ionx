@@ -1,6 +1,5 @@
-import { StyleEventDetail } from "@ionic/core";
+import { ItemReorderEventDetail, StyleEventDetail } from "@ionic/core";
 import { EventEmitter, FunctionalComponent } from "@stencil/core";
-import type Sortable from "sortablejs";
 import { LazyItemsFn } from "./LazyItemsFn";
 import { SelectLazyGroupItem } from "./SelectGroupItem";
 import { SelectItem } from "./SelectItem";
@@ -60,6 +59,10 @@ export declare class Select {
   }>;
   ionFocus: EventEmitter<any>;
   /**
+   * @internal
+   */
+  prefetch: boolean;
+  /**
    * Emitted when the styles change.
    * @internal
    */
@@ -68,7 +71,6 @@ export declare class Select {
   valueChanging: boolean;
   focused: boolean;
   loading: boolean;
-  sortableInstance: Sortable;
   readonly internalId: number;
   /**
    * Always returns value as array. If value is undefined, empty array is returned.
@@ -83,7 +85,8 @@ export declare class Select {
   private emitStyle;
   buildVisibleItems(): Promise<void>;
   open(): Promise<void>;
-  configureSortable(): Promise<void>;
+  valuesReorder(ev: CustomEvent<ItemReorderEventDetail>): void;
+  componentDidLoad(): void;
   connectedCallback(): void;
   renderValue(values: any[], value: any, index: number): any;
   render(): any;

@@ -1,7 +1,9 @@
 import {sleep} from "@co.mmons/js-utils/core";
 import {Component, h, Host} from "@stencil/core";
-import {FormController} from "ionx/forms";
+import {defineIonxForms, FormController} from "ionx/forms";
 import {SelectItem} from "../SelectItem";
+
+defineIonxForms()
 
 @Component({
     tag: "ionx-test"
@@ -25,7 +27,7 @@ export class Test {
         await sleep(1000);
 
         return [
-            {label: "lazy 1", value: 1},
+            {label: "lazy something, lorem ipsum lorem ipsum, lorem lorem 1", value: 1},
             {label: "lazy 2", value: 2}
         ];
 
@@ -66,8 +68,7 @@ export class Test {
                 <ionx-select items={this.basicItems} ref={this.data.controls.select1.attach()}/>
             </fieldset>
 
-            <fieldset>
-                <legend>multiple</legend>
+            <ionx-form-field label="multiple + sortable" style={{"--form-field-container-overflow": "hidden"}}>
                 <ionx-select
                     placeholder="Choose..."
                     overlayTitle="Title here"
@@ -78,7 +79,8 @@ export class Test {
                     ref={this.data.controls.select2.attach()}/>
 
                 <div>Selected: {this.data.controls.select2.value?.join(", ") ?? "empty"}</div>
-            </fieldset>
+
+            </ionx-form-field>
 
             <fieldset>
                 <legend>groups</legend>

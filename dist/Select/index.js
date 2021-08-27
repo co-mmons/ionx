@@ -2,12 +2,12 @@ import { createEvent, forceUpdate, h, Fragment, Host, proxyCustomElement } from 
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { popoverController, modalController, isPlatform } from '@ionic/core';
 import { deepEqual } from 'fast-equals';
+import { prefetchComponent, waitTillHydrated } from 'ionx/utils';
 import { MessageRef, intl } from '@co.mmons/js-intl';
 import { Capacitor } from '@capacitor/core';
 import { sleep, waitTill } from '@co.mmons/js-utils/core';
 import { defineIonxLoading } from 'ionx/Loading';
 import { defineIonxToolbar } from 'ionx/Toolbar';
-import { waitTillHydrated } from 'ionx/utils';
 
 async function showSelectOverlay(overlay, event) {
   let willDismiss;
@@ -56,8 +56,6 @@ function findValueItem(items, value, comparator) {
   }
 }
 
-const sortableItemClass = "ionx-select-sortable";
-
 function valueLabel(items, value, props) {
   if (!items) {
     return;
@@ -73,7 +71,7 @@ function valueLabel(items, value, props) {
   return props.formatter ? props.formatter(value) : `${value}`;
 }
 
-const selectCss = ".sc-ionx-select-h{--select-placeholder-opacity:.5;--select-dropdown-icon-opacity:.5;--select-disabled-opacity:.5;padding:var(--select-padding-top, 0px) var(--select-padding-end, 0px) var(--select-padding-bottom, 0px) var(--select-padding-start, 0px);display:inline-block;overflow:hidden;color:var(--color);font-family:var(--ion-font-family, inherit);max-width:100%;outline:none;cursor:pointer}.sc-ionx-select-h::-moz-focus-inner{border:0}.sc-ionx-select-h .ionx--inner.sc-ionx-select{display:flex;position:relative}.sc-ionx-select-h .ionx--icon.sc-ionx-select{position:relative;width:16px;height:20px}.sc-ionx-select-h .ionx--icon.sc-ionx-select .ionx--icon-inner.sc-ionx-select{top:50%;right:0px;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--select-dropdown-icon-opacity, 0.5);pointer-events:none}.sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-select-h .ionx--text.ionx--placeholder-visible.sc-ionx-select{opacity:var(--select-placeholder-opacity, 0.5)}.ionx--disabled.sc-ionx-select-h{opacity:var(--select-disabled-opacity, 0.5);pointer-events:none}.ionx--readonly.sc-ionx-select-h{opacity:1;pointer-events:none}.ionx--readonly.sc-ionx-select-h .select-icon.sc-ionx-select{display:none}[white-space-normal].sc-ionx-select-h .ionx--text.sc-ionx-select,[ionx--white-space=normal].sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:normal !important;overflow:auto}.in-item.sc-ionx-select-h{position:static}.sc-ionx-select-h ion-chip.sc-ionx-select{max-width:calc(100% - 4px);margin:4px 4px 0px 0px}.sc-ionx-select-h ion-chip.ionx-select-sortable.sc-ionx-select{cursor:default}.sc-ionx-select-h ion-chip.ionx-select-sortable.sc-ionx-select>span.sc-ionx-select{text-overflow:ellipsis;overflow:hidden;white-space:nowrap;line-height:1.1}.ionx--sortable.sc-ionx-select-h{cursor:initial}.ionx--sortable.sc-ionx-select-h .ionx-select-sortable.sc-ionx-select{cursor:move}.ionx--sortable.sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:normal;overflow:auto;width:100%}ion-toolbar.sc-ionx-select-h,ion-toolbar .sc-ionx-select-h{color:var(--ion-toolbar-color);--icon-color:var(--ion-toolbar-color);--select-padding-start:16px;--select-padding-end:16px}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{align-self:flex-start;--select-padding-top:8px;--select-padding-bottom:8px;--select-padding-start:0px}ionx-form-field.sc-ionx-select-h .ionx--text.sc-ionx-select,ionx-form-field .sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked.sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked .sc-ionx-select-h .ionx--text.sc-ionx-select{max-width:calc(100% - 16px);flex:initial}ionx-form-field.ionx--orderable.sc-ionx-select-h .ionx--text.sc-ionx-select,ionx-form-field .ionx--orderable.sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked.ionx--orderable.sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked .ionx--orderable.sc-ionx-select-h .ionx--text.sc-ionx-select{flex:1}[slot-container=default]>.sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{width:100%}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h{--select-padding-start:16px;--select-padding-end:16px}";
+const selectCss = ".sc-ionx-select-h{--select-placeholder-opacity:.5;--select-dropdown-icon-opacity:.5;--select-disabled-opacity:.5;padding:var(--select-padding-top, 0px) var(--select-padding-end, 0px) var(--select-padding-bottom, 0px) var(--select-padding-start, 0px);display:inline-block;overflow:hidden;color:var(--color);font-family:var(--ion-font-family, inherit);max-width:100%;outline:none;cursor:pointer}.sc-ionx-select-h::-moz-focus-inner{border:0}.sc-ionx-select-h .ionx--inner.sc-ionx-select{display:flex;position:relative}.sc-ionx-select-h .ionx--icon.sc-ionx-select{position:relative;width:16px;height:20px}.sc-ionx-select-h .ionx--icon.sc-ionx-select .ionx--icon-inner.sc-ionx-select{top:50%;right:0px;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--select-dropdown-icon-opacity, 0.5);pointer-events:none}.sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-select-h .ionx--text.ionx--placeholder-visible.sc-ionx-select{opacity:var(--select-placeholder-opacity, 0.5)}.ionx--disabled.sc-ionx-select-h{opacity:var(--select-disabled-opacity, 0.5);pointer-events:none}.ionx--readonly.sc-ionx-select-h{opacity:1;pointer-events:none}.ionx--readonly.sc-ionx-select-h .select-icon.sc-ionx-select{display:none}[white-space-normal].sc-ionx-select-h .ionx--text.sc-ionx-select,[ionx--white-space=normal].sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:normal !important;overflow:auto}.in-item.sc-ionx-select-h{position:static}.sc-ionx-select-h ion-reorder-group.sc-ionx-select{overflow:hidden}.sc-ionx-select-h ion-item.sc-ionx-select{--padding-start:0;--padding-end:0;--inner-padding-start:0;--inner-padding-end:0}ion-toolbar.sc-ionx-select-h,ion-toolbar .sc-ionx-select-h{color:var(--ion-toolbar-color);--icon-color:var(--ion-toolbar-color);--select-padding-start:16px;--select-padding-end:16px}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{align-self:flex-start;--select-padding-top:8px;--select-padding-bottom:8px;--select-padding-start:0px}ionx-form-field.sc-ionx-select-h .ionx--text.sc-ionx-select,ionx-form-field .sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked.sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked .sc-ionx-select-h .ionx--text.sc-ionx-select{max-width:calc(100% - 16px);flex:initial}[slot-container=default]>.sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{width:100%}[slot-container=default]>.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked .sc-ionx-select-h ion-reorder-group.sc-ionx-select{width:100%}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h{--select-padding-start:16px;--select-padding-end:16px}";
 
 let instanceCounter = 0;
 const Select = class extends HTMLElement {
@@ -237,18 +235,18 @@ const Select = class extends HTMLElement {
     await didDismiss;
     this.setFocus();
   }
-  async configureSortable() {
-    if (this.sortable && this.multiple) {
-      const prevInstance = this.sortableInstance;
-      this.sortableInstance = (await import('./initSortable.js')).initSortable.call(this);
-      if (prevInstance && prevInstance !== this.sortableInstance) {
-        prevInstance.destroy();
-      }
-    }
-    else if (this.sortableInstance) {
-      this.sortableInstance.destroy();
-      this.sortableInstance = undefined;
-    }
+  valuesReorder(ev) {
+    ev.preventDefault();
+    const values = this.valueAsArray.slice();
+    const value = values[ev.detail.from];
+    values.splice(ev.detail.from, 1);
+    values.splice(ev.detail.to, 0, value);
+    this.valueChanging = true;
+    this.value = values;
+    ev.detail.complete(true);
+  }
+  componentDidLoad() {
+    prefetchComponent({ delay: 0 }, "ion-reorder-group", "ion-item", "ion-label", "ion-spinner", "ion-reorder");
   }
   connectedCallback() {
     if (!this.items && this.options) {
@@ -259,34 +257,37 @@ const Select = class extends HTMLElement {
     if (!this.element.hasAttribute("tabIndex")) {
       this.element.setAttribute("tabIndex", "0");
     }
-    this.configureSortable();
   }
   renderValue(values, value, index) {
+    const sortable = this.sortable && this.multiple;
     const LabelComponent = this.labelComponent;
-    const ValueComponent = this.sortable ? "ion-chip" : "span";
+    const DefaultLabelComponent = sortable ? "ion-label" : "span";
+    const ValueComponent = sortable ? "ion-item" : "span";
     const item = findValueItem(this.visibleItems, value, this.comparator);
     const label = valueLabel(this.visibleItems, value, { comparator: this.comparator, formatter: this.labelFormatter });
-    return h(Fragment, null, h(ValueComponent, Object.assign({ key: value }, (ValueComponent === "ion-chip" ? { outline: true } : {}), { class: { [sortableItemClass]: true } }), !!LabelComponent && h(LabelComponent, { value: value, item: item, label: label, index: index, readonly: this.readonly }), !LabelComponent && h("span", null, label, !this.sortable && index < values.length - 1 ? this.separator : "")), !this.readonly && !this.disabled && this.multiple && this.sortable && index === values.length - 1 && h("ion-chip", { key: "more" }, h("ion-icon", { name: "ellipsis-horizontal", style: { margin: "0px" } })));
+    return h(Fragment, null, h(ValueComponent, { key: value }, !!LabelComponent && h(LabelComponent, { value: value, item: item, label: label, index: index, readonly: this.readonly }), !LabelComponent && h(DefaultLabelComponent, null, label, !sortable && index < values.length - 1 ? this.separator : ""), sortable && !this.readonly && !this.disabled && h("ion-reorder", { slot: "end" })));
   }
   render() {
+    if (this.prefetch) {
+      return;
+    }
     const values = this.valueAsArray;
     const empty = values.length === 0;
+    const sortable = this.sortable && this.multiple;
     return h(Host, { role: "combobox", "aria-haspopup": "dialog", class: {
         "ionx--sortable": this.sortable && !empty && !this.disabled && !this.readonly,
         "ionx--readonly": !!this.readonly,
         "ionx--disabled": !!this.disabled
-      }, onClick: () => this.open() }, h("div", { class: "ionx--inner" }, this.loading && h("ion-spinner", { name: "dots" }), !this.loading && h(Fragment, null, h("div", { class: {
+      }, onClick: () => this.open() }, h("div", { class: "ionx--inner" }, this.loading && h("ion-spinner", { name: "dots" }), !this.loading && h(Fragment, null, (!sortable || empty) && h("div", { class: {
         "ionx--text": true,
         "ionx--placeholder-visible": empty && !!this.placeholder
-      } }, empty && this.placeholder && h("span", null, this.placeholder), values.map((value, index) => this.renderValue(values, value, index))), !this.readonly && !this.disabled && h(Fragment, null, (!this.sortable || empty) && h("div", { class: "ionx--icon", role: "presentation" }, h("div", { class: "ionx--icon-inner" }))))));
+      } }, empty && this.placeholder && h("span", null, this.placeholder), values.map((value, index) => this.renderValue(values, value, index))), !this.readonly && !this.disabled && (!sortable || empty) && h("div", { class: "ionx--icon", role: "presentation" }, h("div", { class: "ionx--icon-inner" })), sortable && !empty && h("ion-reorder-group", { onIonItemReorder: ev => this.valuesReorder(ev), disabled: this.readonly || this.disabled }, values.map((value, index) => this.renderValue(values, value, index))))));
   }
   get element() { return this; }
   static get watchers() { return {
     "disabled": ["disabledChanged"],
     "options": ["optionsChanged"],
-    "value": ["valueChanged"],
-    "sortable": ["configureSortable"],
-    "multiple": ["configureSortable"]
+    "value": ["valueChanged"]
   }; }
   static get style() { return selectCss; }
 };
@@ -306,7 +307,7 @@ const SelectOverlay = class extends HTMLElement {
     this.groupsItems = {};
   }
   async search(ev) {
-    var _a;
+    var _a, _b;
     const query = ((_a = ev.detail.value) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase()) || undefined;
     if (query) {
       const items = [];
@@ -318,10 +319,10 @@ const SelectOverlay = class extends HTMLElement {
               continue;
             }
           }
-          else if ((label || "").toLowerCase().indexOf(query) < 0) {
+          else if ((label || "").toLowerCase().indexOf(query) < 0 && !((_b = this.items[i].search) === null || _b === void 0 ? void 0 : _b.find(v => v.toLowerCase().indexOf(query) > -1))) {
             continue;
           }
-          // search for parent divider
+          // search for parent divider or group
           for (let ii = i - 1; ii >= 0; ii--) {
             if (this.items[ii].divider) {
               items.push(this.items[ii]);
@@ -551,7 +552,7 @@ const SelectOverlay = class extends HTMLElement {
   static get style() { return selectOverlayCss; }
 };
 
-const IonxSelect = /*@__PURE__*/proxyCustomElement(Select, [2,"ionx-select",{"placeholder":[1],"overlay":[1],"overlayTitle":[1,"overlay-title"],"overlayOptions":[16],"alwaysArray":[4,"always-array"],"comparator":[1],"multiple":[4],"sortable":[4],"empty":[4],"readonly":[4],"disabled":[4],"searchTest":[16],"checkValidator":[16],"options":[16],"items":[16],"lazyItems":[16],"labelComponent":[1,"label-component"],"labelFormatter":[16],"separator":[1],"value":[1032]},[[0,"focus","onFocus"],[0,"blur","onBlur"]]]);
+const IonxSelect = /*@__PURE__*/proxyCustomElement(Select, [2,"ionx-select",{"placeholder":[1],"overlay":[1],"overlayTitle":[1,"overlay-title"],"overlayOptions":[16],"alwaysArray":[4,"always-array"],"comparator":[1],"multiple":[4],"sortable":[4],"empty":[4],"readonly":[4],"disabled":[4],"searchTest":[16],"checkValidator":[16],"options":[16],"items":[16],"lazyItems":[16],"labelComponent":[1,"label-component"],"labelFormatter":[16],"separator":[1],"value":[1032],"prefetch":[4]},[[0,"focus","onFocus"],[0,"blur","onBlur"]]]);
 const IonxSelectOverlay = /*@__PURE__*/proxyCustomElement(SelectOverlay, [2,"ionx-select-overlay",{"overlay":[1],"overlayTitle":[1,"overlay-title"],"sortable":[4],"searchTest":[16],"items":[1040],"lazyItems":[16],"multiple":[4],"values":[1040],"empty":[4],"comparator":[1],"checkValidator":[16],"labelFormatter":[16],"visibleItems":[32],"didEnter":[32],"expandedGroups":[32],"loadingGroups":[32]},[[0,"ionViewDidEnter","onDidEnter"]]]);
 const defineIonxSelect = (opts) => {
   if (typeof customElements !== 'undefined') {
@@ -566,4 +567,4 @@ const defineIonxSelect = (opts) => {
   }
 };
 
-export { IonxSelect, IonxSelectOverlay, defineIonxSelect, sortableItemClass as s, showSelectOverlay };
+export { IonxSelect, IonxSelectOverlay, defineIonxSelect, showSelectOverlay };

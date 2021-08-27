@@ -5,14 +5,9 @@
     },
     "types": "../../dist/Select/index.d.ts",
     "peerDependencies": {
-        "fast-equals": "^2.0.1",
-        "dragula": "^3.7.3",
-        "sortablejs": "^1.14.0"
+        "fast-equals": "^2.0.1"
     },
     "devDependencies": {
-        "fast-equals": "^2.0.1",
-        "dragula": "^3.7.3",
-        "sortablejs": "^1.14.0",
-        "@types/sortablejs": "^1.10.7"
+        "fast-equals": "^2.0.1"
     }
 }

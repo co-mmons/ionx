@@ -39,6 +39,7 @@ export namespace Components {
         "overlayOptions": {whiteSpace?: "nowrap" | "normal", title?: string};
         "overlayTitle": string;
         "placeholder": string;
+        "prefetch": boolean;
         "readonly": boolean;
         /**
           * A function, that will be used for testing if value passes search critieria. Default implementation checks lowercased label of value against lowercased searched text.
@@ -118,6 +119,7 @@ declare namespace LocalJSX {
         "overlayOptions"?: {whiteSpace?: "nowrap" | "normal", title?: string};
         "overlayTitle"?: string;
         "placeholder"?: string;
+        "prefetch"?: boolean;
         "readonly"?: boolean;
         /**
           * A function, that will be used for testing if value passes search critieria. Default implementation checks lowercased label of value against lowercased searched text.

@@ -100,11 +100,11 @@ export class SelectOverlay implements ComponentInterface {
                             continue;
                         }
 
-                    } else if ((label || "").toLowerCase().indexOf(query) < 0) {
+                    } else if ((label || "").toLowerCase().indexOf(query) < 0 && !this.items[i].search?.find(v => v.toLowerCase().indexOf(query) > -1)) {
                         continue;
                     }
 
-                    // search for parent divider
+                    // search for parent divider or group
                     for (let ii = i - 1; ii >= 0; ii--) {
                         if (this.items[ii].divider) {
                             items.push(this.items[ii]);

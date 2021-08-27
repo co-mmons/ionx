@@ -83,34 +83,15 @@
         //    max-width: 45%
     }
 
-    ion-chip {
-        max-width: calc(100% - 4px);
-        margin: 4px 4px 0px 0px;
-
-        &.ionx-select-sortable {
-            cursor: default;
-
-            > span {
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-                line-height: 1.1;
-            }
-        }
+    ion-reorder-group {
+        overflow: hidden;
     }
 
-    &.ionx--sortable {
-        cursor: initial;
-
-        .ionx-select-sortable {
-            cursor: move;
-        }
-
-        .ionx--text {
-            white-space: normal;
-            overflow: auto;
-            width: 100%;
-        }
+    ion-item {
+        --padding-start: 0;
+        --padding-end: 0;
+        --inner-padding-start: 0;
+        --inner-padding-end: 0;
     }
 }
 
@@ -131,14 +112,14 @@
         max-width: calc(100% - 16px);
         flex: initial;
     }
-
-    &.ionx--orderable .ionx--text {
-        flex: 1;
-    }
 }
 
 [slot-container=default] > :host, :host-context(.item-label-stacked) {
     width: 100%;
+
+    ion-reorder-group {
+        width: 100%;
+    }
 }
 
 :host-context(ionx-form-field) {
