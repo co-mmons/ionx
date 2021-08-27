@@ -1,6 +1,6 @@
-import {SelectDivider} from "./SelectDivider";
+import {SelectDividerItem} from "./SelectDividerItem";
 import {SelectItem} from "./SelectItem";
-import {SelectValue} from "./SelectValue";
+import {SelectValueItem} from "./SelectValueItem";
 import {ValueComparator} from "./ValueComparator";
 
 export interface SelectOverlayProps {
@@ -18,7 +18,7 @@ export interface SelectOverlayProps {
      */
     items: SelectItem[];
 
-    lazyItems?: (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
+    lazyItems?: () => Promise<Array<SelectValueItem | SelectDividerItem>>;
 
     multiple?: boolean;
 

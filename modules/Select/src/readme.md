@@ -14,7 +14,7 @@
 | `empty`                | `empty`         |             | `boolean`                                                              | `undefined` |
 | `items`                | --              |             | `SelectItem[]`                                                         | `undefined` |
 | `labelFormatter`       | --              |             | `(value: any) => string`                                               | `undefined` |
-| `lazyItems`            | --              |             | `(values?: any[]) => Promise<(SelectValue<any> \| SelectDivider)[]>`   | `undefined` |
+| `lazyItems`            | --              |             | `() => Promise<(SelectValueItem<any> \| SelectDividerItem)[]>`         | `undefined` |
 | `multiple`             | `multiple`      |             | `boolean`                                                              | `undefined` |
 | `overlay` _(required)_ | `overlay`       |             | `"modal" \| "popover"`                                                 | `undefined` |
 | `overlayTitle`         | `overlay-title` |             | `string`                                                               | `undefined` |

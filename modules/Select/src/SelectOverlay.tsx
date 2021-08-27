@@ -8,10 +8,10 @@ import {defineIonxToolbar} from "ionx/Toolbar";
 import {waitTillHydrated} from "ionx/utils";
 import {findValueItem} from "./findValueItem";
 import {isEqualValue} from "./isEqualValue";
-import {SelectDivider} from "./SelectDivider";
-import {SelectGroup} from "./SelectGroup";
+import {SelectDividerItem} from "./SelectDividerItem";
+import {SelectGroupItem} from "./SelectGroupItem";
 import {SelectItem} from "./SelectItem";
-import {SelectValue} from "./SelectValue";
+import {SelectValueItem} from "./SelectValueItem";
 import {ValueComparator} from "./ValueComparator";
 
 defineIonxToolbar();
@@ -45,7 +45,7 @@ export class SelectOverlay implements ComponentInterface {
     items: SelectItem[];
 
     @Prop()
-    lazyItems: (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
+    lazyItems: () => Promise<Array<SelectValueItem | SelectDividerItem>>;
 
     @State()
     visibleItems: SelectItem[];
@@ -280,7 +280,7 @@ export class SelectOverlay implements ComponentInterface {
 
     }
 
-    async toggleGroup(group: SelectGroup) {
+    async toggleGroup(group: SelectGroupItem) {
 
         if (!this.expandedGroups[group.id]) {
             this.expandedGroups[group.id] = true;
@@ -335,7 +335,7 @@ export class SelectOverlay implements ComponentInterface {
 
     ok() {
 
-        const items: SelectValue[] = [];
+        const items: SelectValueItem[] = [];
 
         // we build list of items, that are selected
         // when value is not associated with item, we remove given value
@@ -379,7 +379,7 @@ export class SelectOverlay implements ComponentInterface {
                 button={true}
                 detail={true}
                 detailIcon={this.expandedGroups[item.id] ? "chevron-up" : "chevron-down"}
-                onClick={() => this.toggleGroup(item as SelectGroup)}>
+                onClick={() => this.toggleGroup(item as SelectGroupItem)}>
 
                 <ion-label>{(item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)}</ion-label>
 

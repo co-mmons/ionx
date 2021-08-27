@@ -1,6 +1,6 @@
-import { SelectDivider } from "./SelectDivider";
+import { SelectDividerItem } from "./SelectDividerItem";
 import { SelectItem } from "./SelectItem";
-import { SelectValue } from "./SelectValue";
+import { SelectValueItem } from "./SelectValueItem";
 import { ValueComparator } from "./ValueComparator";
 export interface SelectOverlayProps {
   overlay: "modal" | "popover";
@@ -11,7 +11,7 @@ export interface SelectOverlayProps {
    * Copy of {@link Select.items}.
    */
   items: SelectItem[];
-  lazyItems?: (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
+  lazyItems?: () => Promise<Array<SelectValueItem | SelectDividerItem>>;
   multiple?: boolean;
   values?: any[];
   empty?: boolean;

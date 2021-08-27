@@ -1,8 +1,8 @@
 import { ComponentInterface } from "@stencil/core";
-import { SelectDivider } from "./SelectDivider";
-import { SelectGroup } from "./SelectGroup";
+import { SelectDividerItem } from "./SelectDividerItem";
+import { SelectGroupItem } from "./SelectGroupItem";
 import { SelectItem } from "./SelectItem";
-import { SelectValue } from "./SelectValue";
+import { SelectValueItem } from "./SelectValueItem";
 import { ValueComparator } from "./ValueComparator";
 export declare class SelectOverlay implements ComponentInterface {
   element: HTMLElement;
@@ -11,7 +11,7 @@ export declare class SelectOverlay implements ComponentInterface {
   sortable: boolean;
   searchTest: (query: string, value: any, label: string) => boolean;
   items: SelectItem[];
-  lazyItems: (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
+  lazyItems: () => Promise<Array<SelectValueItem | SelectDividerItem>>;
   visibleItems: SelectItem[];
   multiple: boolean;
   values: any[];
@@ -36,7 +36,7 @@ export declare class SelectOverlay implements ComponentInterface {
   scrollToIndex(index: number): Promise<void>;
   onClick(ev: MouseEvent, item: SelectItem): void;
   onCheck(item: SelectItem, checked: boolean): void;
-  toggleGroup(group: SelectGroup): Promise<void>;
+  toggleGroup(group: SelectGroupItem): Promise<void>;
   cancel(): void;
   ok(): void;
   connectedCallback(): void;

@@ -1,9 +1,10 @@
 import { StyleEventDetail } from "@ionic/core";
 import { EventEmitter, FunctionalComponent } from "@stencil/core";
 import type Sortable from "sortablejs";
-import { SelectDivider } from "./SelectDivider";
+import { LazyItemsFn } from "./LazyItemsFn";
+import { SelectLazyGroupItem } from "./SelectGroupItem";
 import { SelectItem } from "./SelectItem";
-import { SelectValue } from "./SelectValue";
+import { SelectValueItem } from "./SelectValueItem";
 import { ValueComparator } from "./ValueComparator";
 export declare class Select {
   element: HTMLElement;
@@ -43,7 +44,7 @@ export declare class Select {
    */
   options: SelectItem[];
   items: SelectItem[];
-  lazyItems: (() => Promise<Array<SelectValue | SelectDivider>>) | ((values: any[]) => Promise<SelectValue[]>);
+  lazyItems: LazyItemsFn | SelectLazyGroupItem;
   labelComponent?: string | FunctionalComponent<{
     value: any;
     item?: SelectItem;
@@ -63,7 +64,7 @@ export declare class Select {
    * @internal
    */
   ionStyle: EventEmitter<StyleEventDetail>;
-  visibleItems: SelectValue[];
+  visibleItems: SelectValueItem[];
   valueChanging: boolean;
   focused: boolean;
   loading: boolean;

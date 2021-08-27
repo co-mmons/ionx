@@ -40,7 +40,7 @@ function isEqualValue(a, b, comparator) {
     return deepEqual(a, b);
   }
   else if (comparator) {
-    const r = this.comparator(a, b);
+    const r = comparator(a, b);
     return r === 0 || r === true;
   }
   return a === b;
@@ -155,7 +155,7 @@ const Select = class extends HTMLElement {
     if (unmatched.length > 0) {
       this.loading = true;
       if (this.lazyItems) {
-        visible = await this.lazyItems(this.valueAsArray);
+        visible = await (typeof this.lazyItems === "function" ? this.lazyItems(this.valueAsArray) : this.lazyItems.items(this.valueAsArray));
       }
       else if (this.items) {
         for (const item of this.items) {
@@ -209,7 +209,7 @@ const Select = class extends HTMLElement {
     const overlayProps = {
       overlay,
       items: (_a = this.items) === null || _a === void 0 ? void 0 : _a.slice(),
-      lazyItems: this.lazyItems,
+      lazyItems: this.lazyItems ? (() => { var _a; return typeof this.lazyItems === "function" ? this.lazyItems() : (_a = this.lazyItems) === null || _a === void 0 ? void 0 : _a.items(); }) : undefined,
       values: (_b = this.valueAsArray.slice()) !== null && _b !== void 0 ? _b : [],
       multiple: !!this.multiple,
       overlayTitle: overlayTitle,

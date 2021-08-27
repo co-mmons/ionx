@@ -1,6 +1,6 @@
-export {SelectDivider} from "./SelectDivider";
-export {SelectGroup} from "./SelectGroup";
+export {SelectDividerItem} from "./SelectDividerItem";
+export {SelectGroupItem, SelectLazyGroupItem} from "./SelectGroupItem";
 export {SelectItem} from "./SelectItem";
 export {SelectOverlayProps} from "./SelectOverlayProps";
-export {SelectValue, SelectValue as SelectOption} from "./SelectValue";
+export {SelectValueItem, SelectValueItem as SelectOption} from "./SelectValueItem";
 export {showSelectOverlay} from "./showSelectOverlay";

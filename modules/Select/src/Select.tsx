@@ -3,10 +3,11 @@ import {Component, Element, Event, EventEmitter, forceUpdate, Fragment, Function
 import {deepEqual} from "fast-equals";
 import type Sortable from "sortablejs";
 import {findValueItem} from "./findValueItem";
-import {SelectDivider} from "./SelectDivider";
+import {LazyItemsFn} from "./LazyItemsFn";
+import {SelectLazyGroupItem} from "./SelectGroupItem";
 import {SelectItem} from "./SelectItem";
 import {SelectOverlayProps} from "./SelectOverlayProps";
-import {SelectValue} from "./SelectValue";
+import {SelectValueItem} from "./SelectValueItem";
 import {showSelectOverlay} from "./showSelectOverlay";
 import {sortableItemClass} from "./sortableItemClass";
 import {ValueComparator} from "./ValueComparator";
@@ -92,7 +93,7 @@ export class Select {
     items: SelectItem[];
 
     @Prop()
-    lazyItems: (() => Promise<Array<SelectValue | SelectDivider>>) | ((values: any[]) => Promise<SelectValue[]>);
+    lazyItems: LazyItemsFn | SelectLazyGroupItem;
 
     @Prop()
     labelComponent?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
@@ -119,7 +120,7 @@ export class Select {
     @Event()
     ionStyle!: EventEmitter<StyleEventDetail>;
 
-    visibleItems: SelectValue[];
+    visibleItems: SelectValueItem[];
 
     valueChanging: boolean;
 
@@ -194,7 +195,7 @@ export class Select {
 
     async buildVisibleItems() {
 
-        let visible: SelectValue[] = [];
+        let visible: SelectValueItem[] = [];
 
         // values, that do not match items
         const unmatched: any[] = [];
@@ -212,7 +213,7 @@ export class Select {
             this.loading = true;
 
             if (this.lazyItems) {
-                visible = await this.lazyItems(this.valueAsArray) as SelectValue[];
+                visible = await (typeof this.lazyItems === "function" ? this.lazyItems(this.valueAsArray) : this.lazyItems.items(this.valueAsArray)) as SelectValueItem[];
 
             } else if (this.items) {
 
@@ -276,7 +277,7 @@ export class Select {
         const overlayProps: SelectOverlayProps = {
             overlay,
             items: this.items?.slice(),
-            lazyItems: this.lazyItems,
+            lazyItems: this.lazyItems ? (() => typeof this.lazyItems === "function" ? this.lazyItems() : this.lazyItems?.items()) : undefined,
             values: this.valueAsArray.slice() ?? [],
             multiple: !!this.multiple,
             overlayTitle: overlayTitle,

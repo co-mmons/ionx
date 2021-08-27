@@ -7,10 +7,12 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { ValueComparator } from "./ValueComparator";
 import { SelectItem } from "./SelectItem";
-import { SelectValue } from "./SelectValue";
-import { SelectDivider } from "./SelectDivider";
+import { LazyItemsFn } from "./LazyItemsFn";
+import { SelectLazyGroupItem } from "./SelectGroupItem";
 import { FunctionalComponent } from "@stencil/core";
 import { StyleEventDetail } from "@ionic/core";
+import { SelectValueItem } from "./SelectValueItem";
+import { SelectDividerItem } from "./SelectDividerItem";
 export namespace Components {
     interface IonxSelect {
         /**
@@ -24,7 +26,7 @@ export namespace Components {
         "items": SelectItem[];
         "labelComponent"?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
         "labelFormatter"?: (value: any) => string;
-        "lazyItems": (() => Promise<Array<SelectValue | SelectDivider>>) | ((values: any[]) => Promise<SelectValue[]>);
+        "lazyItems": LazyItemsFn | SelectLazyGroupItem;
         /**
           * If multiple value selection is allowed.
          */
@@ -57,7 +59,7 @@ export namespace Components {
         "empty": boolean;
         "items": SelectItem[];
         "labelFormatter"?: (value: any) => string;
-        "lazyItems": (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
+        "lazyItems": () => Promise<Array<SelectValueItem | SelectDividerItem>>;
         "multiple": boolean;
         "overlay": "modal" | "popover";
         "overlayTitle": string;
@@ -97,7 +99,7 @@ declare namespace LocalJSX {
         "items"?: SelectItem[];
         "labelComponent"?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
         "labelFormatter"?: (value: any) => string;
-        "lazyItems"?: (() => Promise<Array<SelectValue | SelectDivider>>) | ((values: any[]) => Promise<SelectValue[]>);
+        "lazyItems"?: LazyItemsFn | SelectLazyGroupItem;
         /**
           * If multiple value selection is allowed.
          */
@@ -134,7 +136,7 @@ declare namespace LocalJSX {
         "empty"?: boolean;
         "items"?: SelectItem[];
         "labelFormatter"?: (value: any) => string;
-        "lazyItems"?: (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
+        "lazyItems"?: () => Promise<Array<SelectValueItem | SelectDividerItem>>;
         "multiple"?: boolean;
         "overlay": "modal" | "popover";
         "overlayTitle"?: string;

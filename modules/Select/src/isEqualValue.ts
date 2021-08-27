@@ -14,7 +14,7 @@ export function isEqualValue(a: any, b: any, comparator: ValueComparator) {
         return deepEqual(a, b);
 
     } else if (comparator) {
-        const r = this.comparator(a, b);
+        const r = comparator(a, b);
         return r === 0 || r === true;
     }
 
