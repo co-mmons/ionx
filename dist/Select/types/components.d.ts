@@ -6,7 +6,9 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { ValueComparator } from "./ValueComparator";
-import { SelectOption } from "./SelectOption";
+import { SelectItem } from "./SelectItem";
+import { SelectValue } from "./SelectValue";
+import { SelectDivider } from "./SelectDivider";
 import { FunctionalComponent } from "@stencil/core";
 import { StyleEventDetail } from "@ionic/core";
 export namespace Components {
@@ -19,20 +21,20 @@ export namespace Components {
         "comparator": ValueComparator;
         "disabled": boolean;
         "empty": boolean;
-        "labelComponent"?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number, readonly?: boolean}>;
+        "items": SelectItem[];
+        "labelComponent"?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
         "labelFormatter"?: (value: any) => string;
-        "lazyOptions": () => Promise<SelectOption[]>;
+        "lazyItems": (() => Promise<Array<SelectValue | SelectDivider>>) | ((values: any[]) => Promise<SelectValue[]>);
         /**
           * If multiple value selection is allowed.
          */
         "multiple": boolean;
-        "options": SelectOption[];
         /**
-          * If multiple values selection can be ordered after selection.
+          * @deprecated
          */
-        "orderable": boolean;
+        "options": SelectItem[];
         "overlay": "popover" | "modal";
-        "overlayOptions": { whiteSpace?: "nowrap" | "normal", title?: string };
+        "overlayOptions": {whiteSpace?: "nowrap" | "normal", title?: string};
         "overlayTitle": string;
         "placeholder": string;
         "readonly": boolean;
@@ -43,23 +45,24 @@ export namespace Components {
         "separator"?: string;
         "setBlur": () => Promise<void>;
         "setFocus": (options?: FocusOptions) => Promise<void>;
+        /**
+          * If multiple values selection can be sorted after selection.
+         */
+        "sortable": boolean;
         "value": any;
-    }
-    interface IonxSelectOrderable {
-        "enabled": boolean;
-        "values": any[];
     }
     interface IonxSelectOverlay {
         "checkValidator": (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
         "comparator": ValueComparator;
         "empty": boolean;
+        "items": SelectItem[];
         "labelFormatter"?: (value: any) => string;
+        "lazyItems": (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
         "multiple": boolean;
-        "options": SelectOption[];
-        "orderable": boolean;
         "overlay": "modal" | "popover";
         "overlayTitle": string;
         "searchTest": (query: string, value: any, label: string) => boolean;
+        "sortable": boolean;
         "values": any[];
     }
 }
@@ -70,12 +73,6 @@ declare global {
         prototype: HTMLIonxSelectElement;
         new (): HTMLIonxSelectElement;
     };
-    interface HTMLIonxSelectOrderableElement extends Components.IonxSelectOrderable, HTMLStencilElement {
-    }
-    var HTMLIonxSelectOrderableElement: {
-        prototype: HTMLIonxSelectOrderableElement;
-        new (): HTMLIonxSelectOrderableElement;
-    };
     interface HTMLIonxSelectOverlayElement extends Components.IonxSelectOverlay, HTMLStencilElement {
     }
     var HTMLIonxSelectOverlayElement: {
@@ -84,7 +81,6 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "ionx-select": HTMLIonxSelectElement;
-        "ionx-select-orderable": HTMLIonxSelectOrderableElement;
         "ionx-select-overlay": HTMLIonxSelectOverlayElement;
     }
 }
@@ -98,9 +94,10 @@ declare namespace LocalJSX {
         "comparator"?: ValueComparator;
         "disabled"?: boolean;
         "empty"?: boolean;
-        "labelComponent"?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number, readonly?: boolean}>;
+        "items"?: SelectItem[];
+        "labelComponent"?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
         "labelFormatter"?: (value: any) => string;
-        "lazyOptions"?: () => Promise<SelectOption[]>;
+        "lazyItems"?: (() => Promise<Array<SelectValue | SelectDivider>>) | ((values: any[]) => Promise<SelectValue[]>);
         /**
           * If multiple value selection is allowed.
          */
@@ -111,13 +108,12 @@ declare namespace LocalJSX {
           * Emitted when the styles change.
          */
         "onIonStyle"?: (event: CustomEvent<StyleEventDetail>) => void;
-        "options"?: SelectOption[];
         /**
-          * If multiple values selection can be ordered after selection.
+          * @deprecated
          */
-        "orderable"?: boolean;
+        "options"?: SelectItem[];
         "overlay"?: "popover" | "modal";
-        "overlayOptions"?: { whiteSpace?: "nowrap" | "normal", title?: string };
+        "overlayOptions"?: {whiteSpace?: "nowrap" | "normal", title?: string};
         "overlayTitle"?: string;
         "placeholder"?: string;
         "readonly"?: boolean;
@@ -126,29 +122,28 @@ declare namespace LocalJSX {
          */
         "searchTest"?: (query: string, value: any, label: string) => boolean;
         "separator"?: string;
+        /**
+          * If multiple values selection can be sorted after selection.
+         */
+        "sortable"?: boolean;
         "value"?: any;
-    }
-    interface IonxSelectOrderable {
-        "enabled"?: boolean;
-        "onOrderChanged"?: (event: CustomEvent<any[]>) => void;
-        "values"?: any[];
     }
     interface IonxSelectOverlay {
         "checkValidator"?: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
         "comparator"?: ValueComparator;
         "empty"?: boolean;
+        "items"?: SelectItem[];
         "labelFormatter"?: (value: any) => string;
+        "lazyItems"?: (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
         "multiple"?: boolean;
-        "options"?: SelectOption[];
-        "orderable"?: boolean;
         "overlay": "modal" | "popover";
         "overlayTitle"?: string;
         "searchTest"?: (query: string, value: any, label: string) => boolean;
+        "sortable"?: boolean;
         "values"?: any[];
     }
     interface IntrinsicElements {
         "ionx-select": IonxSelect;
-        "ionx-select-orderable": IonxSelectOrderable;
         "ionx-select-overlay": IonxSelectOverlay;
     }
 }
@@ -157,7 +152,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ionx-select": LocalJSX.IonxSelect & JSXBase.HTMLAttributes<HTMLIonxSelectElement>;
-            "ionx-select-orderable": LocalJSX.IonxSelectOrderable & JSXBase.HTMLAttributes<HTMLIonxSelectOrderableElement>;
             "ionx-select-overlay": LocalJSX.IonxSelectOverlay & JSXBase.HTMLAttributes<HTMLIonxSelectOverlayElement>;
         }
     }

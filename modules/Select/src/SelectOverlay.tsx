@@ -1,13 +1,23 @@
 import {Capacitor} from "@capacitor/core";
 import {intl, MessageRef} from "@co.mmons/js-intl";
-import {sleep} from "@co.mmons/js-utils/core";
+import {sleep, waitTill} from "@co.mmons/js-utils/core";
 import {isPlatform} from "@ionic/core";
-import {Component, ComponentInterface, Element, h, Host, Listen, Prop, State} from "@stencil/core";
-import {matchesMediaBreakpoint} from "ionx/utils";
-import {indexAttribute} from "./indexAttribute";
+import {Component, ComponentInterface, Element, forceUpdate, h, Host, Listen, Prop, State} from "@stencil/core";
+import {defineIonxLoading} from "ionx/Loading";
+import {defineIonxToolbar} from "ionx/Toolbar";
+import {waitTillHydrated} from "ionx/utils";
+import {findValueItem} from "./findValueItem";
 import {isEqualValue} from "./isEqualValue";
-import {SelectOption} from "./SelectOption";
+import {SelectDivider} from "./SelectDivider";
+import {SelectGroup} from "./SelectGroup";
+import {SelectItem} from "./SelectItem";
+import {SelectValue} from "./SelectValue";
 import {ValueComparator} from "./ValueComparator";
+
+defineIonxToolbar();
+defineIonxLoading();
+
+const indexAttribute = "ionx-select--idx";
 
 @Component({
     tag: "ionx-select-overlay",
@@ -26,16 +36,19 @@ export class SelectOverlay implements ComponentInterface {
     overlayTitle: string;
 
     @Prop()
-    orderable: boolean;
+    sortable: boolean;
 
     @Prop()
     searchTest: (query: string, value: any, label: string) => boolean;
 
+    @Prop({mutable: true})
+    items: SelectItem[];
+
     @Prop()
-    options: SelectOption[];
+    lazyItems: (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
 
     @State()
-    visibleOptions: SelectOption[];
+    visibleItems: SelectItem[];
 
     @Prop()
     multiple: boolean;
@@ -55,27 +68,35 @@ export class SelectOverlay implements ComponentInterface {
     @Prop()
     labelFormatter?: (value: any) => string;
 
+    @State()
+    didEnter = false;
+
+    @State()
+    expandedGroups: { [groupId: string]: boolean } = {};
+
+    @State()
+    loadingGroups: { [groupId: string]: boolean } = {};
+
+    groupsItems: { [groupId: string]: SelectItem[] } = {};
+
     virtualItemHeight: number;
 
     useVirtualScroll: boolean;
 
-    @State()
-    didEnter = false;
-
     async search(ev: CustomEvent) {
-        const query = ev.detail.value?.toLocaleLowerCase() ?? undefined;
+        const query = ev.detail.value?.toLocaleLowerCase() || undefined;
 
         if (query) {
 
-            const options = [];
+            const items = [];
 
-            for (let i = 0; i < this.options.length; i++) {
-                if (!this.options[i].divider) {
+            for (let i = 0; i < this.items.length; i++) {
+                if (!this.items[i].divider) {
 
-                    const label = (this.options[i].label instanceof MessageRef ? intl.message(this.options[i].label) : this.options[i].label) || (this.labelFormatter ? this.labelFormatter(this.options[i].value) : `${this.options[i].value}`);
+                    const label = (this.items[i].label instanceof MessageRef ? intl.message(this.items[i].label) : this.items[i].label) || (this.labelFormatter ? this.labelFormatter(this.items[i].value) : `${this.items[i].value}`);
 
                     if (this.searchTest) {
-                        if (!this.searchTest(query, this.options[i].value, label)) {
+                        if (!this.searchTest(query, this.items[i].value, label)) {
                             continue;
                         }
 
@@ -85,26 +106,69 @@ export class SelectOverlay implements ComponentInterface {
 
                     // search for parent divider
                     for (let ii = i - 1; ii >= 0; ii--) {
-                        if (this.options[ii].divider) {
-                            options.push(this.options[ii]);
+                        if (this.items[ii].divider) {
+                            items.push(this.items[ii]);
                             break;
                         }
                     }
 
-                    options.push(this.options[i]);
+                    items.push(this.items[i]);
                 }
             }
 
-            this.visibleOptions = options;
+            this.visibleItems = items;
 
         } else {
-            this.visibleOptions = this.options.slice();
+            this.visibleItems = this.items.slice();
         }
 
     }
 
     @Listen("ionViewDidEnter")
     async onDidEnter() {
+
+        if (this.lazyItems) {
+            this.items = await this.lazyItems();
+
+        } else {
+
+            // values, that do not match items
+            const unloaded: any[] = [];
+            for (const value of this.values) {
+                if (!findValueItem(this.items ?? [], value, this.comparator)) {
+                    unloaded.push(value);
+                }
+            }
+
+            if (unloaded.length > 0) {
+                for (const group of this.items.filter(item => item.group)) {
+
+                    let subitems: SelectItem[];
+
+                    if (group.values?.(unloaded)?.length) {
+                        subitems = typeof group.items === "function" ? await group.items() : group.items;
+                    } else if (Array.isArray(group.items) && unloaded.find(value => findValueItem(group.items as SelectItem[], value, this.comparator))) {
+                        subitems = group.items;
+                    }
+
+                    if (subitems) {
+
+                        this.groupsItems[group.id] = subitems;
+
+                        for (let i = 0; i < this.items.length; i++) {
+                            if (this.items[i] === group) {
+                                this.items.splice(i, 1, group, ...subitems);
+                                this.expandedGroups[group.id] = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        this.useVirtualScroll = this.overlay === "modal" && this.items.length > 100;
+        this.visibleItems = this.items.slice();
 
         if (this.useVirtualScroll) {
             let firstItem: HTMLElement;
@@ -120,7 +184,9 @@ export class SelectOverlay implements ComponentInterface {
 
         this.didEnter = true;
 
-        const indexToSelect = (this.values.length > 0 && this.options.findIndex(option => this.values.findIndex(v => isEqualValue(option.value, v, this.comparator)) > -1)) || -1;
+        await waitTillHydrated(this.element);
+
+        const indexToSelect = (this.values.length > 0 && this.items.findIndex(option => this.values.findIndex(v => isEqualValue(option.value, v, this.comparator)) > -1)) || -1;
         if (indexToSelect > -1) {
             this.scrollToIndex(indexToSelect);
         }
@@ -150,14 +216,19 @@ export class SelectOverlay implements ComponentInterface {
             if (this.useVirtualScroll) {
                 scroll.scrollTo({top: (index - 1) * this.virtualItemHeight});
             } else {
-                this.element.querySelector(`ion-item[${indexAttribute}="${index - 1}"]`)?.scrollIntoView();
+                let item: HTMLElement;
+                try {
+                    await waitTill(() => !!(item = this.element.querySelector(`ion-item[${indexAttribute}="${index - 1}"]`)), undefined, 5000);
+                    item.scrollIntoView();
+                } catch {
+                }
             }
         }
     }
 
-    onClick(ev: MouseEvent, option: SelectOption) {
+    onClick(ev: MouseEvent, item: SelectItem) {
 
-        const wasChecked = this.values.findIndex(value => isEqualValue(value, option.value, this.comparator)) > -1;
+        const wasChecked = this.values.findIndex(value => isEqualValue(value, item.value, this.comparator)) > -1;
 
         if (!this.empty && this.values.length === 1 && wasChecked) {
             (ev.target as HTMLIonCheckboxElement).checked = true;
@@ -167,10 +238,10 @@ export class SelectOverlay implements ComponentInterface {
             return;
         }
 
-        this.onCheck(option, !wasChecked);
+        this.onCheck(item, !wasChecked);
     }
 
-    onCheck(option: SelectOption, checked: boolean) {
+    onCheck(item: SelectItem, checked: boolean) {
 
         const valuesBefore = this.values.slice();
 
@@ -178,7 +249,7 @@ export class SelectOverlay implements ComponentInterface {
 
             for (let i = 0; i < this.values.length; i++) {
 
-                if (isEqualValue(this.values[i], option.value, this.comparator)) {
+                if (isEqualValue(this.values[i], item.value, this.comparator)) {
 
                     if (!checked) {
                         this.values.splice(i, 1);
@@ -192,21 +263,62 @@ export class SelectOverlay implements ComponentInterface {
 
             if (checked) {
                 if (this.multiple) {
-                    this.values.push(option.value);
+                    this.values.push(item.value);
                 } else {
-                    this.values = [option.value];
+                    this.values = [item.value];
                 }
             }
         }
 
         if (this.multiple && this.checkValidator) {
-            this.values = this.checkValidator(option.value, checked, valuesBefore) || [];
+            this.values = this.checkValidator(item.value, checked, valuesBefore) || [];
         }
 
         if (!this.multiple) {
             this.ok();
         }
 
+    }
+
+    async toggleGroup(group: SelectGroup) {
+
+        if (!this.expandedGroups[group.id]) {
+            this.expandedGroups[group.id] = true;
+            this.loadingGroups[group.id] = true;
+
+            forceUpdate(this);
+
+            const subitems = this.groupsItems[group.id] ?? (typeof group.items === "function" ? await group.items() : group.items);
+            if (subitems) {
+
+                this.groupsItems[group.id] = subitems;
+
+                for (let i = 0; i < this.items.length; i++) {
+                    if (this.items[i] === group) {
+                        this.items.splice(i, 1, group, ...subitems);
+                        this.visibleItems = this.items.slice();
+                        break;
+                    }
+                }
+            }
+
+        } else {
+
+            for (const subitem of this.groupsItems[group.id]) {
+                const i = this.items.indexOf(subitem);
+                if (i > -1) {
+                    this.items.splice(i, 1);
+                }
+            }
+
+            this.visibleItems = this.items.slice();
+
+            delete this.expandedGroups[group.id];
+        }
+
+        delete this.loadingGroups[group.id];
+
+        forceUpdate(this);
     }
 
     cancel() {
@@ -223,40 +335,68 @@ export class SelectOverlay implements ComponentInterface {
 
     ok() {
 
-        if (!this.orderable) {
-            this.values.sort((a, b) => this.options.findIndex(o => isEqualValue(o.value, a, this.comparator)) - this.options.findIndex(o => isEqualValue(o.value, b, this.comparator)));
+        const items: SelectValue[] = [];
+
+        // we build list of items, that are selected
+        // when value is not associated with item, we remove given value
+        for (let i = this.values.length - 1; i >= 0; i--) {
+            const item = findValueItem(this.items, this.values[i], this.comparator);
+            if (item) {
+                items.push(item);
+            } else {
+                this.values.splice(i, 1);
+            }
+        }
+
+        if (!this.sortable) {
+            this.values.sort((a, b) => items.findIndex(o => isEqualValue(o.value, a, this.comparator)) - items.findIndex(o => isEqualValue(o.value, b, this.comparator)));
         }
 
         if (this.overlay === "modal") {
             const modal = this.element.closest<HTMLIonModalElement>("ion-modal");
-            modal.dismiss(this.values, "ok");
+            modal.dismiss({values: this.values, items}, "ok");
         } else {
             const popover = this.element.closest<HTMLIonPopoverElement>("ion-popover");
-            popover.dismiss(this.values, "ok");
+            popover.dismiss({values: this.values, items}, "ok");
         }
 
     }
 
     connectedCallback() {
-        this.useVirtualScroll = this.overlay === "modal" && this.options.length > 100;
-        this.visibleOptions = this.options.slice();
+        this.visibleItems = this.items?.slice();
+        this.useVirtualScroll = this.overlay === "modal" && this.items?.length > 100;
     }
 
-    renderItem(option: SelectOption, index: number) {
+    renderItem(item: SelectItem, index: number) {
 
-        if (!option) {
+        if (!item) {
             return;
         }
 
-        return <ion-item key={index} {...{[indexAttribute]: index}} class={{"ionx--divider": option.divider}}>
+        if (item.group) {
+            return <ion-item
+                key={`group:${item.id}`}
+                button={true}
+                detail={true}
+                detailIcon={this.expandedGroups[item.id] ? "chevron-up" : "chevron-down"}
+                onClick={() => this.toggleGroup(item as SelectGroup)}>
 
-            {!option.divider && <ion-checkbox
+                <ion-label>{(item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)}</ion-label>
+
+                {this.loadingGroups[item.id] && <ion-spinner name="dots" slot="end"/>}
+
+            </ion-item>
+        }
+
+        return <ion-item key={index} {...{[indexAttribute]: index}} class={{"ionx--divider": item.divider}}>
+
+            {!item.divider && <ion-checkbox
                 class="sc-ionx-select-overlay"
                 slot="start"
-                checked={this.values.findIndex(v => isEqualValue(v, option.value, this.comparator)) > -1}
-                onClick={ev => this.onClick(ev, option)}/>}
+                checked={this.values.findIndex(v => isEqualValue(v, item.value, this.comparator)) > -1}
+                onClick={ev => this.onClick(ev, item)}/>}
 
-            <ion-label>{(option.label ? (option.label instanceof MessageRef ? intl.message(option.label) : option.label) : undefined ) ?? (this.labelFormatter ? this.labelFormatter(option.value) : `${option.value}`)}</ion-label>
+            <ion-label>{(item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)}</ion-label>
 
         </ion-item>
     }
@@ -265,24 +405,21 @@ export class SelectOverlay implements ComponentInterface {
 
         return <Host>
 
-            {this.useVirtualScroll && !this.didEnter && <div style={{visibility: "hidden"}}>{this.renderItem(this.options.find(o => !o.divider), 0)}</div>}
+            {this.useVirtualScroll && !this.didEnter && <div style={{visibility: "hidden"}}>{this.renderItem(this.items.find(o => !o.divider), 0)}</div>}
 
             {this.overlay === "modal" && <ion-header>
-                <ion-toolbar>
+                <ionx-toolbar
+                    button="close"
+                    buttonHandler={() => this.cancel()}>
 
-                    <ion-back-button
-                        style={{display: "inline-block"}}
-                        icon={matchesMediaBreakpoint(this, "md") ? "close" : null}
-                        onClick={ev => [ev.preventDefault(), this.cancel()]}
-                        slot="start"/>
+                    <span slot="title">{this.overlayTitle}</span>
 
-                    <ion-title style={{padding: "0px"}}>{this.overlayTitle}</ion-title>
+                    <ion-button
+                        slot="action"
+                        fill="clear"
+                        onClick={() => this.ok()}>{intl.message`@co.mmons/js-intl#Done`}</ion-button>
 
-                    <ion-buttons slot="end">
-                        <ion-button fill="clear" onClick={() => this.ok()}>{intl.message`@co.mmons/js-intl#Done`}</ion-button>
-                    </ion-buttons>
-
-                </ion-toolbar>
+                </ionx-toolbar>
 
                 <ion-toolbar>
                     <ion-searchbar
@@ -298,16 +435,16 @@ export class SelectOverlay implements ComponentInterface {
 
                 {!this.didEnter && this.overlay === "modal" && <ionx-loading type="spinner" cover={true} slot="fixed"/>}
 
-                <ion-list lines="full">
+                {this.visibleItems && <ion-list lines="full">
 
-                    {this.didEnter && this.useVirtualScroll && <ion-virtual-scroll
-                        items={this.visibleOptions}
+                    {this.useVirtualScroll && <ion-virtual-scroll
+                        items={this.visibleItems}
                         approxItemHeight={this.virtualItemHeight}
                         renderItem={(item, index) => this.renderItem(item, index)}/>}
 
-                    {(this.overlay === "popover" || !this.useVirtualScroll) && this.options.map((option, index) => this.renderItem(option, index))}
+                    {(this.overlay === "popover" || !this.useVirtualScroll) && this.visibleItems.map((item, index) => this.renderItem(item, index))}
 
-                </ion-list>
+                </ion-list>}
 
             </ion-content>
 

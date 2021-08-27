@@ -1,11 +1,17 @@
-import { SelectOption } from "./SelectOption";
+import { SelectDivider } from "./SelectDivider";
+import { SelectItem } from "./SelectItem";
+import { SelectValue } from "./SelectValue";
 import { ValueComparator } from "./ValueComparator";
 export interface SelectOverlayProps {
   overlay: "modal" | "popover";
   overlayTitle?: string;
-  orderable?: boolean;
+  sortable?: boolean;
   searchTest?: (query: string, value: any, label: string) => boolean;
-  options: SelectOption[];
+  /**
+   * Copy of {@link Select.items}.
+   */
+  items: SelectItem[];
+  lazyItems?: (values?: any[]) => Promise<Array<SelectValue | SelectDivider>>;
   multiple?: boolean;
   values?: any[];
   empty?: boolean;

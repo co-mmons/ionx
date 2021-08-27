@@ -12,13 +12,14 @@
 | `checkValidator`       | --              |             | `(value: any, checked: boolean, otherCheckedValues: any[]) => any[]`   | `undefined` |
 | `comparator`           | `comparator`    |             | `"deepEqual" \| "toString" \| ((a: any, b: any) => number \| boolean)` | `undefined` |
 | `empty`                | `empty`         |             | `boolean`                                                              | `undefined` |
+| `items`                | --              |             | `SelectItem[]`                                                         | `undefined` |
 | `labelFormatter`       | --              |             | `(value: any) => string`                                               | `undefined` |
+| `lazyItems`            | --              |             | `(values?: any[]) => Promise<(SelectValue<any> \| SelectDivider)[]>`   | `undefined` |
 | `multiple`             | `multiple`      |             | `boolean`                                                              | `undefined` |
-| `options`              | --              |             | `SelectOption[]`                                                       | `undefined` |
-| `orderable`            | `orderable`     |             | `boolean`                                                              | `undefined` |
 | `overlay` _(required)_ | `overlay`       |             | `"modal" \| "popover"`                                                 | `undefined` |
 | `overlayTitle`         | `overlay-title` |             | `string`                                                               | `undefined` |
 | `searchTest`           | --              |             | `(query: string, value: any, label: string) => boolean`                | `undefined` |
+| `sortable`             | `sortable`      |             | `boolean`                                                              | `undefined` |
 | `values`               | --              |             | `any[]`                                                                | `undefined` |
 
 
@@ -27,14 +28,12 @@
 ### Depends on
 
 - ion-item
-- ion-checkbox
 - ion-label
+- ion-spinner
+- ion-checkbox
 - ion-header
-- ion-toolbar
-- ion-back-button
-- ion-title
-- ion-buttons
 - ion-button
+- ion-toolbar
 - ion-searchbar
 - ion-content
 - ion-list
@@ -45,14 +44,12 @@
 ```mermaid
 graph TD;
   ionx-select-overlay --> ion-item
-  ionx-select-overlay --> ion-checkbox
   ionx-select-overlay --> ion-label
+  ionx-select-overlay --> ion-spinner
+  ionx-select-overlay --> ion-checkbox
   ionx-select-overlay --> ion-header
-  ionx-select-overlay --> ion-toolbar
-  ionx-select-overlay --> ion-back-button
-  ionx-select-overlay --> ion-title
-  ionx-select-overlay --> ion-buttons
   ionx-select-overlay --> ion-button
+  ionx-select-overlay --> ion-toolbar
   ionx-select-overlay --> ion-searchbar
   ionx-select-overlay --> ion-content
   ionx-select-overlay --> ion-list
@@ -60,8 +57,6 @@ graph TD;
   ionx-select-overlay --> ion-footer
   ion-item --> ion-icon
   ion-item --> ion-ripple-effect
-  ion-back-button --> ion-icon
-  ion-back-button --> ion-ripple-effect
   ion-button --> ion-ripple-effect
   ion-searchbar --> ion-icon
   style ionx-select-overlay fill:#f9f,stroke:#333,stroke-width:4px

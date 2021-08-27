@@ -1,13 +1,18 @@
 import {StyleEventDetail} from "@ionic/core";
-import {Component, Element, Event, EventEmitter, Fragment, FunctionalComponent, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
+import {Component, Element, Event, EventEmitter, forceUpdate, Fragment, FunctionalComponent, h, Host, Listen, Method, Prop, Watch} from "@stencil/core";
 import {deepEqual} from "fast-equals";
-import {indexAttribute} from "./indexAttribute";
-import {isEqualValue} from "./isEqualValue";
-import {SelectOption} from "./SelectOption";
+import type Sortable from "sortablejs";
+import {findValueItem} from "./findValueItem";
+import {SelectDivider} from "./SelectDivider";
+import {SelectItem} from "./SelectItem";
 import {SelectOverlayProps} from "./SelectOverlayProps";
+import {SelectValue} from "./SelectValue";
 import {showSelectOverlay} from "./showSelectOverlay";
+import {sortableItemClass} from "./sortableItemClass";
 import {ValueComparator} from "./ValueComparator";
 import {valueLabel} from "./valueLabel";
+
+let instanceCounter = 0;
 
 @Component({
     tag: "ionx-select",
@@ -29,7 +34,7 @@ export class Select {
     overlayTitle: string;
 
     @Prop()
-    overlayOptions: { whiteSpace?: "nowrap" | "normal", title?: string };
+    overlayOptions: {whiteSpace?: "nowrap" | "normal", title?: string};
 
     /**
      * Whether value should be always returned as array, no matter if multiple is set to true.
@@ -47,10 +52,10 @@ export class Select {
     multiple: boolean;
 
     /**
-     * If multiple values selection can be ordered after selection.
+     * If multiple values selection can be sorted after selection.
      */
     @Prop()
-    orderable: boolean;
+    sortable: boolean;
 
     @Prop()
     empty: boolean = true;
@@ -65,6 +70,7 @@ export class Select {
     protected disabledChanged() {
         this.emitStyle();
     }
+
     /**
      * A function, that will be used for testing if value passes search critieria.
      * Default implementation checks lowercased label of value against
@@ -76,14 +82,20 @@ export class Select {
     @Prop()
     checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
 
-    @Prop({mutable: true})
-    options: SelectOption[];
+    /**
+     * @deprecated
+     */
+    @Prop()
+    options: SelectItem[];
 
     @Prop()
-    lazyOptions: () => Promise<SelectOption[]>;
+    items: SelectItem[];
 
     @Prop()
-    labelComponent?: string | FunctionalComponent<{value: any, option?: SelectOption, label: string, index: number, readonly?: boolean}>;
+    lazyItems: (() => Promise<Array<SelectValue | SelectDivider>>) | ((values: any[]) => Promise<SelectValue[]>);
+
+    @Prop()
+    labelComponent?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
 
     @Prop()
     labelFormatter?: (value: any) => string;
@@ -91,41 +103,60 @@ export class Select {
     @Prop()
     separator?: string = ", ";
 
-    @State()
-    values: any[] = [];
-
     @Prop({mutable: true})
     value: any;
-
-    valueChangeSilent: boolean;
-
-    @Watch("value")
-    valueChanged(niu: any) {
-
-        if (!this.valueChangeSilent) {
-            this.changeValues(Array.isArray(niu) ? niu : (niu === undefined || niu === null ? [] : [niu]));
-        }
-
-         this.valueChangeSilent = false;
-    }
-
-    private changeValues(values: any[]) {
-
-        if (!deepEqual(this.values, values)) {
-            this.values = values.slice();
-
-            this.valueChangeSilent = true;
-            this.value = this.multiple ? values.slice() : (this.values.length > 0 ? this.values[0] : undefined);
-
-            this.emitStyle();
-        }
-    }
 
     @Event()
     ionChange: EventEmitter<{value: any}>;
 
     @Event()
     ionFocus: EventEmitter<any>;
+
+    /**
+     * Emitted when the styles change.
+     * @internal
+     */
+    @Event()
+    ionStyle!: EventEmitter<StyleEventDetail>;
+
+    visibleItems: SelectValue[];
+
+    valueChanging: boolean;
+
+    focused: boolean;
+
+    loading: boolean;
+
+    sortableInstance: Sortable;
+
+    readonly internalId = ++instanceCounter;
+
+    /**
+     * Always returns value as array. If value is undefined, empty array is returned.
+     */
+    get valueAsArray() {
+        return Array.isArray(this.value) ? this.value : (this.value !== undefined ? [this.value] : []);
+    }
+
+    @Watch("options")
+    optionsChanged(niu: SelectItem[]) {
+        this.items = niu;
+    }
+
+    @Watch("value")
+    async valueChanged(niu: any, old: any) {
+
+        if (this.valueChanging) {
+            if (!deepEqual(niu, old)) {
+                this.ionChange.emit({value: this.value});
+            }
+        } else {
+            this.buildVisibleItems();
+        }
+
+        this.valueChanging = false;
+        this.emitStyle();
+    }
 
     @Method()
     async setFocus(options?: FocusOptions): Promise<void> {
@@ -136,8 +167,6 @@ export class Select {
     async setBlur(): Promise<void> {
         this.element.blur();
     }
-
-    focused: boolean;
 
     @Listen("focus")
     onFocus() {
@@ -151,23 +180,65 @@ export class Select {
         this.emitStyle();
     }
 
-    /**
-     * Emitted when the styles change.
-     * @internal
-     */
-    @Event()
-    ionStyle!: EventEmitter<StyleEventDetail>;
-
     private emitStyle() {
 
         this.ionStyle.emit({
             "interactive": !this.disabled && !this.readonly,
             "input": true,
             "has-placeholder": this.placeholder != null,
-            "has-value": this.values.length > 0,
+            "has-value": this.valueAsArray?.length > 0,
             "has-focus": this.focused,
             "interactive-disabled": this.disabled,
         });
+    }
+
+    async buildVisibleItems() {
+
+        let visible: SelectValue[] = [];
+
+        // values, that do not match items
+        const unmatched: any[] = [];
+
+        for (const value of this.valueAsArray) {
+            const item = findValueItem([].concat(this.items ?? [], this.visibleItems ?? []), value, this.comparator);
+            if (item) {
+                visible.push(item);
+            } else {
+                unmatched.push(value);
+            }
+        }
+
+        if (unmatched.length > 0) {
+            this.loading = true;
+
+            if (this.lazyItems) {
+                visible = await this.lazyItems(this.valueAsArray) as SelectValue[];
+
+            } else if (this.items) {
+
+                for (const item of this.items) {
+                    if (unmatched.length > 0 && item.group) {
+
+                        const subitems = typeof item.items === "function" ? await item.items(unmatched) : item.items;
+
+                        if (subitems) {
+                            for (let i = unmatched.length - 1; i >= 0; i--) {
+                                const subitem = findValueItem(subitems, unmatched[i], this.comparator);
+                                if (subitem) {
+                                    visible = (visible ?? []).concat([subitem]);
+                                    unmatched.splice(i, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        this.visibleItems = visible;
+        this.loading = false;
+
+        forceUpdate(this);
     }
 
     async open() {
@@ -204,13 +275,14 @@ export class Select {
 
         const overlayProps: SelectOverlayProps = {
             overlay,
-            options: this.options,
-            values: this.values.slice(),
+            items: this.items?.slice(),
+            lazyItems: this.lazyItems,
+            values: this.valueAsArray.slice() ?? [],
             multiple: !!this.multiple,
             overlayTitle: overlayTitle,
             comparator: this.comparator,
             labelFormatter: this.labelFormatter,
-            orderable: !!this.orderable,
+            sortable: !!this.sortable,
             empty: !!this.empty,
             searchTest: this.searchTest,
             // whiteSpace: this.overlayWhiteSpace,
@@ -221,8 +293,17 @@ export class Select {
 
         const result = await willDismiss;
         if (result.role === "ok") {
-            this.changeValues(result.data);
-            this.ionChange.emit({value: this.value});
+            this.valueChanging = true;
+
+            const {values, items} = result.data;
+
+            this.visibleItems = items;
+
+            if (this.multiple || this.alwaysArray) {
+                this.value = values;
+            } else {
+                this.value = values.length > 0 ? values[0] : undefined;
+            }
         }
 
         await didDismiss;
@@ -230,69 +311,110 @@ export class Select {
         this.setFocus();
     }
 
+    @Watch("sortable")
+    @Watch("multiple")
+    async configureSortable() {
+
+        if (this.sortable && this.multiple) {
+            const prevInstance = this.sortableInstance;
+            this.sortableInstance = (await import("./initSortable")).initSortable.call(this);
+
+            if (prevInstance && prevInstance !== this.sortableInstance) {
+                prevInstance.destroy();
+            }
+
+        } else if (this.sortableInstance) {
+            this.sortableInstance.destroy();
+            this.sortableInstance = undefined;
+        }
+
+    }
+
     connectedCallback() {
 
-        this.valueChanged(this.value);
+        if (!this.items && this.options) {
+            this.items = this.options;
+        }
+
+        this.emitStyle();
+        this.buildVisibleItems();
 
         if (!this.element.hasAttribute("tabIndex")) {
             this.element.setAttribute("tabIndex", "0");
         }
+
+        this.configureSortable();
+    }
+
+    renderValue(values: any[], value: any, index: number) {
+
+        const LabelComponent = this.labelComponent;
+        const ValueComponent = this.sortable ? "ion-chip" : "span";
+
+        const item = findValueItem(this.visibleItems, value, this.comparator);
+        const label = valueLabel(this.visibleItems, value, {comparator: this.comparator, formatter: this.labelFormatter});
+
+        return <Fragment>
+
+            <ValueComponent key={value} {...(ValueComponent === "ion-chip" ? {outline: true} : {})} class={{[sortableItemClass]: true}}>
+
+                {!!LabelComponent && <LabelComponent
+                    value={value}
+                    item={item}
+                    label={label}
+                    index={index}
+                    readonly={this.readonly}/>}
+
+                {!LabelComponent && <span>{label}{!this.sortable && index < values.length - 1 ? this.separator : ""}</span>}
+
+            </ValueComponent>
+
+            {!this.readonly && !this.disabled && this.multiple && this.sortable && index === values.length - 1 && <ion-chip key="more">
+                <ion-icon name="ellipsis-horizontal" style={{margin: "0px"}}/>
+            </ion-chip>}
+
+        </Fragment>
     }
 
     render() {
 
-        const LabelComponent = this.labelComponent;
-        const ValueComponent = this.orderable ? "ion-chip" : "span";
-
-        const length = this.values.length;
-
-        // currently processed option whose value is selected
-        let currentOption: SelectOption;
-        let currentLabel: string;
+        const values = this.valueAsArray;
+        const empty = values.length === 0;
 
         return <Host
             role="combobox"
             aria-haspopup="dialog"
             class={{
-                "ionx--orderable": this.orderable && !this.disabled && !this.readonly,
+                "ionx--sortable": this.sortable && !empty && !this.disabled && !this.readonly,
                 "ionx--readonly": !!this.readonly,
                 "ionx--disabled": !!this.disabled
             }}
             onClick={() => this.open()}>
 
-            {this.orderable && <ionx-select-orderable enabled={!this.readonly && !this.disabled} values={this.values} onOrderChanged={ev => this.values = ev.detail}/>}
-
             <div class="ionx--inner">
 
-                <div class={{
-                    "ionx--text": true,
-                    "ionx--placeholder-visible": length === 0 && !!this.placeholder
-                }}>
-                    {length === 0 && this.placeholder && <span>{this.placeholder}</span>}
+                {this.loading && <ion-spinner name="dots"/>}
 
-                    {this.values.map((value, index) => <Fragment>
+                {!this.loading && <Fragment>
 
-                        {(currentOption = this.options?.find(option => isEqualValue(value, option.value, this.comparator))) && <Fragment/>}
-                        {(currentLabel = valueLabel(this.options, value, {comparator: this.comparator, formatter: this.labelFormatter})) && <Fragment/>}
+                    <div class={{
+                        "ionx--text": true,
+                        "ionx--placeholder-visible": empty && !!this.placeholder
+                    }}>
 
-                        <ValueComponent key={value} outline={true} {...{[indexAttribute]: index}}>
+                        {empty && this.placeholder && <span>{this.placeholder}</span>}
 
-                            {!!LabelComponent ? <LabelComponent value={value} option={currentOption} label={currentLabel} index={index} readonly={this.readonly}/> :
-                                <span>{currentLabel}{!this.orderable && index < length - 1 ? this.separator : ""}</span>}
+                        {values.map((value, index) => this.renderValue(values, value, index))}
 
-                        </ValueComponent>
+                    </div>
 
-                        {!this.readonly && !this.disabled && this.multiple && this.orderable && index === length - 1 && <ion-chip onClick={() => this.open()}><ion-icon name="ellipsis-horizontal" style={{margin: "0px"}}/></ion-chip>}
+                    {!this.readonly && !this.disabled && <Fragment>
 
-                    </Fragment>)}
+                        {(!this.sortable || empty) && <div class="ionx--icon" role="presentation">
+                            <div class="ionx--icon-inner"/>
+                        </div>}
 
-                </div>
-
-                {!this.readonly && !this.disabled && <Fragment>
-
-                    {!this.orderable && <div class="ionx--icon" role="presentation">
-                        <div class="ionx--icon-inner"/>
-                    </div>}
+                    </Fragment>}
 
                 </Fragment>}
 

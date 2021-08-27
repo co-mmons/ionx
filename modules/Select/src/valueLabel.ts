@@ -1,20 +1,20 @@
 import {intl, MessageRef} from "@co.mmons/js-intl";
 import {isEqualValue} from "./isEqualValue";
-import {SelectOption} from "./SelectOption";
+import {SelectItem} from "./SelectItem";
 import {ValueComparator} from "./ValueComparator";
 
-export function valueLabel(options: SelectOption[], value: any, props: {comparator: ValueComparator, formatter?: (value: any) => string}) {
+export function valueLabel(items: SelectItem[], value: any, props: {comparator: ValueComparator, formatter?: (value: any) => string}) {
 
-    if (!options) {
+    if (!items) {
         return;
     }
 
-    for (let i = 0; i < options.length; i++) {
+    for (let i = 0; i < items.length; i++) {
 
-        if (isEqualValue(value, options[i].value, props.comparator)) {
+        if (isEqualValue(value, items[i].value, props.comparator)) {
 
-            if (options[i].label) {
-                return options[i].label instanceof MessageRef ? intl.message(options[i].label) : options[i].label;
+            if (items[i].label) {
+                return items[i].label instanceof MessageRef ? intl.message(items[i].label) : items[i].label;
             }
 
             return props.formatter ? props.formatter(value) : `${value}`;

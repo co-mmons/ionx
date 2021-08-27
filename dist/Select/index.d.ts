@@ -8,12 +8,6 @@ export const IonxSelect: {
   new (): IonxSelect;
 };
 
-interface IonxSelectOrderable extends Components.IonxSelectOrderable, HTMLElement {}
-export const IonxSelectOrderable: {
-  prototype: IonxSelectOrderable;
-  new (): IonxSelectOrderable;
-};
-
 interface IonxSelectOverlay extends Components.IonxSelectOverlay, HTMLElement {}
 export const IonxSelectOverlay: {
   prototype: IonxSelectOverlay;

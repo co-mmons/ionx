@@ -1,5 +1,6 @@
 import {bestLocale, intl} from "@co.mmons/js-intl";
 import "@ionic/core";
+import {setupConfig} from "@ionic/core";
 
 export default async function() {
     INTL_DEFAULT_LOCALE = "en";
@@ -9,4 +10,6 @@ export default async function() {
     INTL_LOCALE = bestLocale();
 
     intl.setLocale(INTL_LOCALE);
+
+    setupConfig({backButtonText: null});
 }

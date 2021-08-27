@@ -1,6 +1,9 @@
 import { StyleEventDetail } from "@ionic/core";
 import { EventEmitter, FunctionalComponent } from "@stencil/core";
-import { SelectOption } from "./SelectOption";
+import type Sortable from "sortablejs";
+import { SelectDivider } from "./SelectDivider";
+import { SelectItem } from "./SelectItem";
+import { SelectValue } from "./SelectValue";
 import { ValueComparator } from "./ValueComparator";
 export declare class Select {
   element: HTMLElement;
@@ -21,9 +24,9 @@ export declare class Select {
    */
   multiple: boolean;
   /**
-   * If multiple values selection can be ordered after selection.
+   * If multiple values selection can be sorted after selection.
    */
-  orderable: boolean;
+  sortable: boolean;
   empty: boolean;
   readonly: boolean;
   disabled: boolean;
@@ -35,38 +38,52 @@ export declare class Select {
    */
   searchTest: (query: string, value: any, label: string) => boolean;
   checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
-  options: SelectOption[];
-  lazyOptions: () => Promise<SelectOption[]>;
+  /**
+   * @deprecated
+   */
+  options: SelectItem[];
+  items: SelectItem[];
+  lazyItems: (() => Promise<Array<SelectValue | SelectDivider>>) | ((values: any[]) => Promise<SelectValue[]>);
   labelComponent?: string | FunctionalComponent<{
     value: any;
-    option?: SelectOption;
+    item?: SelectItem;
     label: string;
     index: number;
     readonly?: boolean;
   }>;
   labelFormatter?: (value: any) => string;
   separator?: string;
-  values: any[];
   value: any;
-  valueChangeSilent: boolean;
-  valueChanged(niu: any): void;
-  private changeValues;
   ionChange: EventEmitter<{
     value: any;
   }>;
   ionFocus: EventEmitter<any>;
-  setFocus(options?: FocusOptions): Promise<void>;
-  setBlur(): Promise<void>;
-  focused: boolean;
-  onFocus(): void;
-  onBlur(): void;
   /**
    * Emitted when the styles change.
    * @internal
    */
   ionStyle: EventEmitter<StyleEventDetail>;
+  visibleItems: SelectValue[];
+  valueChanging: boolean;
+  focused: boolean;
+  loading: boolean;
+  sortableInstance: Sortable;
+  readonly internalId: number;
+  /**
+   * Always returns value as array. If value is undefined, empty array is returned.
+   */
+  get valueAsArray(): any[];
+  optionsChanged(niu: SelectItem[]): void;
+  valueChanged(niu: any, old: any): Promise<void>;
+  setFocus(options?: FocusOptions): Promise<void>;
+  setBlur(): Promise<void>;
+  onFocus(): void;
+  onBlur(): void;
   private emitStyle;
+  buildVisibleItems(): Promise<void>;
   open(): Promise<void>;
+  configureSortable(): Promise<void>;
   connectedCallback(): void;
+  renderValue(values: any[], value: any, index: number): any;
   render(): any;
 }

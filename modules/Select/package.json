@@ -6,10 +6,13 @@
     "types": "../../dist/Select/index.d.ts",
     "peerDependencies": {
         "fast-equals": "^2.0.1",
-        "dragula": "^3.7.3"
+        "dragula": "^3.7.3",
+        "sortablejs": "^1.14.0"
     },
     "devDependencies": {
         "fast-equals": "^2.0.1",
-        "dragula": "^3.7.3"
+        "dragula": "^3.7.3",
+        "sortablejs": "^1.14.0",
+        "@types/sortablejs": "^1.10.7"
     }
 }

@@ -87,7 +87,7 @@
         max-width: calc(100% - 4px);
         margin: 4px 4px 0px 0px;
 
-        &[__ionx-select-idx] {
+        &.ionx-select-sortable {
             cursor: default;
 
             > span {
@@ -99,10 +99,10 @@
         }
     }
 
-    &.ionx--orderable {
+    &.ionx--sortable {
         cursor: initial;
 
-        ion-chip[__ionx-select-idx] {
+        .ionx-select-sortable {
             cursor: move;
         }
 
