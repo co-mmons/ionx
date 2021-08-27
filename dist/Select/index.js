@@ -71,7 +71,7 @@ function valueLabel(items, value, props) {
   return props.formatter ? props.formatter(value) : `${value}`;
 }
 
-const selectCss = ".sc-ionx-select-h{--select-placeholder-opacity:.5;--select-dropdown-icon-opacity:.5;--select-disabled-opacity:.5;padding:var(--select-padding-top, 0px) var(--select-padding-end, 0px) var(--select-padding-bottom, 0px) var(--select-padding-start, 0px);display:inline-block;overflow:hidden;color:var(--color);font-family:var(--ion-font-family, inherit);max-width:100%;outline:none;cursor:pointer}.sc-ionx-select-h::-moz-focus-inner{border:0}.sc-ionx-select-h .ionx--inner.sc-ionx-select{display:flex;position:relative}.sc-ionx-select-h .ionx--icon.sc-ionx-select{position:relative;width:16px;height:20px}.sc-ionx-select-h .ionx--icon.sc-ionx-select .ionx--icon-inner.sc-ionx-select{top:50%;right:0px;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--select-dropdown-icon-opacity, 0.5);pointer-events:none}.sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-select-h .ionx--text.ionx--placeholder-visible.sc-ionx-select{opacity:var(--select-placeholder-opacity, 0.5)}.ionx--disabled.sc-ionx-select-h{opacity:var(--select-disabled-opacity, 0.5);pointer-events:none}.ionx--readonly.sc-ionx-select-h{opacity:1;pointer-events:none}.ionx--readonly.sc-ionx-select-h .select-icon.sc-ionx-select{display:none}[white-space-normal].sc-ionx-select-h .ionx--text.sc-ionx-select,[ionx--white-space=normal].sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:normal !important;overflow:auto}.in-item.sc-ionx-select-h{position:static}.sc-ionx-select-h ion-reorder-group.sc-ionx-select{overflow:hidden}.sc-ionx-select-h ion-item.sc-ionx-select{--padding-start:0;--padding-end:0;--inner-padding-start:0;--inner-padding-end:0}ion-toolbar.sc-ionx-select-h,ion-toolbar .sc-ionx-select-h{color:var(--ion-toolbar-color);--icon-color:var(--ion-toolbar-color);--select-padding-start:16px;--select-padding-end:16px}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{align-self:flex-start;--select-padding-top:8px;--select-padding-bottom:8px;--select-padding-start:0px}ionx-form-field.sc-ionx-select-h .ionx--text.sc-ionx-select,ionx-form-field .sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked.sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked .sc-ionx-select-h .ionx--text.sc-ionx-select{max-width:calc(100% - 16px);flex:initial}[slot-container=default]>.sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{width:100%}[slot-container=default]>.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked .sc-ionx-select-h ion-reorder-group.sc-ionx-select{width:100%}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h{--select-padding-start:16px;--select-padding-end:16px}";
+const selectCss = ".sc-ionx-select-h{--select-placeholder-opacity:.5;--select-dropdown-icon-opacity:.5;--select-disabled-opacity:.5;padding:var(--select-padding-top, 0px) var(--select-padding-end, 0px) var(--select-padding-bottom, 0px) var(--select-padding-start, 0px);display:inline-block;overflow:hidden;color:var(--color);font-family:var(--ion-font-family, inherit);max-width:100%;outline:none;cursor:pointer}.sc-ionx-select-h::-moz-focus-inner{border:0}.sc-ionx-select-h .ionx--inner.sc-ionx-select{display:flex;position:relative}.sc-ionx-select-h .ionx--icon.sc-ionx-select{position:relative;width:16px;height:20px}.sc-ionx-select-h .ionx--icon.sc-ionx-select .ionx--icon-inner.sc-ionx-select{top:50%;right:0px;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--select-dropdown-icon-opacity, 0.5);pointer-events:none}.sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-select-h .ionx--text.ionx--placeholder-visible.sc-ionx-select{opacity:var(--select-placeholder-opacity, 0.5)}.ionx--disabled.sc-ionx-select-h{opacity:var(--select-disabled-opacity, 0.5);pointer-events:none}.ionx--readonly.sc-ionx-select-h{opacity:1;pointer-events:none}.ionx--readonly.sc-ionx-select-h .select-icon.sc-ionx-select{display:none}[white-space-normal].sc-ionx-select-h .ionx--text.sc-ionx-select,[ionx--white-space=normal].sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:normal !important;overflow:auto}.in-item.sc-ionx-select-h{position:static}.sc-ionx-select-h ion-reorder-group.sc-ionx-select{overflow:hidden}.sc-ionx-select-h ion-item.sc-ionx-select{--padding-start:0;--padding-end:0;--inner-padding-start:0;--inner-padding-end:0}.sc-ionx-select-h ion-item.sc-ionx-select:last-child{--inner-border-width:0}.sc-ionx-select-h ion-item.sc-ionx-select ion-reorder.sc-ionx-select{margin-right:0}ion-toolbar.sc-ionx-select-h,ion-toolbar .sc-ionx-select-h{color:var(--ion-toolbar-color);--icon-color:var(--ion-toolbar-color);--select-padding-start:16px;--select-padding-end:16px}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{align-self:flex-start;--select-padding-top:8px;--select-padding-bottom:8px;--select-padding-start:0px}ionx-form-field.sc-ionx-select-h .ionx--text.sc-ionx-select,ionx-form-field .sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked.sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked .sc-ionx-select-h .ionx--text.sc-ionx-select{max-width:calc(100% - 16px);flex:initial}[slot-container=default]>.sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{width:100%}[slot-container=default]>.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked .sc-ionx-select-h ion-reorder-group.sc-ionx-select{width:100%}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h{--select-padding-start:16px;--select-padding-end:16px}";
 
 let instanceCounter = 0;
 const Select = class extends HTMLElement {
@@ -81,20 +81,32 @@ const Select = class extends HTMLElement {
     this.ionChange = createEvent(this, "ionChange", 7);
     this.ionFocus = createEvent(this, "ionFocus", 7);
     this.ionStyle = createEvent(this, "ionStyle", 7);
+    /**
+     * @inheritDoc
+     */
     this.empty = true;
+    /**
+     * @inheritDoc
+     */
     this.readonly = false;
+    /**
+     * @inheritDoc
+     */
     this.disabled = false;
+    /**
+     * @inheritDoc
+     */
     this.separator = ", ";
     this.internalId = ++instanceCounter;
-  }
-  disabledChanged() {
-    this.emitStyle();
   }
   /**
    * Always returns value as array. If value is undefined, empty array is returned.
    */
   get valueAsArray() {
     return Array.isArray(this.value) ? this.value : (this.value !== undefined ? [this.value] : []);
+  }
+  disabledChanged() {
+    this.emitStyle();
   }
   optionsChanged(niu) {
     this.items = niu;

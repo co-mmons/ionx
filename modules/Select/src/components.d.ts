@@ -5,9 +5,9 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { SelectProps } from "./SelectProps";
 import { ValueComparator } from "./ValueComparator";
 import { SelectItem } from "./SelectItem";
-import { LazyItemsFn } from "./LazyItemsFn";
 import { SelectLazyGroupItem } from "./SelectGroupItem";
 import { FunctionalComponent } from "@stencil/core";
 import { StyleEventDetail } from "@ionic/core";
@@ -17,41 +17,90 @@ export namespace Components {
     interface IonxSelect {
         /**
           * Whether value should be always returned as array, no matter if multiple is set to true.
+          * @inheritDoc
          */
         "alwaysArray": boolean;
-        "checkValidator": (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+        /**
+          * @inheritDoc
+         */
+        "checkValidator": SelectProps.CheckValidatorFn;
+        /**
+          * @inheritDoc
+         */
         "comparator": ValueComparator;
+        /**
+          * @inheritDoc
+         */
         "disabled": boolean;
+        /**
+          * @inheritDoc
+         */
         "empty": boolean;
+        /**
+          * @inheritDoc
+         */
         "items": SelectItem[];
-        "labelComponent"?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
-        "labelFormatter"?: (value: any) => string;
-        "lazyItems": LazyItemsFn | SelectLazyGroupItem;
+        /**
+          * @inheritDoc
+         */
+        "labelComponent"?: string | FunctionalComponent<SelectProps.LabelComponentProps>;
+        /**
+          * @inheritDoc
+         */
+        "labelFormatter"?: SelectProps.LabelFormatterFn;
+        /**
+          * @inheritDoc
+         */
+        "lazyItems": SelectProps.LazyItemsFn | SelectLazyGroupItem;
         /**
           * If multiple value selection is allowed.
+          * @inheritDoc
          */
         "multiple": boolean;
         /**
           * @deprecated
          */
         "options": SelectItem[];
-        "overlay": "popover" | "modal";
-        "overlayOptions": {whiteSpace?: "nowrap" | "normal", title?: string};
+        /**
+          * @inheritDoc
+         */
+        "overlay": SelectProps.Overlay;
+        /**
+          * @inheritDoc
+         */
+        "overlayOptions": SelectProps.OverlayOptions;
+        /**
+          * @inheritDoc
+         */
         "overlayTitle": string;
+        /**
+          * @inheritDoc
+         */
         "placeholder": string;
         "prefetch": boolean;
+        /**
+          * @inheritDoc
+         */
         "readonly": boolean;
         /**
           * A function, that will be used for testing if value passes search critieria. Default implementation checks lowercased label of value against lowercased searched text.
+          * @inheritDoc
          */
-        "searchTest": (query: string, value: any, label: string) => boolean;
+        "searchTest": SelectProps.SearchTestFn;
+        /**
+          * @inheritDoc
+         */
         "separator"?: string;
         "setBlur": () => Promise<void>;
         "setFocus": (options?: FocusOptions) => Promise<void>;
         /**
           * If multiple values selection can be sorted after selection.
+          * @inheritDoc
          */
         "sortable": boolean;
+        /**
+          * @inheritDoc
+         */
         "value": any;
     }
     interface IonxSelectOverlay {
@@ -91,18 +140,44 @@ declare namespace LocalJSX {
     interface IonxSelect {
         /**
           * Whether value should be always returned as array, no matter if multiple is set to true.
+          * @inheritDoc
          */
         "alwaysArray"?: boolean;
-        "checkValidator"?: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+        /**
+          * @inheritDoc
+         */
+        "checkValidator"?: SelectProps.CheckValidatorFn;
+        /**
+          * @inheritDoc
+         */
         "comparator"?: ValueComparator;
+        /**
+          * @inheritDoc
+         */
         "disabled"?: boolean;
+        /**
+          * @inheritDoc
+         */
         "empty"?: boolean;
+        /**
+          * @inheritDoc
+         */
         "items"?: SelectItem[];
-        "labelComponent"?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
-        "labelFormatter"?: (value: any) => string;
-        "lazyItems"?: LazyItemsFn | SelectLazyGroupItem;
+        /**
+          * @inheritDoc
+         */
+        "labelComponent"?: string | FunctionalComponent<SelectProps.LabelComponentProps>;
+        /**
+          * @inheritDoc
+         */
+        "labelFormatter"?: SelectProps.LabelFormatterFn;
+        /**
+          * @inheritDoc
+         */
+        "lazyItems"?: SelectProps.LazyItemsFn | SelectLazyGroupItem;
         /**
           * If multiple value selection is allowed.
+          * @inheritDoc
          */
         "multiple"?: boolean;
         "onIonChange"?: (event: CustomEvent<{value: any}>) => void;
@@ -115,21 +190,44 @@ declare namespace LocalJSX {
           * @deprecated
          */
         "options"?: SelectItem[];
-        "overlay"?: "popover" | "modal";
-        "overlayOptions"?: {whiteSpace?: "nowrap" | "normal", title?: string};
+        /**
+          * @inheritDoc
+         */
+        "overlay"?: SelectProps.Overlay;
+        /**
+          * @inheritDoc
+         */
+        "overlayOptions"?: SelectProps.OverlayOptions;
+        /**
+          * @inheritDoc
+         */
         "overlayTitle"?: string;
+        /**
+          * @inheritDoc
+         */
         "placeholder"?: string;
         "prefetch"?: boolean;
+        /**
+          * @inheritDoc
+         */
         "readonly"?: boolean;
         /**
           * A function, that will be used for testing if value passes search critieria. Default implementation checks lowercased label of value against lowercased searched text.
+          * @inheritDoc
          */
-        "searchTest"?: (query: string, value: any, label: string) => boolean;
+        "searchTest"?: SelectProps.SearchTestFn;
+        /**
+          * @inheritDoc
+         */
         "separator"?: string;
         /**
           * If multiple values selection can be sorted after selection.
+          * @inheritDoc
          */
         "sortable"?: boolean;
+        /**
+          * @inheritDoc
+         */
         "value"?: any;
     }
     interface IonxSelectOverlay {

@@ -92,6 +92,14 @@
         --padding-end: 0;
         --inner-padding-start: 0;
         --inner-padding-end: 0;
+
+        &:last-child {
+            --inner-border-width: 0;
+        }
+
+        ion-reorder {
+            margin-right: 0;
+        }
     }
 }
 

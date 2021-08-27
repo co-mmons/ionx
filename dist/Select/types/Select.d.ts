@@ -1,58 +1,91 @@
 import { ItemReorderEventDetail, StyleEventDetail } from "@ionic/core";
 import { EventEmitter, FunctionalComponent } from "@stencil/core";
-import { LazyItemsFn } from "./LazyItemsFn";
 import { SelectLazyGroupItem } from "./SelectGroupItem";
 import { SelectItem } from "./SelectItem";
+import { SelectProps } from "./SelectProps";
 import { SelectValueItem } from "./SelectValueItem";
 import { ValueComparator } from "./ValueComparator";
-export declare class Select {
+export declare class Select implements SelectProps {
   element: HTMLElement;
-  placeholder: string;
-  overlay: "popover" | "modal";
-  overlayTitle: string;
-  overlayOptions: {
-    whiteSpace?: "nowrap" | "normal";
-    title?: string;
-  };
   /**
-   * Whether value should be always returned as array, no matter if multiple is set to true.
+   * @inheritDoc
+   */
+  placeholder: string;
+  /**
+   * @inheritDoc
+   */
+  overlay: SelectProps.Overlay;
+  /**
+   * @inheritDoc
+   */
+  overlayTitle: string;
+  /**
+   * @inheritDoc
+   */
+  overlayOptions: SelectProps.OverlayOptions;
+  /**
+   * @inheritDoc
    */
   alwaysArray: boolean;
+  /**
+   * @inheritDoc
+   */
   comparator: ValueComparator;
   /**
-   * If multiple value selection is allowed.
+   * @inheritDoc
    */
   multiple: boolean;
   /**
-   * If multiple values selection can be sorted after selection.
+   * @inheritDoc
    */
   sortable: boolean;
-  empty: boolean;
-  readonly: boolean;
-  disabled: boolean;
-  protected disabledChanged(): void;
   /**
-   * A function, that will be used for testing if value passes search critieria.
-   * Default implementation checks lowercased label of value against
-   * lowercased searched text.
+   * @inheritDoc
    */
-  searchTest: (query: string, value: any, label: string) => boolean;
-  checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+  empty: boolean;
+  /**
+   * @inheritDoc
+   */
+  readonly: boolean;
+  /**
+   * @inheritDoc
+   */
+  disabled: boolean;
+  /**
+   * @inheritDoc
+   */
+  searchTest: SelectProps.SearchTestFn;
+  /**
+   * @inheritDoc
+   */
+  checkValidator: SelectProps.CheckValidatorFn;
   /**
    * @deprecated
    */
   options: SelectItem[];
+  /**
+   * @inheritDoc
+   */
   items: SelectItem[];
-  lazyItems: LazyItemsFn | SelectLazyGroupItem;
-  labelComponent?: string | FunctionalComponent<{
-    value: any;
-    item?: SelectItem;
-    label: string;
-    index: number;
-    readonly?: boolean;
-  }>;
-  labelFormatter?: (value: any) => string;
+  /**
+   * @inheritDoc
+   */
+  lazyItems: SelectProps.LazyItemsFn | SelectLazyGroupItem;
+  /**
+   * @inheritDoc
+   */
+  labelComponent?: string | FunctionalComponent<SelectProps.LabelComponentProps>;
+  /**
+   * @inheritDoc
+   */
+  labelFormatter?: SelectProps.LabelFormatterFn;
+  /**
+   * @inheritDoc
+   */
   separator?: string;
+  /**
+   * @inheritDoc
+   */
   value: any;
   ionChange: EventEmitter<{
     value: any;
@@ -76,6 +109,7 @@ export declare class Select {
    * Always returns value as array. If value is undefined, empty array is returned.
    */
   get valueAsArray(): any[];
+  protected disabledChanged(): void;
   optionsChanged(niu: SelectItem[]): void;
   valueChanged(niu: any, old: any): Promise<void>;
   setFocus(options?: FocusOptions): Promise<void>;

@@ -3,10 +3,10 @@ import {Component, Element, Event, EventEmitter, forceUpdate, Fragment, Function
 import {deepEqual} from "fast-equals";
 import {prefetchComponent} from "ionx/utils";
 import {findValueItem} from "./findValueItem";
-import {LazyItemsFn} from "./LazyItemsFn";
 import {SelectLazyGroupItem} from "./SelectGroupItem";
 import {SelectItem} from "./SelectItem";
 import {SelectOverlayProps} from "./SelectOverlayProps";
+import {SelectProps} from "./SelectProps";
 import {SelectValueItem} from "./SelectValueItem";
 import {showSelectOverlay} from "./showSelectOverlay";
 import {ValueComparator} from "./ValueComparator";
@@ -19,68 +19,88 @@ let instanceCounter = 0;
     styleUrl: "Select.scss",
     scoped: true
 })
-export class Select {
+export class Select implements SelectProps {
 
     @Element()
     element: HTMLElement;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     placeholder: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
-    overlay: "popover" | "modal";
+    overlay: SelectProps.Overlay;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     overlayTitle: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
-    overlayOptions: {whiteSpace?: "nowrap" | "normal", title?: string};
+    overlayOptions: SelectProps.OverlayOptions;
 
     /**
-     * Whether value should be always returned as array, no matter if multiple is set to true.
+     * @inheritDoc
      */
     @Prop()
     alwaysArray: boolean;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     comparator: ValueComparator;
 
     /**
-     * If multiple value selection is allowed.
+     * @inheritDoc
      */
     @Prop()
     multiple: boolean;
 
     /**
-     * If multiple values selection can be sorted after selection.
+     * @inheritDoc
      */
     @Prop()
     sortable: boolean;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     empty: boolean = true;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     readonly: boolean = false;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     disabled: boolean = false;
 
-    @Watch("disabled")
-    protected disabledChanged() {
-        this.emitStyle();
-    }
-
     /**
-     * A function, that will be used for testing if value passes search critieria.
-     * Default implementation checks lowercased label of value against
-     * lowercased searched text.
+     * @inheritDoc
      */
     @Prop()
-    searchTest: (query: string, value: any, label: string) => boolean;
+    searchTest: SelectProps.SearchTestFn;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
-    checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+    checkValidator: SelectProps.CheckValidatorFn;
 
     /**
      * @deprecated
@@ -88,21 +108,39 @@ export class Select {
     @Prop()
     options: SelectItem[];
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     items: SelectItem[];
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
-    lazyItems: LazyItemsFn | SelectLazyGroupItem;
+    lazyItems: SelectProps.LazyItemsFn | SelectLazyGroupItem;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
-    labelComponent?: string | FunctionalComponent<{value: any, item?: SelectItem, label: string, index: number, readonly?: boolean}>;
+    labelComponent?: string | FunctionalComponent<SelectProps.LabelComponentProps>;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
-    labelFormatter?: (value: any) => string;
+    labelFormatter?: SelectProps.LabelFormatterFn;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     separator?: string = ", ";
 
+    /**
+     * @inheritDoc
+     */
     @Prop({mutable: true})
     value: any;
 
@@ -140,6 +178,11 @@ export class Select {
      */
     get valueAsArray() {
         return Array.isArray(this.value) ? this.value : (this.value !== undefined ? [this.value] : []);
+    }
+
+    @Watch("disabled")
+    protected disabledChanged() {
+        this.emitStyle();
     }
 
     @Watch("options")
