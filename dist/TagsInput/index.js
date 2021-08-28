@@ -1,7 +1,7 @@
 import { createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
-const tagsInputCss = ".sc-ionx-tags-input-h{display:block}.sc-ionx-tags-input-h ion-chip.sc-ionx-tags-input{margin-left:0px}.item-label-stacked.sc-ionx-tags-input-h,.item-label-stacked .sc-ionx-tags-input-h{width:100%}ionx-form-field [slot-container=default]>.sc-ionx-tags-input-h{margin-left:16px;margin-right:16px}";
+const tagsInputCss = ".sc-ionx-tags-input-h{display:block}.sc-ionx-tags-input-h ion-chip.sc-ionx-tags-input{margin:4px 4px 4px 0;height:30px}.sc-ionx-tags-input-h ion-chip.chip-disabled.sc-ionx-tags-input{opacity:1}.sc-ionx-tags-input-h ion-input.sc-ionx-tags-input{--padding-start:0;--padding-end:0}.item-label-stacked.sc-ionx-tags-input-h,.item-label-stacked .sc-ionx-tags-input-h{width:100%}ionx-form-field [slot-container=default]>.sc-ionx-tags-input-h{margin-left:16px;margin-right:16px;min-height:38px}";
 
 var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, privateMap) {
   if (!privateMap.has(receiver)) {
@@ -171,7 +171,7 @@ const TagsInput = class extends HTMLElement {
   }
   render() {
     var _a;
-    return h(Host, null, h("div", { class: "ionx-tags-input-wrapper" }, (_a = this.value) === null || _a === void 0 ? void 0 : _a.map((tag, index) => h("ion-chip", { outline: true, class: { "ion-activatable": false } }, h("div", null, tag), !this.hideRemove && !this.readonly && h("ion-icon", { name: "close", class: { "ion-activatable": !this.readonly }, onClick: () => this.removeTag(index) })))), !this.readonly && h("ion-input", { disabled: this.readonly, required: this.required, class: { "ionx-tags-input-input": true }, type: this.type, value: this.currentTag, placeholder: this.placeholder, onIonBlur: () => { var _a; return this.pushTag((_a = this.currentTag) === null || _a === void 0 ? void 0 : _a.trim()); }, onIonChange: ev => [ev.stopPropagation(), ev.stopImmediatePropagation()], onKeyUp: ev => this.onKeyUp(ev) }));
+    return h(Host, null, h("div", { class: "ionx-tags-input-wrapper" }, (_a = this.value) === null || _a === void 0 ? void 0 : _a.map((tag, index) => h("ion-chip", { outline: true, disabled: this.readonly }, h("div", null, tag), !this.hideRemove && !this.readonly && h("ion-icon", { name: "close", onClick: () => this.removeTag(index) })))), !this.readonly && h("ion-input", { disabled: this.readonly, required: this.required, class: { "ionx-tags-input-input": true }, type: this.type, value: this.currentTag, placeholder: this.placeholder, onIonBlur: () => { var _a; return this.pushTag((_a = this.currentTag) === null || _a === void 0 ? void 0 : _a.trim()); }, onIonChange: ev => [ev.stopPropagation(), ev.stopImmediatePropagation()], onKeyUp: ev => this.onKeyUp(ev) }));
   }
   get element() { return this; }
   static get style() { return tagsInputCss; }

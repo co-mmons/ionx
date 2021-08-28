@@ -4,6 +4,10 @@
     ion-chip {
         margin: 4px 4px 4px 0;
         height: 30px;
+
+        &.chip-disabled {
+            opacity: 1;
+        }
     }
 
     ion-input {
