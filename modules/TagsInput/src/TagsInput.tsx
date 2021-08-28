@@ -233,13 +233,17 @@ export class TagsInput {
         return <Host>
 
             <div class="ionx-tags-input-wrapper">
-                {this.value?.map((tag, index) => <ion-chip outline={true} class={{"ion-activatable": false}}>
+
+                {this.value?.map((tag, index) => <ion-chip
+                    outline={true}
+                    disabled={this.readonly}>
+
                     <div>{tag}</div>
-                    {!this.hideRemove && !this.readonly && <ion-icon
-                        name="close"
-                        class={{"ion-activatable": !this.readonly}}
-                        onClick={() => this.removeTag(index)}/>}
+
+                    {!this.hideRemove && !this.readonly && <ion-icon name="close" onClick={() => this.removeTag(index)}/>}
+
                 </ion-chip>)}
+
             </div>
 
             {!this.readonly && <ion-input

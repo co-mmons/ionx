@@ -2,7 +2,13 @@
     display: block;
 
     ion-chip {
-        margin-left: 0px;
+        margin: 4px 4px 4px 0;
+        height: 30px;
+    }
+
+    ion-input {
+        --padding-start: 0;
+        --padding-end: 0;
     }
 }
 
@@ -13,4 +19,5 @@
 ionx-form-field [slot-container="default"] > :host {
     margin-left: 16px;
     margin-right: 16px;
+    min-height: 38px;
 }
