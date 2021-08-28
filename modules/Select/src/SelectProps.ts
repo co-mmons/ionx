@@ -47,7 +47,7 @@ export interface SelectProps {
 
     checkValidator?: SelectProps.CheckValidatorFn;
 
-    items: SelectItem[];
+    items?: SelectItem[];
 
     lazyItems?: SelectProps.LazyItemsFn | SelectLazyGroupItem;
 

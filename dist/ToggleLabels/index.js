@@ -2,7 +2,7 @@ import { createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { prefetchComponent } from 'ionx/utils';
 
-const toggleLabelsCss = ".sc-ionx-toggle-labels-h{display:flex;align-items:center}.ionx--readonly.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels,.ionx--readonly.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels,.ionx--readonly.sc-ionx-toggle-labels-h .ionx--default-toggle.sc-ionx-toggle-labels{display:none}.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels{margin-left:4px}.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels{margin-right:4px}.ionx--interactive.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels{cursor:pointer}.ionx--interactive.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels{cursor:pointer}.sc-ionx-toggle-labels-s>ion-toggle,.sc-ionx-toggle-labels-h ion-toggle.sc-ionx-toggle-labels{padding-inline-start:2px;padding-inline-end:2px}.item-label-stacked.sc-ionx-toggle-labels-h,.item-label-stacked .sc-ionx-toggle-labels-h{align-self:flex-start}.ios.sc-ionx-toggle-labels-h .item-label-stacked.sc-ionx-toggle-labels,.ios .item-label-stacked .sc-ionx-toggle-labels-h{margin-top:2px;margin-bottom:2px}ionx-form-field [slot-container=default]>.sc-ionx-toggle-labels-h{margin-left:16px;margin-right:16px}";
+const toggleLabelsCss = ".sc-ionx-toggle-labels-h{display:flex;align-items:center}.ionx--readonly.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels,.ionx--readonly.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels,.ionx--readonly.sc-ionx-toggle-labels-h .ionx--default-toggle.sc-ionx-toggle-labels{display:none}.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels{margin-left:4px}.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels{margin-right:4px}.ionx--interactive.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels{cursor:pointer}.ionx--interactive.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels{cursor:pointer}.sc-ionx-toggle-labels-s>ion-toggle,.sc-ionx-toggle-labels-h ion-toggle.sc-ionx-toggle-labels{padding-inline-start:2px;padding-inline-end:2px}.item-label-stacked.sc-ionx-toggle-labels-h,.item-label-stacked .sc-ionx-toggle-labels-h{align-self:flex-start}.ios.sc-ionx-toggle-labels-h .item-label-stacked.sc-ionx-toggle-labels,.ios .item-label-stacked .sc-ionx-toggle-labels-h{margin-top:2px;margin-bottom:2px}ionx-form-field [slot-container=default]>.sc-ionx-toggle-labels-h{margin-left:16px;margin-right:16px;min-height:38px}";
 
 const ToggleLabels = class extends HTMLElement {
   constructor() {
@@ -35,9 +35,7 @@ const ToggleLabels = class extends HTMLElement {
     toggle.disabled = this.readonly || this.disabled;
   }
   componentDidLoad() {
-    if (this.prefetch) {
-      prefetchComponent({ delay: 0 }, "ion-toggle");
-    }
+    prefetchComponent({ delay: 0 }, "ion-toggle");
   }
   connectedCallback() {
     this.initialToggleState = { checked: this.value, disabled: this.readonly || this.disabled };

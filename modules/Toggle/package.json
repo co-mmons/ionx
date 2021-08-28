@@ -1,7 +1,6 @@
 {
     "scripts": {
-        "build": "stencil build --ts --config stencil.config.build.ts",
+        "build": "node-utils-file-system-glob-copy src ../../dist/Toggle *.scss",
         "start": "../../node_modules/.bin/stencil build --dev --watch --serve --config stencil.config.test.ts"
-    },
-    "types": "../../dist/ToggleLabels/index.d.ts"
+    }
 }

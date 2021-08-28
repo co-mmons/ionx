@@ -1,0 +1,17 @@
+ion-toggle {
+    @import "unification-mixin";
+    @include ionx-toggle-unification();
+}
+
+ionx-form-field [slot-container="default"] > ion-toggle {
+
+    &.md {
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+
+    &.ios {
+        margin-left: 16px;
+        margin-right: 16px;
+    }
+}

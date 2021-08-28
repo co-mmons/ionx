@@ -1,0 +1,18 @@
+@mixin ionx-toggle-unification() {
+    margin: 3px 0;
+
+    &.ios {
+        height: 32px;
+        width: 56px;
+        --handle-width: 28px;
+        --handle-height: 28px;
+    }
+
+    &.md {
+        height: 16px;
+        width: 40px;
+        padding: 8px;
+        --handle-width: 22px;
+        --handle-height: 32px;
+    }
+}

@@ -32,7 +32,7 @@ export interface SelectProps {
    */
   searchTest?: SelectProps.SearchTestFn;
   checkValidator?: SelectProps.CheckValidatorFn;
-  items: SelectItem[];
+  items?: SelectItem[];
   lazyItems?: SelectProps.LazyItemsFn | SelectLazyGroupItem;
   labelComponent?: string | FunctionalComponent<SelectProps.LabelComponentProps>;
   labelFormatter?: SelectProps.LabelFormatterFn;

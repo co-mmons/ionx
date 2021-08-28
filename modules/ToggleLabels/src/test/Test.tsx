@@ -25,6 +25,12 @@ export class Test {
 
             </ionx-form-field>
 
+            <ionx-form-field label="Readonly">
+
+                <ionx-toggle-labels readonly={true} on="yes" off="no" defaultToggle={true} value={true}/>
+
+            </ionx-form-field>
+
         </Host>
     }
 }

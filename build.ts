@@ -31,6 +31,7 @@ const modules = [
     "Svg",
     "TagsInput",
     "ToggleLabels",
+    "Toggle",
     "Toolbar",
     "Textarea",
     "DataTable",
