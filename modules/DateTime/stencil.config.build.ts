@@ -5,17 +5,16 @@ import {defaultExternals} from "../defaultExternals";
 export const config: Config = {
     namespace: "ionx",
     plugins: [sass()],
+    tsconfig: "tsconfig.build.json",
     outputTargets: [
+        {type: "docs-readme"},
         {
             type: "dist-custom-elements-bundle",
             dir: "../../dist/DateTime",
             defineFunctionName: "defineIonxDateTime",
-            external: [
-                ...defaultExternals,
-                /ionx\/(?!modules\/DateTime)/
-            ],
-            empty: true,
-            includeGlobalScripts: false
+            includeGlobalScripts: false,
+            external: [...defaultExternals, /ionx\/(?!modules\/DateTime)/],
+            empty: true
         }
     ]
 };

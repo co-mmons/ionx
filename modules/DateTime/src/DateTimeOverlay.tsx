@@ -1,6 +1,13 @@
 import {intl} from "@co.mmons/js-intl";
-import {TimeZoneDate} from "@co.mmons/js-utils/core";
+import {TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
+import {defineIonxSelect} from "ionx/Select";
+import {noTimeZoneSelectValue} from "./noTimeZoneSelectValue";
+import {timeZoneSelectItemsLoader} from "./timeZoneSelectItemsLoader";
+
+type NumericDateTimePart = "Hour" | "Minute" | "Year" | "Month" | "Day";
+
+defineIonxSelect();
 
 @Component({
     tag: "ionx-date-time-overlay",
@@ -15,21 +22,26 @@ export class DateTimeOverlay {
     @Prop()
     dateOnly: boolean;
 
-    @State()
-    date: Date;
-
     @Prop()
     timeZoneDisabled: boolean;
 
     @Prop()
+    timeZoneRequired: boolean;
+
+    @Prop()
     value: TimeZoneDate;
 
-    values: {[key: string]: string | number} = {};
+    @State()
+    date: Date;
+
+    numericValues: {[key: string]: number} = {};
+
+    timeZoneValue: string;
 
     ranges() {
 
         const ranges = {
-            "Year": [1900, new Date().getUTCFullYear() + 2],
+            "Year": [1900, new Date().getUTCFullYear() + 50],
             "Month": [1, 12],
             "Day": [1, 31],
             "Hour": [0, 23],
@@ -57,14 +69,51 @@ export class DateTimeOverlay {
         return ranges;
     }
 
+    move(part: NumericDateTimePart, step: -1 | 1) {
+
+        const date = new Date(this.date);
+
+        if (part === "Year") {
+            date.setUTCFullYear(date.getUTCFullYear() + step);
+        } else if  (part === "Month") {
+            date.setUTCMonth(date.getUTCMonth() + step);
+        } else if  (part === "Day") {
+            date.setUTCDate(date.getUTCDate() + step);
+        } else if  (part === "Hour") {
+            date.setUTCHours(date.getUTCHours() + step);
+        } else if  (part === "Minute") {
+            date.setUTCMinutes(date.getUTCMinutes() + step);
+        }
+
+        this.date = date;
+    }
+
     ok() {
+
+        let value = new TimeZoneDate(this.date, this.timeZoneValue);
+
+        if (!this.dateOnly && this.timeZoneValue && this.timeZoneValue !== "UTC") {
+            value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue, this.value) * -1));
+        }
+
         const popover = this.element.closest<HTMLIonPopoverElement>("ion-popover");
-        popover.dismiss(new TimeZoneDate(this.date), "ok");
+        popover.dismiss(value, "ok");
     }
 
     cancel() {
         const popover = this.element.closest<HTMLIonPopoverElement>("ion-popover");
         popover.dismiss(undefined, "cancel");
+    }
+
+    @Listen("ionFocus")
+    async onFocus(event: CustomEvent) {
+
+        const input = event.composedPath().find(t => (t as HTMLElement).tagName === "ION-INPUT") as HTMLIonInputElement;
+
+        if (input) {
+            (await input.getInputElement()).select();
+        }
+
     }
 
     @Listen("keydown")
@@ -101,11 +150,11 @@ export class DateTimeOverlay {
             }
 
             if (stringed.length > input.max.length || input.value > parseInt(input.max, 10)) {
-                input.value = this.values[input.name];
+                input.value = this.numericValues[input.name];
                 return;
             }
 
-            this.values[input.name] = input.value;
+            this.numericValues[input.name] = input.value as number;
 
             const date = new Date(this.date);
 
@@ -122,12 +171,16 @@ export class DateTimeOverlay {
             }
 
             this.date = date;
+
+        } else {
+            this.timeZoneValue = event.detail.value;
         }
 
     }
 
     connectedCallback() {
         this.date = new Date(this.value);
+        this.timeZoneValue = this.value.timeZone || undefined;
 
         if (this.dateOnly) {
             this.date.setUTCHours(0);
@@ -135,12 +188,12 @@ export class DateTimeOverlay {
         }
     }
 
-    renderPart(part: "Hour" | "Minute" | "Year" | "Month" | "Day" | "Time zone", range?: number[]) {
+    renderPart(part: NumericDateTimePart | "Time zone", range?: number[]) {
 
         if (part !== "Time zone") {
 
             let def: number;
-            let val: number | string;
+            let val: number;
 
             if (part === "Hour") {
                 def = val = this.date.getUTCHours();
@@ -154,12 +207,23 @@ export class DateTimeOverlay {
                 def = val = this.date.getUTCDate();
             }
 
-            if (part in this.values && this.values[part] === "") {
-                val = "";
+            if (part in this.numericValues && typeof this.numericValues[part] !== "number") {
+                val = undefined;
             }
 
             return <ion-item>
-                <ion-label>{intl.message(`ionx/DateTime#${part}`)}</ion-label>
+
+                <ion-label class="numeric-label">{intl.message(`ionx/DateTime#${part}`)}</ion-label>
+
+                <div class="numeric-buttons" slot="end">
+                    <ion-button fill="clear" size="small" tabindex={-1} onClick={() => this.move(part, -1)}>
+                        <ion-icon slot="icon-only" name="remove-circle-outline"/>
+                    </ion-button>
+                    <ion-button fill="clear" size="small" tabindex={-1} onClick={() => this.move(part, 1)}>
+                        <ion-icon slot="icon-only" name="add-circle"/>
+                    </ion-button>
+                </div>
+
                 <ion-input
                     type="number"
                     name={part}
@@ -167,13 +231,18 @@ export class DateTimeOverlay {
                     value={val}
                     min={`${range[0]}`}
                     max={`${range[1]}`}/>
+
             </ion-item>
 
         } else {
 
             return <ion-item>
                 <ion-label position="stacked">{intl.message(`ionx/DateTime#${part}`)}</ion-label>
-                <ionx-select options={[{value: "", label: intl.message`No time zone`}]} value={""}/>
+                <ionx-select
+                    overlay="modal"
+                    placeholder={this.timeZoneRequired ? "Choose..." : intl.message(noTimeZoneSelectValue.label)}
+                    value={this.timeZoneValue}
+                    lazyItems={timeZoneSelectItemsLoader(this.timeZoneRequired, this.date)}/>
             </ion-item>
         }
     }
@@ -191,6 +260,7 @@ export class DateTimeOverlay {
                 {this.renderPart("Day", ranges["Day"])}
                 {!this.dateOnly && this.renderPart("Hour", ranges["Hour"])}
                 {!this.dateOnly && this.renderPart("Minute", ranges["Minute"])}
+                {!this.timeZoneDisabled && this.renderPart("Time zone")}
 
             </div>
 

@@ -1,6 +1,4 @@
-import {timeZoneInfo, TimeZoneInfo} from "./TimeZoneInfo";
-
-const rawTimeZones = [
+export const timeZones = [
     "Europe/Andorra",
     "Asia/Dubai",
     "Asia/Kabul",
@@ -350,22 +348,3 @@ const rawTimeZones = [
     "Pacific/Apia",
     "Africa/Johannesburg"
 ];
-
-export function timeZones(date?: Date) {
-
-    if (!date) {
-        date = new Date();
-    }
-
-    const unsorted: TimeZoneInfo[] = [];
-
-    for (const tz of rawTimeZones) {
-        try {
-            unsorted.push(timeZoneInfo(tz, date));
-        } catch (error) {
-            // console.warn(error);
-        }
-    }
-
-    return unsorted.sort((a, b) => a.date.localeCompare(b.date));
-}

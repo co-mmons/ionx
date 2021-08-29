@@ -9,31 +9,68 @@ import { TimeZoneDate } from "@co.mmons/js-utils/core";
 import { StyleEventDetail } from "@ionic/core";
 export namespace Components {
     interface IonxDateTime {
+        /**
+          * @inheritDoc
+         */
         "clearButtonIcon": string;
+        /**
+          * @inheritDoc
+         */
         "clearButtonText": string;
+        /**
+          * @inheritDoc
+         */
         "clearButtonVisible": boolean;
+        /**
+          * @inheritDoc
+         */
         "dateOnly": boolean;
         /**
-          * Timezone, that will be set, when new value is picked from picker.
+          * Timezone, that will be set, when new value is picked from picker. By default  time zone of current device will be used.
+          * @inheritDoc
          */
-        "defaultTimeZone": string;
+        "defaultTimeZone": string | "current";
+        /**
+          * @inheritDoc
+         */
         "disabled": boolean;
+        /**
+          * @inheritDoc
+         */
         "formatOptions": Intl.DateTimeFormatOptions;
         "open": (event?: any) => Promise<void>;
+        /**
+          * @inheritDoc
+         */
         "placeholder": string;
+        /**
+          * @inheritDoc
+         */
         "readonly": boolean;
         "setBlur": () => Promise<void>;
         "setFocus": (options?: FocusOptions) => Promise<void>;
         /**
           * Whether timezone cannot be changed.
+          * @inheritDoc
          */
         "timeZoneDisabled": boolean;
+        /**
+          * If time zone must be chosen, by default true.
+          * @inheritDoc
+         */
+        "timeZoneRequired": boolean;
+        /**
+          * @inheritDoc
+         */
         "value": TimeZoneDate;
     }
     interface IonxDateTimeOverlay {
         "dateOnly": boolean;
         "timeZoneDisabled": boolean;
+        "timeZoneRequired": boolean;
         "value": TimeZoneDate;
+    }
+    interface IonxTest {
     }
 }
 declare global {
@@ -49,22 +86,48 @@ declare global {
         prototype: HTMLIonxDateTimeOverlayElement;
         new (): HTMLIonxDateTimeOverlayElement;
     };
+    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
+    }
+    var HTMLIonxTestElement: {
+        prototype: HTMLIonxTestElement;
+        new (): HTMLIonxTestElement;
+    };
     interface HTMLElementTagNameMap {
         "ionx-date-time": HTMLIonxDateTimeElement;
         "ionx-date-time-overlay": HTMLIonxDateTimeOverlayElement;
+        "ionx-test": HTMLIonxTestElement;
     }
 }
 declare namespace LocalJSX {
     interface IonxDateTime {
+        /**
+          * @inheritDoc
+         */
         "clearButtonIcon"?: string;
+        /**
+          * @inheritDoc
+         */
         "clearButtonText"?: string;
+        /**
+          * @inheritDoc
+         */
         "clearButtonVisible"?: boolean;
+        /**
+          * @inheritDoc
+         */
         "dateOnly"?: boolean;
         /**
-          * Timezone, that will be set, when new value is picked from picker.
+          * Timezone, that will be set, when new value is picked from picker. By default  time zone of current device will be used.
+          * @inheritDoc
          */
-        "defaultTimeZone"?: string;
+        "defaultTimeZone"?: string | "current";
+        /**
+          * @inheritDoc
+         */
         "disabled"?: boolean;
+        /**
+          * @inheritDoc
+         */
         "formatOptions"?: Intl.DateTimeFormatOptions;
         "onIonChange"?: (event: CustomEvent<any>) => void;
         "onIonFocus"?: (event: CustomEvent<any>) => void;
@@ -72,22 +135,41 @@ declare namespace LocalJSX {
           * Emitted when the styles change.
          */
         "onIonStyle"?: (event: CustomEvent<StyleEventDetail>) => void;
+        /**
+          * @inheritDoc
+         */
         "placeholder"?: string;
+        /**
+          * @inheritDoc
+         */
         "readonly"?: boolean;
         /**
           * Whether timezone cannot be changed.
+          * @inheritDoc
          */
         "timeZoneDisabled"?: boolean;
+        /**
+          * If time zone must be chosen, by default true.
+          * @inheritDoc
+         */
+        "timeZoneRequired"?: boolean;
+        /**
+          * @inheritDoc
+         */
         "value"?: TimeZoneDate;
     }
     interface IonxDateTimeOverlay {
         "dateOnly"?: boolean;
         "timeZoneDisabled"?: boolean;
+        "timeZoneRequired"?: boolean;
         "value"?: TimeZoneDate;
+    }
+    interface IonxTest {
     }
     interface IntrinsicElements {
         "ionx-date-time": IonxDateTime;
         "ionx-date-time-overlay": IonxDateTimeOverlay;
+        "ionx-test": IonxTest;
     }
 }
 export { LocalJSX as JSX };
@@ -96,6 +178,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ionx-date-time": LocalJSX.IonxDateTime & JSXBase.HTMLAttributes<HTMLIonxDateTimeElement>;
             "ionx-date-time-overlay": LocalJSX.IonxDateTimeOverlay & JSXBase.HTMLAttributes<HTMLIonxDateTimeOverlayElement>;
+            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
         }
     }
 }

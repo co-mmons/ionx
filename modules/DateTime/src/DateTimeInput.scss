@@ -3,11 +3,10 @@
 
     position: relative;
     display: inline-flex;
-    font-family: var(--ion-font-family, inherit);
     max-width: 100%;
-    padding: var(--date-time-padding-top, 8px) var(--date-time-padding-end, 0px) var(--date-time-padding-bottom, 8px) var(--date-time-padding-start, 0px);
     user-select: none;
-
+    min-height: 38px;
+    align-items: center;
     outline: none;
     cursor: pointer;
 
@@ -47,10 +46,13 @@
     }
 }
 
-:host-context(.item-label-stacked) {
+ionx-form-field [slot-container="default"] > :host, :host-context(.item-label-stacked) {
     align-self: flex-start;
     --date-time-padding-start: 0px;
     width: 100%;
+    margin-left: 16px;
+    margin-right: 16px;
+    min-height: 38px;
 
     .ionx--text {
         max-width: calc(100% - 16px);

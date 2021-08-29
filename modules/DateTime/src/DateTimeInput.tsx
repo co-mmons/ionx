@@ -1,8 +1,9 @@
 import {intl} from "@co.mmons/js-intl";
-import {sleep, TimeZoneDate} from "@co.mmons/js-utils/core";
+import {sleep, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
 import {popoverController, StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten} from "ionx/utils";
+import {DateTimeInputProps} from "./DateTimeInputProps";
 import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
 
 @Component({
@@ -10,59 +11,116 @@ import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
     styleUrl: "DateTimeInput.scss",
     scoped: true
 })
-export class DateTimeInput   {
+export class DateTimeInput implements DateTimeInputProps {
 
     @Element()
     element: HTMLElement;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     placeholder: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     dateOnly: boolean;
 
     /**
-     * Whether timezone cannot be changed.
+     * @inheritDoc
      */
     @Prop()
     timeZoneDisabled: boolean;
 
     /**
-     * Timezone, that will be set, when new value is picked from picker.
+     * @inheritDoc
      */
     @Prop()
-    defaultTimeZone: string;
+    defaultTimeZone: string | "current" = "current";
 
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    timeZoneRequired: boolean = true;
+
+    /**
+     * @inheritDoc
+     */
     @Prop()
     clearButtonVisible: boolean;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     clearButtonIcon: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     clearButtonText: string;
 
+    /**
+     * @inheritDoc
+     */
     @Prop()
     readonly: boolean;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    disabled: boolean;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    formatOptions: Intl.DateTimeFormatOptions;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop({mutable: true})
+    value: TimeZoneDate;
+
+    @Event()
+    ionChange: EventEmitter<any>;
+
+    @Event()
+    ionFocus: EventEmitter<any>;
+
+    /**
+     * Emitted when the styles change.
+     * @internal
+     */
+    @Event()
+    ionStyle!: EventEmitter<StyleEventDetail>;
+
+    @State()
+    formattedValue: string;
+
+    focused: boolean;
+
+    nativePicker: HTMLInputElement;
+
+    overlayVisible: boolean;
+
+    itemClickUnlisten: EventUnlisten;
 
     @Watch("readonly")
     readonlyChanged() {
         this.emitStyle();
     }
 
-    @Prop()
-    disabled: boolean;
-
     @Watch("disabled")
     disabledChanged() {
         this.emitStyle();
     }
-
-    @Prop()
-    formatOptions: Intl.DateTimeFormatOptions;
-
-    @Prop({mutable: true})
-    value: TimeZoneDate;
 
     @Watch("value")
     valueChanged(niu: TimeZoneDate, old: TimeZoneDate, fireEvent = true) {
@@ -76,9 +134,6 @@ export class DateTimeInput   {
         }
     }
 
-    @State()
-    formattedValue: string;
-
     formatValue() {
 
         if (this.value) {
@@ -90,9 +145,11 @@ export class DateTimeInput   {
                 if (!options.timeZoneName) {
                     options.timeZoneName = "short";
                 }
-            }
 
-            if (!this.value.timeZone) {
+            } else if (this.value instanceof TimeZoneDate && !this.value.timeZone && this.timeZoneRequired && !this.dateOnly) {
+                options.timeZoneName = "short";
+
+            } else {
                 options.timeZone = "UTC";
                 options.timeZoneName = undefined;
             }
@@ -107,12 +164,6 @@ export class DateTimeInput   {
             return null;
         }
     }
-
-    @Event()
-    ionChange: EventEmitter<any>;
-
-    @Event()
-    ionFocus: EventEmitter<any>;
 
     @Method()
     async setFocus(options?: FocusOptions): Promise<void> {
@@ -131,8 +182,6 @@ export class DateTimeInput   {
             this.open(ev);
         }
     }
-
-    focused: boolean;
 
     @Listen("focus")
     onFocus() {
@@ -155,13 +204,6 @@ export class DateTimeInput   {
             this.open(ev);
         }
     }
-
-    /**
-     * Emitted when the styles change.
-     * @internal
-     */
-    @Event()
-    ionStyle!: EventEmitter<StyleEventDetail>;
 
     emitStyle() {
 
@@ -188,10 +230,6 @@ export class DateTimeInput   {
         this.value = undefined;
     }
 
-    nativePicker: HTMLInputElement;
-
-    overlayVisible: boolean;
-
     @Method()
     async open(event?: any): Promise<void> {
 
@@ -205,9 +243,37 @@ export class DateTimeInput   {
 
         } else if (!this.nativePicker) {
 
+            let value: TimeZoneDate = this.value;
+            let currentTimeZone: string;
+
+            if (this.dateOnly) {
+                value = new TimeZoneDate(this.value ?? new Date());
+
+            } else {
+
+                if (this.timeZoneRequired && (!value || !value.timeZone) && (!this.defaultTimeZone || this.defaultTimeZone === "current")) {
+                    currentTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+                }
+
+                if (!value && !this.timeZoneRequired) {
+                    const now = new Date();
+                    value = new TimeZoneDate(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0 , 0), currentTimeZone);
+                } else if (!value || (!value.timeZone && this.timeZoneRequired)) {
+                    value = new TimeZoneDate(value ?? new Date(), currentTimeZone);
+                }
+            }
+
+            if (!value.timeZone || value.timeZone === "UTC") {
+                value = new TimeZoneDate(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate(), value.getUTCHours(), value.getUTCMinutes(), 0, 0), value.timeZone);
+            } else {
+                value = new TimeZoneDate(value.getTime() + (timeZoneOffset(value.timeZone, value) * -1), value.timeZone);
+            }
+
             const overlayProps = {
-                value: this.value ?? new Date(),
-                dateOnly: !!this.dateOnly
+                value,
+                dateOnly: !!this.dateOnly,
+                timeZoneDisabled: !!this.dateOnly || !!this.timeZoneDisabled,
+                timeZoneRequired: !this.dateOnly && !!this.timeZoneRequired
             };
 
             const popover = await popoverController.create({
@@ -228,8 +294,6 @@ export class DateTimeInput   {
             this.setFocus({preventScroll: true});
         }
     }
-
-    itemClickUnlisten: EventUnlisten;
 
     connectedCallback() {
 

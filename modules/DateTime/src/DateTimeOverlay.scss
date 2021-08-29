@@ -2,8 +2,10 @@
     display: block;
 
     ion-input {
+        flex: 1;
         text-align: right;
         --padding-end: 0px;
+        font-weight: 600;
 
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
@@ -21,6 +23,18 @@
         --inner-padding-end: 16px;
         --padding-start: 0px;
         --padding-end: 0px;
+    }
+
+    .numeric-buttons {
+        text-align: center;
+        margin-left: 16px;
+        margin-right: 0;
+
+        ion-button {
+            margin: 0;
+            --padding-start: 2px;
+            --padding-end: 2px;
+        }
     }
 
     ion-footer {
