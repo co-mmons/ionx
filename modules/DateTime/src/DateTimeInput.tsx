@@ -134,16 +134,18 @@ export class DateTimeInput implements DateTimeInputProps {
     formatValue() {
 
         if (this.value) {
+            let value = this.value;
             const options = Object.assign({}, this.formatOptions || (this.dateOnly ? defaultDateFormat : defaultDateTimeFormat));
 
-            if (this.value.timeZone) {
+            if (value.timeZone) {
                 options.timeZone = this.value.timeZone;
 
                 if (!options.timeZoneName) {
                     options.timeZoneName = "short";
                 }
 
-            } else if (this.value instanceof TimeZoneDate && !this.value.timeZone && this.timeZoneRequired && !this.dateOnly) {
+            } else if (value instanceof TimeZoneDate && !value.timeZone && this.timeZoneRequired && !this.dateOnly) {
+                value = new TimeZoneDate(value, "current");
                 options.timeZoneName = "short";
 
             } else {
@@ -152,9 +154,9 @@ export class DateTimeInput implements DateTimeInputProps {
             }
 
             if (this.dateOnly) {
-                return intl.dateFormat(this.value, options);
+                return intl.dateFormat(value, options);
             } else {
-                return intl.dateTimeFormat(this.value, options);
+                return intl.dateTimeFormat(value, options);
             }
 
         } else {
