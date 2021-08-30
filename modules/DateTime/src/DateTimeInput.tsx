@@ -1,6 +1,6 @@
 import {intl} from "@co.mmons/js-intl";
 import {sleep, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
-import {popoverController, StyleEventDetail} from "@ionic/core";
+import {isPlatform, popoverController, StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {DateTimeInputProps} from "./DateTimeInputProps";
@@ -50,7 +50,7 @@ export class DateTimeInput implements DateTimeInputProps {
      * @inheritDoc
      */
     @Prop()
-    clearButtonVisible: boolean;
+    clearButtonVisible: boolean = true;
 
     /**
      * @inheritDoc
@@ -61,19 +61,13 @@ export class DateTimeInput implements DateTimeInputProps {
     /**
      * @inheritDoc
      */
-    @Prop()
-    clearButtonText: string;
-
-    /**
-     * @inheritDoc
-     */
-    @Prop()
+    @Prop({reflect: true})
     readonly: boolean;
 
     /**
      * @inheritDoc
      */
-    @Prop()
+    @Prop({reflect: true})
     disabled: boolean;
 
     /**
@@ -89,7 +83,7 @@ export class DateTimeInput implements DateTimeInputProps {
     value: TimeZoneDate;
 
     @Event()
-    ionChange: EventEmitter<any>;
+    ionChange: EventEmitter<{value: TimeZoneDate}>;
 
     @Event()
     ionFocus: EventEmitter<any>;
@@ -112,6 +106,8 @@ export class DateTimeInput implements DateTimeInputProps {
 
     itemClickUnlisten: EventUnlisten;
 
+    valueChanging: boolean;
+
     @Watch("readonly")
     readonlyChanged() {
         this.emitStyle();
@@ -123,15 +119,16 @@ export class DateTimeInput implements DateTimeInputProps {
     }
 
     @Watch("value")
-    valueChanged(niu: TimeZoneDate, old: TimeZoneDate, fireEvent = true) {
+    valueChanged(value: TimeZoneDate, old: TimeZoneDate) {
 
         this.formattedValue = this.formatValue();
 
-        this.emitStyle();
-
-        if (fireEvent && (niu !== old || niu?.getTime() !== old?.getTime() || niu?.timeZone !== old?.timeZone)) {
-            this.ionChange.emit({value: niu});
+        if (this.valueChanging && (value !== old || value?.getTime() !== old?.getTime() || value?.timeZone !== old?.timeZone)) {
+            this.ionChange.emit({value});
         }
+
+        this.emitStyle();
+        this.valueChanging = false;
     }
 
     formatValue() {
@@ -179,7 +176,7 @@ export class DateTimeInput implements DateTimeInputProps {
     onKeyDown(ev: KeyboardEvent) {
         if (!this.readonly && !this.disabled && (ev.key === "Enter" || ev.key === " ")) {
             ev.preventDefault();
-            this.open(ev);
+            this.open();
         }
     }
 
@@ -201,7 +198,7 @@ export class DateTimeInput implements DateTimeInputProps {
     onClick(ev: MouseEvent) {
 
         if (!ev.composedPath().find(t => (t as HTMLElement).tagName === "ION-BUTTON")) {
-            this.open(ev);
+            this.open();
         }
     }
 
@@ -226,12 +223,13 @@ export class DateTimeInput implements DateTimeInputProps {
         }
     }
 
-    clearValue() {
+    @Method()
+    async clearValue() {
         this.value = undefined;
     }
 
     @Method()
-    async open(event?: any): Promise<void> {
+    async open(): Promise<void> {
 
         if (this.nativePicker) {
 
@@ -279,14 +277,20 @@ export class DateTimeInput implements DateTimeInputProps {
             const popover = await popoverController.create({
                 component: "ionx-date-time-overlay",
                 componentProps: overlayProps,
-                event,
+                event: {target: this.element} as any,
                 showBackdrop: true
             });
+
+            if (isPlatform("mobile")) {
+                popover.style.setProperty("--width", "250px");
+            }
+
             popover.present();
             this.overlayVisible = true;
 
             const result = await popover.onWillDismiss();
             if (result.role === "ok") {
+                this.valueChanging = true;
                 this.value = result.data;
             }
 
@@ -297,7 +301,7 @@ export class DateTimeInput implements DateTimeInputProps {
 
     connectedCallback() {
 
-        this.valueChanged(this.value, undefined, false);
+        this.valueChanged(this.value, undefined);
 
         if (!this.element.hasAttribute("tabIndex")) {
             this.element.setAttribute("tabIndex", "0");
@@ -325,7 +329,7 @@ export class DateTimeInput implements DateTimeInputProps {
 
         const item = this.element.closest("ion-item");
         if (item) {
-            this.itemClickUnlisten = addEventListener(item, "click", ev => this.focused && ev.target === item && (this.open({target: this.element}) || true));
+            this.itemClickUnlisten = addEventListener(item, "click", ev => this.focused && ev.target === item && (this.open() || true));
         }
     }
 
@@ -337,9 +341,18 @@ export class DateTimeInput implements DateTimeInputProps {
                 "ionx--placeholder-visible": !this.formattedValue && !!this.placeholder
             }}>{this.formattedValue ?? this.placeholder}</div>
 
-            {this.clearButtonVisible && !this.readonly && !this.disabled && this.value && <ion-button fill="clear" size="small" tabIndex={-1} onMouseDown={ev => this.clearButtonClicked(ev)}>
-                <ion-icon name="close" slot={this.clearButtonText ? "start" : "icon-only"}/>
-                {this.clearButtonText && <span>{this.clearButtonText}</span>}
+            {!this.readonly && !this.disabled && <div class="ionx--icon" role="presentation">
+                <div class="ionx--icon-inner"/>
+            </div>}
+
+            {this.clearButtonVisible && !this.readonly && !this.disabled && this.value && <ion-button
+                fill="clear"
+                size="small"
+                tabIndex={-1}
+                onClick={ev => this.clearButtonClicked(ev)}>
+
+                <ion-icon name="backspace" slot="icon-only"/>
+
             </ion-button>}
 
         </Host>;

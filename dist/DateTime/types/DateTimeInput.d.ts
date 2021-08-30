@@ -2,51 +2,82 @@ import { TimeZoneDate } from "@co.mmons/js-utils/core";
 import { StyleEventDetail } from "@ionic/core";
 import { EventEmitter } from "@stencil/core";
 import { EventUnlisten } from "ionx/utils";
-export declare class DateTimeInput {
+import { DateTimeInputProps } from "./DateTimeInputProps";
+export declare class DateTimeInput implements DateTimeInputProps {
   element: HTMLElement;
+  /**
+   * @inheritDoc
+   */
   placeholder: string;
+  /**
+   * @inheritDoc
+   */
   dateOnly: boolean;
   /**
-   * Whether timezone cannot be changed.
+   * @inheritDoc
    */
   timeZoneDisabled: boolean;
   /**
-   * Timezone, that will be set, when new value is picked from picker.
+   * @inheritDoc
    */
-  defaultTimeZone: string;
+  defaultTimeZone: string | "current";
+  /**
+   * @inheritDoc
+   */
+  timeZoneRequired: boolean;
+  /**
+   * @inheritDoc
+   */
   clearButtonVisible: boolean;
+  /**
+   * @inheritDoc
+   */
   clearButtonIcon: string;
-  clearButtonText: string;
+  /**
+   * @inheritDoc
+   */
   readonly: boolean;
-  readonlyChanged(): void;
+  /**
+   * @inheritDoc
+   */
   disabled: boolean;
-  disabledChanged(): void;
+  /**
+   * @inheritDoc
+   */
   formatOptions: Intl.DateTimeFormatOptions;
+  /**
+   * @inheritDoc
+   */
   value: TimeZoneDate;
-  valueChanged(niu: TimeZoneDate, old: TimeZoneDate, fireEvent?: boolean): void;
-  formattedValue: string;
-  formatValue(): string;
-  ionChange: EventEmitter<any>;
+  ionChange: EventEmitter<{
+    value: TimeZoneDate;
+  }>;
   ionFocus: EventEmitter<any>;
-  setFocus(options?: FocusOptions): Promise<void>;
-  setBlur(): Promise<void>;
-  onKeyDown(ev: KeyboardEvent): void;
-  focused: boolean;
-  onFocus(): void;
-  onBlur(): void;
-  onClick(ev: MouseEvent): void;
   /**
    * Emitted when the styles change.
    * @internal
    */
   ionStyle: EventEmitter<StyleEventDetail>;
-  emitStyle(): void;
-  clearButtonClicked(ev: Event): void;
-  clearValue(): void;
+  formattedValue: string;
+  focused: boolean;
   nativePicker: HTMLInputElement;
   overlayVisible: boolean;
-  open(event?: any): Promise<void>;
   itemClickUnlisten: EventUnlisten;
+  valueChanging: boolean;
+  readonlyChanged(): void;
+  disabledChanged(): void;
+  valueChanged(value: TimeZoneDate, old: TimeZoneDate): void;
+  formatValue(): string;
+  setFocus(options?: FocusOptions): Promise<void>;
+  setBlur(): Promise<void>;
+  onKeyDown(ev: KeyboardEvent): void;
+  onFocus(): void;
+  onBlur(): void;
+  onClick(ev: MouseEvent): void;
+  emitStyle(): void;
+  clearButtonClicked(ev: Event): void;
+  clearValue(): Promise<void>;
+  open(): Promise<void>;
   connectedCallback(): void;
   disconnectedCallback(): void;
   initItemListener(): Promise<void>;

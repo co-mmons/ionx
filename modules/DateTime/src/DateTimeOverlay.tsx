@@ -2,6 +2,7 @@ import {intl} from "@co.mmons/js-intl";
 import {TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
 import {defineIonxSelect} from "ionx/Select";
+import {loadIntlMessages} from "./intl/loadIntlMessages";
 import {noTimeZoneSelectValue} from "./noTimeZoneSelectValue";
 import {timeZoneSelectItemsLoader} from "./timeZoneSelectItemsLoader";
 
@@ -88,12 +89,17 @@ export class DateTimeOverlay {
         this.date = date;
     }
 
+    now() {
+        const now = new Date();
+        this.date = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0));
+    }
+
     ok() {
 
         let value = new TimeZoneDate(this.date, this.timeZoneValue);
 
         if (!this.dateOnly && this.timeZoneValue && this.timeZoneValue !== "UTC") {
-            value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue, this.value) * -1));
+            value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue, this.value) * -1), this.timeZoneValue);
         }
 
         const popover = this.element.closest<HTMLIonPopoverElement>("ion-popover");
@@ -178,6 +184,10 @@ export class DateTimeOverlay {
 
     }
 
+    async componentWillLoad() {
+        await loadIntlMessages();
+    }
+
     connectedCallback() {
         this.date = new Date(this.value);
         this.timeZoneValue = this.value.timeZone || undefined;
@@ -260,6 +270,11 @@ export class DateTimeOverlay {
                 {this.renderPart("Day", ranges["Day"])}
                 {!this.dateOnly && this.renderPart("Hour", ranges["Hour"])}
                 {!this.dateOnly && this.renderPart("Minute", ranges["Minute"])}
+
+                <ion-item>
+                    <ion-button size="small" slot="end" onClick={() => this.now()}>{this.dateOnly ? intl.message`ionx/DateTime#Today` : intl.message`ionx/DateTime#Now`}</ion-button>
+                </ion-item>
+
                 {!this.timeZoneDisabled && this.renderPart("Time zone")}
 
             </div>

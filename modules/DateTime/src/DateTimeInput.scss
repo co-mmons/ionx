@@ -1,6 +1,4 @@
 :host {
-    --date-time-placeholder-opacity: .5;
-
     position: relative;
     display: inline-flex;
     max-width: 100%;
@@ -24,32 +22,50 @@
         }
     }
 
-    &.ionx--disabled {
-        opacity: var(--date-time-disabled-opacity, .5);
-        pointer-events: none;
+    .ionx--icon {
+        position: relative;
+        width: 16px;
+        height: 20px;
+
+        .ionx--icon-inner {
+            top: 50%;
+            right: 0;
+            margin-top: -3px;
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 5px solid;
+            border-right: 5px solid transparent;
+            border-left: 5px solid transparent;
+            color: currentColor;
+            opacity: var(--date-time-dropdown-icon-opacity, .5);
+            pointer-events: none;
+        }
     }
 
-    &.ionx--readonly {
+    &[disabled] {
+        opacity: var(--date-time-disabled-opacity, .5);
+        pointer-events: none;
+        cursor: default;
+    }
+
+    &[readonly] {
         opacity: 1;
         pointer-events: none;
+        cursor: default;
     }
 
     ion-button {
-        --border-radius: 100%;
         --padding-start: 4px;
         --padding-end: 4px;
-        margin: 0px;
-        position: absolute;
-        height: 100%;
-        right: 0px;
-        top: 0px;
+        margin: 0 0 0 4px;
+        height: auto;
     }
 }
 
 ionx-form-field [slot-container="default"] > :host, :host-context(.item-label-stacked) {
     align-self: flex-start;
-    --date-time-padding-start: 0px;
-    width: 100%;
+    width: calc(100% - 32px);
     margin-left: 16px;
     margin-right: 16px;
     min-height: 38px;

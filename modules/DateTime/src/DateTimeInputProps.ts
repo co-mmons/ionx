@@ -24,8 +24,6 @@ export interface DateTimeInputProps {
 
     clearButtonIcon?: string;
 
-    clearButtonText?: string;
-
     readonly?: boolean;
 
     disabled?: boolean;

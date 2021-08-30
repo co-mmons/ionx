@@ -1,2 +1,1 @@
-import { TimeZoneInfo } from "./TimeZoneInfo";
-export declare function timeZones(date?: Date): TimeZoneInfo[];
+export declare const timeZones: string[];

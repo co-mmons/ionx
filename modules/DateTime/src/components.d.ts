@@ -16,11 +16,8 @@ export namespace Components {
         /**
           * @inheritDoc
          */
-        "clearButtonText": string;
-        /**
-          * @inheritDoc
-         */
         "clearButtonVisible": boolean;
+        "clearValue": () => Promise<void>;
         /**
           * @inheritDoc
          */
@@ -38,7 +35,7 @@ export namespace Components {
           * @inheritDoc
          */
         "formatOptions": Intl.DateTimeFormatOptions;
-        "open": (event?: any) => Promise<void>;
+        "open": () => Promise<void>;
         /**
           * @inheritDoc
          */
@@ -70,8 +67,6 @@ export namespace Components {
         "timeZoneRequired": boolean;
         "value": TimeZoneDate;
     }
-    interface IonxTest {
-    }
 }
 declare global {
     interface HTMLIonxDateTimeElement extends Components.IonxDateTime, HTMLStencilElement {
@@ -86,16 +81,9 @@ declare global {
         prototype: HTMLIonxDateTimeOverlayElement;
         new (): HTMLIonxDateTimeOverlayElement;
     };
-    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
-    }
-    var HTMLIonxTestElement: {
-        prototype: HTMLIonxTestElement;
-        new (): HTMLIonxTestElement;
-    };
     interface HTMLElementTagNameMap {
         "ionx-date-time": HTMLIonxDateTimeElement;
         "ionx-date-time-overlay": HTMLIonxDateTimeOverlayElement;
-        "ionx-test": HTMLIonxTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -104,10 +92,6 @@ declare namespace LocalJSX {
           * @inheritDoc
          */
         "clearButtonIcon"?: string;
-        /**
-          * @inheritDoc
-         */
-        "clearButtonText"?: string;
         /**
           * @inheritDoc
          */
@@ -129,7 +113,7 @@ declare namespace LocalJSX {
           * @inheritDoc
          */
         "formatOptions"?: Intl.DateTimeFormatOptions;
-        "onIonChange"?: (event: CustomEvent<any>) => void;
+        "onIonChange"?: (event: CustomEvent<{value: TimeZoneDate}>) => void;
         "onIonFocus"?: (event: CustomEvent<any>) => void;
         /**
           * Emitted when the styles change.
@@ -164,12 +148,9 @@ declare namespace LocalJSX {
         "timeZoneRequired"?: boolean;
         "value"?: TimeZoneDate;
     }
-    interface IonxTest {
-    }
     interface IntrinsicElements {
         "ionx-date-time": IonxDateTime;
         "ionx-date-time-overlay": IonxDateTimeOverlay;
-        "ionx-test": IonxTest;
     }
 }
 export { LocalJSX as JSX };
@@ -178,7 +159,6 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ionx-date-time": LocalJSX.IonxDateTime & JSXBase.HTMLAttributes<HTMLIonxDateTimeElement>;
             "ionx-date-time-overlay": LocalJSX.IonxDateTimeOverlay & JSXBase.HTMLAttributes<HTMLIonxDateTimeOverlayElement>;
-            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
         }
     }
 }

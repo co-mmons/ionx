@@ -22,7 +22,7 @@ export class Test {
             </ionx-form-field>
 
             <ionx-form-field label="time zone not required">
-                <ionx-date-time placeholder="Choose..." timeZoneRequired={false}/>
+                <ionx-date-time placeholder="Shalalala" timeZoneRequired={false}/>
             </ionx-form-field>
 
             <ionx-form-field label="only date">
