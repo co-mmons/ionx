@@ -26,6 +26,10 @@ const DateTimeInput = class extends HTMLElement {
     /**
      * @inheritDoc
      */
+    this.placeholder = intl.message `@co.mmons/js-intl#Choose...`;
+    /**
+     * @inheritDoc
+     */
     this.defaultTimeZone = "current";
     /**
      * @inheritDoc
@@ -158,6 +162,7 @@ const DateTimeInput = class extends HTMLElement {
       else {
         value = new TimeZoneDate(value.getTime() + (timeZoneOffset(value.timeZone, value) * -1), value.timeZone);
       }
+      value.setUTCSeconds(0, 0);
       const overlayProps = {
         value,
         dateOnly: !!this.dateOnly,
@@ -448,8 +453,10 @@ const DateTimeOverlay = class extends HTMLElement {
     this.date = new Date(this.value);
     this.timeZoneValue = this.value.timeZone || undefined;
     if (this.dateOnly) {
-      this.date.setUTCHours(0);
-      this.date.setUTCMinutes(0, 0, 0);
+      this.date.setUTCHours(0, 0, 0, 0);
+    }
+    else {
+      this.date.setUTCSeconds(0, 0);
     }
   }
   renderPart(part, range) {

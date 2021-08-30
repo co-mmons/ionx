@@ -193,8 +193,9 @@ export class DateTimeOverlay {
         this.timeZoneValue = this.value.timeZone || undefined;
 
         if (this.dateOnly) {
-            this.date.setUTCHours(0);
-            this.date.setUTCMinutes(0, 0, 0);
+            this.date.setUTCHours(0, 0, 0, 0);
+        } else {
+            this.date.setUTCSeconds(0, 0);
         }
     }
 

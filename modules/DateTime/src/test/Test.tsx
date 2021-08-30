@@ -19,6 +19,7 @@ export class Test {
 
             <ionx-form-field label="simple with time zone required">
                 <ionx-date-time ref={this.data.controls.date1.attach()}/>
+                <div>value: {JSON.stringify(this.data.controls.date1.value.toJSON())}</div>
             </ionx-form-field>
 
             <ionx-form-field label="time zone not required">

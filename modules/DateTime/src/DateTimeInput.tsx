@@ -20,7 +20,7 @@ export class DateTimeInput implements DateTimeInputProps {
      * @inheritDoc
      */
     @Prop()
-    placeholder: string;
+    placeholder: string = intl.message`@co.mmons/js-intl#Choose...`;
 
     /**
      * @inheritDoc
@@ -269,6 +269,8 @@ export class DateTimeInput implements DateTimeInputProps {
                 value = new TimeZoneDate(value.getTime() + (timeZoneOffset(value.timeZone, value) * -1), value.timeZone);
             }
 
+            value.setUTCSeconds(0, 0);
+
             const overlayProps = {
                 value,
                 dateOnly: !!this.dateOnly,
@@ -336,12 +338,13 @@ export class DateTimeInput implements DateTimeInputProps {
     }
 
     render() {
+
         return <Host>
 
             <div class={{
                 "ionx--text": true,
                 "ionx--placeholder-visible": !this.formattedValue && !!this.placeholder
-            }}>{this.formattedValue ?? this.placeholder}</div>
+            }}>{this.formattedValue ?? this.placeholder }</div>
 
             {!this.readonly && !this.disabled && <div class="ionx--icon" role="presentation">
                 <div class="ionx--icon-inner"/>
