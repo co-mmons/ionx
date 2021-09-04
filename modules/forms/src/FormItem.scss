@@ -1,6 +1,6 @@
 :host {
-    --form-item-solid-background-color: var(--ion-color-light);
-    --form-item-focused-background-color: var(--ion-color-light-shade);
+    --form-item--solid-background-color: var(--ionx-form-item-solid-background-color, var(--ion-color-light));
+    --form-item--focused-background-color: var(--ionx-form-item-focused-background-color, var(--ion-color-light-shade));
 
     position: relative;
     display: block;
@@ -46,11 +46,11 @@
         --padding-end: var(--item-padding-end, 16px);
         --inner-padding-start: var(--item-inner-padding-start, 0px);
         --inner-padding-end: var(--item-inner-padding-end, 0px);
-        --background: var(--form-item-solid-background-color);
-        --background-focused: var(--form-item-focused-background-color);
+        --background: var(--form-item--solid-background-color);
+        --background-focused: var(--form-item--focused-background-color);
         --background-focused-opacity: 1;
-        --input-background-color: var(--form-item-solid-background-color);
-        --input-focused-background-color: var(--form-item-focused-background-color);
+        --input-background-color: var(--form-item--solid-background-color);
+        --input-focused-background-color: var(--form-item--focused-background-color);
         --border-width: 0px 0px var(--ionx-border-width, 1px) 0px;
         --border-radius: var(--ionx-border-radius, 4px) var(--ionx-border-radius, 4px) 0px 0px;
         --inner-border-width: 0px;

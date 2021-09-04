@@ -24,6 +24,7 @@ export namespace Components {
     interface IonxFormField {
         "control"?: FormControlState;
         "error"?: string | FormValidationError | MessageRef | Error;
+        "flexContent"?: boolean;
         "label"?: string;
     }
     interface IonxFormItem {
@@ -80,6 +81,7 @@ declare namespace LocalJSX {
     interface IonxFormField {
         "control"?: FormControlState;
         "error"?: string | FormValidationError | MessageRef | Error;
+        "flexContent"?: boolean;
         "label"?: string;
     }
     interface IonxFormItem {

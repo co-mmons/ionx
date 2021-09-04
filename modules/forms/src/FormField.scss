@@ -66,11 +66,9 @@
         }
 
         > [ionx--content] {
-            display: flex;
 
             > [slot-container=default] {
                 flex: 1;
-                overflow: var(--form-field-container-overflow, hidden);
             }
 
             > [slot-container=start], > [slot-container=end] {

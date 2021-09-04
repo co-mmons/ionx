@@ -21,11 +21,13 @@
 ### Depends on
 
 - ion-button
+- ion-icon
 
 ### Graph
 ```mermaid
 graph TD;
   ionx-html-editor-toolbar --> ion-button
+  ionx-html-editor-toolbar --> ion-icon
   ion-button --> ion-ripple-effect
   ionx-html-editor --> ionx-html-editor-toolbar
   style ionx-html-editor-toolbar fill:#f9f,stroke:#333,stroke-width:4px

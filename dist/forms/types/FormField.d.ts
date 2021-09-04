@@ -4,6 +4,7 @@ import { FormControlState } from "./FormControlState";
 import { FormValidationError } from "./FormValidationError";
 export declare class FormField implements ComponentInterface {
   label?: string;
+  flexContent?: boolean;
   control?: FormControlState;
   error?: string | FormValidationError | MessageRef | Error;
   errorMessage: string;

@@ -15,6 +15,9 @@ export class FormField implements ComponentInterface {
     label?: string;
 
     @Prop()
+    flexContent?: boolean;
+
+    @Prop()
     control?: FormControlState;
 
     @Prop()
@@ -74,7 +77,7 @@ export class FormField implements ComponentInterface {
                     <slot name="placeholder"/>
                 </div>
 
-                <div ionx--content>
+                <div ionx--content style={{display: this.flexContent ? "flex" : "block"}}>
 
                     <div slot-container="start">
                         <slot name="start"/>
