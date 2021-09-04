@@ -10,7 +10,7 @@ export { FormValidationErrorPresenter } from "./FormValidationErrorPresenter";
 export { FormValidationError } from "./FormValidationError";
 export { FormValidator, FormValidatorOptions } from "./FormValidator";
 export { FormFieldLabelButton } from "./FormFieldLabelButton";
-export { required } from "./validators/required";
+export { required, RequiredError } from "./validators/required";
 export { requiredTrue } from "./validators/requiredTrue";
 export { minLength } from "./validators/minLength";
 export { validEmail } from "./validators/validEmail";

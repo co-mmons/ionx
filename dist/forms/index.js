@@ -997,4 +997,4 @@ const defineIonxForms = (opts) => {
   }
 };
 
-export { FormController, FormFieldLabelButton, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, defineIonxForms, formGrid, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };
+export { FormController, FormFieldLabelButton, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };
