@@ -57,7 +57,7 @@ export class ToggleLabels {
     @Listen("ionChange")
     toggleChanged(ev: CustomEvent) {
 
-        if (this.defaultToggle) {
+        if (this.defaultToggle && ev.target !== this.element) {
             ev.preventDefault();
             ev.stopImmediatePropagation();
             ev.stopPropagation();
