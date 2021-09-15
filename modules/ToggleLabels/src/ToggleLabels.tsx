@@ -55,7 +55,13 @@ export class ToggleLabels {
     }
 
     @Listen("ionChange")
-    toggleChanged() {
+    toggleChanged(ev: CustomEvent) {
+
+        if (this.defaultToggle) {
+            ev.preventDefault();
+            ev.stopImmediatePropagation();
+            ev.stopPropagation();
+        }
 
         const was = this.value;
         this.value = this.toggle.checked;

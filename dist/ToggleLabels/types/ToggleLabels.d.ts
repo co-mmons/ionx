@@ -23,7 +23,7 @@ export declare class ToggleLabels {
   };
   private get toggle();
   switchToggle(state: "on" | "off"): void;
-  toggleChanged(): void;
+  toggleChanged(ev: CustomEvent): void;
   valueChanged(): void;
   syncToggle(): void;
   componentDidLoad(): void;

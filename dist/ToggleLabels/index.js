@@ -18,7 +18,12 @@ const ToggleLabels = class extends HTMLElement {
       this.toggle.checked = state === "on";
     }
   }
-  toggleChanged() {
+  toggleChanged(ev) {
+    if (this.defaultToggle) {
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      ev.stopPropagation();
+    }
     const was = this.value;
     this.value = this.toggle.checked;
     if (was !== this.value) {
