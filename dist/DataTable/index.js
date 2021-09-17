@@ -164,7 +164,7 @@ const Th = class extends HTMLElement {
   async filterSelect() {
     const current = this.filterCurrent();
     const overlayTitle = this.element.querySelector("[slot-container=label]").innerText || this.element.title;
-    const options = this.filterData()
+    const items = this.filterData()
       .filter((v, i, a) => !a.includes(v, i + 1))
       .map(data => ({ label: toString(data), value: data }))
       .sort((a, b) => (a.label || "").localeCompare(b.label || ""));
@@ -173,13 +173,13 @@ const Th = class extends HTMLElement {
       multiple: true,
       empty: true,
       overlayTitle,
-      options,
+      items,
       values: current instanceof HasOneOfFilter ? current.values : []
     });
     const result = await willDismiss;
     if (result.role === "ok") {
-      this.filterApply(result.data.length === 0 ? undefined : new HasOneOfFilter(result.data));
-      this.filterActive = result.data.length > 0;
+      this.filterApply(result.data.values.length === 0 ? undefined : new HasOneOfFilter(result.data.values));
+      this.filterActive = result.data.values.length > 0;
     }
   }
   render() {
