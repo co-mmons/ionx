@@ -1,4 +1,4 @@
-import { forceUpdate, h, Host, attachShadow, proxyCustomElement } from '@stencil/core/internal/client';
+import { h, Host, attachShadow, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { intl } from '@co.mmons/js-intl';
 import { popoverController } from '@ionic/core';
@@ -52,7 +52,9 @@ const DataTable = class extends HTMLElement {
       }
       this.visibleData = data;
     }
-    forceUpdate(this);
+  }
+  dataChanged() {
+    this.applyFilters();
   }
   connectedCallback() {
     var _a;
@@ -66,6 +68,9 @@ const DataTable = class extends HTMLElement {
     var _a, _b;
     return h(Host, null, h("table", null, h("thead", null, h("tr", null, (_a = this.columns) === null || _a === void 0 ? void 0 : _a.map((column, columnIndex) => h("ionx-data-table-th", { filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled }, column.label)))), h("tbody", null, (_b = this.visibleData) === null || _b === void 0 ? void 0 : _b.map(row => h("tr", null, this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row))))))));
   }
+  static get watchers() { return {
+    "data": ["dataChanged"]
+  }; }
   static get style() { return dataTableCss; }
 };
 
@@ -189,7 +194,7 @@ const Th = class extends HTMLElement {
   static get style() { return thCss; }
 };
 
-const IonxDataTable = /*@__PURE__*/proxyCustomElement(DataTable, [0,"ionx-data-table",{"columns":[16],"data":[16]}]);
+const IonxDataTable = /*@__PURE__*/proxyCustomElement(DataTable, [0,"ionx-data-table",{"columns":[16],"data":[16],"visibleData":[32]}]);
 const IonxDataTableSearchFilter = /*@__PURE__*/proxyCustomElement(SearchPopover, [1,"ionx-data-table-search-filter",{"value":[1]},[[0,"ionViewDidEnter","didEnter"]]]);
 const IonxDataTableTh = /*@__PURE__*/proxyCustomElement(Th, [6,"ionx-data-table-th",{"filterEnabled":[4,"filter-enabled"],"filterType":[1,"filter-type"],"filterData":[16],"filterApply":[16],"filterCurrent":[16],"filterActive":[32]}]);
 const defineIonxDataTable = (opts) => {

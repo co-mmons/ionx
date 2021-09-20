@@ -1,4 +1,4 @@
-import {Component, forceUpdate, h, Host, Prop} from "@stencil/core";
+import {Component, h, Host, Prop, State, Watch} from "@stencil/core";
 import {DataTableColumn} from "./DataTableColumn";
 import {DataTableRow} from "./DataTableRow";
 import {Filter} from "./filter/Filter";
@@ -15,6 +15,7 @@ export class DataTable {
     @Prop()
     data: Array<any[] | DataTableRow>;
 
+    @State()
     visibleData: Array<any[] | DataTableRow>;
 
     filters: {[columnId: string]: Filter} = {};
@@ -68,8 +69,11 @@ export class DataTable {
 
             this.visibleData = data;
         }
+    }
 
-        forceUpdate(this);
+    @Watch("data")
+    dataChanged() {
+        this.applyFilters();
     }
 
     connectedCallback() {
