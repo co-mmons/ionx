@@ -13640,24 +13640,21 @@ const alignment = {
 };
 
 const fontSize = {
-  excludes: "fontSize",
-  group: "fontSize",
   attrs: {
     fontSize: {},
   },
   parseDOM: [
     {
-      tag: "span[data-font-size]",
-      getAttrs: dom => {
-        const size = dom.getAttribute("data-font-size");
-        return size ? { fontSize: size } : false;
+      style: "font-size",
+      getAttrs: fontSize => {
+        return { fontSize };
       },
     },
   ],
   toDOM(mark) {
     return [
       "span",
-      { style: `font-size: ${mark.attrs.fontSize}`, "data-font-size": mark.attrs.fontSize },
+      { style: `font-size: ${mark.attrs.fontSize}` },
       0
     ];
   },
@@ -13721,7 +13718,7 @@ const paragraph = {
       tag: "p",
       getAttrs(node) {
         const indent = node.style.textIndent || null;
-        return { indent };
+        return { indent: indent && !indent.startsWith("0") ? indent : null };
       }
     }],
   toDOM(node) {
@@ -19619,18 +19616,16 @@ const TextMenu = class extends HTMLElement {
     }
     popoverController.dismiss();
   }
-  async resetFontSize() {
-    const view = await this.editor.getView();
-    toggleMark(schema.marks.fontSize)(view.state, t => view.dispatch(t));
-    popoverController.dismiss();
-  }
   async toggleFontSize(size) {
+    this.activeFontSize = size;
     const view = await this.editor.getView();
-    const command = toggleInlineMark(schema.marks.fontSize, { fontSize: size.css });
-    if (command(view.state)) {
-      command(view.state, t => view.dispatch(t));
+    if (size) {
+      toggleInlineMark(schema.marks.fontSize, { fontSize: size.css })(view.state, view.dispatch);
     }
-    popoverController.dismiss();
+    else {
+      toggleMark(schema.marks.fontSize)(view.state, view.dispatch);
+      popoverController.dismiss();
+    }
   }
   async toggleColor(color) {
     this.activeColor = color;
@@ -19669,7 +19664,7 @@ const TextMenu = class extends HTMLElement {
     });
   }
   render() {
-    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggle("bold") }, h("ion-label", { style: { fontWeight: "bold" } }, intl.message `ionx/HtmlEditor#Bold|text`), this.boldActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("italic") }, h("ion-label", { style: { fontStyle: "italic" } }, intl.message `ionx/HtmlEditor#Italic|text`), this.italicActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("underline") }, h("ion-label", { style: { textDecoration: "underline" } }, intl.message `ionx/HtmlEditor#Underline|text`), this.underlineActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeColor || "#000000", onInput: ev => this.toggleColor(ev.target.value) }), this.activeColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor() }, h("ion-icon", { name: "close", slot: "icon-only" }))), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.resetFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
+    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggle("bold") }, h("ion-label", { style: { fontWeight: "bold" } }, intl.message `ionx/HtmlEditor#Bold|text`), this.boldActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("italic") }, h("ion-label", { style: { fontStyle: "italic" } }, intl.message `ionx/HtmlEditor#Italic|text`), this.italicActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("underline") }, h("ion-label", { style: { textDecoration: "underline" } }, intl.message `ionx/HtmlEditor#Underline|text`), this.underlineActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeColor || "#000000", onInput: ev => this.toggleColor(ev.target.value) }), this.activeColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor() }, h("ion-icon", { name: "close", slot: "icon-only" }))), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
   }
   static get style() { return textMenuCss; }
 };

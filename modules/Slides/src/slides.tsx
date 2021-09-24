@@ -143,11 +143,11 @@ export class Slides implements ComponentInterface {
         subtree: true
       });
 
-      this.el.componentOnReady().then(() => {
-        if (!this.didInit) {
-          this.didInit = true;
-          this.initSwiper();
-        }
+      (typeof this.el.componentOnReady === "function" ? this.el.componentOnReady() : Promise.resolve(this.el)).then(() => {
+          if (!this.didInit) {
+              this.didInit = true;
+              this.initSwiper();
+          }
       });
     }
   }
@@ -531,6 +531,6 @@ export class Slides implements ComponentInterface {
 
 const waitForSlides = (el: HTMLElement) => {
   return Promise.all(
-    Array.from(el.querySelectorAll('ionx-slide')).map(s => s.componentOnReady())
+    Array.from(el.querySelectorAll('ionx-slide')).map(s => typeof s.componentOnReady === "function" ? s.componentOnReady() : Promise.resolve(s))
   );
 };

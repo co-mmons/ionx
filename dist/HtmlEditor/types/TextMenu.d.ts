@@ -7,8 +7,7 @@ export declare class TextMenu {
   activeFontSize: FontSize;
   activeColor: string;
   toggle(name: string): Promise<void>;
-  resetFontSize(): Promise<void>;
-  toggleFontSize(size: FontSize): Promise<void>;
+  toggleFontSize(size?: FontSize): Promise<void>;
   toggleColor(color?: string): Promise<void>;
   didDismiss(): void;
   connectedCallback(): void;

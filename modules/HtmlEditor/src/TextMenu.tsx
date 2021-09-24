@@ -51,25 +51,18 @@ export class TextMenu {
         popoverController.dismiss();
     }
 
-    async resetFontSize() {
+    async toggleFontSize(size?: FontSize) {
+
+        this.activeFontSize = size;
 
         const view = await this.editor.getView();
 
-        toggleMark(schema.marks.fontSize)(view.state, t => view.dispatch(t));
-
-        popoverController.dismiss();
-    }
-
-    async toggleFontSize(size: FontSize) {
-
-        const view = await this.editor.getView();
-
-        const command = toggleInlineMark(schema.marks.fontSize, {fontSize: size.css});
-        if (command(view.state)) {
-            command(view.state, t => view.dispatch(t));
+        if (size) {
+            toggleInlineMark(schema.marks.fontSize, {fontSize: size.css})(view.state, view.dispatch);
+        } else {
+            toggleMark(schema.marks.fontSize)(view.state, view.dispatch);
+            popoverController.dismiss();
         }
-
-        popoverController.dismiss();
     }
 
     async toggleColor(color?: string) {
@@ -150,7 +143,7 @@ export class TextMenu {
                 <ion-label>{intl.message`ionx/HtmlEditor#Text size`}</ion-label>
             </ion-item-divider>
 
-            {<ion-item button={true} detail={false} onClick={() => this.resetFontSize()}>
+            {<ion-item button={true} detail={false} onClick={() => this.toggleFontSize()}>
                 <ion-label>{intl.message`ionx/HtmlEditor#Default|text size`}</ion-label>
             </ion-item>}
 

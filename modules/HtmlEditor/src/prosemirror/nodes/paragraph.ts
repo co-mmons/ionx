@@ -12,7 +12,7 @@ export const paragraph: NodeSpec = {
         tag: "p",
         getAttrs(node: HTMLElement) {
             const indent = node.style.textIndent || null;
-            return {indent};
+            return {indent: indent && !indent.startsWith("0") ? indent : null};
         }
     }],
 
