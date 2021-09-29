@@ -144,8 +144,10 @@
     margin: 10px 0 16px 0;
     padding: 0;
 
-    &.list-lines-full ion-item:first-child {
-        --border-width: var(--ionx-border-width) 0 var(--ionx-border-width) 0;
+    &.list-lines-full > {
+        ion-item:first-child, ion-reorder-group:first-child > ion-item:first-child {
+            --border-width: var(--ionx-border-width) 0 var(--ionx-border-width) 0;
+        }
     }
 
     &:not(.list-lines-full) {
@@ -153,13 +155,13 @@
         margin-right: 16px;
 
         ion-item {
-            --inner-padding-start: 0¬;
+            --inner-padding-start: 0;
             --inner-padding-end: 0;
             --padding-start: 0;
             --padding-end: 0;
         }
 
-        ion-item:first-child {
+        > ion-item:first-child, ion-reorder-group:first-child > ion-item:first-child {
             --inner-border-width: var(--ionx-border-width) 0 var(--ionx-border-width) 0;
         }
     }
