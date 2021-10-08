@@ -41,7 +41,7 @@ export class MasonryGrid implements ComponentInterface {
     /**
      * Czy przebudowa gridu została zlecona gdy widok był niewidoczny albo pauzowany.
      */
-    queuedLayout: boolean;
+    queuedArrange: boolean;
 
     contentElement: HTMLElement & ionic.IonContent;
 
@@ -84,13 +84,20 @@ export class MasonryGrid implements ComponentInterface {
     @Method()
     async arrange(options?: {force?: boolean, trigger?: "onresize"}) {
 
+        let waiting = false;
+
+        // we must wait until already started process finish its work
         while (this.busy) {
 
-            if (this.waiting) {
+            // another process is waiting, so we can cancel this process
+            if (!waiting && this.waiting && !options?.force) {
+                console.debug("[ionx-masonry-grid] quit waiting")
                 return;
             }
 
-            this.waiting = true;
+            if (!this.waiting) {
+                waiting = this.waiting = true;
+            }
 
             await sleep(10);
         }
@@ -98,7 +105,10 @@ export class MasonryGrid implements ComponentInterface {
         this.waiting = false;
         this.busy = true;
 
+        // grid is to be displayed as block element, just make sure that items are hydrated
+        // when yes, mark as ready and we are done
         if (this.block) {
+            console.debug("[ionx-masonry-grid] render as block")
 
             const items = this.items();
 
@@ -119,11 +129,11 @@ export class MasonryGrid implements ComponentInterface {
         try {
 
             // czy są itemy, które trzeba ułożyć
-            let doLayout: boolean = false;
+            let doArrange: boolean = false;
 
             // wszystkie itemy gridu
             const items = this.items();
-            // console.error("[ionx-multi-grid] checking items")
+            // console.debug("[ionx-masonry-grid] checking items")
 
             // sprawdzamy item pod kątem zmienionych itemów, usuniętych lub przesuniętych
             for (let i = 0; i < items.length; i++) {
@@ -155,7 +165,7 @@ export class MasonryGrid implements ComponentInterface {
                 }
 
                 if (!item.__ionxMasonryGridReady || options?.force) {
-                    doLayout = true;
+                    doArrange = true;
                 }
 
                 if (!item.__ionxMasonryGridReady) {
@@ -165,7 +175,7 @@ export class MasonryGrid implements ComponentInterface {
 
             // najpewniej usunięte zostały itemy na końcu gridu
             if (items.length !== this.lastItemsCount) {
-                doLayout = true;
+                doArrange = true;
             }
 
             // console.log("rebuild check", container.getBoundingClientRect().width, this.lastWidth, items.length, this.lastItemsCount);
@@ -173,7 +183,9 @@ export class MasonryGrid implements ComponentInterface {
 
             // kolejkujemy renderowania jeżeli strona nie jest widoczna lub aplikacja w pauzie
             QUEUE: if (!this.isParentViewActive() || this.paused) {
-                this.queuedLayout = doLayout || this.itemsElement.getBoundingClientRect().width !== this.lastWidth;
+                console.debug("[ionx-masonry-grid] queue arrange")
+
+                this.queuedArrange = doArrange || this.itemsElement.getBoundingClientRect().width !== this.lastWidth;
 
                 // poczekajmy na skończenie animacji zmiany strony
                 // tak na wszelki wypadek, aby mieć pewność, że
@@ -192,11 +204,11 @@ export class MasonryGrid implements ComponentInterface {
                 return;
             }
 
-            this.queuedLayout = false;
+            this.queuedArrange = false;
 
             // podczas przekręcania urządzenia iOS mamy opóźnienie w uzyskaniu nowego rozmiaru okna
             // todo zweryfikować jak to działa
-            if (Capacitor.platform === "ios" && items.length > 0 && !doLayout && options?.force && this.itemsElement.getBoundingClientRect().width === this.lastWidth) {
+            if (Capacitor.getPlatform() === "ios" && items.length > 0 && !doArrange && options?.force && this.itemsElement.getBoundingClientRect().width === this.lastWidth) {
                 for (let i = 0; i < 40; i++) {
                     await sleep(50);
                     if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
@@ -207,21 +219,23 @@ export class MasonryGrid implements ComponentInterface {
 
             // zmienił się rozmiar kontenera, oznaczamy wszystkie itemy do renderu
             if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
-                doLayout = true;
+                doArrange = true;
                 for (const item of items) {
                     item.__ionxMasonryGridReady = false;
                 }
             }
 
             // ok, możemy przystąpić do renderowania
-            LAYOUT: if (doLayout) {
+            ARRANGE: if (doArrange) {
+                console.debug("[ionx-masonry-grid] arrange started")
+
                 // console.log("rebuild grid", this.itemsElement.getBoundingClientRect().width, this.lastWidth, window.innerWidth);
                 // upewniamy się, że możemy renderować - kontener musi mieć jakąś szerokość
                 if (this.itemsElement.getBoundingClientRect().width === 0) {
                     try {
                         await waitTill(() => this.itemsElement.getBoundingClientRect().width > 0, undefined, 5000);
                     } catch {
-                        break LAYOUT;
+                        break ARRANGE;
                     }
                 }
 
@@ -367,7 +381,7 @@ export class MasonryGrid implements ComponentInterface {
                 this.lastWidth = gridRect.width;
                 this.lastItemsCount = items.length;
 
-                if (Capacitor.platform === "ios") {
+                if (Capacitor.getPlatform() === "ios") {
                     const scroll: HTMLElement = await this.contentElement.getScrollElement();
                     scroll.style.overflowY = "hidden";
                     await sleep(200);
@@ -396,7 +410,7 @@ export class MasonryGrid implements ComponentInterface {
     @Listen("resize", {target: "window"})
     protected async resized(event: CustomEvent) {
 
-        if (Capacitor.platform === "ios") {
+        if (Capacitor.getPlatform() === "ios") {
 
             if (event.type === "resize") {
                 return;
@@ -420,13 +434,13 @@ export class MasonryGrid implements ComponentInterface {
     viewResumed() {
         this.paused = false;
 
-        if (this.queuedLayout) {
+        if (this.queuedArrange) {
             this.arrange();
         }
     }
 
     viewDidEnter() {
-        if (this.queuedLayout) {
+        if (this.queuedArrange) {
             this.arrange();
         }
     }
