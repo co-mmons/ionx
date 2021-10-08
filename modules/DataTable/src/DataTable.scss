@@ -4,9 +4,14 @@ ionx-data-table {
     max-height: 100%;
     border: var(--ionx-border-width) solid var(--ion-border-color);
     border-radius: var(--ionx-border-radius);
+    user-select: none;
 
     > table {
         width: 100%;
+    }
+
+    > table > tbody {
+        user-select: auto;
     }
 
     > table > tbody > tr {

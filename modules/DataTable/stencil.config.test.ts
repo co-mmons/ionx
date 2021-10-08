@@ -1,10 +1,10 @@
 import {Config} from "@stencil/core";
-import {sass} from "@stencil/sass";
+import {defaultStencilPlugins} from "../defaultStencilPlugins";
 import {resolveIonxPlugin} from "../resolveIonxPlugin";
 
 export const config: Config = {
     namespace: "App",
-    plugins: [sass()],
+    plugins: defaultStencilPlugins(),
     srcIndexHtml: "src/test/index.html",
     globalScript: "src/test/global.ts",
     globalStyle: "src/test/global.scss",
