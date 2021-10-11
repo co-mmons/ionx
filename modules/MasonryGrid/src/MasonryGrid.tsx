@@ -1,6 +1,6 @@
-import type {Components as ionic} from "@ionic/core";
 import {Capacitor} from "@capacitor/core";
 import {sleep, waitTill} from "@co.mmons/js-utils/core";
+import type {Components as ionic} from "@ionic/core";
 import {Component, ComponentInterface, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
 import {addEventListener, EventUnlisten, isHydrated, markAsReady, markAsUnready} from "ionx/utils";
 import {ExtendedItemElement} from "./ExtendedItemElement";
@@ -24,9 +24,11 @@ export class MasonryGrid implements ComponentInterface {
     /**
      * If at least one layout call is waiting.
      */
-    waiting: boolean;
+    waiting: {force: boolean};
 
-    observer: MutationObserver;
+    mutationObserver: MutationObserver;
+
+    resizeObserver: ResizeObserver;
 
     /**
      * Ostatnia ilość itemów w gridzie (żeby wiedzieć, czy trzeba przebudować).
@@ -55,11 +57,11 @@ export class MasonryGrid implements ComponentInterface {
 
     viewDidEnterUnlisten: EventUnlisten;
 
+    itemsElement: HTMLElement;
+
     isParentViewActive() {
         return !this.parentViewElement?.classList.contains("ion-page-hidden");
     }
-
-    itemsElement: HTMLElement;
 
     items() {
         const items: Array<HTMLElement & ExtendedItemElement> = [];
@@ -90,20 +92,32 @@ export class MasonryGrid implements ComponentInterface {
         while (this.busy) {
 
             // another process is waiting, so we can cancel this process
-            if (!waiting && this.waiting && !options?.force) {
+            if (!waiting && this.waiting) {
+
+                if (options?.force) {
+                    this.waiting.force = true;
+                }
+
                 console.debug("[ionx-masonry-grid] quit waiting")
+
                 return;
             }
 
             if (!this.waiting) {
-                waiting = this.waiting = true;
+                waiting = true;
+                this.waiting = {force: !!options?.force};
             }
 
             await sleep(10);
         }
 
-        this.waiting = false;
+        const forceArrange = !!this.waiting?.force || !!options?.force;
+
+        // if arranging must be done because of changes in the content or sizes
+        let doArrange: boolean = false;
+
         this.busy = true;
+        this.waiting = undefined;
 
         // grid is to be displayed as block element, just make sure that items are hydrated
         // when yes, mark as ready and we are done
@@ -128,9 +142,6 @@ export class MasonryGrid implements ComponentInterface {
 
         try {
 
-            // czy są itemy, które trzeba ułożyć
-            let doArrange: boolean = false;
-
             // wszystkie itemy gridu
             const items = this.items();
             // console.debug("[ionx-masonry-grid] checking items")
@@ -146,7 +157,7 @@ export class MasonryGrid implements ComponentInterface {
                 // }
 
                 // zmieniła się pozycja itemu albo wymuszony rendering
-                if (item.__ionxMasonryGridCache?.index !== i || options?.force) {
+                if (item.__ionxMasonryGridCache?.index !== i || forceArrange) {
                     item.__ionxMasonryGridReady = false;
                 }
 
@@ -164,7 +175,7 @@ export class MasonryGrid implements ComponentInterface {
                     }
                 }
 
-                if (!item.__ionxMasonryGridReady || options?.force) {
+                if (!item.__ionxMasonryGridReady) {
                     doArrange = true;
                 }
 
@@ -208,14 +219,20 @@ export class MasonryGrid implements ComponentInterface {
 
             // podczas przekręcania urządzenia iOS mamy opóźnienie w uzyskaniu nowego rozmiaru okna
             // todo zweryfikować jak to działa
-            if (Capacitor.getPlatform() === "ios" && items.length > 0 && !doArrange && options?.force && this.itemsElement.getBoundingClientRect().width === this.lastWidth) {
-                for (let i = 0; i < 40; i++) {
-                    await sleep(50);
-                    if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
-                        break;
-                    }
-                }
-            }
+            // if (Capacitor.getPlatform() === "ios" && items.length > 0 && forceArrange && this.itemsElement.getBoundingClientRect().width === this.lastWidth) {
+            //     for (let i = 0; i < 50; i++) {
+            //
+            //         await new Promise<void>(resolve => {
+            //             requestAnimationFrame(() => resolve())
+            //         });
+            //
+            //         console.debug("[ionx-masonry-grid] width did not change");
+            //
+            //         if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
+            //             break;
+            //         }
+            //     }
+            // }
 
             // zmienił się rozmiar kontenera, oznaczamy wszystkie itemy do renderu
             if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
@@ -382,10 +399,12 @@ export class MasonryGrid implements ComponentInterface {
                 this.lastItemsCount = items.length;
 
                 if (Capacitor.getPlatform() === "ios") {
+                    this.itemsElement.style.transform = "translateZ(0)";
                     const scroll: HTMLElement = await this.contentElement.getScrollElement();
                     scroll.style.overflowY = "hidden";
                     await sleep(200);
                     scroll.style.overflowY = "auto";
+                    this.itemsElement.style.transform = "";
                 }
             }
 
@@ -406,17 +425,19 @@ export class MasonryGrid implements ComponentInterface {
 
     }
 
-    @Listen("beforeresize", {target: "window"})
-    @Listen("resize", {target: "window"})
+    // @Listen("beforeresize", {target: "window"})
+    // @Listen("resize", {target: "window"})
     protected async resized(event: CustomEvent) {
 
         if (Capacitor.getPlatform() === "ios") {
 
             if (event.type === "resize") {
+                console.log("resize")
                 return;
             }
 
             let width = event.detail.width;
+            console.log("beforeresize:", width);
 
             try {
                 await waitTill(() => window.innerWidth === width, undefined, 2000);
@@ -435,21 +456,21 @@ export class MasonryGrid implements ComponentInterface {
         this.paused = false;
 
         if (this.queuedArrange) {
-            this.arrange();
+            this.arrange({force: true});
         }
     }
 
     viewDidEnter() {
         if (this.queuedArrange) {
-            this.arrange();
+            this.arrange({force: true});
         }
     }
 
     @Listen("visibilitychange", {target: "document"})
     visibilityChanged() {
-        if (document.visibilityState == "hidden") {
+        if (document.visibilityState === "hidden") {
             this.viewPaused();
-        } else if (document.visibilityState == "visible") {
+        } else if (document.visibilityState === "visible") {
             this.viewResumed();
         }
     }
@@ -495,16 +516,22 @@ export class MasonryGrid implements ComponentInterface {
         this.resumeUnlisten = addEventListener(document, "resume", () => this.viewPaused());
         this.viewDidEnterUnlisten = addEventListener(this.parentViewElement, "ionViewDidEnter", () => this.viewDidEnter())
 
-        this.observer = new MutationObserver(mutations => this.onMutation(mutations));
-        this.observer.observe(this.itemsElement, {childList: true});
+        this.mutationObserver = new MutationObserver(mutations => this.onMutation(mutations));
+        this.mutationObserver.observe(this.itemsElement, {childList: true});
+
+        this.resizeObserver = new ResizeObserver(() => this.arrange({force: true, trigger: "onresize"}));
+        this.resizeObserver.observe(this.itemsElement);
 
         this.arrange();
     }
 
     disconnectedCallback() {
 
-        this.observer.disconnect();
-        this.observer = undefined;
+        this.mutationObserver.disconnect();
+        this.mutationObserver = undefined;
+
+        this.resizeObserver.disconnect();
+        this.resizeObserver = undefined;
 
         this.contentElement = undefined;
         this.parentViewElement = undefined;

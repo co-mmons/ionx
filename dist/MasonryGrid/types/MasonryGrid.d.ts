@@ -9,8 +9,11 @@ export declare class MasonryGrid implements ComponentInterface {
   /**
    * If at least one layout call is waiting.
    */
-  waiting: boolean;
-  observer: MutationObserver;
+  waiting: {
+    force: boolean;
+  };
+  mutationObserver: MutationObserver;
+  resizeObserver: ResizeObserver;
   /**
    * Ostatnia ilość itemów w gridzie (żeby wiedzieć, czy trzeba przebudować).
    */
@@ -22,15 +25,15 @@ export declare class MasonryGrid implements ComponentInterface {
   /**
    * Czy przebudowa gridu została zlecona gdy widok był niewidoczny albo pauzowany.
    */
-  queuedLayout: boolean;
+  queuedArrange: boolean;
   contentElement: HTMLElement & ionic.IonContent;
   parentViewElement: HTMLElement;
   paused: boolean;
   pauseUnlisten: EventUnlisten;
   resumeUnlisten: EventUnlisten;
   viewDidEnterUnlisten: EventUnlisten;
-  isParentViewActive(): boolean;
   itemsElement: HTMLElement;
+  isParentViewActive(): boolean;
   items(): (HTMLElement & ExtendedItemElement)[];
   markItemAsDirty(item: HTMLElement): Promise<void>;
   arrange(options?: {
