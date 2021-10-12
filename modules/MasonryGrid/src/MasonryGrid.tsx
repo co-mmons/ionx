@@ -142,116 +142,92 @@ export class MasonryGrid implements ComponentInterface {
 
         try {
 
-            // wszystkie itemy gridu
-            const items = this.items();
-            // console.debug("[ionx-masonry-grid] checking items")
-
-            // sprawdzamy item pod kątem zmienionych itemów, usuniętych lub przesuniętych
-            for (let i = 0; i < items.length; i++) {
-
-                const item = items[i];
-
-                //
-                // if (!item.hidden) {
-                //     items.push(item);
-                // }
-
-                // zmieniła się pozycja itemu albo wymuszony rendering
-                if (item.__ionxMasonryGridCache?.index !== i || forceArrange) {
-                    item.__ionxMasonryGridReady = false;
-                }
-
-                // jeżeli poprzedni item wymaga renderu, to jego sąsiad również
-                if (i > 0 && !items[i - 1].__ionxMasonryGridReady) {
-                    item.__ionxMasonryGridReady = false;
-                }
-
-                const rect = item.getBoundingClientRect();
-                if (item.__ionxMasonryGridCache?.rect?.width !== rect.width || item.__ionxMasonryGridCache?.rect?.height !== rect.height) {
-                    item.__ionxMasonryGridReady = false;
-
-                    if (!item.__ionxMasonryGridCache) {
-                        item.__ionxMasonryGridCache = {rect};
-                    }
-                }
-
-                if (!item.__ionxMasonryGridReady) {
-                    doArrange = true;
-                }
-
-                if (!item.__ionxMasonryGridReady) {
-                    item.style.display = "none";
-                }
-            }
-
-            // najpewniej usunięte zostały itemy na końcu gridu
-            if (items.length !== this.lastItemsCount) {
-                doArrange = true;
-            }
-
-            // console.log("rebuild check", container.getBoundingClientRect().width, this.lastWidth, items.length, this.lastItemsCount);
-            // console.log("rebuild check",  items.length, this.lastItemsCount, doRender);
+            this.queuedArrange = false;
 
             // kolejkujemy renderowania jeżeli strona nie jest widoczna lub aplikacja w pauzie
             QUEUE: if (!this.isParentViewActive() || this.paused) {
-                console.debug("[ionx-masonry-grid] queue arrange")
-
-                this.queuedArrange = doArrange || this.itemsElement.getBoundingClientRect().width !== this.lastWidth;
 
                 // poczekajmy na skończenie animacji zmiany strony
                 // tak na wszelki wypadek, aby mieć pewność, że
                 // strona jest jednak aktywna, mimo, że stan na to nie wskazuje
                 if (!this.paused) {
-                    for (let i = 0; i < 40; i++) {
-                        await sleep(50);
+                    for (let i = 0; i < 10; i++) {
+                        await sleep(100);
                         if (this.isParentViewActive()) {
                             break QUEUE;
                         }
                     }
                 }
 
+                console.debug("[ionx-masonry-grid] queue arrange")
+
+                this.queuedArrange = forceArrange || this.itemsElement.getBoundingClientRect().width !== this.lastWidth;
                 this.busy = false;
 
                 return;
             }
 
-            this.queuedArrange = false;
+            const items = this.items();
 
-            // podczas przekręcania urządzenia iOS mamy opóźnienie w uzyskaniu nowego rozmiaru okna
-            // todo zweryfikować jak to działa
-            // if (Capacitor.getPlatform() === "ios" && items.length > 0 && forceArrange && this.itemsElement.getBoundingClientRect().width === this.lastWidth) {
-            //     for (let i = 0; i < 50; i++) {
-            //
-            //         await new Promise<void>(resolve => {
-            //             requestAnimationFrame(() => resolve())
-            //         });
-            //
-            //         console.debug("[ionx-masonry-grid] width did not change");
-            //
-            //         if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
-            //             break;
-            //         }
-            //     }
-            // }
-
-            // zmienił się rozmiar kontenera, oznaczamy wszystkie itemy do renderu
+            // items container width is changed, all items must be repositioned
             if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
+
                 doArrange = true;
+
                 for (const item of items) {
                     item.__ionxMasonryGridReady = false;
+                    item.style.display = "none";
                 }
+
+            } else {
+
+                // we must check which items must be repositioned
+                for (let i = 0; i < items.length; i++) {
+
+                    const item = items[i];
+
+                    // zmieniła się pozycja itemu albo wymuszony rendering
+                    if (item.__ionxMasonryGridCache?.index !== i || forceArrange) {
+                        item.__ionxMasonryGridReady = false;
+                    }
+
+                    // jeżeli poprzedni item wymaga renderu, to jego sąsiad również
+                    if (i > 0 && !items[i - 1].__ionxMasonryGridReady) {
+                        item.__ionxMasonryGridReady = false;
+                    }
+
+                    const rect = item.getBoundingClientRect();
+                    if (item.__ionxMasonryGridCache?.rect?.width !== rect.width || item.__ionxMasonryGridCache?.rect?.height !== rect.height) {
+                        item.__ionxMasonryGridReady = false;
+
+                        if (!item.__ionxMasonryGridCache) {
+                            item.__ionxMasonryGridCache = {rect};
+                        }
+                    }
+
+                    if (!item.__ionxMasonryGridReady) {
+                        doArrange = true;
+                        item.style.display = "none";
+                    }
+                }
+
+                // najpewniej usunięte zostały itemy na końcu gridu
+                if (items.length !== this.lastItemsCount) {
+                    doArrange = true;
+                }
+
             }
 
             // ok, możemy przystąpić do renderowania
             ARRANGE: if (doArrange) {
                 console.debug("[ionx-masonry-grid] arrange started")
 
-                // console.log("rebuild grid", this.itemsElement.getBoundingClientRect().width, this.lastWidth, window.innerWidth);
                 // upewniamy się, że możemy renderować - kontener musi mieć jakąś szerokość
                 if (this.itemsElement.getBoundingClientRect().width === 0) {
                     try {
                         await waitTill(() => this.itemsElement.getBoundingClientRect().width > 0, undefined, 5000);
                     } catch {
+                        console.debug("[ionx-masonry-grid] unable to arrange, container has not width");
                         break ARRANGE;
                     }
                 }
@@ -353,14 +329,11 @@ export class MasonryGrid implements ComponentInterface {
 
                         itemLeft = isNewSection ? 0 : (itemsPositions[sibling.__ionxMasonryGridCache.index].left + (!sectionCascade ? sibling.__ionxMasonryGridCache.rect.width : 0));
                         itemTop = !sibling ? 0 : (itemsPositions[sibling.__ionxMasonryGridCache.index].top + (sectionCascade || isNewSection ? sibling.__ionxMasonryGridCache.rect.height : 0));
+                        // console.log(itemLeft, sibling, sibling && itemsPositions[sibling.__ionxMasonryCache.index].left);
 
                         item.style.left = `${itemLeft}px`;
                         item.style.top = `${itemTop}px`;
-
-                        // console.log(itemLeft, sibling, sibling && itemsPositions[sibling.__ionxMasonryCache.index].left);
-
                         item.__ionxMasonryGridReady = true;
-
                         item.__ionxMasonryGridCache.left = itemLeft;
                         item.__ionxMasonryGridCache.top = itemTop;
                         item.__ionxMasonryGridCache.rect = item.getBoundingClientRect();
