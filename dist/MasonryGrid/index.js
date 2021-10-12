@@ -43,25 +43,18 @@ const MasonryGrid = class extends HTMLElement {
     this.arrange({ force: true });
   }
   async arrange(options) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e;
     let waiting = false;
     // we must wait until already started process finish its work
     while (this.busy) {
       // another process is waiting, so we can cancel this process
       if (!waiting && this.waiting) {
-        if (options === null || options === void 0 ? void 0 : options.force) {
-          this.waiting.force = true;
-        }
         console.debug("[ionx-masonry-grid] quit waiting");
         return;
       }
-      if (!this.waiting) {
-        waiting = true;
-        this.waiting = { force: !!(options === null || options === void 0 ? void 0 : options.force) };
-      }
+      this.waiting = waiting = true;
       await sleep(10);
     }
-    const forceArrange = !!((_a = this.waiting) === null || _a === void 0 ? void 0 : _a.force) || !!(options === null || options === void 0 ? void 0 : options.force);
     // if arranging must be done because of changes in the content or sizes
     let doArrange = false;
     this.busy = true;
@@ -96,14 +89,16 @@ const MasonryGrid = class extends HTMLElement {
             }
           }
         }
-        console.debug("[ionx-masonry-grid] queue arrange");
-        this.queuedArrange = forceArrange || this.itemsElement.getBoundingClientRect().width !== this.lastWidth;
+        console.debug("[ionx-masonry-grid] queue arrange new:" + this.itemsElement.getBoundingClientRect().width + ", old:" + this.lastWidth);
+        console.error(new Error());
+        this.queuedArrange = true;
         this.busy = false;
         return;
       }
       const items = this.items();
       // items container width is changed, all items must be repositioned
       if (this.itemsElement.getBoundingClientRect().width !== this.lastWidth) {
+        console.debug("[ionx-masonry-grid] container width changed new:" + this.itemsElement.getBoundingClientRect().width + ", old:" + this.lastWidth);
         doArrange = true;
         for (const item of items) {
           item.__ionxMasonryGridReady = false;
@@ -114,8 +109,8 @@ const MasonryGrid = class extends HTMLElement {
         // we must check which items must be repositioned
         for (let i = 0; i < items.length; i++) {
           const item = items[i];
-          // zmieniła się pozycja itemu albo wymuszony rendering
-          if (((_b = item.__ionxMasonryGridCache) === null || _b === void 0 ? void 0 : _b.index) !== i || forceArrange) {
+          // zmieniła się pozycja itemu
+          if (((_a = item.__ionxMasonryGridCache) === null || _a === void 0 ? void 0 : _a.index) !== i) {
             item.__ionxMasonryGridReady = false;
           }
           // jeżeli poprzedni item wymaga renderu, to jego sąsiad również
@@ -123,7 +118,7 @@ const MasonryGrid = class extends HTMLElement {
             item.__ionxMasonryGridReady = false;
           }
           const rect = item.getBoundingClientRect();
-          if (((_d = (_c = item.__ionxMasonryGridCache) === null || _c === void 0 ? void 0 : _c.rect) === null || _d === void 0 ? void 0 : _d.width) !== rect.width || ((_f = (_e = item.__ionxMasonryGridCache) === null || _e === void 0 ? void 0 : _e.rect) === null || _f === void 0 ? void 0 : _f.height) !== rect.height) {
+          if (((_c = (_b = item.__ionxMasonryGridCache) === null || _b === void 0 ? void 0 : _b.rect) === null || _c === void 0 ? void 0 : _c.width) !== rect.width || ((_e = (_d = item.__ionxMasonryGridCache) === null || _d === void 0 ? void 0 : _d.rect) === null || _e === void 0 ? void 0 : _e.height) !== rect.height) {
             item.__ionxMasonryGridReady = false;
             if (!item.__ionxMasonryGridCache) {
               item.__ionxMasonryGridCache = { rect };
@@ -142,12 +137,13 @@ const MasonryGrid = class extends HTMLElement {
       // ok, możemy przystąpić do renderowania
       ARRANGE: if (doArrange) {
         console.debug("[ionx-masonry-grid] arrange started");
+        console.error(new Error());
         // upewniamy się, że możemy renderować - kontener musi mieć jakąś szerokość
         if (this.itemsElement.getBoundingClientRect().width === 0) {
           try {
             await waitTill(() => this.itemsElement.getBoundingClientRect().width > 0, undefined, 5000);
           }
-          catch (_g) {
+          catch (_f) {
             console.debug("[ionx-masonry-grid] unable to arrange, container has not width");
             break ARRANGE;
           }
@@ -286,39 +282,40 @@ const MasonryGrid = class extends HTMLElement {
       }
     }
   }
-  // @Listen("beforeresize", {target: "window"})
-  // @Listen("resize", {target: "window"})
   async resized(event) {
+    console.debug("[ionx-masonry-grid] window " + event.type);
     if (Capacitor.getPlatform() === "ios") {
       if (event.type === "resize") {
-        console.log("resize");
         return;
       }
       let width = event.detail.width;
-      console.log("beforeresize:", width);
       try {
         await waitTill(() => window.innerWidth === width, undefined, 2000);
       }
       catch (_a) {
       }
     }
-    this.arrange({ force: true, trigger: "onresize" });
+    this.arrange({ trigger: "onresize" });
   }
   viewPaused() {
+    console.debug("[ionx-masonry-grid] app paused");
     this.paused = true;
   }
   viewResumed() {
+    console.debug("[ionx-masonry-grid] app resumed, queued arrange: " + this.queuedArrange);
     this.paused = false;
     if (this.queuedArrange) {
       this.arrange({ force: true });
     }
   }
   viewDidEnter() {
+    console.debug("[ionx-masonry-grid] view did enter, queued arrange: " + this.queuedArrange);
     if (this.queuedArrange) {
       this.arrange({ force: true });
     }
   }
   visibilityChanged() {
+    console.debug("[ionx-masonry-grid] visibility changed");
     if (document.visibilityState === "hidden") {
       this.viewPaused();
     }
@@ -330,12 +327,14 @@ const MasonryGrid = class extends HTMLElement {
     for (const mutation of mutations) {
       for (let i = 0; i < mutation.addedNodes.length; i++) {
         if (mutation.addedNodes[i] instanceof HTMLElement) {
+          console.debug("[ionx-masonry-grid] added nodes");
           this.arrange();
           return;
         }
       }
       for (let i = 0; i < mutation.removedNodes.length; i++) {
         if (mutation.removedNodes[i] instanceof HTMLElement) {
+          console.debug("[ionx-masonry-grid] removed nodes");
           this.arrange();
           return;
         }
@@ -358,7 +357,13 @@ const MasonryGrid = class extends HTMLElement {
     this.viewDidEnterUnlisten = addEventListener(this.parentViewElement, "ionViewDidEnter", () => this.viewDidEnter());
     this.mutationObserver = new MutationObserver(mutations => this.onMutation(mutations));
     this.mutationObserver.observe(this.itemsElement, { childList: true });
-    this.resizeObserver = new ResizeObserver(() => this.arrange({ force: true, trigger: "onresize" }));
+    this.resizeObserver = new ResizeObserver(() => {
+      const width = this.itemsElement.getBoundingClientRect().width;
+      if (width > 0 && width !== this.lastWidth) {
+        console.debug("[ionx-masonry-grid] container resized");
+        this.arrange({ trigger: "onresize" });
+      }
+    });
     this.resizeObserver.observe(this.itemsElement);
     this.arrange();
   }
@@ -384,7 +389,7 @@ const MasonryGrid = class extends HTMLElement {
   static get style() { return masonryGridCss; }
 };
 
-const IonxMasonryGrid = /*@__PURE__*/proxyCustomElement(MasonryGrid, [6,"ionx-masonry-grid",{"block":[4]},[[4,"visibilitychange","visibilityChanged"]]]);
+const IonxMasonryGrid = /*@__PURE__*/proxyCustomElement(MasonryGrid, [6,"ionx-masonry-grid",{"block":[4]},[[8,"beforeresize","resized"],[9,"resize","resized"],[4,"visibilitychange","visibilityChanged"]]]);
 const defineIonxMasonryGrid = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

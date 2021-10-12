@@ -9,9 +9,7 @@ export declare class MasonryGrid implements ComponentInterface {
   /**
    * If at least one layout call is waiting.
    */
-  waiting: {
-    force: boolean;
-  };
+  waiting: boolean;
   mutationObserver: MutationObserver;
   resizeObserver: ResizeObserver;
   /**
