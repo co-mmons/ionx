@@ -1,0 +1,9 @@
+@import "~swiper/modules/navigation/navigation";
+
+ionx-swiper-navigation {
+    display: block;
+}
+
+ionx-swiper:not(.swiper-initialized) ionx-swiper-navigation {
+    display: none;
+}

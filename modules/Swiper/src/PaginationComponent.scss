@@ -1,0 +1,9 @@
+@import "~swiper/modules/pagination/pagination";
+
+ionx-swiper-pagination {
+    display: block;
+}
+
+ionx-swiper:not(.swiper-initialized) ionx-swiper-pagination {
+    display: none;
+}

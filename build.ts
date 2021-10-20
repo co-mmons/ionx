@@ -36,6 +36,7 @@ const modules = [
     "Textarea",
     "DataTable",
     "Slides",
+    "Swiper",
 
     "LinkEditor",
     "HtmlEditor",

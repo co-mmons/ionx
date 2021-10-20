@@ -5,7 +5,8 @@
     },
     "types": "../../dist/Select/index.d.ts",
     "peerDependencies": {
-        "fast-equals": "^2.0.1"
+        "fast-equals": "^2.0.1",
+        "sortablejs": "^1.14.0"
     },
     "devDependencies": {
         "fast-equals": "^2.0.1"

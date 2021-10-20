@@ -90,7 +90,6 @@ const MasonryGrid = class extends HTMLElement {
           }
         }
         console.debug("[ionx-masonry-grid] queue arrange new:" + this.itemsElement.getBoundingClientRect().width + ", old:" + this.lastWidth);
-        console.error(new Error());
         this.queuedArrange = true;
         this.busy = false;
         return;
@@ -137,7 +136,6 @@ const MasonryGrid = class extends HTMLElement {
       // ok, możemy przystąpić do renderowania
       ARRANGE: if (doArrange) {
         console.debug("[ionx-masonry-grid] arrange started");
-        console.error(new Error());
         // upewniamy się, że możemy renderować - kontener musi mieć jakąś szerokość
         if (this.itemsElement.getBoundingClientRect().width === 0) {
           try {
@@ -267,6 +265,9 @@ const MasonryGrid = class extends HTMLElement {
           scroll.style.overflowY = "auto";
           this.itemsElement.style.transform = "";
         }
+      }
+      else {
+        console.debug("[ionx-masonry-grid] arrange not needed");
       }
     }
     finally {
