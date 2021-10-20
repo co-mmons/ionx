@@ -2,6 +2,16 @@
 
 ionx-swiper-navigation {
     display: block;
+
+    .swiper-button-next, .swiper-button-prev {
+        &.swiper-button-disabled {
+            pointer-events: initial;
+        }
+
+        &:not(.swiper-button-disabled) {
+            text-shadow: 0 0 6px #000;
+        }
+    }
 }
 
 ionx-swiper:not(.swiper-initialized) ionx-swiper-navigation {

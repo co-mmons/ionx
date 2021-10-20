@@ -1,5 +1,2 @@
-import { Swiper } from "swiper";
-export declare function PaginationModule(context: {
-  swiper: Swiper;
-  extendParams: (params: any) => void;
-}): void;
+import { SwiperModule } from "swiper/types";
+export declare const PaginationModule: SwiperModule;
