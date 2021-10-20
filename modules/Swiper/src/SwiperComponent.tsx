@@ -64,10 +64,6 @@ export class SwiperComponent implements ComponentInterface {
         }
     }
 
-    onSwiperEvent(eventName: keyof SwiperEvents) {
-        this.swiperEvent.emit({eventName});
-    }
-
     private normalizeOptions(): any {
 
         const swiperOptions: any = {
@@ -79,7 +75,7 @@ export class SwiperComponent implements ComponentInterface {
             }
         };
 
-        return {...swiperOptions, ...this.options, ...{onAny: (eventName) => this.onSwiperEvent(eventName)}};
+        return {...swiperOptions, ...this.options, ...{onAny: eventName => this.swiperEvent.emit({eventName})}};
     }
 
     async initSwiper() {

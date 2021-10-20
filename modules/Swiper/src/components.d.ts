@@ -24,6 +24,7 @@ export namespace Components {
         "update": () => Promise<void>;
     }
     interface IonxSwiperNavigation {
+        "hideOnMobile": boolean;
     }
     interface IonxSwiperPagination {
     }
@@ -81,6 +82,7 @@ declare namespace LocalJSX {
         "swiper"?: Swiper;
     }
     interface IonxSwiperNavigation {
+        "hideOnMobile"?: boolean;
     }
     interface IonxSwiperPagination {
     }

@@ -26,7 +26,6 @@ export declare class SwiperComponent implements ComponentInterface {
    */
   update(): Promise<void>;
   optionsChanged(niu: SwiperOptions, old: SwiperOptions): Promise<void>;
-  onSwiperEvent(eventName: keyof SwiperEvents): void;
   private normalizeOptions;
   initSwiper(): Promise<void>;
   connectedCallback(): void;

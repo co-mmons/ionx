@@ -2,6 +2,7 @@
 
 ionx-swiper-navigation {
     display: block;
+    --swiper-navigation-color: #fff;
 
     .swiper-button-next, .swiper-button-prev {
         &.swiper-button-disabled {
@@ -14,6 +15,7 @@ ionx-swiper-navigation {
     }
 }
 
-ionx-swiper:not(.swiper-initialized) ionx-swiper-navigation {
+ionx-swiper:not(.swiper-initialized) ionx-swiper-navigation,
+.plt-mobile ionx-swiper-navigation.ionx--hide-on-mobile {
     display: none;
 }
