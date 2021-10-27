@@ -38,6 +38,9 @@ export class Th implements DataTableColumnFilterOptions {
     filterCurrent: () => Filter;
 
     @Prop()
+    sortingEnabled: boolean;
+
+    @Prop()
     sortingActive: "asc" | "desc" | false;
 
     @Prop()
@@ -125,7 +128,7 @@ export class Th implements DataTableColumnFilterOptions {
                     <slot/>
                 </div>
 
-                {this.filterEnabled && <ion-button
+                {this.sortingEnabled && <ion-button
                     fill="clear"
                     size="small"
                     shape="round"

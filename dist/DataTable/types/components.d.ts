@@ -28,6 +28,7 @@ export namespace Components {
         "filterType": DataTableColumnFilterOptions.FilterType;
         "sortingActive": "asc" | "desc" | false;
         "sortingApply": (order: "asc" | "desc" | false) => void;
+        "sortingEnabled": boolean;
     }
 }
 declare global {
@@ -74,6 +75,7 @@ declare namespace LocalJSX {
         "filterType"?: DataTableColumnFilterOptions.FilterType;
         "sortingActive"?: "asc" | "desc" | false;
         "sortingApply"?: (order: "asc" | "desc" | false) => void;
+        "sortingEnabled"?: boolean;
     }
     interface IntrinsicElements {
         "ionx-data-table": IonxDataTable;

@@ -101,7 +101,7 @@ const DataTable = class extends HTMLElement {
     return h("td", null, column.formatter ? column.formatter(value) : value);
   }
   render() {
-    return h(Host, null, h("table", null, h("thead", null, h("tr", null, this.columns?.map((column, columnIndex) => h("ionx-data-table-th", { filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled, sortingApply: order => this.setColumnSorting(column, order), sortingActive: this.sortingColumn.id === column.id ? this.sortingColumn.order : undefined }, column.label)))), h("tbody", null, this.visibleData?.map(row => h("tr", null, this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row))))))));
+    return h(Host, null, h("table", null, h("thead", null, h("tr", null, this.columns?.map((column, columnIndex) => h("ionx-data-table-th", { filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled, sortingEnabled: column.sortingEnabled, sortingApply: order => this.setColumnSorting(column, order), sortingActive: this.sortingColumn.id === column.id ? this.sortingColumn.order : undefined }, column.label)))), h("tbody", null, this.visibleData?.map(row => h("tr", null, this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row))))))));
   }
   static get watchers() { return {
     "data": ["dataChanged"]
@@ -233,7 +233,7 @@ const Th = class extends HTMLElement {
     }
   }
   render() {
-    return h(Host, null, h("div", { class: "ionx--outer" }, h("div", { "slot-container": "label" }, h("slot", null)), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.sortingClicked() }, h("ion-icon", { "ionx--sorting": this.sortingActive || "no", src: "/assets/ionx.DataTable/sort.svg" })), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.filterClicked() }, h("ion-icon", { name: this.filterType === "search" ? "search" : "filter" }))));
+    return h(Host, null, h("div", { class: "ionx--outer" }, h("div", { "slot-container": "label" }, h("slot", null)), this.sortingEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.sortingClicked() }, h("ion-icon", { "ionx--sorting": this.sortingActive || "no", src: "/assets/ionx.DataTable/sort.svg" })), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.filterClicked() }, h("ion-icon", { name: this.filterType === "search" ? "search" : "filter" }))));
   }
   get element() { return this; }
   static get style() { return thCss; }
@@ -241,7 +241,7 @@ const Th = class extends HTMLElement {
 
 const IonxDataTable = /*@__PURE__*/proxyCustomElement(DataTable, [0,"ionx-data-table",{"columns":[16],"data":[16],"visibleData":[32]}]);
 const IonxDataTableSearchFilter = /*@__PURE__*/proxyCustomElement(SearchPopover, [1,"ionx-data-table-search-filter",{"value":[1]},[[0,"ionViewDidEnter","didEnter"]]]);
-const IonxDataTableTh = /*@__PURE__*/proxyCustomElement(Th, [6,"ionx-data-table-th",{"filterEnabled":[4,"filter-enabled"],"filterType":[1,"filter-type"],"filterData":[16],"filterApply":[16],"filterCurrent":[16],"sortingActive":[8,"sorting-active"],"sortingApply":[16],"filterActive":[32]}]);
+const IonxDataTableTh = /*@__PURE__*/proxyCustomElement(Th, [6,"ionx-data-table-th",{"filterEnabled":[4,"filter-enabled"],"filterType":[1,"filter-type"],"filterData":[16],"filterApply":[16],"filterCurrent":[16],"sortingEnabled":[4,"sorting-enabled"],"sortingActive":[8,"sorting-active"],"sortingApply":[16],"filterActive":[32]}]);
 const defineIonxDataTable = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

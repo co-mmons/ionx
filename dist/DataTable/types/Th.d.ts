@@ -10,6 +10,7 @@ export declare class Th implements DataTableColumnFilterOptions {
    * Returns currently applied filter for given column.
    */
   filterCurrent: () => Filter;
+  sortingEnabled: boolean;
   sortingActive: "asc" | "desc" | false;
   sortingApply: (order: "asc" | "desc" | false) => void;
   filterActive: boolean;

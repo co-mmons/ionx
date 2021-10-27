@@ -150,6 +150,7 @@ export class DataTable {
                             filterType={column.filterType}
                             filterCurrent={() => this.filters[column.id]}
                             filterEnabled={column.filterEnabled}
+                            sortingEnabled={column.sortingEnabled}
                             sortingApply={order => this.setColumnSorting(column, order)}
                             sortingActive={this.sortingColumn.id === column.id ? this.sortingColumn.order : undefined}>{column.label}</ionx-data-table-th>)}
                     </tr>
