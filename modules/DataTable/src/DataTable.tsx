@@ -104,7 +104,7 @@ export class DataTable {
                     if (column.sort) {
                         return column.sort(aVal, bVal) * order;
                     } else {
-                        return toString(aVal).localeCompare(toString(bVal)) * order;
+                        return toString(aVal === null || aVal === undefined ? "" : aVal).localeCompare(toString(bVal === null || bVal === undefined ? "" : bVal)) * order;
                     }
                 })
 
