@@ -19,7 +19,10 @@ export class Test {
     basicItems: SelectItem[] = [
         {label: "test", value: 1},
         {label: "aloha", divider: true},
-        {label: "city", value: 2}
+        {label: "city", value: 2},
+        {label: "b", value: 3},
+        {label: "c", value: 4},
+        {label: "d", value: 5}
     ];
 
     async lazyItems(_values?: any[]) {
@@ -66,6 +69,11 @@ export class Test {
             <fieldset>
                 <legend>Simple</legend>
                 <ionx-select items={this.basicItems} ref={this.data.controls.select1.attach()}/>
+            </fieldset>
+
+            <fieldset>
+                <legend>Simple multiple</legend>
+                <ionx-select items={this.basicItems} multiple={true}/>
             </fieldset>
 
             <ionx-form-field label="multiple + sortable" style={{"--form-field-container-overflow": "hidden"}}>

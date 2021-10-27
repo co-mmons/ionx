@@ -86,19 +86,23 @@ class FormControlImpl {
     return this.stateChanges$.subscribe(change => observer(change));
   }
   async focus(options) {
-    if (!this.element$ && ((options === null || options === void 0 ? void 0 : options.waitForElement) === true || (typeof (options === null || options === void 0 ? void 0 : options.waitForElement) === "number" && options.waitForElement > 0))) {
+    if (!this.element$ && (options?.waitForElement === true || (typeof options?.waitForElement === "number" && options.waitForElement > 0))) {
       try {
         await waitTill(() => !!this.element$ && isHydrated(this.element$), undefined, typeof options.waitForElement === "number" ? options.waitForElement : 1000);
       }
-      catch (_a) {
+      catch {
       }
     }
     if (this.element$) {
+      // fix for ion-onput, as setFocus do not waits for native input to be loaded
+      if (this.element$.tagName === "ION-INPUT") {
+        await this.element$["getInputElement"]();
+      }
       if (this.element$.setFocus) {
         await this.element$.setFocus(options);
       }
       else if (this.element$.tagName.startsWith("ION-") || this.element$.tagName.startsWith("IONX-")) {
-        if (!(options === null || options === void 0 ? void 0 : options.preventScroll)) {
+        if (!options?.preventScroll) {
           scrollIntoView(this.element$.closest("ion-item") || this.element$);
         }
       }
@@ -136,10 +140,10 @@ class FormControlImpl {
   }
   setValue(value, options) {
     const state = { value: value };
-    if (typeof (options === null || options === void 0 ? void 0 : options.dirty) === "boolean") {
+    if (typeof options?.dirty === "boolean") {
       state.dirty = options.dirty;
     }
-    else if (typeof (options === null || options === void 0 ? void 0 : options.touched) === "boolean") {
+    else if (typeof options?.touched === "boolean") {
       state.dirty = options.touched;
     }
     this.applyState(state);
@@ -168,9 +172,8 @@ class FormControlImpl {
     const detachFunctionName = "__ionxFormControlDetach";
     const control = this;
     const func = function (el) {
-      var _a, _b;
       if (!el) {
-        (_a = this[detachFunctionName]) === null || _a === void 0 ? void 0 : _a.call(this);
+        this[detachFunctionName]?.();
       }
       else {
         // do nothing, as nothing really changed
@@ -182,7 +185,7 @@ class FormControlImpl {
           control.detach();
         }
         // detach function if given element was already attached somewhere
-        (_b = el[detachFunctionName]) === null || _b === void 0 ? void 0 : _b.call(el, control);
+        el[detachFunctionName]?.(control);
         // define detach function
         // returns true if control was detached or false if it wasn't needed
         this[detachFunctionName] = el[detachFunctionName] = (newControl) => {
@@ -210,12 +213,11 @@ class FormControlImpl {
     return Object.assign({ value: this.value }, this.status());
   }
   detach() {
-    var _a, _b;
     if (this.element$) {
       console.debug(`[ionx-form-control] detach control ${this.name}`, this.element$);
-      (_a = this.unlistenOnChange) === null || _a === void 0 ? void 0 : _a.call(this);
+      this.unlistenOnChange?.();
       this.unlistenOnChange = undefined;
-      (_b = this.unlistenOnFocus) === null || _b === void 0 ? void 0 : _b.call(this);
+      this.unlistenOnFocus?.();
       this.unlistenOnFocus = undefined;
       delete this.element$[detachFunctionName];
       this.element$.removeAttribute("ionx-form-control");
@@ -229,7 +231,6 @@ class FormControlImpl {
     return this.applyState(state, options);
   }
   async validateImpl(options) {
-    var _a, _b;
     await loadIntlMessages();
     this.validated$ = true;
     let error;
@@ -249,7 +250,7 @@ class FormControlImpl {
     }
     if (!error) {
       try {
-        (_b = (_a = this.element$) === null || _a === void 0 ? void 0 : _a.formValidate) === null || _b === void 0 ? void 0 : _b.call(_a);
+        this.element$?.formValidate?.();
       }
       catch (er) {
         error = er instanceof Error ? er : new Error(er);
@@ -413,7 +414,7 @@ class FormController {
         this.add(controlName, (!Array.isArray(controls) && controls[controlName]) || undefined);
       }
     }
-    if (options === null || options === void 0 ? void 0 : options.errorHandler) {
+    if (options?.errorHandler) {
       this.errorPresenter$ = options.errorHandler;
     }
   }
@@ -464,7 +465,7 @@ class FormController {
     else if (!exists) {
       this.fireStateChange();
     }
-    if (options === null || options === void 0 ? void 0 : options.validators) {
+    if (options?.validators) {
       this.controls[controlName].setValidators(options.validators);
     }
     return this.controls[controlName];
@@ -488,28 +489,22 @@ class FormController {
     return this.stateChanged.subscribe(event => observer(event));
   }
   get dirty() {
-    var _a;
-    return ((_a = this.status) === null || _a === void 0 ? void 0 : _a.dirty) || false;
+    return this.status?.dirty || false;
   }
   get pristine() {
-    var _a;
-    return ((_a = this.status) === null || _a === void 0 ? void 0 : _a.pristine) || false;
+    return this.status?.pristine || false;
   }
   get touched() {
-    var _a;
-    return ((_a = this.status) === null || _a === void 0 ? void 0 : _a.touched) || false;
+    return this.status?.touched || false;
   }
   get untouched() {
-    var _a;
-    return ((_a = this.status) === null || _a === void 0 ? void 0 : _a.untouched) || false;
+    return this.status?.untouched || false;
   }
   get valid() {
-    var _a;
-    return ((_a = this.status) === null || _a === void 0 ? void 0 : _a.valid) || false;
+    return this.status?.valid || false;
   }
   get invalid() {
-    var _a;
-    return ((_a = this.status) === null || _a === void 0 ? void 0 : _a.invalid) || false;
+    return this.status?.invalid || false;
   }
   markAsDirty() {
     for (const control of Object.values(this.controls)) {
@@ -574,23 +569,22 @@ class FormController {
     }
   }
   fireStateChange(checkForChange = true) {
-    var _a, _b;
     const previousEvent = this.stateChanged.getValue();
     const currentState = this.state();
     const previousStatus = this.status;
     this.status = Object.assign({}, currentState, { controls: undefined });
     const statusChange = !deepEqual(this.status, previousStatus);
-    const valueChange = !deepEqual(Object.entries((currentState === null || currentState === void 0 ? void 0 : currentState.controls) || {}).map(entry => ({ control: entry[0], value: entry[1].value })), Object.entries(((_a = previousEvent === null || previousEvent === void 0 ? void 0 : previousEvent.current) === null || _a === void 0 ? void 0 : _a.controls) || {}).map(entry => ({ control: entry[0], value: entry[1].value })));
+    const valueChange = !deepEqual(Object.entries(currentState?.controls || {}).map(entry => ({ control: entry[0], value: entry[1].value })), Object.entries(previousEvent?.current?.controls || {}).map(entry => ({ control: entry[0], value: entry[1].value })));
     if (!checkForChange || (checkForChange && (statusChange || valueChange))) {
       console.debug(`[ionx-form-controller] form state changed`, currentState);
       this.runBindHost(currentState);
       if (this.renderer) {
         forceUpdate(this.renderer);
       }
-      this.stateChanged.next({ current: currentState, previous: previousEvent === null || previousEvent === void 0 ? void 0 : previousEvent.current, status: statusChange, value: valueChange });
+      this.stateChanged.next({ current: currentState, previous: previousEvent?.current, status: statusChange, value: valueChange });
     }
     if (currentState.valid) {
-      (_b = this.errorPresenter$) === null || _b === void 0 ? void 0 : _b.dismiss(this);
+      this.errorPresenter$?.dismiss(this);
     }
   }
   runBindHost(state) {
@@ -612,7 +606,6 @@ class FormController {
     }
   }
   async validate(options) {
-    var _a, _b;
     let firstErrorControl;
     for (const control of this.orderedControls()) {
       if (!(await control.validate()) && control.element && !firstErrorControl) {
@@ -620,8 +613,8 @@ class FormController {
       }
     }
     if (firstErrorControl) {
-      if (!(options === null || options === void 0 ? void 0 : options.preventFocus)) {
-        if (options === null || options === void 0 ? void 0 : options.beforeFocus) {
+      if (!options?.preventFocus) {
+        if (options?.beforeFocus) {
           try {
             const res = options.beforeFocus(firstErrorControl);
             if (res instanceof Promise) {
@@ -632,13 +625,13 @@ class FormController {
             console.warn(e);
           }
         }
-        firstErrorControl.focus({ preventScroll: options === null || options === void 0 ? void 0 : options.preventScroll });
+        firstErrorControl.focus({ preventScroll: options?.preventScroll });
       }
-      (_a = this.errorPresenter$) === null || _a === void 0 ? void 0 : _a.present(this, firstErrorControl);
+      this.errorPresenter$?.present(this, firstErrorControl);
       return false;
     }
     else {
-      (_b = this.errorPresenter$) === null || _b === void 0 ? void 0 : _b.dismiss(this);
+      this.errorPresenter$?.dismiss(this);
       return true;
     }
   }
@@ -893,7 +886,6 @@ const FormField = class extends HTMLElement {
     this.buildErrorMessage();
   }
   buildErrorMessage() {
-    var _a;
     if (typeof this.error === "string") {
       this.errorMessage = this.error;
     }
@@ -909,7 +901,7 @@ const FormField = class extends HTMLElement {
     else if (this.error) {
       this.errorMessage = intl.message `ionx/forms#validators/InvalidValueError`;
     }
-    else if ((_a = this.control) === null || _a === void 0 ? void 0 : _a.error) {
+    else if (this.control?.error) {
       this.errorMessage = this.control.error.message;
     }
     else {
@@ -943,7 +935,6 @@ const FormItem = class extends HTMLElement {
     this.buildErrorMessage();
   }
   buildErrorMessage() {
-    var _a;
     if (typeof this.error === "string") {
       this.errorMessage = this.error;
     }
@@ -959,7 +950,7 @@ const FormItem = class extends HTMLElement {
     else if (this.error) {
       this.errorMessage = intl.message `ionx/forms#validators/InvalidValueError`;
     }
-    else if ((_a = this.control) === null || _a === void 0 ? void 0 : _a.error) {
+    else if (this.control?.error) {
       this.errorMessage = this.control.error.message;
     }
     else {
@@ -970,8 +961,7 @@ const FormItem = class extends HTMLElement {
     await loadIntlMessages();
   }
   render() {
-    var _a;
-    return h$1(Host, null, h$1("div", { "ionx--buttons": true }, h$1("slot", { name: "buttons" })), h$1("ion-item", Object.assign({ style: this.itemStyle }, (_a = this.partProps) === null || _a === void 0 ? void 0 : _a.item, this.itemProps), h$1("slot", { name: "start", slot: "start" }), h$1("slot", null), h$1("slot", { name: "end", slot: "end" })), h$1("slot", { name: "error" }), !!this.errorMessage && h$1("div", { "ionx--error": true }, this.errorMessage), h$1("slot", { name: "hint" }), !!this.hint && h$1("div", { "ionx--hint": true }, this.hint));
+    return h$1(Host, null, h$1("div", { "ionx--buttons": true }, h$1("slot", { name: "buttons" })), h$1("ion-item", Object.assign({ style: this.itemStyle }, this.partProps?.item, this.itemProps), h$1("slot", { name: "start", slot: "start" }), h$1("slot", null), h$1("slot", { name: "end", slot: "end" })), h$1("slot", { name: "error" }), !!this.errorMessage && h$1("div", { "ionx--error": true }, this.errorMessage), h$1("slot", { name: "hint" }), !!this.hint && h$1("div", { "ionx--hint": true }, this.hint));
   }
   static get watchers() { return {
     "control": ["watchControl"],

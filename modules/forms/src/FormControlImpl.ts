@@ -93,6 +93,11 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
         if (this.element$) {
 
+            // fix for ion-onput, as setFocus do not waits for native input to be loaded
+            if (this.element$.tagName === "ION-INPUT") {
+                await this.element$["getInputElement"]();
+            }
+
             if (this.element$.setFocus) {
                 await this.element$.setFocus(options);
 

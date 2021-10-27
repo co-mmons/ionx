@@ -47,7 +47,7 @@ const TooltipErrorPresenterComponent = class extends HTMLElement {
     }
     if (this.instance$) {
       const form = this.element.closest("ionx-form-controller");
-      if (form === null || form === void 0 ? void 0 : form.controller) {
+      if (form?.controller) {
         form.controller.errorPresenter = this.instance$;
       }
     }

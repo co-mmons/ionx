@@ -138,23 +138,21 @@ const Select = class extends HTMLElement {
     this.emitStyle();
   }
   emitStyle() {
-    var _a;
     this.ionStyle.emit({
       "interactive": !this.disabled && !this.readonly,
       "input": true,
       "has-placeholder": this.placeholder != null,
-      "has-value": ((_a = this.valueAsArray) === null || _a === void 0 ? void 0 : _a.length) > 0,
+      "has-value": this.valueAsArray?.length > 0,
       "has-focus": this.focused,
       "interactive-disabled": this.disabled,
     });
   }
   async buildVisibleItems() {
-    var _a, _b;
     let visible = [];
     // values, that do not match items
     const unmatched = [];
     for (const value of this.valueAsArray) {
-      const item = findValueItem([].concat((_a = this.items) !== null && _a !== void 0 ? _a : [], (_b = this.visibleItems) !== null && _b !== void 0 ? _b : []), value, this.comparator);
+      const item = findValueItem([].concat(this.items ?? [], this.visibleItems ?? []), value, this.comparator);
       if (item) {
         visible.push(item);
       }
@@ -175,7 +173,7 @@ const Select = class extends HTMLElement {
               for (let i = unmatched.length - 1; i >= 0; i--) {
                 const subitem = findValueItem(subitems, unmatched[i], this.comparator);
                 if (subitem) {
-                  visible = (visible !== null && visible !== void 0 ? visible : []).concat([subitem]);
+                  visible = (visible ?? []).concat([subitem]);
                   unmatched.splice(i, 1);
                 }
               }
@@ -189,7 +187,6 @@ const Select = class extends HTMLElement {
     forceUpdate(this);
   }
   async open() {
-    var _a, _b;
     const overlay = this.overlay || "popover";
     let overlayTitle;
     if (this.overlayTitle) {
@@ -218,9 +215,9 @@ const Select = class extends HTMLElement {
     }
     const overlayProps = {
       overlay,
-      items: (_a = this.items) === null || _a === void 0 ? void 0 : _a.slice(),
-      lazyItems: this.lazyItems ? (() => { var _a; return typeof this.lazyItems === "function" ? this.lazyItems() : (_a = this.lazyItems) === null || _a === void 0 ? void 0 : _a.items(); }) : undefined,
-      values: (_b = this.valueAsArray.slice()) !== null && _b !== void 0 ? _b : [],
+      items: this.items?.slice(),
+      lazyItems: this.lazyItems ? (() => typeof this.lazyItems === "function" ? this.lazyItems() : this.lazyItems?.items()) : undefined,
+      values: this.valueAsArray.slice() ?? [],
       multiple: !!this.multiple,
       overlayTitle: overlayTitle,
       comparator: this.comparator,
@@ -319,8 +316,7 @@ const SelectOverlay = class extends HTMLElement {
     this.groupsItems = {};
   }
   async search(ev) {
-    var _a, _b;
-    const query = ((_a = ev.detail.value) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase()) || undefined;
+    const query = ev.detail.value?.toLocaleLowerCase() || undefined;
     if (query) {
       const items = [];
       for (let i = 0; i < this.items.length; i++) {
@@ -331,7 +327,7 @@ const SelectOverlay = class extends HTMLElement {
               continue;
             }
           }
-          else if ((label || "").toLowerCase().indexOf(query) < 0 && !((_b = this.items[i].search) === null || _b === void 0 ? void 0 : _b.find(v => v.toLowerCase().indexOf(query) > -1))) {
+          else if ((label || "").toLowerCase().indexOf(query) < 0 && !this.items[i].search?.find(v => v.toLowerCase().indexOf(query) > -1)) {
             continue;
           }
           // search for parent divider or group
@@ -351,7 +347,6 @@ const SelectOverlay = class extends HTMLElement {
     }
   }
   async onDidEnter() {
-    var _a, _b, _c;
     if (this.lazyItems) {
       this.items = await this.lazyItems();
     }
@@ -359,14 +354,14 @@ const SelectOverlay = class extends HTMLElement {
       // values, that do not match items
       const unloaded = [];
       for (const value of this.values) {
-        if (!findValueItem((_a = this.items) !== null && _a !== void 0 ? _a : [], value, this.comparator)) {
+        if (!findValueItem(this.items ?? [], value, this.comparator)) {
           unloaded.push(value);
         }
       }
       if (unloaded.length > 0) {
         for (const group of this.items.filter(item => item.group)) {
           let subitems;
-          if ((_c = (_b = group.values) === null || _b === void 0 ? void 0 : _b.call(group, unloaded)) === null || _c === void 0 ? void 0 : _c.length) {
+          if (group.values?.(unloaded)?.length) {
             subitems = typeof group.items === "function" ? await group.items() : group.items;
           }
           else if (Array.isArray(group.items) && unloaded.find(value => findValueItem(group.items, value, this.comparator))) {
@@ -430,7 +425,7 @@ const SelectOverlay = class extends HTMLElement {
           await waitTill(() => !!(item = this.element.querySelector(`ion-item[${indexAttribute}="${index - 1}"]`)), undefined, 5000);
           item.scrollIntoView();
         }
-        catch (_a) {
+        catch {
         }
       }
     }
@@ -477,12 +472,11 @@ const SelectOverlay = class extends HTMLElement {
     }
   }
   async toggleGroup(group) {
-    var _a;
     if (!this.expandedGroups[group.id]) {
       this.expandedGroups[group.id] = true;
       this.loadingGroups[group.id] = true;
       forceUpdate(this);
-      const subitems = (_a = this.groupsItems[group.id]) !== null && _a !== void 0 ? _a : (typeof group.items === "function" ? await group.items() : group.items);
+      const subitems = this.groupsItems[group.id] ?? (typeof group.items === "function" ? await group.items() : group.items);
       if (subitems) {
         this.groupsItems[group.id] = subitems;
         for (let i = 0; i < this.items.length; i++) {
@@ -531,7 +525,7 @@ const SelectOverlay = class extends HTMLElement {
       }
     }
     if (!this.sortable) {
-      this.values.sort((a, b) => items.findIndex(o => isEqualValue(o.value, a, this.comparator)) - items.findIndex(o => isEqualValue(o.value, b, this.comparator)));
+      this.values.sort((a, b) => this.items.findIndex(o => isEqualValue(o.value, a, this.comparator)) - this.items.findIndex(o => isEqualValue(o.value, b, this.comparator)));
     }
     if (this.overlay === "modal") {
       const modal = this.element.closest("ion-modal");
@@ -543,19 +537,17 @@ const SelectOverlay = class extends HTMLElement {
     }
   }
   connectedCallback() {
-    var _a, _b;
-    this.visibleItems = (_a = this.items) === null || _a === void 0 ? void 0 : _a.slice();
-    this.useVirtualScroll = this.overlay === "modal" && ((_b = this.items) === null || _b === void 0 ? void 0 : _b.length) > 100;
+    this.visibleItems = this.items?.slice();
+    this.useVirtualScroll = this.overlay === "modal" && this.items?.length > 100;
   }
   renderItem(item, index) {
-    var _a, _b;
     if (!item) {
       return;
     }
     if (item.group) {
-      return h("ion-item", { key: `group:${item.id}`, button: true, detail: true, detailIcon: this.expandedGroups[item.id] ? "chevron-up" : "chevron-down", onClick: () => this.toggleGroup(item) }, h("ion-label", null, (_a = (item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined)) !== null && _a !== void 0 ? _a : (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)), this.loadingGroups[item.id] && h("ion-spinner", { name: "dots", slot: "end" }));
+      return h("ion-item", { key: `group:${item.id}`, button: true, detail: true, detailIcon: this.expandedGroups[item.id] ? "chevron-up" : "chevron-down", onClick: () => this.toggleGroup(item) }, h("ion-label", null, (item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)), this.loadingGroups[item.id] && h("ion-spinner", { name: "dots", slot: "end" }));
     }
-    return h("ion-item", Object.assign({ key: index }, { [indexAttribute]: index }, { class: { "ionx--divider": item.divider } }), !item.divider && h("ion-checkbox", { class: "sc-ionx-select-overlay", slot: "start", checked: this.values.findIndex(v => isEqualValue(v, item.value, this.comparator)) > -1, onClick: ev => this.onClick(ev, item) }), h("ion-label", null, (_b = (item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined)) !== null && _b !== void 0 ? _b : (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)));
+    return h("ion-item", Object.assign({ key: index }, { [indexAttribute]: index }, { class: { "ionx--divider": item.divider } }), !item.divider && h("ion-checkbox", { class: "sc-ionx-select-overlay", slot: "start", checked: this.values.findIndex(v => isEqualValue(v, item.value, this.comparator)) > -1, onClick: ev => this.onClick(ev, item) }), h("ion-label", null, (item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)));
   }
   render() {
     return h(Host, null, this.useVirtualScroll && !this.didEnter && h("div", { style: { visibility: "hidden" } }, this.renderItem(this.items.find(o => !o.divider), 0)), this.overlay === "modal" && h("ion-header", null, h("ionx-toolbar", { button: "close", buttonHandler: () => this.cancel() }, h("span", { slot: "title" }, this.overlayTitle), h("ion-button", { slot: "action", fill: "clear", onClick: () => this.ok() }, intl.message `@co.mmons/js-intl#Done`)), h("ion-toolbar", null, h("ion-searchbar", { type: "text", autocomplete: "off", placeholder: intl.message `@co.mmons/js-intl#Search`, onIonChange: ev => this.search(ev) }))), h("ion-content", { scrollY: this.overlay === "modal", scrollX: false }, !this.didEnter && this.overlay === "modal" && h("ionx-loading", { type: "spinner", cover: true, slot: "fixed" }), this.visibleItems && h("ion-list", { lines: "full" }, this.useVirtualScroll && h("ion-virtual-scroll", { items: this.visibleItems, approxItemHeight: this.virtualItemHeight, renderItem: (item, index) => this.renderItem(item, index) }), (this.overlay === "popover" || !this.useVirtualScroll) && this.visibleItems.map((item, index) => this.renderItem(item, index)))), this.multiple && this.overlay === "popover" && h("ion-footer", null, h("ion-toolbar", null, h("div", null, h("ion-button", { size: "small", fill: "clear", onClick: () => this.cancel() }, intl.message `@co.mmons/js-intl#Cancel`), h("ion-button", { size: "small", fill: "clear", onClick: () => this.ok() }, intl.message `@co.mmons/js-intl#Ok`)))));

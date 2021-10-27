@@ -349,7 +349,7 @@ export class SelectOverlay implements ComponentInterface {
         }
 
         if (!this.sortable) {
-            this.values.sort((a, b) => items.findIndex(o => isEqualValue(o.value, a, this.comparator)) - items.findIndex(o => isEqualValue(o.value, b, this.comparator)));
+            this.values.sort((a, b) => this.items.findIndex(o => isEqualValue(o.value, a, this.comparator)) - this.items.findIndex(o => isEqualValue(o.value, b, this.comparator)));
         }
 
         if (this.overlay === "modal") {
