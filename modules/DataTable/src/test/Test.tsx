@@ -17,6 +17,7 @@ export class Test implements ComponentInterface {
             this.columns.push({
                 id: `${i}`,
                 label: `Kol ${i}`,
+                sortingEnabled: i === 3 || i === 0,
                 filterEnabled: i === 3 || i === 0,
                 filterType: i === 3 ? "select" : (i === 0 ? "search" : undefined)
             });

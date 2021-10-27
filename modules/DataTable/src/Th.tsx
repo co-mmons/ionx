@@ -37,11 +37,27 @@ export class Th implements DataTableColumnFilterOptions {
     @Prop()
     filterCurrent: () => Filter;
 
+    @Prop()
+    sortingActive: "asc" | "desc" | false;
+
+    @Prop()
+    sortingApply: (order: "asc" | "desc" | false) => void;
+
     @State()
     filterActive: boolean;
 
     dataTable() {
         return this.element.closest("ionx-data-table");
+    }
+
+    async sortingClicked() {
+        if (this.sortingActive === "asc") {
+            this.sortingApply("desc");
+        } else if (this.sortingActive === "desc") {
+            this.sortingApply(false);
+        } else {
+            this.sortingApply("asc");
+        }
     }
 
     async filterClicked() {
@@ -108,6 +124,15 @@ export class Th implements DataTableColumnFilterOptions {
                 <div slot-container="label">
                     <slot/>
                 </div>
+
+                {this.filterEnabled && <ion-button
+                    fill="clear"
+                    size="small"
+                    shape="round"
+                    color={this.filterActive ? "success" : "primary"}
+                    onClick={() => this.sortingClicked()}>
+                    <ion-icon ionx--sorting={this.sortingActive || "no"} src="/assets/ionx.DataTable/sort.svg"/>
+                </ion-button>}
 
                 {this.filterEnabled && <ion-button
                     fill="clear"

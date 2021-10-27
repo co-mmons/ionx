@@ -14,7 +14,13 @@ export const config: Config = {
         port: 9001
     },
     outputTargets: [
-        {type: "www", serviceWorker: null, baseUrl: "/"}
+        {
+            type: "www",
+            serviceWorker: null,
+            baseUrl: "/",
+            copy: [
+            ]
+        }
     ],
     rollupPlugins: {
         before: [resolveIonxPlugin()]

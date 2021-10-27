@@ -23,9 +23,30 @@
         align-items: center;
 
         ion-button {
-            margin: 0 4px;
+            margin: 0;
             --padding-start: 4px;
             --padding-end: 4px;
+
+            &:first-of-type {
+                margin-left: 4px;
+            }
+
+            &:last-of-type {
+                margin-right: 4px;
+            }
+        }
+    }
+
+    ion-icon[ionx--sorting] {
+        --data-table--sorting-asc: var(--ion-border-color);
+        --data-table--sorting-desc: var(--ion-border-color);
+
+        &[ionx--sorting=asc] {
+            --data-table--sorting-asc: var(--ion-color-primary);
+        }
+
+        &[ionx--sorting=desc] {
+            --data-table--sorting-desc: var(--ion-color-primary);
         }
     }
 }

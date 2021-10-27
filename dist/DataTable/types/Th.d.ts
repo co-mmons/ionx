@@ -10,8 +10,11 @@ export declare class Th implements DataTableColumnFilterOptions {
    * Returns currently applied filter for given column.
    */
   filterCurrent: () => Filter;
+  sortingActive: "asc" | "desc" | false;
+  sortingApply: (order: "asc" | "desc" | false) => void;
   filterActive: boolean;
   dataTable(): HTMLIonxDataTableElement;
+  sortingClicked(): Promise<void>;
   filterClicked(): Promise<void>;
   filterSearch(): Promise<void>;
   filterSelect(): Promise<void>;

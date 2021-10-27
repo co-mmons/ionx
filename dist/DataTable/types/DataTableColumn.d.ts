@@ -1,5 +1,6 @@
 import { DataTableColumnFilterOptions } from "./DataTableColumnFilterOptions";
-export interface DataTableColumn extends DataTableColumnFilterOptions {
+import { DataTableColumnSortingOptions } from "./DataTableColumnSortingOptions";
+export interface DataTableColumn extends DataTableColumnFilterOptions, DataTableColumnSortingOptions {
   label: string;
   id: string;
   formatter?: (value: any) => string;

@@ -1,4 +1,5 @@
-import {Component, h, Host, Prop, State, Watch} from "@stencil/core";
+import {toString} from "@co.mmons/js-utils/core";
+import {Component, forceUpdate, h, Host, Prop, State, Watch} from "@stencil/core";
 import {DataTableColumn} from "./DataTableColumn";
 import {DataTableRow} from "./DataTableRow";
 import {Filter} from "./filter/Filter";
@@ -20,6 +21,8 @@ export class DataTable {
 
     filters: {[columnId: string]: Filter} = {};
 
+    sortingColumn: {id?: string, order?: "asc" | "desc"} = {};
+
     columnData(column: DataTableColumn, columnIndex: number) {
         return this.data?.map(row => Array.isArray(row) ? row[columnIndex] : row[column.id]).filter(v => v !== undefined);
     }
@@ -37,12 +40,13 @@ export class DataTable {
 
     applyFilters() {
 
+        let data = [];
+
         if (Object.keys(this.filters).length === 0) {
-            this.visibleData = this.data.slice();
+            data = this.data.slice();
 
         } else {
 
-            const data = [];
             const columnsIdIndex = {};
 
             ROWS: for (const row of this.data) {
@@ -66,9 +70,59 @@ export class DataTable {
 
                 data.push(row);
             }
-
-            this.visibleData = data;
         }
+
+        if (this.sortingColumn.id) {
+            this.applySorting(data);
+        }
+
+        this.visibleData = data;
+    }
+
+    applySorting(rows: any[]) {
+
+        if (!this.sortingColumn.id) {
+            this.applyFilters();
+
+        } else {
+
+            const column = this.columns.find(c => c.id === this.sortingColumn.id);
+            const columnIndex = this.columns.findIndex(c => c.id === column.id);
+
+            if (!column || !column.sortingEnabled) {
+                this.sortingColumn = {};
+
+            } else {
+
+                const order = this.sortingColumn.order === "asc" ? 1 : -1;
+
+                rows.sort((aRow, bRow) => {
+
+                    const aVal = Array.isArray(aRow) ? aRow[columnIndex] : aRow[column.id];
+                    const bVal = Array.isArray(bRow) ? bRow[columnIndex] : bRow[column.id];
+
+                    if (column.sort) {
+                        return column.sort(aVal, bVal) * order;
+                    } else {
+                        return toString(aVal).localeCompare(toString(bVal)) * order;
+                    }
+                })
+
+            }
+        }
+    }
+
+    setColumnSorting(column: DataTableColumn, order: "asc" | "desc" | false) {
+
+        if (!order) {
+            this.sortingColumn = {};
+        } else {
+            this.sortingColumn = {id: column.id, order};
+        }
+
+        this.applySorting(this.visibleData);
+
+        forceUpdate(this);
     }
 
     @Watch("data")
@@ -95,7 +149,9 @@ export class DataTable {
                             filterApply={value => this.setColumnFilter(column, value)}
                             filterType={column.filterType}
                             filterCurrent={() => this.filters[column.id]}
-                            filterEnabled={column.filterEnabled}>{column.label}</ionx-data-table-th>)}
+                            filterEnabled={column.filterEnabled}
+                            sortingApply={order => this.setColumnSorting(column, order)}
+                            sortingActive={this.sortingColumn.id === column.id ? this.sortingColumn.order : undefined}>{column.label}</ionx-data-table-th>)}
                     </tr>
                 </thead>
                 <tbody>

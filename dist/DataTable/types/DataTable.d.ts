@@ -8,9 +8,15 @@ export declare class DataTable {
   filters: {
     [columnId: string]: Filter;
   };
+  sortingColumn: {
+    id?: string;
+    order?: "asc" | "desc";
+  };
   columnData(column: DataTableColumn, columnIndex: number): any[];
   setColumnFilter(column: DataTableColumn, value: any): void;
   applyFilters(): void;
+  applySorting(rows: any[]): void;
+  setColumnSorting(column: DataTableColumn, order: "asc" | "desc" | false): void;
   dataChanged(): void;
   connectedCallback(): void;
   renderCell(column: DataTableColumn, columnIndex: number, row: any, accessByIndex: boolean): any;

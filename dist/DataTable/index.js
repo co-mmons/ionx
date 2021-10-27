@@ -1,8 +1,8 @@
-import { h, Host, attachShadow, proxyCustomElement } from '@stencil/core/internal/client';
+import { forceUpdate, h, Host, attachShadow, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
+import { toString } from '@co.mmons/js-utils/core';
 import { intl } from '@co.mmons/js-intl';
 import { popoverController } from '@ionic/core';
-import { toString } from '@co.mmons/js-utils/core';
 import { defineIonxSelect, showSelectOverlay } from 'ionx/Select';
 
 const dataTableCss = "ionx-data-table{display:block;overflow:auto;max-height:100%;border:var(--ionx-border-width) solid var(--ion-border-color);border-radius:var(--ionx-border-radius);-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}ionx-data-table>table{width:100%}ionx-data-table>table>tbody{-webkit-user-select:auto;-moz-user-select:auto;-ms-user-select:auto;user-select:auto}ionx-data-table>table>tbody>tr>td{padding:8px;border:var(--ionx-border-width) solid var(--ion-border-color)}ionx-data-table>table>tbody>tr>td:first-child{border-left:0}ionx-data-table>table>tbody>tr>td:last-child{border-right:0}ionx-data-table>table>tbody>tr:last-child>td{border-bottom:0}";
@@ -12,10 +12,10 @@ const DataTable = class extends HTMLElement {
     super();
     this.__registerHost();
     this.filters = {};
+    this.sortingColumn = {};
   }
   columnData(column, columnIndex) {
-    var _a;
-    return (_a = this.data) === null || _a === void 0 ? void 0 : _a.map(row => Array.isArray(row) ? row[columnIndex] : row[column.id]).filter(v => v !== undefined);
+    return this.data?.map(row => Array.isArray(row) ? row[columnIndex] : row[column.id]).filter(v => v !== undefined);
   }
   setColumnFilter(column, value) {
     if (value === undefined) {
@@ -27,16 +27,15 @@ const DataTable = class extends HTMLElement {
     this.applyFilters();
   }
   applyFilters() {
-    var _a;
+    let data = [];
     if (Object.keys(this.filters).length === 0) {
-      this.visibleData = this.data.slice();
+      data = this.data.slice();
     }
     else {
-      const data = [];
       const columnsIdIndex = {};
       ROWS: for (const row of this.data) {
         for (const columnId in this.filters) {
-          const columnIndex = (_a = columnsIdIndex[columnId]) !== null && _a !== void 0 ? _a : (columnsIdIndex[columnId] = this.columns.findIndex(column => column.id === columnId));
+          const columnIndex = columnsIdIndex[columnId] ?? (columnsIdIndex[columnId] = this.columns.findIndex(column => column.id === columnId));
           let value;
           if (Array.isArray(row)) {
             value = row[columnIndex];
@@ -50,23 +49,59 @@ const DataTable = class extends HTMLElement {
         }
         data.push(row);
       }
-      this.visibleData = data;
     }
+    if (this.sortingColumn.id) {
+      this.applySorting(data);
+    }
+    this.visibleData = data;
+  }
+  applySorting(rows) {
+    if (!this.sortingColumn.id) {
+      this.applyFilters();
+    }
+    else {
+      const column = this.columns.find(c => c.id === this.sortingColumn.id);
+      const columnIndex = this.columns.findIndex(c => c.id === column.id);
+      if (!column || !column.sortingEnabled) {
+        this.sortingColumn = {};
+      }
+      else {
+        const order = this.sortingColumn.order === "asc" ? 1 : -1;
+        rows.sort((aRow, bRow) => {
+          const aVal = Array.isArray(aRow) ? aRow[columnIndex] : aRow[column.id];
+          const bVal = Array.isArray(bRow) ? bRow[columnIndex] : bRow[column.id];
+          if (column.sort) {
+            return column.sort(aVal, bVal) * order;
+          }
+          else {
+            return toString(aVal).localeCompare(toString(bVal)) * order;
+          }
+        });
+      }
+    }
+  }
+  setColumnSorting(column, order) {
+    if (!order) {
+      this.sortingColumn = {};
+    }
+    else {
+      this.sortingColumn = { id: column.id, order };
+    }
+    this.applySorting(this.visibleData);
+    forceUpdate(this);
   }
   dataChanged() {
     this.applyFilters();
   }
   connectedCallback() {
-    var _a;
-    this.visibleData = (_a = this.data) === null || _a === void 0 ? void 0 : _a.slice();
+    this.visibleData = this.data?.slice();
   }
   renderCell(column, columnIndex, row, accessByIndex) {
     const value = row[accessByIndex ? columnIndex : column.id];
     return h("td", null, column.formatter ? column.formatter(value) : value);
   }
   render() {
-    var _a, _b;
-    return h(Host, null, h("table", null, h("thead", null, h("tr", null, (_a = this.columns) === null || _a === void 0 ? void 0 : _a.map((column, columnIndex) => h("ionx-data-table-th", { filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled }, column.label)))), h("tbody", null, (_b = this.visibleData) === null || _b === void 0 ? void 0 : _b.map(row => h("tr", null, this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row))))))));
+    return h(Host, null, h("table", null, h("thead", null, h("tr", null, this.columns?.map((column, columnIndex) => h("ionx-data-table-th", { filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled, sortingApply: order => this.setColumnSorting(column, order), sortingActive: this.sortingColumn.id === column.id ? this.sortingColumn.order : undefined }, column.label)))), h("tbody", null, this.visibleData?.map(row => h("tr", null, this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row))))))));
   }
   static get watchers() { return {
     "data": ["dataChanged"]
@@ -129,7 +164,7 @@ class MatchStringFilter extends Filter {
   }
 }
 
-const thCss = ".sc-ionx-data-table-th-h{display:table-cell;position:-webkit-sticky;position:sticky;top:0;background-color:var(--data-table-background-color, var(--ion-background-color, #fff));box-shadow:0 1px 0 0 var(--ion-border-color);border-color:var(--ion-border-color);border-style:solid;border-width:0 var(--ionx-border-width) 0 var(--ionx-border-width);padding:8px;font-weight:500}.sc-ionx-data-table-th-h:first-child{border-left:0}.sc-ionx-data-table-th-h:last-child{border-right:0}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th{display:flex;align-items:center}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th{margin:0 4px;--padding-start:4px;--padding-end:4px}";
+const thCss = ".sc-ionx-data-table-th-h{display:table-cell;position:-webkit-sticky;position:sticky;top:0;background-color:var(--data-table-background-color, var(--ion-background-color, #fff));box-shadow:0 1px 0 0 var(--ion-border-color);border-color:var(--ion-border-color);border-style:solid;border-width:0 var(--ionx-border-width) 0 var(--ionx-border-width);padding:8px;font-weight:500}.sc-ionx-data-table-th-h:first-child{border-left:0}.sc-ionx-data-table-th-h:last-child{border-right:0}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th{display:flex;align-items:center}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th{margin:0;--padding-start:4px;--padding-end:4px}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th:first-of-type{margin-left:4px}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th:last-of-type{margin-right:4px}.sc-ionx-data-table-th-h ion-icon[ionx--sorting].sc-ionx-data-table-th{--data-table--sorting-asc:var(--ion-border-color);--data-table--sorting-desc:var(--ion-border-color)}.sc-ionx-data-table-th-h ion-icon[ionx--sorting][ionx--sorting=asc].sc-ionx-data-table-th{--data-table--sorting-asc:var(--ion-color-primary)}.sc-ionx-data-table-th-h ion-icon[ionx--sorting][ionx--sorting=desc].sc-ionx-data-table-th{--data-table--sorting-desc:var(--ion-color-primary)}";
 
 defineIonxSelect();
 const Th = class extends HTMLElement {
@@ -140,6 +175,17 @@ const Th = class extends HTMLElement {
   dataTable() {
     return this.element.closest("ionx-data-table");
   }
+  async sortingClicked() {
+    if (this.sortingActive === "asc") {
+      this.sortingApply("desc");
+    }
+    else if (this.sortingActive === "desc") {
+      this.sortingApply(false);
+    }
+    else {
+      this.sortingApply("asc");
+    }
+  }
   async filterClicked() {
     if (this.filterType === "select") {
       await this.filterSelect();
@@ -149,7 +195,6 @@ const Th = class extends HTMLElement {
     }
   }
   async filterSearch() {
-    var _a;
     const current = this.filterCurrent();
     const popover = await popoverController.create({
       component: "ionx-data-table-search-filter",
@@ -161,7 +206,7 @@ const Th = class extends HTMLElement {
     await popover.present();
     const result = await popover.onWillDismiss();
     if (result.role === "ok") {
-      const value = (_a = result.data) === null || _a === void 0 ? void 0 : _a.trim();
+      const value = result.data?.trim();
       this.filterApply(value ? new MatchStringFilter(value) : undefined);
       this.filterActive = !!value;
     }
@@ -188,7 +233,7 @@ const Th = class extends HTMLElement {
     }
   }
   render() {
-    return h(Host, null, h("div", { class: "ionx--outer" }, h("div", { "slot-container": "label" }, h("slot", null)), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.filterClicked() }, h("ion-icon", { name: this.filterType === "search" ? "search" : "filter" }))));
+    return h(Host, null, h("div", { class: "ionx--outer" }, h("div", { "slot-container": "label" }, h("slot", null)), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.sortingClicked() }, h("ion-icon", { "ionx--sorting": this.sortingActive || "no", src: "/assets/ionx.DataTable/sort.svg" })), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.filterClicked() }, h("ion-icon", { name: this.filterType === "search" ? "search" : "filter" }))));
   }
   get element() { return this; }
   static get style() { return thCss; }
@@ -196,7 +241,7 @@ const Th = class extends HTMLElement {
 
 const IonxDataTable = /*@__PURE__*/proxyCustomElement(DataTable, [0,"ionx-data-table",{"columns":[16],"data":[16],"visibleData":[32]}]);
 const IonxDataTableSearchFilter = /*@__PURE__*/proxyCustomElement(SearchPopover, [1,"ionx-data-table-search-filter",{"value":[1]},[[0,"ionViewDidEnter","didEnter"]]]);
-const IonxDataTableTh = /*@__PURE__*/proxyCustomElement(Th, [6,"ionx-data-table-th",{"filterEnabled":[4,"filter-enabled"],"filterType":[1,"filter-type"],"filterData":[16],"filterApply":[16],"filterCurrent":[16],"filterActive":[32]}]);
+const IonxDataTableTh = /*@__PURE__*/proxyCustomElement(Th, [6,"ionx-data-table-th",{"filterEnabled":[4,"filter-enabled"],"filterType":[1,"filter-type"],"filterData":[16],"filterApply":[16],"filterCurrent":[16],"sortingActive":[8,"sorting-active"],"sortingApply":[16],"filterActive":[32]}]);
 const defineIonxDataTable = (opts) => {
   if (typeof customElements !== 'undefined') {
     [
