@@ -81,14 +81,20 @@ const DataTable = class extends HTMLElement {
     }
   }
   setColumnSorting(column, order) {
+    const prev = this.sortingColumn.id;
     if (!order) {
       this.sortingColumn = {};
     }
     else {
       this.sortingColumn = { id: column.id, order };
     }
-    this.applySorting(this.visibleData);
-    forceUpdate(this);
+    if (prev !== this.sortingColumn.id) {
+      this.applyFilters();
+    }
+    else {
+      this.applySorting(this.visibleData);
+      forceUpdate(this);
+    }
   }
   dataChanged() {
     this.applyFilters();
