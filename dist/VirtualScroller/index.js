@@ -3220,7 +3220,10 @@ const VirtualScrollerComponent = class extends HTMLElement {
   }
   componentDidRender() {
     if (this.didUpdateState) {
-      this.didUpdateState(this.prevState);
+      const update = this.didUpdateState;
+      const state = this.prevState;
+      setTimeout(() => update(state));
+      this.didUpdateState = undefined;
     }
   }
   disconnectedCallback() {
@@ -3228,7 +3231,7 @@ const VirtualScrollerComponent = class extends HTMLElement {
   }
   render() {
     const { items, firstShownItemIndex, lastShownItemIndex, beforeItemsHeight, afterItemsHeight, itemHeights } = this.state;
-    if (itemHeights.find(h => typeof h === "number")) {
+    if (itemHeights.find(h => typeof h === "number") || items.length === 0) {
       this.beforeItemsHeight = beforeItemsHeight;
       this.afterItemsHeight = afterItemsHeight;
     }
