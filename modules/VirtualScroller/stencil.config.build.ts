@@ -1,21 +1,21 @@
 import {Config} from "@stencil/core";
-import {sass} from "@stencil/sass";
 import {defaultExternals} from "../defaultExternals";
+import {defaultStencilPlugins} from "../defaultStencilPlugins";
 
 export const config: Config = {
     namespace: "ionx",
-    plugins: [sass()],
+    plugins: defaultStencilPlugins(),
     tsconfig: "tsconfig.build.json",
     outputTargets: [
         {type: "docs-readme"},
         {
             type: "dist-custom-elements-bundle",
-            dir: "../../dist/VirtualScroll",
+            dir: "../../dist/VirtualScroller",
             includeGlobalScripts: false,
-            defineFunctionName: "defineIonxVirtualScroll",
+            defineFunctionName: "defineIonxVirtualScroller",
             external: [
                 ...defaultExternals,
-                /ionx\/(?!modules\/VirtualScroll)/
+                /ionx\/(?!modules\/VirtualScroller)/
             ],
             empty: true
         }

@@ -1,0 +1,19 @@
+@import "~@ionic/core/css/core.css";
+@import "~@ionic/core/css/normalize.css";
+@import "~@ionic/core/css/structure.css";
+@import "~@ionic/core/css/typography.css";
+
+// @import "~@ionic/core/css/padding.css";
+/* @import "~@ionic/core/css/float-elements.css"; */
+// @import "~@ionic/core/css/text-alignment.css";
+/* @import "~@ionic/core/css/text-transformation.css"; */
+/* @import "~@ionic/core/css/flex-utils.css"; */
+
+:root {
+    --ion-color-primary: #69bb7b;
+    --ion-color-primary-rgb: 105,187,123;
+    --ion-color-primary-contrast: #000000;
+    --ion-color-primary-contrast-rgb: 0,0,0;
+    --ion-color-primary-shade: #5ca56c;
+    --ion-color-primary-tint: #78c288;
+}
