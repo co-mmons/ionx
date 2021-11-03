@@ -16,6 +16,7 @@ export namespace Components {
         "readonly": boolean;
         "required"?: boolean;
         "separator": string;
+        "setFocus": () => Promise<void>;
         "sortFn": (a: string, b: string) => number;
         "sortable": boolean;
         "type": TextFieldTypes;

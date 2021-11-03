@@ -1,0 +1,16 @@
+ion-checkbox {
+    &[readonly] {
+        pointer-events: none;
+    }
+}
+
+ionx-form-field [slot-container="default"] > ion-checkbox {
+
+    &.md {
+        margin: 10px 16px;
+    }
+
+    &.ios {
+        margin: 6px 16px;
+    }
+}

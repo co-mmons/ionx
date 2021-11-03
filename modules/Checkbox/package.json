@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "build": "node-utils-file-system-copy-directory src ../../dist/Checkbox"
+    }
+}

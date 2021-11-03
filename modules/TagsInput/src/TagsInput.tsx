@@ -1,5 +1,5 @@
 import {TextFieldTypes} from "@ionic/core";
-import {Component, Host, h, Prop, Element, State, EventEmitter, Event} from "@stencil/core";
+import {Component, Element, Event, EventEmitter, h, Host, Method, Prop, State} from "@stencil/core";
 
 @Component({
     tag: "ionx-tags-input",
@@ -47,8 +47,6 @@ export class TagsInput {
     @Prop()
     unique: boolean = true;
 
-    #focused: boolean = false;
-
     @Prop()
     required?: boolean;
 
@@ -59,7 +57,7 @@ export class TagsInput {
     currentTag: string = "";
 
     get input() {
-        return this.element.shadowRoot.querySelector("input");
+        return this.element.querySelector("input");
     }
 
     @Event()
@@ -71,22 +69,12 @@ export class TagsInput {
             this.pushTag(this.currentTag);
         }
 
-        if (this.#focused) {
-            this.#focused = false;
-            // this.ionBlur.emit(this._tags);
-        }
-
         this.input?.blur();
     }
 
-    setFocus(): any {
-        if (!this.#focused) {
-            this.#focused = true;
-
-            this.input?.focus();
-
-            // this.ionFocus.emit(this._tags);
-        }
+    @Method()
+    async setFocus(): Promise<void> {
+        this.input?.focus();
     }
 
     isUnique(tag: string) {

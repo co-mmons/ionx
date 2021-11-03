@@ -32,6 +32,19 @@
 | `ionChange` |             | `CustomEvent<{ value: string[]; }>` |
 
 
+## Methods
+
+### `setFocus() => Promise<void>`
+
+
+
+#### Returns
+
+Type: `Promise<void>`
+
+
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

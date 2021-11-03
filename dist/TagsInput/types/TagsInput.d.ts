@@ -1,7 +1,6 @@
 import { TextFieldTypes } from "@ionic/core";
 import { EventEmitter } from "@stencil/core";
 export declare class TagsInput {
-  #private;
   element: HTMLElement;
   readonly: boolean;
   hideRemove: boolean;
@@ -23,7 +22,7 @@ export declare class TagsInput {
     value: string[];
   }>;
   setBlur(): void;
-  setFocus(): any;
+  setFocus(): Promise<void>;
   isUnique(tag: string): boolean;
   verifyTag(tagStr: string): boolean;
   sortTags(): void;

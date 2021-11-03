@@ -38,6 +38,7 @@ const modules = [
     "Slides",
     "Swiper",
     "VirtualScroller",
+    "Checkbox",
 
     "LinkEditor",
     "HtmlEditor",
