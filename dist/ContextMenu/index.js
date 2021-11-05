@@ -4,7 +4,12 @@ import { popoverController } from '@ionic/core';
 import { addEventListener } from 'ionx/utils';
 
 async function showContextMenu(target, items, options) {
-  const popover = await popoverController.create(Object.assign(Object.assign({}, (options !== null && options !== void 0 ? options : {})), { component: "ionx-context-menu", componentProps: { items }, event: target instanceof HTMLElement ? { target } : target }));
+  const popover = await popoverController.create({
+    ...(options ?? {}),
+    component: "ionx-context-menu",
+    componentProps: { items: items.filter(item => !!item) },
+    event: target instanceof HTMLElement ? { target } : target
+  });
   await popover.present();
   popover.animated = false;
 }
@@ -15,9 +20,8 @@ function contextMenuToggleButton(items, options) {
   // 1. create __ionxContextMenuToggle prop in a button element, this will be onClick unlisten function
   // 2. create __ionxContextMenuToggle prop on a function itself, with onClick unlisten function
   const func = function (el) {
-    var _a;
     if (!el) {
-      (_a = this[internalProp]) === null || _a === void 0 ? void 0 : _a.call(this);
+      this[internalProp]?.();
     }
     else {
       // already initialized by other ref call

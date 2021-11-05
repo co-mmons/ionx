@@ -7,7 +7,7 @@ export async function showContextMenu(target: HTMLElement | Event, items: Contex
     const popover = await popoverController.create({
         ...(options ?? {}),
         component: "ionx-context-menu",
-        componentProps: {items},
+        componentProps: {items: items.filter(item => !!item)},
         event: target instanceof HTMLElement ? {target} as any : target
     });
 
