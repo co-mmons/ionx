@@ -9,9 +9,17 @@
     color: var(--color);
     font-family: var(--ion-font-family, inherit);
     max-width: 100%;
+    position: relative;
 
     outline: none;
     cursor: pointer;
+
+    //@media(any-hover: hover) {
+    //    &:hover {
+    //        background: var(--background-hover, red);
+    //        opacity: var(--background-hover-opacity, .3);
+    //    }
+    //}
 
     &::-moz-focus-inner {
         border: 0;
@@ -20,14 +28,21 @@
     .ionx--inner {
         display: flex;
         position: relative;
+        align-items: center;
+
+
     }
 
-    .ionx--icon {
+    ::slotted([slot=icon]) {
+        margin-right: 8px;
+    }
+
+    .ionx--dropdown {
         position: relative;
         width: 16px;
         height: 20px;
 
-        .ionx--icon-inner {
+        .ionx--dropdown-inner {
             top: 50%;
             right: 0px;
             margin-top: -3px;

@@ -68,7 +68,9 @@ export class Test {
 
             <fieldset>
                 <legend>Simple</legend>
-                <ionx-select items={this.basicItems} ref={this.data.controls.select1.attach()}/>
+                <ionx-select placeholder="Olahahas" items={this.basicItems} ref={this.data.controls.select1.attach()}>
+                    <ion-icon name="language-outline" slot="icon"/>
+                </ionx-select>
             </fieldset>
 
             <fieldset>

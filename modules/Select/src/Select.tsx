@@ -437,11 +437,14 @@ export class Select implements SelectProps {
             class={{
                 "ionx--sortable": this.sortable && !empty && !this.disabled && !this.readonly,
                 "ionx--readonly": !!this.readonly,
-                "ionx--disabled": !!this.disabled
+                "ionx--disabled": !!this.disabled,
+                "ion-activatable": !this.readonly && !this.disabled
             }}
             onClick={() => this.open()}>
 
             <div class="ionx--inner">
+
+                <slot name="icon"/>
 
                 {this.loading && <ion-spinner name="dots"/>}
 
@@ -458,8 +461,8 @@ export class Select implements SelectProps {
 
                     </div>}
 
-                    {!this.readonly && !this.disabled && (!sortable || empty) && <div class="ionx--icon" role="presentation">
-                        <div class="ionx--icon-inner"/>
+                    {!this.readonly && !this.disabled && (!sortable || empty) && <div class="ionx--dropdown" role="presentation">
+                        <div class="ionx--dropdown-inner"/>
                     </div>}
 
                     {sortable && !empty && <ion-reorder-group onIonItemReorder={ev => this.valuesReorder(ev)} disabled={this.readonly || this.disabled}>
