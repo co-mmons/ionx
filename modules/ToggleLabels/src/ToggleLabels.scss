@@ -10,10 +10,18 @@
 
     .ionx--on {
         margin-left: 4px;
+
+        &:empty {
+            display: none;
+        }
     }
 
     .ionx--off {
         margin-right: 4px;
+
+        &:empty {
+            display: none;
+        }
     }
 
     &.ionx--interactive {
