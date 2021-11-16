@@ -606,11 +606,37 @@ class FormController {
     }
   }
   async validate(options) {
+    const errorControls = [];
     let firstErrorControl;
     for (const control of this.orderedControls()) {
-      if (!(await control.validate()) && control.element && !firstErrorControl) {
-        firstErrorControl = control;
+      if (!(await control.validate())) {
+        errorControls.push(control);
+        if (!firstErrorControl) {
+          if ((!options?.focusableControl || options?.focusableControl === "firstElement") && control.element) {
+            firstErrorControl = control;
+          }
+          else if (options?.focusableControl === "first") {
+            firstErrorControl = control;
+          }
+        }
       }
+    }
+    if (typeof options?.focusableControl === "function") {
+      try {
+        const result = options.focusableControl(errorControls);
+        if (result instanceof Promise) {
+          firstErrorControl = await result;
+        }
+        else {
+          firstErrorControl = result;
+        }
+      }
+      catch (e) {
+        console.warn("[ionx-form-controller] Error in FormControllerValidateOptions.focusableControl()", e);
+      }
+    }
+    if (!firstErrorControl && errorControls.length > 0) {
+      firstErrorControl = errorControls[0];
     }
     if (firstErrorControl) {
       if (!options?.preventFocus) {
@@ -625,7 +651,7 @@ class FormController {
             console.warn(e);
           }
         }
-        firstErrorControl.focus({ preventScroll: options?.preventScroll });
+        firstErrorControl.focus({ preventScroll: options?.preventScroll, waitForElement: options?.waitForFocusElement });
       }
       this.errorPresenter$?.present(this, firstErrorControl);
       return false;

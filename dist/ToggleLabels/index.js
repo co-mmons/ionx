@@ -15,7 +15,8 @@ const ToggleLabels = class extends HTMLElement {
   }
   switchToggle(state) {
     if (!this.disabled && !this.readonly) {
-      this.toggle.checked = state === "on";
+      const toggle = this.toggle;
+      toggle.checked = state === "auto" ? !toggle.checked : state === "on";
     }
   }
   toggleChanged(ev) {
@@ -49,7 +50,7 @@ const ToggleLabels = class extends HTMLElement {
     if (this.prefetch) {
       return;
     }
-    return h(Host, { class: { "ionx--interactive": !this.disabled && !this.readonly, "ionx--readonly": this.readonly } }, this.readonly && h("span", null, this.value ? this.on : this.off), h("span", { class: "ionx--off", onClick: () => this.switchToggle("off") }, this.off && h("span", null, this.off), h("slot", { name: "off" })), this.defaultToggle && h("ion-toggle", Object.assign({ class: "ionx--default-toggle" }, this.initialToggleState)), h("slot", null), h("span", { class: "ionx--on", onClick: () => this.switchToggle("on") }, this.on && h("span", null, this.on), h("slot", { name: "on" })));
+    return h(Host, { class: { "ionx--interactive": !this.disabled && !this.readonly, "ionx--readonly": this.readonly } }, this.readonly && h("span", null, this.value ? this.on : this.off), h("span", { class: "ionx--off", onClick: () => this.switchToggle(this.on ? "off" : "auto") }, this.off && h("span", null, this.off), h("slot", { name: "off" })), this.defaultToggle && h("ion-toggle", Object.assign({ class: "ionx--default-toggle" }, this.initialToggleState)), h("slot", null), h("span", { class: "ionx--on", onClick: () => this.switchToggle(this.off ? "on" : "auto") }, this.on && h("span", null, this.on), h("slot", { name: "on" })));
   }
   get element() { return this; }
   static get watchers() { return {

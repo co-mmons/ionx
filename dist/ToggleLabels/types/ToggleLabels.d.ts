@@ -22,7 +22,7 @@ export declare class ToggleLabels {
     disabled: boolean;
   };
   private get toggle();
-  switchToggle(state: "on" | "off"): void;
+  switchToggle(state: "on" | "off" | "auto"): void;
   toggleChanged(ev: CustomEvent): void;
   valueChanged(): void;
   syncToggle(): void;

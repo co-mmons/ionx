@@ -48,9 +48,10 @@ export class ToggleLabels {
         return this.element.querySelector<HTMLElement & ionic.IonToggle>("ion-toggle");
     }
 
-    switchToggle(state: "on" | "off") {
+    switchToggle(state: "on" | "off" | "auto") {
         if (!this.disabled && !this.readonly) {
-            this.toggle.checked = state === "on";
+            const toggle = this.toggle;
+            toggle.checked = state === "auto" ? !toggle.checked : state === "on";
         }
     }
 
@@ -103,7 +104,7 @@ export class ToggleLabels {
 
             {this.readonly && <span>{this.value ? this.on : this.off}</span>}
 
-            <span class="ionx--off" onClick={() => this.switchToggle("off")}>
+            <span class="ionx--off" onClick={() => this.switchToggle(this.on ? "off" : "auto")}>
                 {this.off && <span>{this.off}</span>}
                 <slot name="off"/>
             </span>
@@ -112,7 +113,7 @@ export class ToggleLabels {
 
             <slot/>
 
-            <span class="ionx--on" onClick={() => this.switchToggle("on")}>
+            <span class="ionx--on" onClick={() => this.switchToggle(this.off ? "on" : "auto")}>
                 {this.on && <span>{this.on}</span>}
                 <slot name="on"/>
             </span>
