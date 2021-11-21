@@ -39,7 +39,7 @@ declare namespace LocalJSX {
         "disabled"?: boolean;
         "off"?: string;
         "on"?: string;
-        "onIonChange"?: (event: CustomEvent<{value: boolean}>) => void;
+        "onIonChange"?: (event: CustomEvent<{value: boolean, checked: boolean}>) => void;
         "prefetch"?: boolean;
         "readonly"?: boolean;
         "value"?: boolean;

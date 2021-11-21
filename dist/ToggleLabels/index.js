@@ -3,6 +3,7 @@ export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client'
 import { prefetchComponent } from 'ionx/utils';
 
 const toggleLabelsCss = ".sc-ionx-toggle-labels-h{display:flex;align-items:center}.ionx--readonly.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels,.ionx--readonly.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels,.ionx--readonly.sc-ionx-toggle-labels-h .ionx--default-toggle.sc-ionx-toggle-labels{display:none}.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels{margin-left:4px}.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels:empty{display:none}.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels{margin-right:4px}.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels:empty{display:none}.ionx--interactive.sc-ionx-toggle-labels-h .ionx--on.sc-ionx-toggle-labels{cursor:pointer}.ionx--interactive.sc-ionx-toggle-labels-h .ionx--off.sc-ionx-toggle-labels{cursor:pointer}.sc-ionx-toggle-labels-s>ion-toggle,.sc-ionx-toggle-labels-h ion-toggle.sc-ionx-toggle-labels{padding-inline-start:2px;padding-inline-end:2px}.item-label-stacked.sc-ionx-toggle-labels-h,.item-label-stacked .sc-ionx-toggle-labels-h{align-self:flex-start}.ios.sc-ionx-toggle-labels-h .item-label-stacked.sc-ionx-toggle-labels,.ios .item-label-stacked .sc-ionx-toggle-labels-h{margin-top:2px;margin-bottom:2px}ionx-form-field [slot-container=default]>.sc-ionx-toggle-labels-h{margin-left:16px;margin-right:16px;min-height:38px}";
+const ionxToggleLabelsStyle = toggleLabelsCss;
 
 const ToggleLabels = class extends HTMLElement {
   constructor() {
@@ -28,7 +29,7 @@ const ToggleLabels = class extends HTMLElement {
     const was = this.value;
     this.value = this.toggle.checked;
     if (was !== this.value) {
-      this.ionChange.emit({ value: this.value });
+      this.ionChange.emit({ value: this.value, checked: this.value });
     }
   }
   valueChanged() {
@@ -58,7 +59,7 @@ const ToggleLabels = class extends HTMLElement {
     "readonly": ["syncToggle"],
     "disabled": ["syncToggle"]
   }; }
-  static get style() { return toggleLabelsCss; }
+  static get style() { return ionxToggleLabelsStyle; }
 };
 
 const IonxToggleLabels = /*@__PURE__*/proxyCustomElement(ToggleLabels, [6,"ionx-toggle-labels",{"on":[1],"off":[1],"defaultToggle":[4,"default-toggle"],"readonly":[4],"disabled":[4],"value":[1028],"prefetch":[4]},[[0,"ionChange","toggleChanged"]]]);

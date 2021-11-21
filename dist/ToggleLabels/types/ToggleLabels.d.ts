@@ -16,6 +16,7 @@ export declare class ToggleLabels {
   prefetch: boolean;
   ionChange: EventEmitter<{
     value: boolean;
+    checked: boolean;
   }>;
   initialToggleState: {
     checked: boolean;

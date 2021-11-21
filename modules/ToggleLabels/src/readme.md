@@ -19,9 +19,9 @@
 
 ## Events
 
-| Event       | Description | Type                               |
-| ----------- | ----------- | ---------------------------------- |
-| `ionChange` |             | `CustomEvent<{ value: boolean; }>` |
+| Event       | Description | Type                                                 |
+| ----------- | ----------- | ---------------------------------------------------- |
+| `ionChange` |             | `CustomEvent<{ value: boolean; checked: boolean; }>` |
 
 
 ----------------------------------------------

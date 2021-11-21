@@ -40,7 +40,7 @@ export class ToggleLabels {
     prefetch: boolean;
 
     @Event()
-    ionChange: EventEmitter<{value: boolean}>;
+    ionChange: EventEmitter<{value: boolean, checked: boolean}>;
 
     initialToggleState: {checked: boolean, disabled: boolean};
 
@@ -68,7 +68,7 @@ export class ToggleLabels {
         this.value = this.toggle.checked;
 
         if (was !== this.value) {
-            this.ionChange.emit({value: this.value});
+            this.ionChange.emit({value: this.value, checked: this.value});
         }
     }
 
