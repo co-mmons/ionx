@@ -6,6 +6,7 @@ export declare class SwiperComponent implements ComponentInterface {
   options?: SwiperOptions;
   swiperEvent: EventEmitter<{
     eventName: keyof SwiperEvents;
+    swiper: Swiper;
   }>;
   mutationObserver?: MutationObserver;
   /**
