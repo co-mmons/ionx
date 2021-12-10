@@ -1,13 +1,13 @@
-import { attachShadow, h, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, h, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
 const svgCss = ":host{display:inline-block}:host svg{display:inline-block;width:100%;height:100%;fill:var(--svg-fill-color);stroke:var(--svg-stroke-color);position:absolute;left:0px;top:0px}";
 
-const Svg = class extends HTMLElement {
+let Svg = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   render() {
     return h("span", { innerHTML: this.svg });

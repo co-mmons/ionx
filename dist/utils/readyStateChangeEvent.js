@@ -11,7 +11,7 @@ export function markAsUnready(elementOrComponent) {
 export function markAsReady(elementOrComponent, options) {
     const element = elementOrComponent instanceof Element ? elementOrComponent : elementOrComponent.element;
     if (!isReady(element)) {
-        if (options === null || options === void 0 ? void 0 : options.delay) {
+        if (options?.delay) {
             setTimeout(() => setState(element, true), options.delay);
         }
         else {
@@ -28,7 +28,7 @@ export function isReady(elementOrComponent, options) {
     if (element.getAttribute(attributeName) === "false") {
         return false;
     }
-    if (!(options === null || options === void 0 ? void 0 : options.noChildrenCheck)) {
+    if (!options?.noChildrenCheck) {
         return isChildrenReady(element, options);
     }
     return true;
@@ -37,7 +37,7 @@ export function isChildrenReady(element, options) {
     if (element.querySelector(notReadySelector)) {
         return false;
     }
-    if (!(options === null || options === void 0 ? void 0 : options.noShadowCheck)) {
+    if (!options?.noShadowCheck) {
         const children = element.children;
         for (let i = 0; i < children.length; i++) {
             if (!checkShadowReady(children[i])) {
@@ -51,11 +51,10 @@ export function isChildrenReady(element, options) {
     return true;
 }
 function checkShadowReady(element) {
-    var _a, _b;
-    if ((_a = element.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector(notReadySelector)) {
+    if (element.shadowRoot?.querySelector(notReadySelector)) {
         return false;
     }
-    const children = (_b = element.shadowRoot) === null || _b === void 0 ? void 0 : _b.children;
+    const children = element.shadowRoot?.children;
     if (children) {
         for (let i = 0; i < children.length; i++) {
             if (!checkShadowReady(children[i])) {

@@ -7,7 +7,7 @@ export function isHydrated(element, options) {
     if (isHydratable(element) && !element.classList.contains("hydrated")) {
         return false;
     }
-    if (!(options === null || options === void 0 ? void 0 : options.noChildrenCheck)) {
+    if (!options?.noChildrenCheck) {
         return isChildrenHydrated(element, options);
     }
     return true;
@@ -22,7 +22,7 @@ export function isChildrenHydrated(element, options) {
             return false;
         }
     }
-    if (!(options === null || options === void 0 ? void 0 : options.noShadowCheck)) {
+    if (!options?.noShadowCheck) {
         for (let i = 0; i < children.length; i++) {
             if (!checkShadowHydrated(children[i])) {
                 return false;
@@ -35,8 +35,7 @@ export function isChildrenHydrated(element, options) {
     return true;
 }
 function checkShadowHydrated(element) {
-    var _a;
-    const shadowChildren = (_a = element.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelectorAll(notHydratedSelector);
+    const shadowChildren = element.shadowRoot?.querySelectorAll(notHydratedSelector);
     if (shadowChildren) {
         for (let i = 0; i < shadowChildren.length; i++) {
             if (isHydratable(shadowChildren[i])) {

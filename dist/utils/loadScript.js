@@ -3,7 +3,7 @@ export function loadScript(url) {
     return new Promise((resolve, reject) => {
         const id = btoa(url).replace("=", "");
         const existing = document.getElementById(id);
-        if (existing === null || existing === void 0 ? void 0 : existing.hasAttribute("loaded")) {
+        if (existing?.hasAttribute("loaded")) {
             if (existing.getAttribute("loaded") === "true") {
                 resolve(false);
             }

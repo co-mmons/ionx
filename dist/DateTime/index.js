@@ -1,4 +1,4 @@
-import { createEvent, h, Host, attachShadow, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { intl, setMessages, MessageRef } from '@co.mmons/js-intl';
 import { TimeZoneDate, timeZoneOffset, sleep } from '@co.mmons/js-utils/core';
@@ -16,7 +16,7 @@ const defaultDateFormat = {
 
 const dateTimeInputCss = ".sc-ionx-date-time-h{position:relative;display:inline-flex;max-width:100%;user-select:none;min-height:38px;align-items:center;outline:none;cursor:pointer}.sc-ionx-date-time-h::-moz-focus-inner{border:0}.sc-ionx-date-time-h .ionx--text.sc-ionx-date-time{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-date-time-h .ionx--text.ionx--placeholder-visible.sc-ionx-date-time{opacity:var(--date-time-placeholder-opacity, 0.5)}.sc-ionx-date-time-h .ionx--icon.sc-ionx-date-time{position:relative;width:16px;height:20px}.sc-ionx-date-time-h .ionx--icon.sc-ionx-date-time .ionx--icon-inner.sc-ionx-date-time{top:50%;right:0;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--date-time-dropdown-icon-opacity, 0.5);pointer-events:none}[disabled].sc-ionx-date-time-h{opacity:var(--date-time-disabled-opacity, 0.5);pointer-events:none;cursor:default}[readonly].sc-ionx-date-time-h{opacity:1;pointer-events:none;cursor:default}.sc-ionx-date-time-h ion-button.sc-ionx-date-time{--padding-start:4px;--padding-end:4px;margin:0 0 0 4px;height:auto}ionx-form-field [slot-container=default]>.sc-ionx-date-time-h,.item-label-stacked.sc-ionx-date-time-h,.item-label-stacked .sc-ionx-date-time-h{align-self:flex-start;width:calc(100% - 32px);margin-left:16px;margin-right:16px;min-height:38px}ionx-form-field [slot-container=default]>.sc-ionx-date-time-h .ionx--text.sc-ionx-date-time,.item-label-stacked.sc-ionx-date-time-h .ionx--text.sc-ionx-date-time,.item-label-stacked .sc-ionx-date-time-h .ionx--text.sc-ionx-date-time{max-width:calc(100% - 16px);flex:initial}";
 
-const DateTimeInput = class extends HTMLElement {
+let DateTimeInput = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -48,7 +48,7 @@ const DateTimeInput = class extends HTMLElement {
   }
   valueChanged(value, old) {
     this.formattedValue = this.formatValue();
-    if (this.valueChanging && (value !== old || (value === null || value === void 0 ? void 0 : value.getTime()) !== (old === null || old === void 0 ? void 0 : old.getTime()) || (value === null || value === void 0 ? void 0 : value.timeZone) !== (old === null || old === void 0 ? void 0 : old.timeZone))) {
+    if (this.valueChanging && (value !== old || value?.getTime() !== old?.getTime() || value?.timeZone !== old?.timeZone)) {
       this.ionChange.emit({ value });
     }
     this.emitStyle();
@@ -131,7 +131,6 @@ const DateTimeInput = class extends HTMLElement {
     this.value = undefined;
   }
   async open() {
-    var _a;
     if (this.nativePicker) {
       this.nativePicker = document.createElement("input");
       this.nativePicker.type = "date";
@@ -142,7 +141,7 @@ const DateTimeInput = class extends HTMLElement {
       let value = this.value;
       let currentTimeZone;
       if (this.dateOnly) {
-        value = new TimeZoneDate((_a = this.value) !== null && _a !== void 0 ? _a : new Date());
+        value = new TimeZoneDate(this.value ?? new Date());
       }
       else {
         if (this.timeZoneRequired && (!value || !value.timeZone) && (!this.defaultTimeZone || this.defaultTimeZone === "current")) {
@@ -153,7 +152,7 @@ const DateTimeInput = class extends HTMLElement {
           value = new TimeZoneDate(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0), currentTimeZone);
         }
         else if (!value || (!value.timeZone && this.timeZoneRequired)) {
-          value = new TimeZoneDate(value !== null && value !== void 0 ? value : new Date(), currentTimeZone);
+          value = new TimeZoneDate(value ?? new Date(), currentTimeZone);
         }
       }
       if (!value.timeZone || value.timeZone === "UTC") {
@@ -197,8 +196,7 @@ const DateTimeInput = class extends HTMLElement {
     this.initItemListener();
   }
   disconnectedCallback() {
-    var _a;
-    (_a = this.itemClickUnlisten) === null || _a === void 0 ? void 0 : _a.call(this);
+    this.itemClickUnlisten?.();
     this.itemClickUnlisten = undefined;
   }
   async initItemListener() {
@@ -216,11 +214,10 @@ const DateTimeInput = class extends HTMLElement {
     }
   }
   render() {
-    var _a;
     return h(Host, null, h("div", { class: {
         "ionx--text": true,
         "ionx--placeholder-visible": !this.formattedValue && !!this.placeholder
-      } }, (_a = this.formattedValue) !== null && _a !== void 0 ? _a : this.placeholder), !this.readonly && !this.disabled && h("div", { class: "ionx--icon", role: "presentation" }, h("div", { class: "ionx--icon-inner" })), this.clearButtonVisible && !this.readonly && !this.disabled && this.value && h("ion-button", { fill: "clear", size: "small", tabIndex: -1, onClick: ev => this.clearButtonClicked(ev) }, h("ion-icon", { name: "backspace", slot: "icon-only" })));
+      } }, this.formattedValue ?? this.placeholder), !this.readonly && !this.disabled && h("div", { class: "ionx--icon", role: "presentation" }, h("div", { class: "ionx--icon-inner" })), this.clearButtonVisible && !this.readonly && !this.disabled && this.value && h("ion-button", { fill: "clear", size: "small", tabIndex: -1, onClick: ev => this.clearButtonClicked(ev) }, h("ion-icon", { name: "backspace", slot: "icon-only" })));
   }
   get element() { return this; }
   static get watchers() { return {
@@ -300,7 +297,7 @@ function timeZoneSelectItemsLoader(required, date) {
       date = new Date();
     }
     if (values) {
-      return values.map(timeZone => { var _a, _b; return (_b = (timeZone && { value: timeZone, label: (_a = TimeZone.get(timeZone)) === null || _a === void 0 ? void 0 : _a.label })) !== null && _b !== void 0 ? _b : noTimeZoneSelectValue; });
+      return values.map(timeZone => (timeZone && { value: timeZone, label: TimeZone.get(timeZone)?.label }) ?? noTimeZoneSelectValue);
     }
     const { timeZones } = await import('./timeZones.js');
     const unsorted = [];
@@ -323,11 +320,11 @@ function timeZoneSelectItemsLoader(required, date) {
 const dateTimeOverlayCss = ":host{display:block}:host ion-input{flex:1;text-align:right;--padding-end:0px;font-weight:600}:host ion-input input::-webkit-outer-spin-button,:host ion-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}:host ion-input input[type=number]{-moz-appearance:textfield}:host ion-item{--inner-padding-start:16px;--inner-padding-end:16px;--padding-start:0px;--padding-end:0px}:host ion-item ion-button[slot=end]{margin:0}:host .numeric-buttons{text-align:center;margin-left:16px;margin-right:0}:host .numeric-buttons ion-button{margin:0;--padding-start:2px;--padding-end:2px}:host ion-footer{--border-width:0px}:host ion-footer::before{display:none}:host ion-footer ion-toolbar{--border-width:0px !important;--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px}:host ion-footer div{flex:1;display:flex}:host ion-footer ion-button{min-height:44px;margin:0px}:host ion-footer ion-button:not(:last-child){font-weight:400}:host ion-footer ion-button:last-child{font-weight:500}:host ion-footer.md div{justify-content:flex-end}:host ion-footer.md ion-button{flex:none !important}:host ion-footer.ios ion-button{width:50%}";
 
 defineIonxSelect();
-const DateTimeOverlay = class extends HTMLElement {
+let DateTimeOverlay = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
     this.numericValues = {};
   }
   ranges() {
@@ -395,13 +392,12 @@ const DateTimeOverlay = class extends HTMLElement {
     }
   }
   async onKeyDown(event) {
-    var _a;
     const input = event.composedPath().find(t => t.tagName === "ION-INPUT");
     if (input && (event.key === "e" || event.key === "E" || event.key === "-" || event.key === "." || event.key === ",")) {
       event.preventDefault();
     }
     else if (input && event.key === "Enter") {
-      const next = (_a = input.closest("ion-item").nextElementSibling) === null || _a === void 0 ? void 0 : _a.querySelector("ion-input");
+      const next = input.closest("ion-item").nextElementSibling?.querySelector("ion-input");
       if (next) {
         event.preventDefault();
         next.setFocus();

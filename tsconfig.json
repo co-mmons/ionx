@@ -5,6 +5,7 @@
         "declaration": false,
         "experimentalDecorators": true,
         "resolveJsonModule": true,
+        "useDefineForClassFields": false,
         "lib": [
             "dom",
             "es2017",

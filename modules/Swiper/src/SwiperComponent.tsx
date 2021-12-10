@@ -18,7 +18,7 @@ export class SwiperComponent implements ComponentInterface {
     options?: SwiperOptions;
 
     @Event()
-    swiperEvent!: EventEmitter<{eventName: keyof SwiperEvents, swiper: Swiper}>;
+    swiperEvent!: EventEmitter<{swiper: Swiper, eventName: keyof SwiperEvents, eventArgs: any[]}>;
 
     mutationObserver?: MutationObserver;
 
@@ -75,7 +75,7 @@ export class SwiperComponent implements ComponentInterface {
             }
         };
 
-        return {...swiperOptions, ...this.options, ...{onAny: (eventName, ...args) => this.swiperEvent.emit({eventName, swiper: this.swiper, ...args})}};
+        return {...swiperOptions, ...this.options, ...{onAny: (eventName, ...args) => this.swiperEvent.emit({eventName, swiper: this.swiper, eventArgs: args.splice(1)})}};
     }
 
     async initSwiper() {

@@ -20,8 +20,8 @@ export async function prefetchComponent() {
     for (const tagName of tagNames) {
         fetched.push(tagName);
     }
-    if (typeof (options === null || options === void 0 ? void 0 : options.delay) !== "number" || (typeof (options === null || options === void 0 ? void 0 : options.delay) === "number" && options.delay > 0)) {
-        await sleep((options === null || options === void 0 ? void 0 : options.delay) || 1000);
+    if (typeof options?.delay !== "number" || (typeof options?.delay === "number" && options.delay > 0)) {
+        await sleep(options?.delay || 1000);
     }
     for (const tag of tagNames) {
         const element = document.createElement(tag);
@@ -33,7 +33,7 @@ export async function prefetchComponent() {
         try {
             await waitTillHydrated(element, { interval: 100, timeout: 10000 });
         }
-        catch (_a) {
+        catch {
             const idx = fetched.indexOf(tag);
             if (idx > -1) {
                 fetched.splice(idx, 1);

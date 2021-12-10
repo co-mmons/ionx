@@ -35,9 +35,8 @@ class QueryMatcher {
         forceUpdate(this.component);
     }
     disconnect() {
-        var _a;
         this.component = undefined;
-        (_a = this.unlisten) === null || _a === void 0 ? void 0 : _a.call(this);
+        this.unlisten?.();
         this.unlisten = undefined;
     }
 }

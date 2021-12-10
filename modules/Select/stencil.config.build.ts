@@ -13,7 +13,7 @@ export const config: Config = {
             dir: "../../dist/Select",
             defineFunctionName: "defineIonxSelect",
             includeGlobalScripts: false,
-            external: ["dragula", ...defaultExternals, /ionx\/(?!modules\/Select)/],
+            external: ["sortablejs", ...defaultExternals, /ionx\/(?!modules\/Select)/],
             empty: true
         }
     ]

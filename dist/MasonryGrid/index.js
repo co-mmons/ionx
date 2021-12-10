@@ -1,4 +1,4 @@
-import { h, Host, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { Capacitor } from '@capacitor/core';
 import { sleep, waitTill } from '@co.mmons/js-utils/core';
@@ -16,20 +16,18 @@ function lineBreak(beforeOrAfter = "before") {
 
 const masonryGridCss = ".sc-ionx-masonry-grid-h{display:block;position:relative;margin:8px}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{display:block;position:relative}.ionx--block.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{height:auto !important}.sc-ionx-masonry-grid-h:not(.ionx--block) [ionx--grid-items].sc-ionx-masonry-grid-s>*{position:absolute;display:none}.sc-ionx-masonry-grid-h.ionx--block [ionx--grid-items].sc-ionx-masonry-grid-s>*{left:unset;top:unset}";
 
-const MasonryGrid = class extends HTMLElement {
+let MasonryGrid = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
     this.paused = false;
   }
   isParentViewActive() {
-    var _a;
-    return !((_a = this.parentViewElement) === null || _a === void 0 ? void 0 : _a.classList.contains("ion-page-hidden"));
+    return !this.parentViewElement?.classList.contains("ion-page-hidden");
   }
   items() {
-    var _a;
     const items = [];
-    const children = (_a = this.itemsElement) === null || _a === void 0 ? void 0 : _a.children;
+    const children = this.itemsElement?.children;
     if (children) {
       for (let i = 0; i < children.length; i++) {
         items.push(children[i]);
@@ -43,7 +41,6 @@ const MasonryGrid = class extends HTMLElement {
     this.arrange({ force: true });
   }
   async arrange(options) {
-    var _a, _b, _c, _d, _e;
     let waiting = false;
     // we must wait until already started process finish its work
     while (this.busy) {
@@ -109,7 +106,7 @@ const MasonryGrid = class extends HTMLElement {
         for (let i = 0; i < items.length; i++) {
           const item = items[i];
           // zmieniła się pozycja itemu
-          if (((_a = item.__ionxMasonryGridCache) === null || _a === void 0 ? void 0 : _a.index) !== i) {
+          if (item.__ionxMasonryGridCache?.index !== i) {
             item.__ionxMasonryGridReady = false;
           }
           // jeżeli poprzedni item wymaga renderu, to jego sąsiad również
@@ -117,7 +114,7 @@ const MasonryGrid = class extends HTMLElement {
             item.__ionxMasonryGridReady = false;
           }
           const rect = item.getBoundingClientRect();
-          if (((_c = (_b = item.__ionxMasonryGridCache) === null || _b === void 0 ? void 0 : _b.rect) === null || _c === void 0 ? void 0 : _c.width) !== rect.width || ((_e = (_d = item.__ionxMasonryGridCache) === null || _d === void 0 ? void 0 : _d.rect) === null || _e === void 0 ? void 0 : _e.height) !== rect.height) {
+          if (item.__ionxMasonryGridCache?.rect?.width !== rect.width || item.__ionxMasonryGridCache?.rect?.height !== rect.height) {
             item.__ionxMasonryGridReady = false;
             if (!item.__ionxMasonryGridCache) {
               item.__ionxMasonryGridCache = { rect };
@@ -141,7 +138,7 @@ const MasonryGrid = class extends HTMLElement {
           try {
             await waitTill(() => this.itemsElement.getBoundingClientRect().width > 0, undefined, 5000);
           }
-          catch (_f) {
+          catch {
             console.debug("[ionx-masonry-grid] unable to arrange, container has not width");
             break ARRANGE;
           }
@@ -187,7 +184,7 @@ const MasonryGrid = class extends HTMLElement {
           if (!item.__ionxMasonryGridReady || !item.__ionxMasonryGridCache.rect) {
             item.__ionxMasonryGridCache.rect = item.getBoundingClientRect();
           }
-          const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || ((previous === null || previous === void 0 ? void 0 : previous.getAttribute(lineBreakAttribute)) === "after") || gridRect.width === item.__ionxMasonryGridCache.rect.width;
+          const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after") || gridRect.width === item.__ionxMasonryGridCache.rect.width;
           const isNewSection = sectionItems.length === 0 || breakLine;
           // element, pod którym mam być wstawiony ten element
           // w przypadku nowej lini albo puste, albo element, który jest najbardziej wysunięty do dołu
@@ -277,7 +274,7 @@ const MasonryGrid = class extends HTMLElement {
         if (!this.isParentViewActive() || this.paused) {
           this.arrange();
         }
-        else if ((options === null || options === void 0 ? void 0 : options.trigger) === "onresize") {
+        else if (options?.trigger === "onresize") {
           setTimeout(() => this.arrange());
         }
       }
@@ -293,7 +290,7 @@ const MasonryGrid = class extends HTMLElement {
       try {
         await waitTill(() => window.innerWidth === width, undefined, 2000);
       }
-      catch (_a) {
+      catch {
       }
     }
     this.arrange({ trigger: "onresize" });

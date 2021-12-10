@@ -21,7 +21,7 @@ export function matchesMediaBreakpoints(componentOrBreakpoints, breakpoints) {
     if (!component) {
         breakpoints = componentOrBreakpoints;
     }
-    const hookName = hookNamePrefix + ((breakpoints === null || breakpoints === void 0 ? void 0 : breakpoints.length) ? breakpoints.filter(bp => !!bp).join(",") : "all");
+    const hookName = hookNamePrefix + (breakpoints?.length ? breakpoints.filter(bp => !!bp).join(",") : "all");
     if (!breakpoints || !breakpoints.length) {
         breakpoints = allBreakpoints;
     }

@@ -5,4 +5,5 @@ export interface VirtualScrollerState {
   beforeItemsHeight?: number;
   afterItemsHeight?: number;
   itemHeights?: number[];
+  itemStates?: any[];
 }

@@ -6,6 +6,6 @@
     },
     "types": "../../dist/VirtualScroller/index.d.ts",
     "dependencies": {
-        "virtual-scroller": "^1.7.9"
+        "virtual-scroller": "1.7.9"
     }
 }

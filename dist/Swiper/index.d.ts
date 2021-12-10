@@ -1,48 +1,6 @@
-/* ionx custom elements bundle */
+/* ionx custom elements */
 
 import type { Components, JSX } from "./types/components";
-
-interface IonxSwiper extends Components.IonxSwiper, HTMLElement {}
-export const IonxSwiper: {
-  prototype: IonxSwiper;
-  new (): IonxSwiper;
-};
-
-interface IonxSwiperNavigation extends Components.IonxSwiperNavigation, HTMLElement {}
-export const IonxSwiperNavigation: {
-  prototype: IonxSwiperNavigation;
-  new (): IonxSwiperNavigation;
-};
-
-interface IonxSwiperPagination extends Components.IonxSwiperPagination, HTMLElement {}
-export const IonxSwiperPagination: {
-  prototype: IonxSwiperPagination;
-  new (): IonxSwiperPagination;
-};
-
-interface IonxSwiperSlide extends Components.IonxSwiperSlide, HTMLElement {}
-export const IonxSwiperSlide: {
-  prototype: IonxSwiperSlide;
-  new (): IonxSwiperSlide;
-};
-
-interface IonxSwiperSlides extends Components.IonxSwiperSlides, HTMLElement {}
-export const IonxSwiperSlides: {
-  prototype: IonxSwiperSlides;
-  new (): IonxSwiperSlides;
-};
-
-/**
- * Utility to define all custom elements within this package using the tag name provided in the component's source. 
- * When defining each custom element, it will also check it's safe to define by:
- *
- * 1. Ensuring the "customElements" registry is available in the global context (window).
- * 2. The component tag name is not already defined.
- *
- * Use the standard [customElements.define()](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/define) 
- * method instead to define custom elements individually, or to provide a different tag name.
- */
-export declare const defineIonxSwiper: (opts?: any) => void;
 
 /**
  * Used to manually set the base path where assets can be found.
@@ -60,7 +18,6 @@ export interface SetPlatformOptions {
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
-  ce?: (eventName: string, opts?: any) => CustomEvent;
 }
 export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;
 

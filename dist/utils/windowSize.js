@@ -35,7 +35,6 @@ class WindowSizeHook {
         return { width: this.width, height: this.height, breakpoint: this.breakpoint, orientation: this.orientation };
     }
     async onResize(event) {
-        var _a, _b;
         let width = window.innerWidth;
         let height = window.innerHeight;
         if (Capacitor.platform === "ios") {
@@ -47,16 +46,16 @@ class WindowSizeHook {
             try {
                 await waitTill(() => window.innerWidth === width && window.innerHeight === height, undefined, 2000);
             }
-            catch (_c) {
+            catch {
             }
         }
         const breakpoint = calcBreakpoint(width);
         const orientation = calcOrientation(width, height);
         let changed = false;
-        if ((_a = this.options) === null || _a === void 0 ? void 0 : _a.orientationOnly) {
+        if (this.options?.orientationOnly) {
             changed = this.orientation !== orientation;
         }
-        else if ((_b = this.options) === null || _b === void 0 ? void 0 : _b.breakpointOnly) {
+        else if (this.options?.breakpointOnly) {
             changed = this.breakpoint !== breakpoint;
         }
         else if (this.width !== width || this.height !== height) {
@@ -77,7 +76,7 @@ class WindowSizeHook {
             try {
                 un();
             }
-            catch (_a) {
+            catch {
             }
         }
         this.unlisten = undefined;

@@ -10,6 +10,9 @@ const modules = [
     "forms",
     "forms/TooltipErrorPresenter",
 
+    "Loading",
+    "Toolbar",
+
     "Dialog",
     "ContextMenu",
     "Select",
@@ -22,7 +25,6 @@ const modules = [
     "Input",
     "InputGroup",
     "LazyLoad",
-    "Loading",
     "LoadingSkeleton",
     "MasonryGrid",
     "Router",
@@ -32,10 +34,8 @@ const modules = [
     "TagsInput",
     "ToggleLabels",
     "Toggle",
-    "Toolbar",
     "Textarea",
     "DataTable",
-    "Slides",
     "Swiper",
     "VirtualScroller",
     "Checkbox",

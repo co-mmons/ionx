@@ -1,4 +1,4 @@
-import { h, Host, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { popoverController } from '@ionic/core';
 import { intl } from '@co.mmons/js-intl';
@@ -121,7 +121,7 @@ class LoadingProxy {
 }
 
 async function showLoadingOverlay(options) {
-  if (!(options === null || options === void 0 ? void 0 : options.type)) {
+  if (!options?.type) {
     const app = document.querySelector("ion-app");
     const overlay = document.createElement("div");
     overlay.className = "ionx-loading-overlay";
@@ -130,7 +130,7 @@ async function showLoadingOverlay(options) {
     overlay.style.top = "0";
     overlay.style.width = "100%";
     overlay.style.height = "100%";
-    overlay.style.backgroundColor = `rgba(${(options === null || options === void 0 ? void 0 : options.backdropTheme) === "light" ? "255,255,255, 0.5" : "0,0,0,.32"})`;
+    overlay.style.backgroundColor = `rgba(${options?.backdropTheme === "light" ? "255,255,255, 0.5" : "0,0,0,.32"})`;
     overlay.style.zIndex = "19999";
     overlay.style.display = "flex";
     overlay.style.flexDirection = "column";
@@ -138,7 +138,7 @@ async function showLoadingOverlay(options) {
     overlay.style.justifyContent = "center";
     app.appendChild(overlay);
     const spinner = document.createElement("ion-spinner");
-    spinner.style.color = (options === null || options === void 0 ? void 0 : options.backdropTheme) === "light" ? "#000" : "#fff";
+    spinner.style.color = options?.backdropTheme === "light" ? "#000" : "#fff";
     overlay.appendChild(spinner);
     return new LoadingProxy(overlay);
   }
@@ -146,7 +146,7 @@ async function showLoadingOverlay(options) {
     const popover = await popoverController.create({
       animated: false,
       cssClass: "ionx-loading-popover",
-      showBackdrop: typeof (options === null || options === void 0 ? void 0 : options.backdropVisible) === "boolean" ? options.backdropVisible : true,
+      showBackdrop: typeof options?.backdropVisible === "boolean" ? options.backdropVisible : true,
       backdropDismiss: false,
       keyboardClose: false,
       component: "ionx-loading",
@@ -166,7 +166,7 @@ function isShowingLoadingOverlay() {
 
 const loadingCss = "ionx-loading{display:flex;align-items:center;--loading-backdrop-opacity:0.8}ionx-loading[cover]{position:absolute;width:100%;height:100%;align-items:center;align-content:center;justify-items:center;justify-content:center;top:0px;left:0px}ionx-loading.ionx--backdrop-visible{background-color:rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity))}.ionx-loading-popover .popover-wrapper{display:flex;align-content:center;justify-content:center;align-items:center;justify-items:center}.ionx-loading-popover .popover-content{position:initial !important}";
 
-const Loading = class extends HTMLElement {
+let Loading = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();

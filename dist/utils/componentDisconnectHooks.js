@@ -1,8 +1,7 @@
 const hooksProperty = "__disconnectHooks";
 export function addComponentDisconnectHook(component, hookName, hook, options) {
-    var _a;
-    const existing = (_a = component[hooksProperty]) === null || _a === void 0 ? void 0 : _a[hookName];
-    if ((options === null || options === void 0 ? void 0 : options.whenExists) === "persist") {
+    const existing = component[hooksProperty]?.[hookName];
+    if (options?.whenExists === "persist") {
         return;
     }
     else if (existing) {
@@ -23,7 +22,6 @@ export function addComponentDisconnectHook(component, hookName, hook, options) {
     component[hooksProperty][hookName] = hook;
 }
 function disconnectHook(component, hookName) {
-    var _a;
     if (!component[hooksProperty]) {
         return;
     }
@@ -32,7 +30,7 @@ function disconnectHook(component, hookName) {
         console.debug(`[ionx/componentDisconnectHooks] disconnected hook "${hookName}"`);
         delete component[hooksProperty][hookName];
         try {
-            (_a = hook.disconnect) === null || _a === void 0 ? void 0 : _a.call(hook);
+            hook.disconnect?.();
         }
         catch (e) {
             console.warn("[componentDisconnectHooks] error when disconnecting hook", e);
@@ -41,8 +39,7 @@ function disconnectHook(component, hookName) {
     return hook;
 }
 export function getComponentDisconnectHook(component, hookName) {
-    var _a;
-    return (_a = component === null || component === void 0 ? void 0 : component[hooksProperty]) === null || _a === void 0 ? void 0 : _a[hookName];
+    return component?.[hooksProperty]?.[hookName];
 }
 export function removeComponentDisconnectHook(component, hookName) {
     return disconnectHook(component, hookName);

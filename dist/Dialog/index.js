@@ -1,4 +1,4 @@
-import { h, Host, attachShadow, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { modalController } from '@ionic/core';
 import { Subject } from 'rxjs';
@@ -30,24 +30,24 @@ async function showDialog(options) {
 const dialogValueAttribute = "ionx-dialog-value";
 const markAsDialogValue = { [dialogValueAttribute]: true };
 
-var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, privateMap) {
-  if (!privateMap.has(receiver)) {
-    throw new TypeError("attempted to get private field on non-instance");
-  }
-  return privateMap.get(receiver);
+var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+  if (kind === "a" && !f)
+    throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
+    throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _didEnter;
-const Dialog = class extends HTMLElement {
+var _Dialog_didEnter;
+let Dialog = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
-    _didEnter.set(this, new Subject());
+    _Dialog_didEnter.set(this, new Subject());
   }
   async clickButton(role) {
-    var _a;
     const buttonsElem = this.element.querySelector("ionx-dialog-buttons");
     if (buttonsElem) {
-      const button = (_a = buttonsElem.buttons) === null || _a === void 0 ? void 0 : _a.find(button => button.role === role);
+      const button = buttonsElem.buttons?.find(button => button.role === role);
       if (button) {
         await buttonsElem.buttonClicked(button);
       }
@@ -57,10 +57,10 @@ const Dialog = class extends HTMLElement {
    * A promise resolved when dialog was fully presented.
    */
   onDidEnter() {
-    return __classPrivateFieldGet(this, _didEnter).pipe(first()).toPromise();
+    return __classPrivateFieldGet(this, _Dialog_didEnter, "f").pipe(first()).toPromise();
   }
   ionDidEnter() {
-    __classPrivateFieldGet(this, _didEnter).next(true);
+    __classPrivateFieldGet(this, _Dialog_didEnter, "f").next(true);
   }
   onDidDismiss() {
     return this.element.closest("ion-modal").onDidDismiss();
@@ -79,25 +79,24 @@ const Dialog = class extends HTMLElement {
     }
     const Component = this.component;
     const Message = this.messageComponent;
-    return h(Host, { style: { display: "flex", position: "initial", contain: "initial" } }, this.component && h(Component, Object.assign({}, this.componentProps)), !this.component && h("ionx-dialog-content", null, (this.header || this.subheader) && h("ionx-dialog-headers", { slot: "header", header: this.header, subheader: this.subheader }), this.messageComponent && h(Message, Object.assign({}, this.messageComponentProps, { slot: "message" })), !this.messageComponent && this.message && h("ionx-dialog-message", { message: this.message, slot: "message" }), this.buttons && this.buttons.length && h("ionx-dialog-buttons", { buttons: this.buttons, slot: "footer" })));
+    return h(Host, { style: { display: "flex", position: "initial", contain: "initial" } }, this.component && h(Component, { ...this.componentProps }), !this.component && h("ionx-dialog-content", null, (this.header || this.subheader) && h("ionx-dialog-headers", { slot: "header", header: this.header, subheader: this.subheader }), this.messageComponent && h(Message, { ...this.messageComponentProps, slot: "message" }), !this.messageComponent && this.message && h("ionx-dialog-message", { message: this.message, slot: "message" }), this.buttons && this.buttons.length && h("ionx-dialog-buttons", { buttons: this.buttons, slot: "footer" })));
   }
   get element() { return this; }
 };
-_didEnter = new WeakMap();
+_Dialog_didEnter = new WeakMap();
 
 const dialogButtonsCss = ".sc-ionx-dialog-buttons-h{--dialog--border-color:var(--dialog-border-color, var(--ion-border-color));display:block}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons{--border-color:var(--dialog--border-color)}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-toolbar.sc-ionx-dialog-buttons{--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px;--ion-toolbar-background:var(--dialog--background-color, #ffffff);--ion-toolbar-background-color:var(--dialog--background-color, #000000);--ion-toolbar-color:var(--dialog--foreground-color, #000000)}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-buttons.sc-ionx-dialog-buttons{justify-content:var(--dialog-buttons-align, flex-end)}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons{min-height:44px;margin:0px}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons:not(:last-child){font-weight:400}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons:last-child{font-weight:500}.md.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-toolbar.sc-ionx-dialog-buttons,.md .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-toolbar.sc-ionx-dialog-buttons{--padding-bottom:8px;--padding-end:8px}.md.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons::before,.md .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons::before{display:none}.md.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons,.md .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons{flex:none !important}.ios.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons,.ios .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons{flex:1}.ios.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons:not(:first-child),.ios .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons:not(:first-child){border-left:var(--ionx-border-width) solid var(--dialog--border-color)}";
 
-const DialogButtons = class extends HTMLElement {
+let DialogButtons = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
   }
   async buttonClicked(button) {
-    var _a, _b;
     let value;
     if (!button.role || button.role !== "cancel") {
       try {
-        value = await ((_b = (_a = this.element.closest("ionx-dialog").querySelector(`[${dialogValueAttribute}]`)) === null || _a === void 0 ? void 0 : _a.dialogValue) === null || _b === void 0 ? void 0 : _b.call(_a));
+        value = await (this.element.closest("ionx-dialog").querySelector(`[${dialogValueAttribute}]`)?.dialogValue?.());
       }
       catch (error) {
         console.debug("Dialog value aborted", error);
@@ -148,11 +147,11 @@ const DialogButtons = class extends HTMLElement {
 
 const dialogContentCss = ":host{display:flex;flex-direction:column;background:var(--dialog--background-color, #ffffff);color:var(--dialog--foreground-color);max-height:90vh}::slotted([slot=message]){margin:16px 16px 24px 16px}";
 
-const DialogContent = class extends HTMLElement {
+let DialogContent = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   render() {
     return h(Host, null, h("slot", { name: "header" }), h("slot", { name: "message" }), h("slot", { name: "footer" }));
@@ -162,11 +161,11 @@ const DialogContent = class extends HTMLElement {
 
 const dialogHeadersCss = ":host-context(.md){--dialog--header-font-size-default:20px;--dialog--subheader-font-size-default:16px}:host-context(.ios){--dialog--header-font-size-default:18px;--dialog--subheader-font-size-default:14px}:host{display:block;margin:16px;font-weight:var(--dialog--header-font-weight, 500);text-align:var(--dialog--text-align, left)}:host [ionx--header]{font-size:var(--dialog--header-font-size, var(--dialog--header-font-size-default))}:host [ionx--subheader]{font-size:var(--dialog--subheader-font-size, var(--dialog--subheader-font-size-default));opacity:0.7}";
 
-const DialogHeaders = class extends HTMLElement {
+let DialogHeaders = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   render() {
     return h(Host, null, this.header && h("div", { "ionx--header": true }, this.header), this.subheader && h("div", { "ionx--subheader": true }, this.subheader));
@@ -176,11 +175,11 @@ const DialogHeaders = class extends HTMLElement {
 
 const dialogMessageCss = ":host{display:block;overflow:auto}";
 
-const DialogMessage = class extends HTMLElement {
+let DialogMessage = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   render() {
     return h(Host, null, this.message && (this.message instanceof HtmlString ? h("div", { innerHTML: this.message.toString() }) : h("div", null, this.message)), h("slot", null));

@@ -1,4 +1,4 @@
-import { createEvent, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, createEvent, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
 // copied from https://github.com/troch/path-parser/blob/master/src/rules.ts
@@ -87,7 +87,7 @@ const matchesPath = (inputPath, chain) => {
   return chain.map((route, i) => ({
     id: route.id,
     path: route.path,
-    params: Object.assign(Object.assign({}, (allparams ? mergeParams(route.params, allparams[i]) : route.params)), matrixParams),
+    params: { ...(allparams ? mergeParams(route.params, allparams[i]) : route.params), ...matrixParams },
     beforeEnter: route.beforeEnter,
     beforeLeave: route.beforeLeave
   }));
@@ -100,7 +100,10 @@ const mergeParams = (a, b) => {
     return a;
   }
   else if (a && b) {
-    return Object.assign(Object.assign({}, a), b);
+    return {
+      ...a,
+      ...b
+    };
   }
   return undefined;
 };
@@ -332,7 +335,7 @@ function matchRoute(router, urlOrPath) {
     segments = [""];
   }
   const matches = routerPathToChain(segments, routes);
-  if ((matches === null || matches === void 0 ? void 0 : matches.length) > 0) {
+  if (matches?.length > 0) {
     return matches[0];
   }
 }
@@ -452,7 +455,7 @@ const searchNavNode = (root) => {
   return outlet ? outlet : undefined;
 };
 
-const Router = class extends HTMLElement {
+let Router = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();

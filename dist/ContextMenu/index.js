@@ -1,4 +1,4 @@
-import { h, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement as HTMLElement$1, h, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { popoverController } from '@ionic/core';
 import { addEventListener } from 'ionx/utils';
@@ -44,7 +44,7 @@ function contextMenuToggleButton(items, options) {
 
 const contextMenuCss = ".sc-ionx-context-menu-h ion-list.sc-ionx-context-menu{margin:0;padding:0}.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu>ion-item.item.sc-ionx-context-menu:last-child,.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu>*.sc-ionx-context-menu:last-child>ion-item.item.sc-ionx-context-menu:last-child{--border-width:0;--inner-border-width:0}";
 
-const ContextMenu = class extends HTMLElement {
+let ContextMenu = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();

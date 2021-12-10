@@ -1,4 +1,4 @@
-import { forceUpdate, h, Host, attachShadow, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, forceUpdate, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { toString } from '@co.mmons/js-utils/core';
 import { intl } from '@co.mmons/js-intl';
@@ -7,7 +7,7 @@ import { defineIonxSelect, showSelectOverlay } from 'ionx/Select';
 
 const dataTableCss = "ionx-data-table{display:block;overflow:auto;max-height:100%;border:var(--ionx-border-width) solid var(--ion-border-color);border-radius:var(--ionx-border-radius);-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}ionx-data-table>table{width:100%}ionx-data-table>table>tbody{-webkit-user-select:auto;-moz-user-select:auto;-ms-user-select:auto;user-select:auto}ionx-data-table>table>tbody>tr>td{padding:8px;border:var(--ionx-border-width) solid var(--ion-border-color)}ionx-data-table>table>tbody>tr>td:first-child{border-left:0}ionx-data-table>table>tbody>tr>td:last-child{border-right:0}ionx-data-table>table>tbody>tr:last-child>td{border-bottom:0}";
 
-const DataTable = class extends HTMLElement {
+let DataTable = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -117,11 +117,11 @@ const DataTable = class extends HTMLElement {
 
 const searchPopoverCss = ":host ion-footer{position:-webkit-sticky;position:sticky;bottom:0px}:host ion-footer ion-toolbar{--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px}:host ion-footer div{flex:1;display:flex}:host ion-footer ion-button{min-height:44px;margin:0px}:host ion-footer ion-button:not(:last-child){font-weight:400}:host ion-footer ion-button:last-child{font-weight:500}:host ion-footer.md div{justify-content:flex-end}:host ion-footer.md ion-button{flex:none !important}:host ion-footer.ios ion-button{width:50%}:host ion-footer.ios ion-button:not(:first-child){border-left:var(--ionx-border-width) solid var(--ion-border-color)}";
 
-const SearchPopover = class extends HTMLElement {
+let SearchPopover = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   cancel() {
     popoverController.dismiss();
@@ -173,7 +173,7 @@ class MatchStringFilter extends Filter {
 const thCss = ".sc-ionx-data-table-th-h{display:table-cell;position:-webkit-sticky;position:sticky;top:0;background-color:var(--data-table-background-color, var(--ion-background-color, #fff));box-shadow:0 1px 0 0 var(--ion-border-color);border-color:var(--ion-border-color);border-style:solid;border-width:0 var(--ionx-border-width) 0 var(--ionx-border-width);padding:8px;font-weight:500}.sc-ionx-data-table-th-h:first-child{border-left:0}.sc-ionx-data-table-th-h:last-child{border-right:0}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th{display:flex;align-items:center}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th{margin:0;--padding-start:4px;--padding-end:4px}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th:first-of-type{margin-left:4px}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th:last-of-type{margin-right:4px}.sc-ionx-data-table-th-h ion-icon[ionx--sorting].sc-ionx-data-table-th{--data-table--sorting-asc:var(--ion-border-color);--data-table--sorting-desc:var(--ion-border-color)}.sc-ionx-data-table-th-h ion-icon[ionx--sorting][ionx--sorting=asc].sc-ionx-data-table-th{--data-table--sorting-asc:var(--ion-color-primary)}.sc-ionx-data-table-th-h ion-icon[ionx--sorting][ionx--sorting=desc].sc-ionx-data-table-th{--data-table--sorting-desc:var(--ion-color-primary)}";
 
 defineIonxSelect();
-const Th = class extends HTMLElement {
+let Th = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();

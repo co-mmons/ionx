@@ -1,4 +1,4 @@
-import { h, Host, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement as HTMLElement$1, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { isHydrated, waitTillHydrated } from 'ionx/utils';
 import { waitTill } from '@co.mmons/js-utils/core';
@@ -10,7 +10,7 @@ function ensureLazyLoad(contentOrOptions, options) {
   }
   for (let i = 0; i < contentElements.length; i++) {
     if (contentElements[i].__ionxLazyLoad) {
-      contentElements[i].__ionxLazyLoad.ensureLoaded({ retryError: options === null || options === void 0 ? void 0 : options.retryError });
+      contentElements[i].__ionxLazyLoad.ensureLoaded({ retryError: options?.retryError });
     }
   }
 }
@@ -74,7 +74,7 @@ class LazyLoadController {
     delete element.__lazyLoadSrc;
     element.classList.remove(itemPendingCssClass);
     element.classList.add(itemLoadingCssClass);
-    styleParents(element, options === null || options === void 0 ? void 0 : options.styleParents);
+    styleParents(element, options?.styleParents);
     const load = (afterError) => {
       if (element.lazyLoad) {
         if (!afterError) {
@@ -84,7 +84,7 @@ class LazyLoadController {
           markAsError();
         }
       }
-      else if (options === null || options === void 0 ? void 0 : options.src) {
+      else if (options?.src) {
         const src = Array.isArray(options.src) ? options.src : [options.src];
         if (src.length === 0) {
           console.warn("[ionx-lazy-load] element cannot be lazy loaded, no src given", element);
@@ -110,7 +110,7 @@ class LazyLoadController {
     const markAsError = () => {
       element.classList.add(itemErrorCssClass);
       element.classList.remove(itemLoadedCssClass, itemPendingCssClass, itemLoadingCssClass);
-      styleParents(element, options === null || options === void 0 ? void 0 : options.styleParents);
+      styleParents(element, options?.styleParents);
       element.removeEventListener("load", onItemLoad);
       element.removeEventListener("error", onItemError);
       this.intersectionObserver.unobserve(element);
@@ -127,7 +127,7 @@ class LazyLoadController {
       const target = _ev.target;
       element.classList.add(itemLoadedCssClass);
       element.classList.remove(itemPendingCssClass, itemLoadingCssClass, itemErrorCssClass);
-      styleParents(element, options === null || options === void 0 ? void 0 : options.styleParents);
+      styleParents(element, options?.styleParents);
       this.intersectionObserver.unobserve(element);
       target.removeEventListener("load", onItemLoad);
       target.removeEventListener("error", onItemError);
@@ -148,8 +148,8 @@ class LazyLoadController {
       const element = realContainerElement(containerElement);
       this.containers.push({
         element: containerElement,
-        items: element === null || element === void 0 ? void 0 : element.getElementsByClassName("ionx-lazy-load-pending"),
-        errors: element === null || element === void 0 ? void 0 : element.getElementsByClassName(itemErrorCssClass),
+        items: element?.getElementsByClassName("ionx-lazy-load-pending"),
+        errors: element?.getElementsByClassName(itemErrorCssClass),
         shadowItems: () => containerElement.observeShadow && element.shadowRoot.querySelectorAll(`.${itemPendingCssClass}`),
         shadowErrors: () => containerElement.observeShadow && element.shadowRoot.querySelectorAll(`.${itemErrorCssClass}`)
       });
@@ -166,7 +166,7 @@ class LazyLoadController {
     }
   }
   async ensureLoaded(options) {
-    if (options === null || options === void 0 ? void 0 : options.retryError) {
+    if (options?.retryError) {
       for (const errors of [this.errors, ...this.containers.map(c => c.errors), ...this.containers.map(c => c.shadowErrors())]) {
         if (errors) {
           for (let i = 0; i < errors.length; i++) {
@@ -214,7 +214,7 @@ function lazyLoadItem(elementOrOptions, options) {
     const wasLoaded = elementOrOptions.classList.contains(itemLoadedCssClass) || elementOrOptions.classList.contains(itemLoadingCssClass) || elementOrOptions.classList.contains(itemErrorCssClass);
     elementOrOptions.classList.add(itemPendingCssClass);
     elementOrOptions.classList.remove(itemErrorCssClass, itemLoadingCssClass, itemLoadedCssClass);
-    styleParents(elementOrOptions, options === null || options === void 0 ? void 0 : options.styleParents);
+    styleParents(elementOrOptions, options?.styleParents);
     elementOrOptions.__lazyLoadOptions = Object.assign({}, options);
     if (wasLoaded) {
       ensureLazyLoad(elementOrOptions.closest("ion-content"));
@@ -243,7 +243,7 @@ function closestElement(node, selector) {
   return closestElement(node.parentNode, selector);
 }
 
-const LazyLoad = class extends HTMLElement {
+let LazyLoad = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();

@@ -5,8 +5,9 @@ export declare class SwiperComponent implements ComponentInterface {
   element: HTMLElement;
   options?: SwiperOptions;
   swiperEvent: EventEmitter<{
-    eventName: keyof SwiperEvents;
     swiper: Swiper;
+    eventName: keyof SwiperEvents;
+    eventArgs: any[];
   }>;
   mutationObserver?: MutationObserver;
   /**

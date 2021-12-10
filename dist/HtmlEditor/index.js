@@ -1,4 +1,4 @@
-import { createEvent, h, Host, attachShadow, Fragment as Fragment$1, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement as HTMLElement$1, createEvent, h, Host, Fragment as Fragment$1, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { loadIonxLinkEditorIntl, defineIonxLinkEditor, showLinkEditor } from 'ionx/LinkEditor';
@@ -231,7 +231,9 @@ Fragment.prototype.descendants = function descendants (f) {
   this.nodesBetween(0, this.size, f);
 };
 
-// : (number, number, ?string, ?string) → string
+// :: (number, number, ?string, ?string | ?(leafNode: Node) -> string) → string
+// Extract the text between `from` and `to`. See the same method on
+// [`Node`](#model.Node.textBetween).
 Fragment.prototype.textBetween = function textBetween (from, to, blockSeparator, leafText) {
   var text = "", separated = true;
   this.nodesBetween(from, to, function (node, pos) {
@@ -239,7 +241,7 @@ Fragment.prototype.textBetween = function textBetween (from, to, blockSeparator,
       text += node.text.slice(Math.max(from, pos) - pos, to - pos);
       separated = !blockSeparator;
     } else if (node.isLeaf && leafText) {
-      text += leafText;
+      text += typeof leafText === 'function' ? leafText(node): leafText;
       separated = !blockSeparator;
     } else if (!separated && node.isBlock) {
       text += blockSeparator;
@@ -1218,7 +1220,7 @@ Node$1.prototype.descendants = function descendants (f) {
 // children.
 prototypeAccessors$3$1.textContent.get = function () { return this.textBetween(0, this.content.size, "") };
 
-// :: (number, number, ?string, ?string) → string
+// :: (number, number, ?string, ?string | ?(leafNode: Node) -> string) → string
 // Get all text between positions `from` and `to`. When
 // `blockSeparator` is given, it will be inserted whenever a new
 // block node is started. When `leafText` is given, it'll be
@@ -1467,6 +1469,10 @@ Node$1.prototype.canAppend = function canAppend (other) {
 Node$1.prototype.check = function check () {
   if (!this.type.validContent(this.content))
     { throw new RangeError(("Invalid content for node " + (this.type.name) + ": " + (this.content.toString().slice(0, 50)))) }
+  var copy = Mark.none;
+  for (var i = 0; i < this.marks.length; i++) { copy = this.marks[i].addToSet(copy); }
+  if (!Mark.sameSet(copy, this.marks))
+    { throw new RangeError(("Invalid collection of marks for node " + (this.type.name) + ": " + (this.marks.map(function (m) { return m.type.name; })))) }
   this.content.forEach(function (node) { return node.check(); });
 };
 
@@ -2916,6 +2922,12 @@ NodeContext.prototype.applyPending = function applyPending (nextType) {
   }
 };
 
+NodeContext.prototype.inlineContext = function inlineContext (node) {
+  if (this.type) { return this.type.inlineContent }
+  if (this.content.length) { return this.content[0].isInline }
+  return node.parentNode && !blockTags.hasOwnProperty(node.parentNode.nodeName.toLowerCase())
+};
+
 var ParseContext = function ParseContext(parser, options, open) {
   // : DOMParser The parser we are using.
   this.parser = parser;
@@ -2963,7 +2975,9 @@ ParseContext.prototype.addDOM = function addDOM (dom) {
 ParseContext.prototype.addTextNode = function addTextNode (dom) {
   var value = dom.nodeValue;
   var top = this.top;
-  if ((top.type ? top.type.inlineContent : top.content.length && top.content[0].isInline) || /[^ \t\r\n\u000c]/.test(value)) {
+  if (top.options & OPT_PRESERVE_WS_FULL ||
+      top.inlineContext(dom) ||
+      /[^ \t\r\n\u000c]/.test(value)) {
     if (!(top.options & OPT_PRESERVE_WS)) {
       value = value.replace(/[ \t\r\n\u000c]+/g, " ");
       // If this starts with whitespace, and there is no node before it, or
@@ -2979,6 +2993,8 @@ ParseContext.prototype.addTextNode = function addTextNode (dom) {
       }
     } else if (!(top.options & OPT_PRESERVE_WS_FULL)) {
       value = value.replace(/\r?\n|\r/g, " ");
+    } else {
+      value = value.replace(/\r\n?/g, "\n");
     }
     if (value) { this.insertNode(this.parser.schema.text(value)); }
     this.findInText(dom);
@@ -2997,6 +3013,7 @@ ParseContext.prototype.addElement = function addElement (dom, matchAfter) {
       (ruleID = this.parser.matchTag(dom, this, matchAfter));
   if (rule ? rule.ignore : ignoreTags.hasOwnProperty(name)) {
     this.findInside(dom);
+    this.ignoreFallback(dom);
   } else if (!rule || rule.skip || rule.closeParent) {
     if (rule && rule.closeParent) { this.open = Math.max(0, this.open - 1); }
     else if (rule && rule.skip.nodeType) { dom = rule.skip; }
@@ -3020,6 +3037,13 @@ ParseContext.prototype.addElement = function addElement (dom, matchAfter) {
 ParseContext.prototype.leafFallback = function leafFallback (dom) {
   if (dom.nodeName == "BR" && this.top.type && this.top.type.inlineContent)
     { this.addTextNode(dom.ownerDocument.createTextNode("\n")); }
+};
+
+// Called for ignored nodes
+ParseContext.prototype.ignoreFallback = function ignoreFallback (dom) {
+  // Ignored BR nodes should at least create an inline context
+  if (dom.nodeName == "BR" && (!this.top.type || !this.top.type.inlineContent))
+    { this.findPlace(this.parser.schema.text("-")); }
 };
 
 // Run any style parser associated with the node's styles. Either
@@ -3435,19 +3459,13 @@ DOMSerializer.prototype.serializeFragment = function serializeFragment (fragment
         }
       }
     }
-    top.appendChild(this$1.serializeNode(node, options));
+    top.appendChild(this$1.serializeNodeInner(node, options));
   });
 
   return target
 };
 
-// :: (Node, ?Object) → dom.Node
-// Serialize this node to a DOM node. This can be useful when you
-// need to serialize a part of a document, as opposed to the whole
-// document. To serialize a whole document, use
-// [`serializeFragment`](#model.DOMSerializer.serializeFragment) on
-// its [content](#model.Node.content).
-DOMSerializer.prototype.serializeNode = function serializeNode (node, options) {
+DOMSerializer.prototype.serializeNodeInner = function serializeNodeInner (node, options) {
     if ( options === void 0 ) options = {};
 
   var ref =
@@ -3465,10 +3483,16 @@ DOMSerializer.prototype.serializeNode = function serializeNode (node, options) {
   return dom
 };
 
-DOMSerializer.prototype.serializeNodeAndMarks = function serializeNodeAndMarks (node, options) {
+// :: (Node, ?Object) → dom.Node
+// Serialize this node to a DOM node. This can be useful when you
+// need to serialize a part of a document, as opposed to the whole
+// document. To serialize a whole document, use
+// [`serializeFragment`](#model.DOMSerializer.serializeFragment) on
+// its [content](#model.Node.content).
+DOMSerializer.prototype.serializeNode = function serializeNode (node, options) {
     if ( options === void 0 ) options = {};
 
-  var dom = this.serializeNode(node, options);
+  var dom = this.serializeNodeInner(node, options);
   for (var i = node.marks.length - 1; i >= 0; i--) {
     var wrap = this.serializeMark(node.marks[i], node.isInline, options);
     if (wrap) {
@@ -4027,8 +4051,14 @@ StepResult.fromReplace = function fromReplace (doc, from, to, slice) {
 var ReplaceStep = /*@__PURE__*/(function (Step) {
   function ReplaceStep(from, to, slice, structure) {
     Step.call(this);
+    // :: number
+    // The start position of the replaced range.
     this.from = from;
+    // :: number
+    // The end position of the replaced range.
     this.to = to;
+    // :: Slice
+    // The slice to insert.
     this.slice = slice;
     this.structure = !!structure;
   }
@@ -4097,11 +4127,24 @@ Step.jsonID("replace", ReplaceStep);
 var ReplaceAroundStep = /*@__PURE__*/(function (Step) {
   function ReplaceAroundStep(from, to, gapFrom, gapTo, slice, insert, structure) {
     Step.call(this);
+    // :: number
+    // The start position of the replaced range.
     this.from = from;
+    // :: number
+    // The end position of the replaced range.
     this.to = to;
+    // :: number
+    // The start of preserved range.
     this.gapFrom = gapFrom;
+    // :: number
+    // The end of preserved range.
     this.gapTo = gapTo;
+    // :: Slice
+    // The slice to insert.
     this.slice = slice;
+    // :: number
+    // The position in the slice where the preserved range should be
+    // inserted.
     this.insert = insert;
     this.structure = !!structure;
   }
@@ -4473,9 +4516,14 @@ function dropPoint(doc, pos, slice) {
     for (var d = $pos.depth; d >= 0; d--) {
       var bias = d == $pos.depth ? 0 : $pos.pos <= ($pos.start(d + 1) + $pos.end(d + 1)) / 2 ? -1 : 1;
       var insertPos = $pos.index(d) + (bias > 0 ? 1 : 0);
-      if (pass == 1
-          ? $pos.node(d).canReplace(insertPos, insertPos, content)
-          : $pos.node(d).contentMatchAt(insertPos).findWrapping(content.firstChild.type))
+      var parent = $pos.node(d), fits = false;
+      if (pass == 1) {
+        fits = parent.canReplace(insertPos, insertPos, content);
+      } else {
+        var wrapping = parent.contentMatchAt(insertPos).findWrapping(content.firstChild.type);
+        fits = wrapping && parent.canReplaceWith(insertPos, insertPos, wrapping[0]);
+      }
+      if (fits)
         { return bias == 0 ? $pos.pos : bias < 0 ? $pos.before(d + 1) : $pos.after(d + 1) }
     }
   }
@@ -4497,8 +4545,14 @@ function mapFragment(fragment, f, parent) {
 var AddMarkStep = /*@__PURE__*/(function (Step) {
   function AddMarkStep(from, to, mark) {
     Step.call(this);
+    // :: number
+    // The start of the marked range.
     this.from = from;
+    // :: number
+    // The end of the marked range.
     this.to = to;
+    // :: Mark
+    // The mark to add.
     this.mark = mark;
   }
 
@@ -4556,8 +4610,14 @@ Step.jsonID("addMark", AddMarkStep);
 var RemoveMarkStep = /*@__PURE__*/(function (Step) {
   function RemoveMarkStep(from, to, mark) {
     Step.call(this);
+    // :: number
+    // The start of the unmarked range.
     this.from = from;
+    // :: number
+    // The end of the unmarked range.
     this.to = to;
+    // :: Mark
+    // The mark to remove.
     this.mark = mark;
   }
 
@@ -5163,7 +5223,7 @@ Transform.prototype.replaceRange = function(from, to, slice) {
     this.replace(from, to, slice);
     if (this.steps.length > startSteps) { break }
     var depth = targetDepths[i$2];
-    if (i$2 < 0) { continue }
+    if (depth < 0) { continue }
     from = $from.before(depth); to = $to.after(depth);
   }
   return this
@@ -5229,7 +5289,10 @@ function coveredDepths($from, $to) {
         $to.end(d) > $to.pos + ($to.depth - d) ||
         $from.node(d).type.spec.isolating ||
         $to.node(d).type.spec.isolating) { break }
-    if (start == $to.start(d)) { result.push(d); }
+    if (start == $to.start(d) ||
+        (d == $from.depth && d == $to.depth && $from.parent.inlineContent && $to.parent.inlineContent &&
+         d && $to.start(d - 1) == start - 1))
+      { result.push(d); }
   }
   return result
 }
@@ -6436,9 +6499,11 @@ function joinBackward(state, dispatch, view) {
   return false
 }
 
-function textblockAt(node, side) {
-  for (; node; node = (side == "start" ? node.firstChild : node.lastChild))
-    { if (node.isTextblock) { return true } }
+function textblockAt(node, side, only) {
+  for (; node; node = (side == "start" ? node.firstChild : node.lastChild)) {
+    if (node.isTextblock) { return true }
+    if (only && node.childCount != 1) { return false }
+  }
   return false
 }
 
@@ -6712,9 +6777,11 @@ function splitBlock(state, dispatch) {
     }
     if (can) {
       tr.split(tr.mapping.map($from.pos), 1, types);
-      if (!atEnd && !$from.parentOffset && $from.parent.type != deflt &&
-          $from.node(-1).canReplace($from.index(-1), $from.indexAfter(-1), Fragment.from([deflt.create(), $from.parent])))
-        { tr.setNodeMarkup(tr.mapping.map($from.before()), deflt); }
+      if (!atEnd && !$from.parentOffset && $from.parent.type != deflt) {
+        var first = tr.mapping.map($from.before()), $first = tr.doc.resolve(first);
+        if ($from.node(-1).canReplaceWith($first.index(), $first.index() + 1, deflt))
+          { tr.setNodeMarkup(tr.mapping.map($from.before()), deflt); }
+      }
     }
     dispatch(tr.scrollIntoView());
   }
@@ -6789,19 +6856,21 @@ function deleteBarrier(state, $cut, dispatch) {
     return true
   }
 
-  if (canDelAfter && after.isTextblock && textblockAt(before, "end")) {
+  if (canDelAfter && textblockAt(after, "start", true) && textblockAt(before, "end")) {
     var at = before, wrap$1 = [];
     for (;;) {
       wrap$1.push(at);
       if (at.isTextblock) { break }
       at = at.lastChild;
     }
-    if (at.canReplace(at.childCount, at.childCount, after.content)) {
+    var afterText = after, afterDepth = 1;
+    for (; !afterText.isTextblock; afterText = afterText.firstChild) { afterDepth++; }
+    if (at.canReplace(at.childCount, at.childCount, afterText.content)) {
       if (dispatch) {
         var end$1 = Fragment.empty;
         for (var i$1 = wrap$1.length - 1; i$1 >= 0; i$1--) { end$1 = Fragment.from(wrap$1[i$1].copy(end$1)); }
         var tr$1 = state.tr.step(new ReplaceAroundStep($cut.pos - wrap$1.length, $cut.pos + after.nodeSize,
-                                                     $cut.pos + 1, $cut.pos + after.nodeSize - 1,
+                                                     $cut.pos + afterDepth, $cut.pos + after.nodeSize - afterDepth,
                                                      new Slice(end$1, wrap$1.length, 0), 0, true));
         dispatch(tr$1.scrollIntoView());
       }
@@ -6958,7 +7027,7 @@ function autoJoin(command, isJoinable) {
     var types = isJoinable;
     isJoinable = function (node) { return types.indexOf(node.type.name) > -1; };
   }
-  return function (state, dispatch) { return command(state, dispatch && wrapDispatchForJoin(dispatch, isJoinable)); }
+  return function (state, dispatch, view) { return command(state, dispatch && wrapDispatchForJoin(dispatch, isJoinable), view); }
 }
 
 // :: (...[(EditorState, ?(tr: Transaction), ?EditorView) → bool]) → (EditorState, ?(tr: Transaction), ?EditorView) → bool
@@ -6994,6 +7063,7 @@ var pcBaseKeymap = {
   "Mod-Enter": exitCode,
   "Backspace": backspace,
   "Mod-Backspace": backspace,
+  "Shift-Backspace": backspace,
   "Delete": del,
   "Mod-Delete": del,
   "Mod-a": selectAll
@@ -7015,7 +7085,7 @@ var macBaseKeymap = {
 for (var key$2 in pcBaseKeymap) { macBaseKeymap[key$2] = pcBaseKeymap[key$2]; }
 
 // declare global: os, navigator
-var mac$3 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform)
+var mac$3 = typeof navigator != "undefined" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform)
           : typeof os != "undefined" ? os.platform() == "darwin" : false;
 
 // :: Object
@@ -7151,7 +7221,7 @@ function keyName(event) {
 
 // declare global: navigator
 
-var mac$1 = typeof navigator != "undefined" ? /Mac/.test(navigator.platform) : false;
+var mac$1 = typeof navigator != "undefined" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : false;
 
 function normalizeKeyName(name) {
   var parts = name.split(/-(?!$)/), result = parts[parts.length - 1];
@@ -7223,7 +7293,7 @@ function keymap(bindings) {
 
 // :: (Object) → (view: EditorView, event: dom.Event) → bool
 // Given a set of bindings (using the same format as
-// [`keymap`](#keymap.keymap), return a [keydown
+// [`keymap`](#keymap.keymap)), return a [keydown
 // handler](#view.EditorProps.handleKeyDown) that handles them.
 function keydownHandler(bindings) {
   var map = normalize(bindings);
@@ -7256,7 +7326,6 @@ if (typeof navigator != "undefined" && typeof document != "undefined") {
   var ie_upto10 = /MSIE \d/.test(navigator.userAgent);
   var ie_11up = /Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(navigator.userAgent);
 
-  result.mac = /Mac/.test(navigator.platform);
   var ie = result.ie = !!(ie_upto10 || ie_11up || ie_edge);
   result.ie_version = ie_upto10 ? document.documentMode || 6 : ie_11up ? +ie_11up[1] : ie_edge ? +ie_edge[1] : null;
   result.gecko = !ie && /gecko\/(\d+)/i.test(navigator.userAgent);
@@ -7267,6 +7336,7 @@ if (typeof navigator != "undefined" && typeof document != "undefined") {
   // Is true for both iOS and iPadOS for convenience
   result.safari = !ie && /Apple Computer/.test(navigator.vendor);
   result.ios = result.safari && (/Mobile\/\w+/.test(navigator.userAgent) || navigator.maxTouchPoints > 2);
+  result.mac = result.ios || /Mac/.test(navigator.platform);
   result.android = /Android \d/.test(navigator.userAgent);
   result.webkit = "webkitFontSmoothing" in document.documentElement.style;
   result.webkit_version = result.webkit && +(/\bAppleWebKit\/(\d+)/.exec(navigator.userAgent) || [0, 0])[1];
@@ -7280,7 +7350,7 @@ var domIndex = function(node) {
 };
 
 var parentNode = function(node) {
-  var parent = node.parentNode;
+  var parent = node.assignedSlot || node.parentNode;
   return parent && parent.nodeType == 11 ? parent.host : parent
 };
 
@@ -7604,19 +7674,19 @@ function elementFromPoint(element, coords, box) {
 function posAtCoords(view, coords) {
   var assign, assign$1;
 
-  var root = view.root, node, offset;
-  if (root.caretPositionFromPoint) {
+  var doc = view.dom.ownerDocument, node, offset;
+  if (doc.caretPositionFromPoint) {
     try { // Firefox throws for this call in hard-to-predict circumstances (#994)
-      var pos$1 = root.caretPositionFromPoint(coords.left, coords.top);
+      var pos$1 = doc.caretPositionFromPoint(coords.left, coords.top);
       if (pos$1) { ((assign = pos$1, node = assign.offsetNode, offset = assign.offset)); }
     } catch (_) {}
   }
-  if (!node && root.caretRangeFromPoint) {
-    var range = root.caretRangeFromPoint(coords.left, coords.top);
+  if (!node && doc.caretRangeFromPoint) {
+    var range = doc.caretRangeFromPoint(coords.left, coords.top);
     if (range) { ((assign$1 = range, node = assign$1.startContainer, offset = assign$1.startOffset)); }
   }
 
-  var elt = root.elementFromPoint(coords.left, coords.top + 1), pos;
+  var elt = (view.root.elementFromPoint ? view.root : doc).elementFromPoint(coords.left, coords.top + 1), pos;
   if (!elt || !view.dom.contains(elt.nodeType != 1 ? elt.parentNode : elt)) {
     var box = view.dom.getBoundingClientRect();
     if (!inRect(coords, box)) { return null }
@@ -7624,7 +7694,10 @@ function posAtCoords(view, coords) {
     if (!elt) { return null }
   }
   // Safari's caretRangeFromPoint returns nonsense when on a draggable element
-  if (result.safari && elt.draggable) { node = offset = null; }
+  if (result.safari) {
+    for (var p = elt; node && p; p = parentNode(p))
+      { if (p.draggable) { node = offset = null; } }
+  }
   elt = targetKludge(elt, coords);
   if (node) {
     if (result.gecko && node.nodeType == 1) {
@@ -7724,7 +7797,8 @@ function coordsAtPos(view, pos, side) {
   }
   if (offset < nodeSize(node)) {
     var after$1 = node.childNodes[offset];
-    var target$1 = after$1.nodeType == 3 ? textRange(after$1, 0, (supportEmptyRange ? 0 : 1))
+    while (after$1.pmViewDesc && after$1.pmViewDesc.ignoreForCoords) { after$1 = after$1.nextSibling; }
+    var target$1 = !after$1 ? null : after$1.nodeType == 3 ? textRange(after$1, 0, (supportEmptyRange ? 0 : 1))
         : after$1.nodeType == 1 ? after$1 : null;
     if (target$1) { return flattenV(singleRect(target$1, -1), true) }
   }
@@ -7779,7 +7853,9 @@ function endOfTextblockVertical(view, state, dir) {
       else { continue }
       for (var i = 0; i < boxes.length; i++) {
         var box = boxes[i];
-        if (box.bottom > box.top && (dir == "up" ? box.bottom < coords.top + 1 : box.top > coords.bottom - 1))
+        if (box.bottom > box.top + 1 &&
+            (dir == "up" ? coords.top - box.top > (box.bottom - coords.top) * 2
+             : box.bottom - coords.bottom > (coords.bottom - box.top) * 2))
           { return false }
       }
     }
@@ -7794,7 +7870,7 @@ function endOfTextblockHorizontal(view, state, dir) {
   var $head = ref.$head;
   if (!$head.parent.isTextblock) { return false }
   var offset = $head.parentOffset, atStart = !offset, atEnd = offset == $head.parent.content.size;
-  var sel = getSelection();
+  var sel = view.root.getSelection();
   // If the textblock is all LTR, or the browser doesn't support
   // Selection.modify (Edge), fall back to a primitive approach
   if (!maybeRTL.test($head.parent.textContent) || !sel.modify)
@@ -7931,16 +8007,14 @@ var ViewDesc = function ViewDesc(parent, children, dom, contentDOM) {
   this.dirty = NOT_DIRTY;
 };
 
-var prototypeAccessors = { beforePosition: { configurable: true },size: { configurable: true },border: { configurable: true },posBefore: { configurable: true },posAtStart: { configurable: true },posAfter: { configurable: true },posAtEnd: { configurable: true },contentLost: { configurable: true },domAtom: { configurable: true } };
+var prototypeAccessors = { size: { configurable: true },border: { configurable: true },posBefore: { configurable: true },posAtStart: { configurable: true },posAfter: { configurable: true },posAtEnd: { configurable: true },contentLost: { configurable: true },domAtom: { configurable: true },ignoreForCoords: { configurable: true } };
 
 // Used to check whether a given description corresponds to a
 // widget/mark/node.
 ViewDesc.prototype.matchesWidget = function matchesWidget () { return false };
 ViewDesc.prototype.matchesMark = function matchesMark () { return false };
 ViewDesc.prototype.matchesNode = function matchesNode () { return false };
-ViewDesc.prototype.matchesHack = function matchesHack () { return false };
-
-prototypeAccessors.beforePosition.get = function () { return false };
+ViewDesc.prototype.matchesHack = function matchesHack (_nodeName) { return false };
 
 // : () → ?ParseRule
 // When parsing in-editor content (in domchange.js), we allow
@@ -8090,23 +8164,34 @@ ViewDesc.prototype.descAt = function descAt (pos) {
 // : (number, number) → {node: dom.Node, offset: number}
 ViewDesc.prototype.domFromPos = function domFromPos (pos, side) {
   if (!this.contentDOM) { return {node: this.dom, offset: 0} }
-  for (var offset = 0, i = 0, first = true;; i++, first = false) {
-    // Skip removed or always-before children
-    while (i < this.children.length && (this.children[i].beforePosition ||
-                                        this.children[i].dom.parentNode != this.contentDOM))
-      { offset += this.children[i++].size; }
-    var child = i == this.children.length ? null : this.children[i];
-    if (offset == pos && (side == 0 || !child || !child.size || child.border || (side < 0 && first)) ||
-        child && child.domAtom && pos < offset + child.size) { return {
-      node: this.contentDOM,
-      offset: child ? domIndex(child.dom) : this.contentDOM.childNodes.length
-    } }
-    if (!child) { throw new Error("Invalid position " + pos) }
-    var end = offset + child.size;
-    if (!child.domAtom && (side < 0 && !child.border ? end >= pos : end > pos) &&
-        (end > pos || i + 1 >= this.children.length || !this.children[i + 1].beforePosition))
-      { return child.domFromPos(pos - offset - child.border, side) }
-    offset = end;
+  // First find the position in the child array
+  var i = 0, offset = 0;
+  for (var curPos = 0; i < this.children.length; i++) {
+    var child = this.children[i], end = curPos + child.size;
+    if (end > pos || child instanceof TrailingHackViewDesc) { offset = pos - curPos; break }
+    curPos = end;
+  }
+  // If this points into the middle of a child, call through
+  if (offset) { return this.children[i].domFromPos(offset - this.children[i].border, side) }
+  // Go back if there were any zero-length widgets with side >= 0 before this point
+  for (var prev = (void 0); i && !(prev = this.children[i - 1]).size && prev instanceof WidgetViewDesc && prev.widget.type.side >= 0; i--) {}
+  // Scan towards the first useable node
+  if (side <= 0) {
+    var prev$1, enter = true;
+    for (;; i--, enter = false) {
+      prev$1 = i ? this.children[i - 1] : null;
+      if (!prev$1 || prev$1.dom.parentNode == this.contentDOM) { break }
+    }
+    if (prev$1 && side && enter && !prev$1.border && !prev$1.domAtom) { return prev$1.domFromPos(prev$1.size, side) }
+    return {node: this.contentDOM, offset: prev$1 ? domIndex(prev$1.dom) + 1 : 0}
+  } else {
+    var next, enter$1 = true;
+    for (;; i++, enter$1 = false) {
+      next = i < this.children.length ? this.children[i] : null;
+      if (!next || next.dom.parentNode == this.contentDOM) { break }
+    }
+    if (next && enter$1 && !next.border && !next.domAtom) { return next.domFromPos(0, side) }
+    return {node: this.contentDOM, offset: next ? domIndex(next.dom) : this.contentDOM.childNodes.length}
   }
 };
 
@@ -8204,13 +8289,27 @@ ViewDesc.prototype.setSelection = function setSelection (anchor, head, root, for
     if (node.nodeType == 3) {
       brKludge = offset$1 && node.nodeValue[offset$1 - 1] == "\n";
       // Issue #1128
-      if (brKludge && offset$1 == node.nodeValue.length &&
-          node.nextSibling && node.nextSibling.nodeName == "BR")
-        { anchorDOM = headDOM = {node: node.parentNode, offset: domIndex(node) + 1}; }
+      if (brKludge && offset$1 == node.nodeValue.length) {
+        for (var scan = node, after = (void 0); scan; scan = scan.parentNode) {
+          if (after = scan.nextSibling) {
+            if (after.nodeName == "BR")
+              { anchorDOM = headDOM = {node: after.parentNode, offset: domIndex(after) + 1}; }
+            break
+          }
+          var desc = scan.pmViewDesc;
+          if (desc && desc.node && desc.node.isBlock) { break }
+        }
+      }
     } else {
       var prev = node.childNodes[offset$1 - 1];
       brKludge = prev && (prev.nodeName == "BR" || prev.contentEditable == "false");
     }
+  }
+  // Firefox can act strangely when the selection is in front of an
+  // uneditable node. See #1163 and https://bugzilla.mozilla.org/show_bug.cgi?id=1709536
+  if (result.gecko && domSel.focusNode && domSel.focusNode != headDOM.node && domSel.focusNode.nodeType == 1) {
+    var after$1 = domSel.focusNode.childNodes[domSel.focusOffset];
+    if (after$1 && after$1.contentEditable == "false") { force = true; }
   }
 
   if (!(force || brKludge && result.safari) &&
@@ -8269,7 +8368,7 @@ ViewDesc.prototype.markDirty = function markDirty (from, to) {
         else { child.markDirty(from - startInside, to - startInside); }
         return
       } else {
-        child.dirty = NODE_DIRTY;
+        child.dirty = child.dom == child.contentDOM && child.dom.parentNode == this.contentDOM ? CONTENT_DIRTY : NODE_DIRTY;
       }
     }
     offset = end;
@@ -8286,6 +8385,8 @@ ViewDesc.prototype.markParentsDirty = function markParentsDirty () {
 };
 
 prototypeAccessors.domAtom.get = function () { return false };
+
+prototypeAccessors.ignoreForCoords.get = function () { return false };
 
 Object.defineProperties( ViewDesc.prototype, prototypeAccessors );
 
@@ -8320,11 +8421,7 @@ var WidgetViewDesc = /*@__PURE__*/(function (ViewDesc) {
   WidgetViewDesc.prototype = Object.create( ViewDesc && ViewDesc.prototype );
   WidgetViewDesc.prototype.constructor = WidgetViewDesc;
 
-  var prototypeAccessors$1 = { beforePosition: { configurable: true },domAtom: { configurable: true } };
-
-  prototypeAccessors$1.beforePosition.get = function () {
-    return this.widget.type.side < 0
-  };
+  var prototypeAccessors$1 = { domAtom: { configurable: true } };
 
   WidgetViewDesc.prototype.matchesWidget = function matchesWidget (widget) {
     return this.dirty == NOT_DIRTY && widget.type.eq(this.widget.type)
@@ -8339,6 +8436,11 @@ var WidgetViewDesc = /*@__PURE__*/(function (ViewDesc) {
 
   WidgetViewDesc.prototype.ignoreMutation = function ignoreMutation (mutation) {
     return mutation.type != "selection" || this.widget.spec.ignoreSelection
+  };
+
+  WidgetViewDesc.prototype.destroy = function destroy () {
+    this.widget.type.destroy(this.dom);
+    ViewDesc.prototype.destroy.call(this);
   };
 
   prototypeAccessors$1.domAtom.get = function () { return true };
@@ -8457,7 +8559,7 @@ var NodeViewDesc = /*@__PURE__*/(function (ViewDesc) {
   // the way the node works.
   //
   // (Using subclassing for this was intentionally decided against,
-  // since it'd require exposing a whole slew of finnicky
+  // since it'd require exposing a whole slew of finicky
   // implementation details to the user code that they probably will
   // never need.)
   NodeViewDesc.create = function create (parent, node, outerDeco, innerDeco, view, pos) {
@@ -8528,8 +8630,10 @@ var NodeViewDesc = /*@__PURE__*/(function (ViewDesc) {
     var this$1 = this;
 
     var inline = this.node.inlineContent, off = pos;
-    var composition = inline && view.composing && this.localCompositionNode(view, pos);
-    var updater = new ViewTreeUpdater(this, composition && composition.node);
+    var composition = view.composing && this.localCompositionInfo(view, pos);
+    var localComposition = composition && composition.pos > -1 ? composition : null;
+    var compositionInChild = composition && composition.pos < 0;
+    var updater = new ViewTreeUpdater(this, localComposition && localComposition.node);
     iterDeco(this.node, this.innerDeco, function (widget, i, insideNode) {
       if (widget.spec.marks)
         { updater.syncToMarks(widget.spec.marks, inline, view); }
@@ -8541,13 +8645,15 @@ var NodeViewDesc = /*@__PURE__*/(function (ViewDesc) {
     }, function (child, outerDeco, innerDeco, i) {
       // Make sure the wrapping mark descs match the node's marks.
       updater.syncToMarks(child.marks, inline, view);
-      // Either find an existing desc that exactly matches this node,
-      // and drop the descs before it.
-      updater.findNodeMatch(child, outerDeco, innerDeco, i) ||
-        // Or try updating the next desc to reflect this node.
-        updater.updateNextNode(child, outerDeco, innerDeco, view, i) ||
-        // Or just add it as a new desc.
+      // Try several strategies for drawing this node
+      var compIndex;
+      if (updater.findNodeMatch(child, outerDeco, innerDeco, i)) ; else if (compositionInChild && view.state.selection.from > off &&
+                 view.state.selection.to < off + child.nodeSize &&
+                 (compIndex = updater.findIndexWithChild(composition.node)) > -1 &&
+                 updater.updateNodeAt(child, outerDeco, innerDeco, compIndex, view)) ; else if (updater.updateNextNode(child, outerDeco, innerDeco, view, i)) ; else {
+        // Add it as a new view
         updater.addNode(child, outerDeco, innerDeco, view, off);
+      }
       off += child.nodeSize;
     });
     // Drop all remaining descs after the current position.
@@ -8558,16 +8664,15 @@ var NodeViewDesc = /*@__PURE__*/(function (ViewDesc) {
     // Sync the DOM if anything changed
     if (updater.changed || this.dirty == CONTENT_DIRTY) {
       // May have to protect focused DOM from being changed if a composition is active
-      if (composition) { this.protectLocalComposition(view, composition); }
+      if (localComposition) { this.protectLocalComposition(view, localComposition); }
       renderDescs(this.contentDOM, this.children, view);
       if (result.ios) { iosHacks(this.dom); }
     }
   };
 
-  NodeViewDesc.prototype.localCompositionNode = function localCompositionNode (view, pos) {
+  NodeViewDesc.prototype.localCompositionInfo = function localCompositionInfo (view, pos) {
     // Only do something if both the selection and a focused text node
-    // are inside of this node, and the node isn't already part of a
-    // view that's a child of this view
+    // are inside of this node
     var ref = view.state.selection;
     var from = ref.from;
     var to = ref.to;
@@ -8576,13 +8681,16 @@ var NodeViewDesc = /*@__PURE__*/(function (ViewDesc) {
     var textNode = nearbyTextNode(sel.focusNode, sel.focusOffset);
     if (!textNode || !this.dom.contains(textNode.parentNode)) { return }
 
-    // Find the text in the focused node in the node, stop if it's not
-    // there (may have been modified through other means, in which
-    // case it should overwritten)
-    var text = textNode.nodeValue;
-    var textPos = findTextInFragment(this.node.content, text, from - pos, to - pos);
-
-    return textPos < 0 ? null : {node: textNode, pos: textPos, text: text}
+    if (this.node.inlineContent) {
+      // Find the text in the focused node in the node, stop if it's not
+      // there (may have been modified through other means, in which
+      // case it should overwritten)
+      var text = textNode.nodeValue;
+      var textPos = findTextInFragment(this.node.content, text, from - pos, to - pos);
+      return textPos < 0 ? null : {node: textNode, pos: textPos, text: text}
+    } else {
+      return {node: textNode, pos: -1}
+    }
   };
 
   NodeViewDesc.prototype.protectLocalComposition = function protectLocalComposition (view, ref) {
@@ -8720,6 +8828,12 @@ var TextViewDesc = /*@__PURE__*/(function (NodeViewDesc) {
     return new TextViewDesc(this.parent, node, this.outerDeco, this.innerDeco, dom, dom, view)
   };
 
+  TextViewDesc.prototype.markDirty = function markDirty (from, to) {
+    NodeViewDesc.prototype.markDirty.call(this, from, to);
+    if (this.dom != this.nodeDOM && (from == 0 || to == this.nodeDOM.nodeValue.length))
+      { this.dirty = NODE_DIRTY; }
+  };
+
   prototypeAccessors$4.domAtom.get = function () { return false };
 
   Object.defineProperties( TextViewDesc.prototype, prototypeAccessors$4 );
@@ -8727,26 +8841,27 @@ var TextViewDesc = /*@__PURE__*/(function (NodeViewDesc) {
   return TextViewDesc;
 }(NodeViewDesc));
 
-// A dummy desc used to tag trailing BR or span nodes created to work
+// A dummy desc used to tag trailing BR or IMG nodes created to work
 // around contentEditable terribleness.
-var BRHackViewDesc = /*@__PURE__*/(function (ViewDesc) {
-  function BRHackViewDesc () {
+var TrailingHackViewDesc = /*@__PURE__*/(function (ViewDesc) {
+  function TrailingHackViewDesc () {
     ViewDesc.apply(this, arguments);
   }
 
-  if ( ViewDesc ) BRHackViewDesc.__proto__ = ViewDesc;
-  BRHackViewDesc.prototype = Object.create( ViewDesc && ViewDesc.prototype );
-  BRHackViewDesc.prototype.constructor = BRHackViewDesc;
+  if ( ViewDesc ) TrailingHackViewDesc.__proto__ = ViewDesc;
+  TrailingHackViewDesc.prototype = Object.create( ViewDesc && ViewDesc.prototype );
+  TrailingHackViewDesc.prototype.constructor = TrailingHackViewDesc;
 
-  var prototypeAccessors$5 = { domAtom: { configurable: true } };
+  var prototypeAccessors$5 = { domAtom: { configurable: true },ignoreForCoords: { configurable: true } };
 
-  BRHackViewDesc.prototype.parseRule = function parseRule () { return {ignore: true} };
-  BRHackViewDesc.prototype.matchesHack = function matchesHack () { return this.dirty == NOT_DIRTY };
+  TrailingHackViewDesc.prototype.parseRule = function parseRule () { return {ignore: true} };
+  TrailingHackViewDesc.prototype.matchesHack = function matchesHack (nodeName) { return this.dirty == NOT_DIRTY && this.dom.nodeName == nodeName };
   prototypeAccessors$5.domAtom.get = function () { return true };
+  prototypeAccessors$5.ignoreForCoords.get = function () { return this.dom.nodeName == "IMG" };
 
-  Object.defineProperties( BRHackViewDesc.prototype, prototypeAccessors$5 );
+  Object.defineProperties( TrailingHackViewDesc.prototype, prototypeAccessors$5 );
 
-  return BRHackViewDesc;
+  return TrailingHackViewDesc;
 }(ViewDesc));
 
 // A separate subclass is used for customized node views, so that the
@@ -8897,12 +9012,14 @@ function patchAttributes(dom, prev, cur) {
     { if (name$1 != "class" && name$1 != "style" && name$1 != "nodeName" && cur[name$1] != prev[name$1])
       { dom.setAttribute(name$1, cur[name$1]); } }
   if (prev.class != cur.class) {
-    var prevList = prev.class ? prev.class.split(" ") : nothing;
-    var curList = cur.class ? cur.class.split(" ") : nothing;
+    var prevList = prev.class ? prev.class.split(" ").filter(Boolean) : nothing;
+    var curList = cur.class ? cur.class.split(" ").filter(Boolean) : nothing;
     for (var i = 0; i < prevList.length; i++) { if (curList.indexOf(prevList[i]) == -1)
       { dom.classList.remove(prevList[i]); } }
     for (var i$1 = 0; i$1 < curList.length; i$1++) { if (prevList.indexOf(curList[i$1]) == -1)
       { dom.classList.add(curList[i$1]); } }
+    if (dom.classList.length == 0)
+      { dom.removeAttribute("class"); }
   }
   if (prev.style != cur.style) {
     if (prev.style) {
@@ -8947,13 +9064,7 @@ var ViewTreeUpdater = function ViewTreeUpdater(top, lockedNode) {
   // Tracks whether anything was changed
   this.changed = false;
 
-  var pre = preMatch(top.node.content, top.children);
-  this.preMatched = pre.nodes;
-  this.preMatchOffset = pre.offset;
-};
-
-ViewTreeUpdater.prototype.getPreMatch = function getPreMatch (index) {
-  return index >= this.preMatchOffset ? this.preMatched[index - this.preMatchOffset] : null
+  this.preMatch = preMatch(top.node.content, top);
 };
 
 // Destroy and remove the children between the given indices in
@@ -9014,13 +9125,15 @@ ViewTreeUpdater.prototype.syncToMarks = function syncToMarks (marks, inline, vie
 // Try to find a node desc matching the given data. Skip over it and
 // return true when successful.
 ViewTreeUpdater.prototype.findNodeMatch = function findNodeMatch (node, outerDeco, innerDeco, index) {
-  var found = -1, preMatch = index < 0 ? undefined : this.getPreMatch(index), children = this.top.children;
-  if (preMatch && preMatch.matchesNode(node, outerDeco, innerDeco)) {
-    found = children.indexOf(preMatch);
+  var found = -1, targetDesc;
+  if (index >= this.preMatch.index &&
+      (targetDesc = this.preMatch.matches[index - this.preMatch.index]).parent == this.top &&
+      targetDesc.matchesNode(node, outerDeco, innerDeco)) {
+    found = this.top.children.indexOf(targetDesc, this.index);
   } else {
-    for (var i = this.index, e = Math.min(children.length, i + 5); i < e; i++) {
-      var child = children[i];
-      if (child.matchesNode(node, outerDeco, innerDeco) && this.preMatched.indexOf(child) < 0) {
+    for (var i = this.index, e = Math.min(this.top.children.length, i + 5); i < e; i++) {
+      var child = this.top.children[i];
+      if (child.matchesNode(node, outerDeco, innerDeco) && !this.preMatch.matched.has(child)) {
         found = i;
         break
       }
@@ -9032,6 +9145,29 @@ ViewTreeUpdater.prototype.findNodeMatch = function findNodeMatch (node, outerDec
   return true
 };
 
+ViewTreeUpdater.prototype.updateNodeAt = function updateNodeAt (node, outerDeco, innerDeco, index, view) {
+  var child = this.top.children[index];
+  if (!child.update(node, outerDeco, innerDeco, view)) { return false }
+  this.destroyBetween(this.index, index);
+  this.index = index + 1;
+  return true
+};
+
+ViewTreeUpdater.prototype.findIndexWithChild = function findIndexWithChild (domNode) {
+  for (;;) {
+    var parent = domNode.parentNode;
+    if (!parent) { return -1 }
+    if (parent == this.top.contentDOM) {
+      var desc = domNode.pmViewDesc;
+      if (desc) { for (var i = this.index; i < this.top.children.length; i++) {
+        if (this.top.children[i] == desc) { return i }
+      } }
+      return -1
+    }
+    domNode = parent;
+  }
+};
+
 // : (Node, [Decoration], DecorationSource, EditorView, Fragment, number) → bool
 // Try to update the next node, if any, to the given data. Checks
 // pre-matches to avoid overwriting nodes that could still be used.
@@ -9039,8 +9175,8 @@ ViewTreeUpdater.prototype.updateNextNode = function updateNextNode (node, outerD
   for (var i = this.index; i < this.top.children.length; i++) {
     var next = this.top.children[i];
     if (next instanceof NodeViewDesc) {
-      var preMatch = this.preMatched.indexOf(next);
-      if (preMatch > -1 && preMatch + this.preMatchOffset != index) { return false }
+      var preMatch = this.preMatch.matched.get(next);
+      if (preMatch != null && preMatch != index) { return false }
       var nextDOM = next.dom;
 
       // Can't update if nextDOM is or contains this.lock, except if
@@ -9088,32 +9224,63 @@ ViewTreeUpdater.prototype.addTextblockHacks = function addTextblockHacks () {
   if (!lastChild || // Empty textblock
       !(lastChild instanceof TextViewDesc) ||
       /\n$/.test(lastChild.node.text)) {
-    if (this.index < this.top.children.length && this.top.children[this.index].matchesHack()) {
-      this.index++;
-    } else {
-      var dom = document.createElement("br");
-      this.top.children.splice(this.index++, 0, new BRHackViewDesc(this.top, nothing, dom, null));
-      this.changed = true;
-    }
+    // Avoid bugs in Safari's cursor drawing (#1165) and Chrome's mouse selection (#1152)
+    if ((result.safari || result.chrome) && lastChild && lastChild.dom.contentEditable == "false")
+      { this.addHackNode("IMG"); }
+    this.addHackNode("BR");
   }
 };
 
-// : (Fragment, [ViewDesc]) → [ViewDesc]
-// Iterate from the end of the fragment and array of descs to find
-// directly matching ones, in order to avoid overeagerly reusing
-// those for other nodes. Returns an array whose positions correspond
-// to node positions in the fragment, and whose elements are either
-// descs matched to the child at that index, or empty.
-function preMatch(frag, descs) {
-  var result = [], end = frag.childCount;
-  for (var i = descs.length - 1; end > 0 && i >= 0; i--) {
-    var desc = descs[i], node = desc.node;
-    if (!node) { continue }
-    if (node != frag.child(end - 1)) { break }
-    result.push(desc);
-    --end;
+ViewTreeUpdater.prototype.addHackNode = function addHackNode (nodeName) {
+  if (this.index < this.top.children.length && this.top.children[this.index].matchesHack(nodeName)) {
+    this.index++;
+  } else {
+    var dom = document.createElement(nodeName);
+    if (nodeName == "IMG") { dom.className = "ProseMirror-separator"; }
+    if (nodeName == "BR") { dom.className = "ProseMirror-trailingBreak"; }
+    this.top.children.splice(this.index++, 0, new TrailingHackViewDesc(this.top, nothing, dom, null));
+    this.changed = true;
   }
-  return {nodes: result.reverse(), offset: end}
+};
+
+// : (Fragment, [ViewDesc]) → {index: number, matched: Map<ViewDesc, number>, matches: ViewDesc[]}
+// Iterate from the end of the fragment and array of descs to find
+// directly matching ones, in order to avoid overeagerly reusing those
+// for other nodes. Returns the fragment index of the first node that
+// is part of the sequence of matched nodes at the end of the
+// fragment.
+function preMatch(frag, parentDesc) {
+  var curDesc = parentDesc, descI = curDesc.children.length;
+  var fI = frag.childCount, matched = new Map, matches = [];
+  outer: while (fI > 0) {
+    var desc = (void 0);
+    for (;;) {
+      if (descI) {
+        var next = curDesc.children[descI - 1];
+        if (next instanceof MarkViewDesc) {
+          curDesc = next;
+          descI = next.children.length;
+        } else {
+          desc = next;
+          descI--;
+          break
+        }
+      } else if (curDesc == parentDesc) {
+        break outer
+      } else {
+        // FIXME
+        descI = curDesc.parent.children.indexOf(curDesc);
+        curDesc = curDesc.parent;
+      }
+    }
+    var node = desc.node;
+    if (!node) { continue }
+    if (node != frag.child(fI - 1)) { break }
+    --fI;
+    matched.set(desc, fI);
+    matches.push(desc);
+  }
+  return {index: fI, matched: matched, matches: matches.reverse()}
 }
 
 function compareSide(a, b) { return a.type.side - b.type.side }
@@ -9297,6 +9464,12 @@ function selectionToDOM(view, force) {
   syncNodeSelection(view, sel);
 
   if (!editorOwnsSelection(view)) { return }
+
+  if (!force && view.mouseDown && view.mouseDown.allowDefault) {
+    view.mouseDown.delayedSelectionSync = true;
+    view.domObserver.setCurSelection();
+    return
+  }
 
   view.domObserver.disconnectSelection();
 
@@ -9746,7 +9919,7 @@ function parseBetween(view, from_, to_) {
   if (result.chrome && view.lastKeyCode === 8) {
     for (var off = toOffset; off > fromOffset; off--) {
       var node = parent.childNodes[off - 1], desc = node.pmViewDesc;
-      if (node.nodeType == "BR" && !desc) { toOffset = off; break }
+      if (node.nodeName == "BR" && !desc) { toOffset = off; break }
       if (!desc || desc.size) { break }
     }
   }
@@ -9839,7 +10012,7 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
     if (typeOver && sel instanceof TextSelection && !sel.empty && sel.$head.sameParent(sel.$anchor) &&
         !view.composing && !(parse.sel && parse.sel.anchor != parse.sel.head)) {
       change = {start: sel.from, endA: sel.to, endB: sel.to};
-    } else if (result.ios && view.lastIOSEnter > Date.now() - 225 &&
+    } else if ((result.ios && view.lastIOSEnter > Date.now() - 225 || result.android) &&
                addedNodes.some(function (n) { return n.nodeName == "DIV" || n.nodeName == "P"; }) &&
                view.someProp("handleKeyDown", function (f) { return f(view, keyEvent(13, "Enter")); })) {
       view.lastIOSEnter = 0;
@@ -9901,6 +10074,12 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
     return
   }
 
+  // Chrome Android will occasionally, during composition, delete the
+  // entire composition and then immediately insert it again. This is
+  // used to detect that situation.
+  if (result.chrome && result.android && change.toB == change.from)
+    { view.lastAndroidDelete = Date.now(); }
+
   // This tries to detect Android virtual keyboard
   // enter-and-pick-suggestion action. That sometimes (see issue
   // #1059) first fires a DOM mutation, before moving the selection to
@@ -9957,7 +10136,8 @@ function readDOMChange(view, from, to, typeOver, addedNodes) {
     // Edge just doesn't move the cursor forward when you start typing
     // in an empty block or between br nodes.
     if (sel$2 && !(result.chrome && result.android && view.composing && sel$2.empty &&
-                   (sel$2.head == chFrom || sel$2.head == tr.mapping.map(chTo) - 1) ||
+                 (change.start != change.endB || view.lastAndroidDelete < Date.now() - 100) &&
+                 (sel$2.head == chFrom || sel$2.head == tr.mapping.map(chTo) - 1) ||
                  result.ie && sel$2.empty && sel$2.head == chFrom))
       { tr.setSelection(sel$2); }
   }
@@ -10081,6 +10261,10 @@ function serializeForClipboard(view, slice) {
       var wrapper = doc.createElement(needsWrap[i]);
       while (wrap.firstChild) { wrapper.appendChild(wrap.firstChild); }
       wrap.appendChild(wrapper);
+      if (needsWrap[i] != "tbody") {
+        openStart++;
+        openEnd++;
+      }
     }
     firstChild = wrap.firstChild;
   }
@@ -10102,35 +10286,59 @@ function parseFromClipboard(view, text, html, plainText, $context) {
   var asText = text && (plainText || inCode || !html);
   if (asText) {
     view.someProp("transformPastedText", function (f) { text = f(text, inCode || plainText); });
-    if (inCode) { return new Slice(Fragment.from(view.state.schema.text(text.replace(/\r\n?/g, "\n"))), 0, 0) }
+    if (inCode) { return text ? new Slice(Fragment.from(view.state.schema.text(text.replace(/\r\n?/g, "\n"))), 0, 0) : Slice.empty }
     var parsed = view.someProp("clipboardTextParser", function (f) { return f(text, $context, plainText); });
     if (parsed) {
       slice = parsed;
     } else {
+      var marks = $context.marks();
+      var ref = view.state;
+      var schema = ref.schema;
+      var serializer = DOMSerializer.fromSchema(schema);
       dom = document.createElement("div");
-      text.trim().split(/(?:\r\n?|\n)+/).forEach(function (block) {
-        dom.appendChild(document.createElement("p")).textContent = block;
+      text.split(/(?:\r\n?|\n)+/).forEach(function (block) {
+        var p = dom.appendChild(document.createElement("p"));
+        if (block) { p.appendChild(serializer.serializeNode(schema.text(block, marks))); }
       });
     }
   } else {
     view.someProp("transformPastedHTML", function (f) { html = f(html); });
     dom = readHTML(html);
+    if (result.webkit) { restoreReplacedSpaces(dom); }
   }
 
   var contextNode = dom && dom.querySelector("[data-pm-slice]");
   var sliceData = contextNode && /^(\d+) (\d+) (.*)/.exec(contextNode.getAttribute("data-pm-slice"));
   if (!slice) {
     var parser = view.someProp("clipboardParser") || view.someProp("domParser") || DOMParser.fromSchema(view.state.schema);
-    slice = parser.parseSlice(dom, {preserveWhitespace: !!(asText || sliceData), context: $context});
+    slice = parser.parseSlice(dom, {
+      preserveWhitespace: !!(asText || sliceData),
+      context: $context,
+      ruleFromNode: function ruleFromNode(dom) {
+        if (dom.nodeName == "BR" && !dom.nextSibling &&
+            dom.parentNode && !inlineParents.test(dom.parentNode.nodeName)) { return {ignore: true} }
+      }
+    });
   }
-  if (sliceData)
-    { slice = addContext(closeSlice(slice, +sliceData[1], +sliceData[2]), sliceData[3]); }
-  else // HTML wasn't created by ProseMirror. Make sure top-level siblings are coherent
-    { slice = Slice.maxOpen(normalizeSiblings(slice.content, $context), false); }
+  if (sliceData) {
+    slice = addContext(closeSlice(slice, +sliceData[1], +sliceData[2]), sliceData[3]);
+  } else { // HTML wasn't created by ProseMirror. Make sure top-level siblings are coherent
+    slice = Slice.maxOpen(normalizeSiblings(slice.content, $context), true);
+    if (slice.openStart || slice.openEnd) {
+      var openStart = 0, openEnd = 0;
+      for (var node = slice.content.firstChild; openStart < slice.openStart && !node.type.spec.isolating;
+           openStart++, node = node.firstChild) {}
+      for (var node$1 = slice.content.lastChild; openEnd < slice.openEnd && !node$1.type.spec.isolating;
+           openEnd++, node$1 = node$1.lastChild) {}
+      slice = closeSlice(slice, openStart, openEnd);
+    }
+  }
 
   view.someProp("transformPasted", function (f) { slice = f(slice); });
   return slice
 }
+
+var inlineParents = /^(a|abbr|acronym|b|cite|code|del|em|i|ins|kbd|label|output|q|ruby|s|samp|span|strong|sub|sup|time|u|tt|var)$/i;
 
 // Takes a slice parsed with parseSlice, which means there hasn't been
 // any content-expression checking done on the top nodes, tries to
@@ -10236,17 +10444,29 @@ function detachedDoc() {
 }
 
 function readHTML(html) {
-  var metas = /(\s*<meta [^>]*>)*/.exec(html);
+  var metas = /^(\s*<meta [^>]*>)*/.exec(html);
   if (metas) { html = html.slice(metas[0].length); }
   var elt = detachedDoc().createElement("div");
-  var firstTag = /(?:<meta [^>]*>)*<([a-z][^>\s]+)/i.exec(html), wrap, depth = 0;
-  if (wrap = firstTag && wrapMap[firstTag[1].toLowerCase()]) {
-    html = wrap.map(function (n) { return "<" + n + ">"; }).join("") + html + wrap.map(function (n) { return "</" + n + ">"; }).reverse().join("");
-    depth = wrap.length;
-  }
+  var firstTag = /<([a-z][^>\s]+)/i.exec(html), wrap;
+  if (wrap = firstTag && wrapMap[firstTag[1].toLowerCase()])
+    { html = wrap.map(function (n) { return "<" + n + ">"; }).join("") + html + wrap.map(function (n) { return "</" + n + ">"; }).reverse().join(""); }
   elt.innerHTML = html;
-  for (var i = 0; i < depth; i++) { elt = elt.firstChild; }
+  if (wrap) { for (var i = 0; i < wrap.length; i++) { elt = elt.querySelector(wrap[i]) || elt; } }
   return elt
+}
+
+// Webkit browsers do some hard-to-predict replacement of regular
+// spaces with non-breaking spaces when putting content on the
+// clipboard. This tries to convert such non-breaking spaces (which
+// will be wrapped in a plain span on Chrome, a span with class
+// Apple-converted-space on Safari) back to regular spaces.
+function restoreReplacedSpaces(dom) {
+  var nodes = dom.querySelectorAll(result.chrome ? "span:not([class]):not([style])" : "span.Apple-converted-space");
+  for (var i = 0; i < nodes.length; i++) {
+    var node = nodes[i];
+    if (node.childNodes.length == 1 && node.textContent == "\u00a0" && node.parentNode)
+      { node.parentNode.replaceChild(dom.ownerDocument.createTextNode(" "), node); }
+  }
 }
 
 function addContext(slice, context) {
@@ -10462,14 +10682,15 @@ DOMObserver.prototype.registerMutation = function registerMutation (mut, added) 
   if (!desc || desc.ignoreMutation(mut)) { return null }
 
   if (mut.type == "childList") {
+    for (var i = 0; i < mut.addedNodes.length; i++) { added.push(mut.addedNodes[i]); }
     if (desc.contentDOM && desc.contentDOM != desc.dom && !desc.contentDOM.contains(mut.target))
       { return {from: desc.posBefore, to: desc.posAfter} }
     var prev = mut.previousSibling, next = mut.nextSibling;
     if (result.ie && result.ie_version <= 11 && mut.addedNodes.length) {
       // IE11 gives us incorrect next/prev siblings for some
       // insertions, so if there are added nodes, recompute those
-      for (var i = 0; i < mut.addedNodes.length; i++) {
-        var ref = mut.addedNodes[i];
+      for (var i$1 = 0; i$1 < mut.addedNodes.length; i$1++) {
+        var ref = mut.addedNodes[i$1];
           var previousSibling = ref.previousSibling;
           var nextSibling = ref.nextSibling;
         if (!previousSibling || Array.prototype.indexOf.call(mut.addedNodes, previousSibling) < 0) { prev = previousSibling; }
@@ -10481,7 +10702,6 @@ DOMObserver.prototype.registerMutation = function registerMutation (mut, added) 
     var from = desc.localPosFromDOM(mut.target, fromOffset, -1);
     var toOffset = next && next.parentNode == mut.target
         ? domIndex(next) : mut.target.childNodes.length;
-    for (var i$1 = 0; i$1 < mut.addedNodes.length; i$1++) { added.push(mut.addedNodes[i$1]); }
     var to = desc.localPosFromDOM(mut.target, toOffset, 1);
     return {from: from, to: to}
   } else if (mut.type == "attributes") {
@@ -10523,6 +10743,7 @@ function initInput(view) {
 
   view.lastIOSEnter = 0;
   view.lastIOSEnterFallbackTimeout = null;
+  view.lastAndroidDelete = 0;
 
   view.composing = false;
   view.composingTimeout = null;
@@ -10599,7 +10820,7 @@ function dispatchEvent(view, event) {
 editHandlers.keydown = function (view, event) {
   view.shiftKey = event.keyCode == 16 || event.shiftKey;
   if (inOrNearComposition(view, event)) { return }
-  view.domObserver.forceFlush();
+  if (event.keyCode != 229) { view.domObserver.forceFlush(); }
   view.lastKeyCode = event.keyCode;
   view.lastKeyCodeTime = Date.now();
   // On iOS, if we preventDefault enter key presses, the virtual
@@ -10725,10 +10946,11 @@ function handleDoubleClick(view, pos, inside, event) {
 function handleTripleClick$1(view, pos, inside, event) {
   return runHandlerOnContext(view, "handleTripleClickOn", pos, inside, event) ||
     view.someProp("handleTripleClick", function (f) { return f(view, pos, event); }) ||
-    defaultTripleClick(view, inside)
+    defaultTripleClick(view, inside, event)
 }
 
-function defaultTripleClick(view, inside) {
+function defaultTripleClick(view, inside, event) {
+  if (event.button != 0) { return false }
   var doc = view.state.doc;
   if (inside == -1) {
     if (doc.inlineContent) {
@@ -10771,12 +10993,14 @@ handlers.mousedown = function (view, event) {
   var pos = view.posAtCoords(eventCoords(event));
   if (!pos) { return }
 
-  if (type == "singleClick")
-    { view.mouseDown = new MouseDown(view, pos, event, flushed); }
-  else if ((type == "doubleClick" ? handleDoubleClick : handleTripleClick$1)(view, pos.pos, pos.inside, event))
-    { event.preventDefault(); }
-  else
-    { setSelectionOrigin(view, "pointer"); }
+  if (type == "singleClick") {
+    if (view.mouseDown) { view.mouseDown.done(); }
+    view.mouseDown = new MouseDown(view, pos, event, flushed);
+  } else if ((type == "doubleClick" ? handleDoubleClick : handleTripleClick$1)(view, pos.pos, pos.inside, event)) {
+    event.preventDefault();
+  } else {
+    setSelectionOrigin(view, "pointer");
+  }
 };
 
 var MouseDown = function MouseDown(view, pos, event, flushed) {
@@ -10789,6 +11013,7 @@ var MouseDown = function MouseDown(view, pos, event, flushed) {
   this.flushed = flushed;
   this.selectNode = event[selectNodeModifier];
   this.allowDefault = event.shiftKey;
+  this.delayedSelectionSync = false;
 
   var targetNode, targetPos;
   if (pos.inside > -1) {
@@ -10806,8 +11031,11 @@ var MouseDown = function MouseDown(view, pos, event, flushed) {
   var targetDesc = target ? view.docView.nearestDesc(target, true) : null;
   this.target = targetDesc ? targetDesc.dom : null;
 
-  if (targetNode.type.spec.draggable && targetNode.type.spec.selectable !== false ||
-      view.state.selection instanceof NodeSelection && targetPos == view.state.selection.from)
+  var ref = view.state;
+  var selection = ref.selection;
+  if (event.button == 0 &&
+      targetNode.type.spec.draggable && targetNode.type.spec.selectable !== false ||
+      selection instanceof NodeSelection && selection.from <= targetPos && selection.to > targetPos)
     { this.mightDrag = {node: targetNode,
                       pos: targetPos,
                       addAttr: this.target && !this.target.draggable,
@@ -10817,7 +11045,9 @@ var MouseDown = function MouseDown(view, pos, event, flushed) {
     this.view.domObserver.stop();
     if (this.mightDrag.addAttr) { this.target.draggable = true; }
     if (this.mightDrag.setUneditable)
-      { setTimeout(function () { return this$1.target.setAttribute("contentEditable", "false"); }, 20); }
+      { setTimeout(function () {
+        if (this$1.view.mouseDown == this$1) { this$1.target.setAttribute("contentEditable", "false"); }
+      }, 20); }
     this.view.domObserver.start();
   }
 
@@ -10827,6 +11057,8 @@ var MouseDown = function MouseDown(view, pos, event, flushed) {
 };
 
 MouseDown.prototype.done = function done () {
+    var this$1 = this;
+
   this.view.root.removeEventListener("mouseup", this.up);
   this.view.root.removeEventListener("mousemove", this.move);
   if (this.mightDrag && this.target) {
@@ -10835,6 +11067,7 @@ MouseDown.prototype.done = function done () {
     if (this.mightDrag.setUneditable) { this.target.removeAttribute("contentEditable"); }
     this.view.domObserver.start();
   }
+  if (this.delayedSelectionSync) { setTimeout(function () { return selectionToDOM(this$1.view); }); }
   this.view.mouseDown = null;
 };
 
@@ -10851,18 +11084,20 @@ MouseDown.prototype.up = function up (event) {
     setSelectionOrigin(this.view, "pointer");
   } else if (handleSingleClick(this.view, pos.pos, pos.inside, event, this.selectNode)) {
     event.preventDefault();
-  } else if (this.flushed ||
-             // Safari ignores clicks on draggable elements
-             (result.safari && this.mightDrag && !this.mightDrag.node.isAtom) ||
-             // Chrome will sometimes treat a node selection as a
-             // cursor, but still report that the node is selected
-             // when asked through getSelection. You'll then get a
-             // situation where clicking at the point where that
-             // (hidden) cursor is doesn't change the selection, and
-             // thus doesn't get a reaction from ProseMirror. This
-             // works around that.
-             (result.chrome && !(this.view.state.selection instanceof TextSelection) &&
-              (pos.pos == this.view.state.selection.from || pos.pos == this.view.state.selection.to))) {
+  } else if (event.button == 0 &&
+             (this.flushed ||
+              // Safari ignores clicks on draggable elements
+              (result.safari && this.mightDrag && !this.mightDrag.node.isAtom) ||
+              // Chrome will sometimes treat a node selection as a
+              // cursor, but still report that the node is selected
+              // when asked through getSelection. You'll then get a
+              // situation where clicking at the point where that
+              // (hidden) cursor is doesn't change the selection, and
+              // thus doesn't get a reaction from ProseMirror. This
+              // works around that.
+              (result.chrome && !(this.view.state.selection instanceof TextSelection) &&
+               Math.min(Math.abs(pos.pos - this.view.state.selection.from),
+                        Math.abs(pos.pos - this.view.state.selection.to)) <= 2))) {
     updateSelection(this.view, Selection.near(this.view.state.doc.resolve(pos.pos)), "pointer");
     event.preventDefault();
   } else {
@@ -10875,6 +11110,7 @@ MouseDown.prototype.move = function move (event) {
                              Math.abs(this.event.y - event.clientY) > 4))
     { this.allowDefault = true; }
   setSelectionOrigin(this.view, "pointer");
+  if (event.buttons == 0) { this.done(); }
 };
 
 handlers.touchdown = function (view) {
@@ -10957,8 +11193,17 @@ function scheduleComposeEnd(view, delay) {
 }
 
 function clearComposition(view) {
-  view.composing = false;
+  if (view.composing) {
+    view.composing = false;
+    view.compositionEndedAt = timestampFromCustomEvent();
+  }
   while (view.compositionNodes.length > 0) { view.compositionNodes.pop().markParentsDirty(); }
+}
+
+function timestampFromCustomEvent() {
+  var event = document.createEvent("Event");
+  event.initEvent("event", true, true);
+  return event.timeStamp
 }
 
 function endComposition(view, forceUpdate) {
@@ -11075,8 +11320,8 @@ handlers.dragstart = function (view, e) {
     view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, mouseDown.mightDrag.pos)));
   } else if (e.target && e.target.nodeType == 1) {
     var desc = view.docView.nearestDesc(e.target, true);
-    if (!desc || !desc.node.type.spec.draggable || desc == view.docView) { return }
-    view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, desc.posBefore)));
+    if (desc && desc.node.type.spec.draggable && desc != view.docView)
+      { view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, desc.posBefore))); }
   }
   var slice = view.state.selection.content();
   var ref = serializeForClipboard(view, slice);
@@ -11084,6 +11329,8 @@ handlers.dragstart = function (view, e) {
   var text = ref.text;
   e.dataTransfer.clearData();
   e.dataTransfer.setData(brokenClipboardAPI ? "Text" : "text/html", dom.innerHTML);
+  // See https://github.com/ProseMirror/prosemirror/issues/1156
+  e.dataTransfer.effectAllowed = "copyMove";
   if (!brokenClipboardAPI) { e.dataTransfer.setData("text/plain", text); }
   view.dragging = new Dragging(slice, !e[dragCopyModifier]);
 };
@@ -11107,9 +11354,13 @@ editHandlers.drop = function (view, e) {
   if (!eventPos) { return }
   var $mouse = view.state.doc.resolve(eventPos.pos);
   if (!$mouse) { return }
-  var slice = dragging && dragging.slice ||
-      parseFromClipboard(view, e.dataTransfer.getData(brokenClipboardAPI ? "Text" : "text/plain"),
-                         brokenClipboardAPI ? null : e.dataTransfer.getData("text/html"), false, $mouse);
+  var slice = dragging && dragging.slice;
+  if (slice) {
+    view.someProp("transformPasted", function (f) { slice = f(slice); });
+  } else {
+    slice = parseFromClipboard(view, e.dataTransfer.getData(brokenClipboardAPI ? "Text" : "text/plain"),
+                               brokenClipboardAPI ? null : e.dataTransfer.getData("text/html"), false, $mouse);
+  }
   var move = dragging && !e[dragCopyModifier];
   if (view.someProp("handleDrop", function (f) { return f(view, e, slice || Slice.empty, move); })) {
     e.preventDefault();
@@ -11159,12 +11410,13 @@ handlers.focus = function (view) {
   }
 };
 
-handlers.blur = function (view) {
+handlers.blur = function (view, e) {
   if (view.focused) {
     view.domObserver.stop();
     view.dom.classList.remove("ProseMirror-focused");
     view.domObserver.start();
-    view.domObserver.currentSelection.set({});
+    if (e.relatedTarget && view.dom.contains(e.relatedTarget))
+      { view.domObserver.currentSelection.set({}); }
     view.focused = false;
   }
 };
@@ -11223,6 +11475,10 @@ WidgetType.prototype.eq = function eq (other) {
       this.toDOM == other.toDOM && compareObjs(this.spec, other.spec)))
 };
 
+WidgetType.prototype.destroy = function destroy (node) {
+  if (this.spec.destroy) { this.spec.destroy(node); }
+};
+
 var InlineType = function InlineType(attrs, spec) {
   this.spec = spec || noSpec;
   this.attrs = attrs;
@@ -11261,7 +11517,8 @@ NodeType.prototype.valid = function valid (node, span) {
   var ref = node.content.findIndex(span.from);
     var index = ref.index;
     var offset = ref.offset;
-  return offset == span.from && offset + node.child(index).nodeSize == span.to
+    var child;
+  return offset == span.from && !(child = node.child(index)).isText && offset + child.nodeSize == span.to
 };
 
 NodeType.prototype.eq = function eq (other) {
@@ -11349,6 +11606,10 @@ Decoration.prototype.map = function map (mapping, offset, oldOffset) {
 //   key are interchangeable—if widgets differ in, for example,
 //   the behavior of some event handler, they should get
 //   different keys.
+//
+//   destroy:: ?(node: dom.Node)
+//   Called when the widget decoration is removed as a result of
+//   mapping
 Decoration.widget = function widget (pos, toDOM, spec) {
   return new Decoration(pos, pos, new WidgetType(toDOM, spec))
 };
@@ -11616,6 +11877,10 @@ DecorationSet.prototype.localsInner = function localsInner (node) {
 // An object that can [provide](#view.EditorProps.decorations)
 // decorations. Implemented by [`DecorationSet`](#view.DecorationSet),
 // and passed to [node views](#view.EditorProps.nodeViews).
+//
+//   map:: (Mapping, Node) → DecorationSource
+//   Map the set of decorations in response to a change in the
+//   document.
 
 var empty = new DecorationSet();
 
@@ -11630,6 +11895,13 @@ DecorationSet.removeOverlap = removeOverlap;
 // with (a subset of) the same interface.
 var DecorationGroup = function DecorationGroup(members) {
   this.members = members;
+};
+
+DecorationGroup.prototype.map = function map (mapping, doc) {
+  var mappedDecos = this.members.map(
+    function (member) { return member.map(mapping, doc, noSpec); }
+  );
+  return DecorationGroup.from(mappedDecos)
 };
 
 DecorationGroup.prototype.forChild = function forChild (offset, child) {
@@ -11798,7 +12070,7 @@ function withoutNulls(array) {
 
 // : ([Decoration], Node, number) → DecorationSet
 // Build up a tree that corresponds to a set of decorations. `offset`
-// is a base offset that should be subtractet from the `from` and `to`
+// is a base offset that should be subtracted from the `from` and `to`
 // positions in the spans (so that we don't have to allocate new spans
 // for recursive calls).
 function buildTree(spans, node, offset, options) {
@@ -11890,6 +12162,9 @@ var EditorView = function EditorView(place, props) {
   // The view's current [state](#state.EditorState).
   this.state = props.state;
 
+  this.directPlugins = props.plugins || [];
+  this.directPlugins.forEach(checkStateComponent);
+
   this.dispatch = this.dispatch.bind(this);
 
   this._root = null;
@@ -11925,11 +12200,12 @@ var EditorView = function EditorView(place, props) {
 
   initInput(this);
 
+  this.prevDirectPlugins = [];
   this.pluginViews = [];
   this.updatePluginViews();
 };
 
-var prototypeAccessors$2 = { props: { configurable: true },root: { configurable: true } };
+var prototypeAccessors$2 = { props: { configurable: true },root: { configurable: true },isDestroyed: { configurable: true } };
 
 // composing:: boolean
 // Holds `true` when a
@@ -11954,6 +12230,10 @@ prototypeAccessors$2.props.get = function () {
 EditorView.prototype.update = function update (props) {
   if (props.handleDOMEvents != this._props.handleDOMEvents) { ensureListeners(this); }
   this._props = props;
+  if (props.plugins) {
+    props.plugins.forEach(checkStateComponent);
+    this.directPlugins = props.plugins;
+  }
   this.updateStateInner(props.state, true);
 };
 
@@ -12065,15 +12345,20 @@ EditorView.prototype.destroyPluginViews = function destroyPluginViews () {
 };
 
 EditorView.prototype.updatePluginViews = function updatePluginViews (prevState) {
-  if (!prevState || prevState.plugins != this.state.plugins) {
+  if (!prevState || prevState.plugins != this.state.plugins || this.directPlugins != this.prevDirectPlugins) {
+    this.prevDirectPlugins = this.directPlugins;
     this.destroyPluginViews();
-    for (var i = 0; i < this.state.plugins.length; i++) {
-      var plugin = this.state.plugins[i];
+    for (var i = 0; i < this.directPlugins.length; i++) {
+      var plugin = this.directPlugins[i];
       if (plugin.spec.view) { this.pluginViews.push(plugin.spec.view(this)); }
     }
+    for (var i$1 = 0; i$1 < this.state.plugins.length; i$1++) {
+      var plugin$1 = this.state.plugins[i$1];
+      if (plugin$1.spec.view) { this.pluginViews.push(plugin$1.spec.view(this)); }
+    }
   } else {
-    for (var i$1 = 0; i$1 < this.pluginViews.length; i$1++) {
-      var pluginView = this.pluginViews[i$1];
+    for (var i$2 = 0; i$2 < this.pluginViews.length; i$2++) {
+      var pluginView = this.pluginViews[i$2];
       if (pluginView.update) { pluginView.update(this, prevState); }
     }
   }
@@ -12081,18 +12366,22 @@ EditorView.prototype.updatePluginViews = function updatePluginViews (prevState) 
 
 // :: (string, ?(prop: *) → *) → *
 // Goes over the values of a prop, first those provided directly,
-// then those from plugins (in order), and calls `f` every time a
-// non-undefined value is found. When `f` returns a truthy value,
-// that is immediately returned. When `f` isn't provided, it is
-// treated as the identity function (the prop value is returned
-// directly).
+// then those from plugins given to the view, then from plugins in
+// the state (in order), and calls `f` every time a non-undefined
+// value is found. When `f` returns a truthy value, that is
+// immediately returned. When `f` isn't provided, it is treated as
+// the identity function (the prop value is returned directly).
 EditorView.prototype.someProp = function someProp (propName, f) {
   var prop = this._props && this._props[propName], value;
   if (prop != null && (value = f ? f(prop) : prop)) { return value }
-  var plugins = this.state.plugins;
-  if (plugins) { for (var i = 0; i < plugins.length; i++) {
-    var prop$1 = plugins[i].props[propName];
+  for (var i = 0; i < this.directPlugins.length; i++) {
+    var prop$1 = this.directPlugins[i].props[propName];
     if (prop$1 != null && (value = f ? f(prop$1) : prop$1)) { return value }
+  }
+  var plugins = this.state.plugins;
+  if (plugins) { for (var i$1 = 0; i$1 < plugins.length; i$1++) {
+    var prop$2 = plugins[i$1].props[propName];
+    if (prop$2 != null && (value = f ? f(prop$2) : prop$2)) { return value }
   } }
 };
 
@@ -12226,6 +12515,14 @@ EditorView.prototype.destroy = function destroy () {
   this.docView = null;
 };
 
+// :: boolean
+// This is true when the view has been
+// [destroyed](#view.EditorView.destroy) (and thus should not be
+// used anymore).
+prototypeAccessors$2.isDestroyed.get = function () {
+  return this.docView == null
+};
+
 // Used for testing.
 EditorView.prototype.dispatchEvent = function dispatchEvent$1 (event) {
   return dispatchEvent(this, event)
@@ -12251,12 +12548,16 @@ function computeDocDeco(view) {
   var attrs = Object.create(null);
   attrs.class = "ProseMirror";
   attrs.contenteditable = String(view.editable);
+  attrs.translate = "no";
 
   view.someProp("attributes", function (value) {
     if (typeof value == "function") { value = value(view.state); }
     if (value) { for (var attr in value) {
       if (attr == "class")
         { attrs.class += " " + value[attr]; }
+      if (attr == "style") {
+        attrs.style = (attrs.style ? attrs.style + ";" : "") + value[attr];
+      }
       else if (!attrs[attr] && attr != "contenteditable" && attr != "nodeName")
         { attrs[attr] = String(value[attr]); }
     } }
@@ -12268,6 +12569,7 @@ function computeDocDeco(view) {
 function updateCursorWrapper(view) {
   if (view.markCursor) {
     var dom = document.createElement("img");
+    dom.className = "ProseMirror-separator";
     dom.setAttribute("mark-placeholder", "true");
     view.cursorWrapper = {dom: dom, deco: Decoration.widget(view.state.selection.head, dom, {raw: true, marks: view.markCursor})};
   } else {
@@ -12301,6 +12603,11 @@ function changedNodeViews(a, b) {
   }
   for (var _ in b) { nB++; }
   return nA != nB
+}
+
+function checkStateComponent(plugin) {
+  if (plugin.spec.state || plugin.spec.filterTransaction || plugin.spec.appendTransaction)
+    { throw new RangeError("Plugins passed directly to the view must not have a state component") }
 }
 
 // ::- Gap cursor selections are represented using this class. Its
@@ -13097,7 +13404,18 @@ function history(config) {
       }
     },
 
-    config: config
+    config: config,
+
+    props: {
+      handleDOMEvents: {
+        beforeinput: function beforeinput(view, e) {
+          var handled = e.inputType == "historyUndo" ? undo(view.state, view.dispatch) :
+              e.inputType == "historyRedo" ? redo(view.state, view.dispatch) : false;
+          if (handled) { e.preventDefault(); }
+          return handled
+        }
+      }
+    }
   })
 }
 
@@ -13286,15 +13604,24 @@ function splitListItem(itemType) {
       if ($from.depth == 2 || $from.node(-3).type != itemType ||
           $from.index(-2) != $from.node(-2).childCount - 1) { return false }
       if (dispatch) {
-        var wrap = Fragment.empty, keepItem = $from.index(-1) > 0;
+        var wrap = Fragment.empty;
+        var depthBefore = $from.index(-1) ? 1 : $from.index(-2) ? 2 : 3;
         // Build a fragment containing empty versions of the structure
         // from the outer list item to the parent node of the cursor
-        for (var d = $from.depth - (keepItem ? 1 : 2); d >= $from.depth - 3; d--)
+        for (var d = $from.depth - depthBefore; d >= $from.depth - 3; d--)
           { wrap = Fragment.from($from.node(d).copy(wrap)); }
+        var depthAfter = $from.indexAfter(-1) < $from.node(-2).childCount ? 1
+            : $from.indexAfter(-2) < $from.node(-3).childCount ? 2 : 3;
         // Add a second list item with an empty default start node
         wrap = wrap.append(Fragment.from(itemType.createAndFill()));
-        var tr$1 = state.tr.replace($from.before(keepItem ? null : -1), $from.after(-3), new Slice(wrap, keepItem ? 3 : 2, 2));
-        tr$1.setSelection(state.selection.constructor.near(tr$1.doc.resolve($from.pos + (keepItem ? 3 : 2))));
+        var start = $from.before($from.depth - (depthBefore - 1));
+        var tr$1 = state.tr.replace(start, $from.after(-depthAfter), new Slice(wrap, 4 - depthBefore, 0));
+        var sel = -1;
+        tr$1.doc.nodesBetween(start, tr$1.doc.content.size, function (node, pos) {
+          if (sel > -1) { return false }
+          if (node.isTextblock && node.content.size == 0) { sel = pos + 1; }
+        });
+        if (sel > -1) { tr$1.setSelection(state.selection.constructor.near(tr$1.doc.resolve(sel))); }
         dispatch(tr$1.scrollIntoView());
       }
       return true
@@ -13347,6 +13674,7 @@ function liftOutOfList(state, dispatch, range) {
     tr.delete(pos - 1, pos + 1);
   }
   var $start = tr.doc.resolve(range.start), item = $start.nodeAfter;
+  if (tr.mapping.map(range.end) != range.start + $start.nodeAfter.nodeSize) { return false }
   var atStart = range.startIndex == 0, atEnd = range.endIndex == list.childCount;
   var parent = $start.node(-1), indexBefore = $start.index(-1);
   if (!parent.canReplace(indexBefore + (atStart ? 0 : 1), indexBefore + 1,
@@ -13898,9 +14226,9 @@ function scrollToCaret(parent) {
   }
 }
 
-const htmlEditorCss = ".ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}ionx-html-editor{display:block}ionx-html-editor>.ionx--prosemirror>.ProseMirror{outline:none;user-select:text}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>.ionx--prosemirror>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>.ionx--prosemirror>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>.ionx--prosemirror>.ProseMirror p:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1{font-size:130%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h2{font-size:125%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h3{font-size:120%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h4{font-size:115%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h5{font-size:110%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{font-size:105%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror ul:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
+const htmlEditorCss = ".ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}img.ProseMirror-separator{display:inline !important;border:none !important;margin:0 !important}ionx-html-editor{display:block}ionx-html-editor>.ionx--prosemirror>.ProseMirror{outline:none;user-select:text}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>.ionx--prosemirror>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>.ionx--prosemirror>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>.ionx--prosemirror>.ProseMirror p:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1{font-size:130%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h2{font-size:125%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h3{font-size:120%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h4{font-size:115%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h5{font-size:110%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{font-size:105%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror ul:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
 
-const HtmlEditor = class extends HTMLElement {
+let HtmlEditor = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
@@ -14026,8 +14354,7 @@ const HtmlEditor = class extends HTMLElement {
     fixIonItemOverflow(this.element);
   }
   disconnectedCallback() {
-    var _a;
-    (_a = this.view) === null || _a === void 0 ? void 0 : _a.destroy();
+    this.view?.destroy();
     this.view = undefined;
   }
   render() {
@@ -14128,11 +14455,11 @@ function findBlockMarks(state, markType) {
 
 const alignmentMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}";
 
-const AlignmentMenu = class extends HTMLElement {
+let AlignmentMenu = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   async toggleAlignment(alignment) {
     const view = await this.editor.getView();
@@ -14184,11 +14511,11 @@ function findMarksInSelection(state, markType, attrs) {
 
 const insertMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
-const InsertMenu = class extends HTMLElement {
+let InsertMenu = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   async link() {
     await popoverController.dismiss();
@@ -14233,11 +14560,11 @@ function findNodeStartEnd(doc, pos) {
 const linkMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
 defineIonxLinkEditor();
-const LinkMenu = class extends HTMLElement {
+let LinkMenu = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   async edit() {
     const view = await this.editor.getView();
@@ -19404,11 +19731,11 @@ function wrapInList(nodeType) {
 
 const listMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
-const ListMenu = class extends HTMLElement {
+let ListMenu = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   async level(level) {
     const view = await this.editor.getView();
@@ -19440,11 +19767,11 @@ const ListMenu = class extends HTMLElement {
 
 const paragraphMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
-const ParagraphMenu = class extends HTMLElement {
+let ParagraphMenu = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   async indentLevel(move) {
     const view = await this.editor.getView();
@@ -19593,11 +19920,11 @@ function toggleInlineMark(markType, attrs) {
 
 const textMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}:host input[type=color]{width:20px;height:20px;border:1px solid var(--ion-border-color);background-color:transparent;margin:0 0 0 8px;outline:none}:host ion-button[slot=end]{margin:0}";
 
-const TextMenu = class extends HTMLElement {
+let TextMenu = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
-    attachShadow(this);
+    this.__attachShadow();
   }
   async toggle(name) {
     let command;
@@ -19685,7 +20012,7 @@ function isBlockMarkActive(state, type) {
 
 const toolbarCss = ".sc-ionx-html-editor-toolbar-h{outline:none;display:flex;justify-content:center;flex-wrap:wrap;position:sticky;position:-webkit-sticky;top:0;background-color:var(--background);z-index:1;padding:8px 0}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar{margin:0 4px;--padding-end:2px;--padding-start:4px}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar:not(.button-outline){border:1px solid transparent}.sc-ionx-html-editor-toolbar-h ion-button.button-outline.sc-ionx-html-editor-toolbar{--border-width:1px}.sc-ionx-html-editor-toolbar-h ion-icon[slot=end].sc-ionx-html-editor-toolbar{margin:0;font-size:1em}.sc-ionx-html-editor-toolbar-h ion-button[disabled].sc-ionx-html-editor-toolbar{opacity:0.5}.sc-ionx-html-editor-toolbar-h [ionx--buttons-group].sc-ionx-html-editor-toolbar{display:flex}.sc-ionx-html-editor-toolbar-h .buttons-group.sc-ionx-html-editor-toolbar ion-button.sc-ionx-html-editor-toolbar:not(:last-child){margin-right:0}.ion-focused.sc-ionx-html-editor-toolbar-h,.ion-focused .sc-ionx-html-editor-toolbar-h{background-color:var(--background-focused)}";
 
-const Toolbar = class extends HTMLElement {
+let Toolbar = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
@@ -19741,12 +20068,10 @@ const Toolbar = class extends HTMLElement {
     this.editorSelectionChanged();
   }
   disconnectedCallback() {
-    var _a;
-    (_a = this.selectionUnlisten) === null || _a === void 0 ? void 0 : _a.call(this);
+    this.selectionUnlisten?.();
   }
   render() {
-    var _a, _b, _c, _d;
-    return h(Host, null, h("ion-button", { size: "small", fill: this.activeFeatures.text ? "outline" : "clear", onClick: ev => this.showMenu(ev, "text") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Text`)), ((_a = this.features) === null || _a === void 0 ? void 0 : _a.alignment) !== false && h("ion-button", { size: "small", fill: this.activeFeatures.alignment ? "outline" : "clear", onClick: ev => this.showMenu(ev, "alignment") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Alignment`)), ((_b = this.features) === null || _b === void 0 ? void 0 : _b.heading) !== false && h("ion-button", { size: "small", fill: this.activeFeatures.paragraph ? "outline" : "clear", onClick: ev => this.showMenu(ev, "paragraph") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Paragraph`)), ((_c = this.features) === null || _c === void 0 ? void 0 : _c.list) !== false && h("ion-button", { size: "small", fill: this.activeFeatures.list ? "outline" : "clear", onClick: ev => this.showMenu(ev, "list") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#listMenu/List`)), ((_d = this.features) === null || _d === void 0 ? void 0 : _d.link) !== false && h("ion-button", { size: "small", fill: "clear", onClick: ev => this.showMenu(ev, "insert") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Insert`)), this.activeFeatures.link && h("ion-button", { size: "small", fill: "outline", onClick: ev => this.showMenu(ev, "link") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/LinkEditor#Link`)), h("div", { class: "buttons-group" }, h("ion-button", { size: "small", fill: "clear", tabindex: "-1", disabled: !this.canUndo, title: intl.message `ionx/HtmlEditor#Undo`, onClick: () => this.undo() }, h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/undo.svg", slot: "icon-only" })), h("ion-button", { size: "small", fill: "clear", tabindex: "-1", disabled: !this.canRedo, title: intl.message `ionx/HtmlEditor#Redo`, onClick: () => this.redo() }, h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/redo.svg", slot: "icon-only" }))));
+    return h(Host, null, h("ion-button", { size: "small", fill: this.activeFeatures.text ? "outline" : "clear", onClick: ev => this.showMenu(ev, "text") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Text`)), this.features?.alignment !== false && h("ion-button", { size: "small", fill: this.activeFeatures.alignment ? "outline" : "clear", onClick: ev => this.showMenu(ev, "alignment") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Alignment`)), this.features?.heading !== false && h("ion-button", { size: "small", fill: this.activeFeatures.paragraph ? "outline" : "clear", onClick: ev => this.showMenu(ev, "paragraph") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Paragraph`)), this.features?.list !== false && h("ion-button", { size: "small", fill: this.activeFeatures.list ? "outline" : "clear", onClick: ev => this.showMenu(ev, "list") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#listMenu/List`)), this.features?.link !== false && h("ion-button", { size: "small", fill: "clear", onClick: ev => this.showMenu(ev, "insert") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Insert`)), this.activeFeatures.link && h("ion-button", { size: "small", fill: "outline", onClick: ev => this.showMenu(ev, "link") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/LinkEditor#Link`)), h("div", { class: "buttons-group" }, h("ion-button", { size: "small", fill: "clear", tabindex: "-1", disabled: !this.canUndo, title: intl.message `ionx/HtmlEditor#Undo`, onClick: () => this.undo() }, h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/undo.svg", slot: "icon-only" })), h("ion-button", { size: "small", fill: "clear", tabindex: "-1", disabled: !this.canRedo, title: intl.message `ionx/HtmlEditor#Redo`, onClick: () => this.redo() }, h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/redo.svg", slot: "icon-only" }))));
   }
   get element() { return this; }
   static get style() { return toolbarCss; }

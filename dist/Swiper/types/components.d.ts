@@ -74,7 +74,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxSwiper {
-        "onSwiperEvent"?: (event: CustomEvent<{eventName: keyof SwiperEvents, swiper: Swiper}>) => void;
+        "onSwiperEvent"?: (event: CustomEvent<{swiper: Swiper, eventName: keyof SwiperEvents, eventArgs: any[]}>) => void;
         "options"?: SwiperOptions;
         /**
           * Swiper instance set in constructor of new Swiper instance. It is set as Prop, but should be treated as readonly.
