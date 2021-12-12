@@ -7,6 +7,7 @@ export class MediaBreakpoint extends Enum {
     static readonly md = new MediaBreakpoint("md", 768);
     static readonly lg = new MediaBreakpoint("lg", 992);
     static readonly xl = new MediaBreakpoint("xl", 1200);
+    static readonly xxl = new MediaBreakpoint("xxl", 1400);
 
     static values() {
         return super.values() as MediaBreakpoint[];

@@ -1,5 +1,4 @@
-const cli = require("child_process");
-const path = require("path");
+const utils = require("@appspltfrm/stencil-utils");
 
 /**
  * List of modules, the order is important as some modules are required by other!
@@ -39,6 +38,7 @@ const modules = [
     "Swiper",
     "VirtualScroller",
     "Checkbox",
+    "WidthBreakpoints",
 
     "LinkEditor",
     "HtmlEditor",
@@ -46,20 +46,8 @@ const modules = [
 
 (async () => {
 
-    try {
-        const targetModule = process.argv.length === 3 && process.argv[2].trim();
+    const targetModule = process.argv.length === 3 && process.argv[2].trim();
 
-        for (const module of modules) {
-
-            if (!targetModule || module === targetModule) {
-                console.log(`--- ${module} ---`);
-                cli.execSync(`npm run build`, {cwd: path.resolve("modules", module), stdio: "inherit"});
-            }
-        }
-
-    } catch (error) {
-        console.error(error);
-        process.exit(0);
-    }
+    await utils.buildModules(modules, targetModule ? [targetModule] : undefined);
 
 })();

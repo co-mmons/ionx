@@ -19,3 +19,4 @@ MediaBreakpoint.sm = new MediaBreakpoint("sm", 576);
 MediaBreakpoint.md = new MediaBreakpoint("md", 768);
 MediaBreakpoint.lg = new MediaBreakpoint("lg", 992);
 MediaBreakpoint.xl = new MediaBreakpoint("xl", 1200);
+MediaBreakpoint.xxl = new MediaBreakpoint("xxl", 1400);

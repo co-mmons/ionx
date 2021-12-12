@@ -1,47 +1,5 @@
-[ionx-hide-when=">xs"] {
-    @media (min-width: 576px) {
-        display: none;
-    }
-}
+@import "hide-when-media-width-breakpoint-mixin";
 
-[ionx-hide-when=">sm"] {
-    @media (min-width: 768px) {
-        display: none;
-    }
-}
-
-[ionx-hide-when=">md"] {
-    @media (min-width: 992px) {
-        display: none;
-    }
-}
-
-[ionx-hide-when=">lg"] {
-    @media (min-width: 1200px) {
-        display: none;
-    }
-}
-
-[ionx-hide-when="<sm"] {
-    @media (max-width: 575px) {
-        display: none;
-    }
-}
-
-[ionx-hide-when="<md"] {
-    @media (max-width: 767px) {
-        display: none;
-    }
-}
-
-[ionx-hide-when="<lg"] {
-    @media (max-width: 991px) {
-        display: none;
-    }
-}
-
-[ionx-hide-when="<xl"] {
-    @media (max-width: 1199px) {
-        display: none;
-    }
+* {
+    @include ionx-hide-when-media-width-breakpoint("ionx-hide-when");
 }

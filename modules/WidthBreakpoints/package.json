@@ -1,0 +1,7 @@
+{
+    "scripts": {
+        "build": "stencil build --ts --config stencil.config.build.ts && node-utils-file-system-copy-directory src/styles ../../dist/WidthBreakpoints",
+        "start": "../../node_modules/.bin/stencil build --dev --watch --serve --config stencil.config.test.ts"
+    },
+    "types": "../../dist/WidthBreakpoints/index.d.ts"
+}

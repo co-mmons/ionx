@@ -1,0 +1,16 @@
+@import "../styles/set-prop";
+
+:host {
+
+    small {
+        display: inline-block;
+        background: red;
+        --width-xs: var(--ionx-width-breakpoints);
+        --width-sm: var(--ionx-width-breakpoints-sm) calc(var(--ionx-width-breakpoints) * .9);
+        --width-md: var(--ionx-width-breakpoints-md) calc(var(--ionx-width-breakpoints) * .8);
+        --width-lg: var(--ionx-width-breakpoints-lg) calc(var(--ionx-width-breakpoints) * .7);
+        --width-xl: var(--ionx-width-breakpoints-xl) calc(var(--ionx-width-breakpoints) * .6);
+        --width-xxl: var(--ionx-width-breakpoints-xxl) calc(var(--ionx-width-breakpoints) * .5);
+        @include ionx-width-breakpoints-set-prop("width", "width")
+    }
+}

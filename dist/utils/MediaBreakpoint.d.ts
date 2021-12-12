@@ -6,6 +6,7 @@ export declare class MediaBreakpoint extends Enum {
     static readonly md: MediaBreakpoint;
     static readonly lg: MediaBreakpoint;
     static readonly xl: MediaBreakpoint;
+    static readonly xxl: MediaBreakpoint;
     static values(): MediaBreakpoint[];
     static valueOf(value: EnumValueOfValue): MediaBreakpoint;
     static fromJSON(value: EnumFromJSONValue): MediaBreakpoint;

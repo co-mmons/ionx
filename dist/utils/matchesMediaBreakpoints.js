@@ -8,6 +8,7 @@ const breakpointsMinWidth = {
     "md": `(min-width: ${MediaBreakpoint.md.minWidth}px)`,
     "lg": `(min-width: ${MediaBreakpoint.lg.minWidth}px)`,
     "xl": `(min-width: ${MediaBreakpoint.xl.minWidth}px)`,
+    "xxl": `(min-width: ${MediaBreakpoint.xxl.minWidth}px)`,
 };
 const allBreakpoints = MediaBreakpoint.values().map(b => b.name);
 const hookNamePrefix = "ionx/utils/matchesMediaBreakpoints:";

@@ -1,0 +1,8 @@
+@mixin ionx-width-breakpoints-set-prop($prop-name, $var-name) {
+    #{$prop-name}: var(--#{$var-name}-xxl,
+        var(--#{$var-name}-xl,
+            var(--#{$var-name}-lg,
+                var(--#{$var-name}-md,
+                    var(--#{$var-name}-sm,
+                        var(--#{$var-name}-xs))))));
+}

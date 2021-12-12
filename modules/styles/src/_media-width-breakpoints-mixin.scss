@@ -1,0 +1,25 @@
+@import "./width-breakpoints";
+
+@mixin ionx-media-width-breakpoints($varPrefix, $defaultWidth) {
+    width: var(#{$varPrefix + "-xs"}, #{$defaultWidth});
+
+    @media (min-width: map-get($ionx-width-breakpoints, "sm")) {
+        width: var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, #{$defaultWidth}));
+    }
+
+    @media (min-width: map-get($ionx-width-breakpoints, "md")) {
+        width: var(#{$varPrefix + "-md"}, var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, #{$defaultWidth})));
+    }
+
+    @media (min-width: map-get($ionx-width-breakpoints, "lg")) {
+        width: var(#{$varPrefix + "-lg"}, var(#{$varPrefix + "-md"}, var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, #{$defaultWidth}))));
+    }
+
+    @media (min-width: map-get($ionx-width-breakpoints, "xl")) {
+        width: var(#{$varPrefix + "-xl"}, var(#{$varPrefix + "-lg"}, var(#{$varPrefix + "-md"}, var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, #{$defaultWidth})))));
+    }
+
+    @media (min-width: map-get($ionx-width-breakpoints, "xxl")) {
+        width: var(#{$varPrefix + "-xxl"}, var(#{$varPrefix + "-xl"}, var(#{$varPrefix + "-lg"}, var(#{$varPrefix + "-md"}, var(#{$varPrefix + "-sm"}, var(#{$varPrefix + "-xs"}, #{$defaultWidth}))))));
+    }
+}
