@@ -1,4 +1,4 @@
-import {resolveLocalModulePlugin} from "@appspltfrm/stencil-utils";
+import {resolveLocalModulePlugin} from "@appspltfrm/stencil-dev-utils";
 import {Config} from "@stencil/core";
 import {sass} from "@stencil/sass";
 

@@ -1,4 +1,4 @@
-const utils = require("@appspltfrm/stencil-utils");
+const utils = require("@appspltfrm/stencil-dev-utils");
 
 /**
  * List of modules, the order is important as some modules are required by other!
