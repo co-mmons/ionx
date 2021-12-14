@@ -9,7 +9,8 @@
     },
     "optionalDependencies": {
         "swiper": "^7.0.8",
-        "tippy.js": "^6.2.6"
+        "tippy.js": "^6.2.6",
+        "sortablejs": "github:appspltfrm/sortablejs-build"
     },
     "dependencies": {
         "@co.mmons/js-intl": "github:co-mmons/js-intl",
