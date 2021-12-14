@@ -1,6 +1,7 @@
 import {Config} from "@stencil/core";
 import {defaultExternals} from "../defaultExternals";
 import {defaultStencilPlugins} from "../defaultStencilPlugins";
+import {customElementsBundlePlugin, externalsPlugin} from "@appspltfrm/stencil-dev-utils";
 
 export const config: Config = {
     namespace: "ionx",
@@ -9,15 +10,16 @@ export const config: Config = {
     outputTargets: [
         {type: "docs-readme"},
         {
-            type: "dist-custom-elements-bundle",
+            type: "dist-custom-elements",
             dir: "../../dist/VirtualScroller",
+            autoDefineCustomElements: true,
+            externalRuntime: true,
             includeGlobalScripts: false,
-            defineFunctionName: "defineIonxVirtualScroller",
-            external: [
-                ...defaultExternals,
-                /ionx\/(?!modules\/VirtualScroller)/
-            ],
             empty: true
         }
-    ]
+    ],
+    rollupPlugins: {
+        before: [externalsPlugin([...defaultExternals, /ionx\/(?!modules\/VirtualScroller)/])],
+        after: [customElementsBundlePlugin("ionx-virtual-scroller")]
+    }
 };
