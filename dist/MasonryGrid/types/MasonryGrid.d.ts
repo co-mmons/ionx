@@ -1,6 +1,7 @@
 import type { Components as ionic } from "@ionic/core";
 import { ComponentInterface } from "@stencil/core";
 import { EventUnlisten } from "ionx/utils";
+import { WidthBreakpointsContainer } from "ionx/WidthBreakpoints";
 import { ExtendedItemElement } from "./ExtendedItemElement";
 export declare class MasonryGrid implements ComponentInterface {
   element: HTMLElement;
@@ -10,6 +11,7 @@ export declare class MasonryGrid implements ComponentInterface {
    * If at least one layout call is waiting.
    */
   waiting: boolean;
+  breakpoints: WidthBreakpointsContainer;
   mutationObserver: MutationObserver;
   resizeObserver: ResizeObserver;
   /**

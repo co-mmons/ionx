@@ -3,6 +3,7 @@ import {sleep, waitTill} from "@co.mmons/js-utils/core";
 import type {Components as ionic} from "@ionic/core";
 import {Component, ComponentInterface, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
 import {addEventListener, EventUnlisten, isHydrated, markAsReady, markAsUnready} from "ionx/utils";
+import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {ExtendedItemElement} from "./ExtendedItemElement";
 import {lineBreakAttribute} from "./lineBreak";
 
@@ -25,6 +26,8 @@ export class MasonryGrid implements ComponentInterface {
      * If at least one layout call is waiting.
      */
     waiting: boolean;
+
+    breakpoints: WidthBreakpointsContainer;
 
     mutationObserver: MutationObserver;
 
@@ -497,6 +500,8 @@ export class MasonryGrid implements ComponentInterface {
         });
         this.resizeObserver.observe(this.itemsElement);
 
+        this.breakpoints = new WidthBreakpointsContainer(this.itemsElement, "grid-width-breakpoints");
+
         this.arrange();
     }
 
@@ -507,6 +512,9 @@ export class MasonryGrid implements ComponentInterface {
 
         this.resizeObserver.disconnect();
         this.resizeObserver = undefined;
+
+        this.breakpoints.disconnect();
+        this.breakpoints = undefined;
 
         this.contentElement = undefined;
         this.parentViewElement = undefined;

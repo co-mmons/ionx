@@ -41,7 +41,7 @@ export class WidthBreakpointsContainer {
             style.setProperty(`--${this.accessorName}-${bp.name}`, bp === breakpoint ? "\t" : "initial");
         }
 
-        element.setAttribute(this.accessorName, queries.join("  "));
+        element.setAttribute(this.accessorName, queries.join(" "));
     }
 
     private connect() {

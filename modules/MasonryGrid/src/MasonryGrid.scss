@@ -6,6 +6,7 @@
     [ionx--grid-items] {
         display: block;
         position: relative;
+        --grid-container-width: 100%;
     }
 
     &.ionx--block {

@@ -3,6 +3,7 @@ export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client'
 import { Capacitor } from '@capacitor/core';
 import { sleep, waitTill } from '@co.mmons/js-utils/core';
 import { isHydrated, markAsReady, markAsUnready, addEventListener } from 'ionx/utils';
+import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
 const lineBreakAttribute = "ionx-masonry-grid-line-break";
 function lineBreak(beforeOrAfter = "before") {
@@ -14,7 +15,7 @@ function lineBreak(beforeOrAfter = "before") {
   }
 }
 
-const masonryGridCss = ".sc-ionx-masonry-grid-h{display:block;position:relative;margin:8px}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{display:block;position:relative}.ionx--block.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{height:auto !important}.sc-ionx-masonry-grid-h:not(.ionx--block) [ionx--grid-items].sc-ionx-masonry-grid-s>*{position:absolute;display:none}.sc-ionx-masonry-grid-h.ionx--block [ionx--grid-items].sc-ionx-masonry-grid-s>*{left:unset;top:unset}";
+const masonryGridCss = ".sc-ionx-masonry-grid-h{display:block;position:relative;margin:8px}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{display:block;position:relative;--grid-container-width:100%}.ionx--block.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{height:auto !important}.sc-ionx-masonry-grid-h:not(.ionx--block) [ionx--grid-items].sc-ionx-masonry-grid-s>*{position:absolute;display:none}.sc-ionx-masonry-grid-h.ionx--block [ionx--grid-items].sc-ionx-masonry-grid-s>*{left:unset;top:unset}";
 
 let MasonryGrid = class extends HTMLElement {
   constructor() {
@@ -363,6 +364,7 @@ let MasonryGrid = class extends HTMLElement {
       }
     });
     this.resizeObserver.observe(this.itemsElement);
+    this.breakpoints = new WidthBreakpointsContainer(this.itemsElement, "grid-width-breakpoints");
     this.arrange();
   }
   disconnectedCallback() {
@@ -370,6 +372,8 @@ let MasonryGrid = class extends HTMLElement {
     this.mutationObserver = undefined;
     this.resizeObserver.disconnect();
     this.resizeObserver = undefined;
+    this.breakpoints.disconnect();
+    this.breakpoints = undefined;
     this.contentElement = undefined;
     this.parentViewElement = undefined;
     this.itemsElement = undefined;

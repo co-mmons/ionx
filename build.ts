@@ -25,7 +25,7 @@ const modules = [
     "InputGroup",
     "LazyLoad",
     "LoadingSkeleton",
-    "MasonryGrid",
+    ["MasonryGrid", ["WidthBreakpoints"]],
     "Router",
     "Searchbar",
     "styles",
