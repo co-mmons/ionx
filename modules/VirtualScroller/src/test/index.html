@@ -28,9 +28,14 @@
 <body>
 
     <ion-app>
-        <ion-content>
-            <ionx-test></ionx-test>
-        </ion-content>
+
+        <ion-router root="/" use-hash="false">
+            <ion-route component="ionx-test-page1" url="/"></ion-route>
+            <ion-route component="ionx-test-page2" url="/page2"></ion-route>
+        </ion-router>
+
+        <ion-nav/>
+
     </ion-app>
 
 </body>

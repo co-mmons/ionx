@@ -11,12 +11,13 @@ export declare class VirtualScrollerComponent implements ComponentInterface {
   state: VirtualScrollerState;
   prevState: VirtualScrollerState;
   didUpdateState: (prevState: VirtualScrollerState) => void;
-  scroller: VirtualScroller;
+  scroller: VirtualScroller<HTMLElement, any>;
   beforeItemsHeight: number;
   afterItemsHeight: number;
+  paused: boolean;
   itemsChanged(newItems: any[]): void;
   connectedCallback(): void;
-  componentDidLoad(): void;
+  componentDidLoad(): Promise<void>;
   componentDidRender(): void;
   disconnectedCallback(): void;
   render(): any;

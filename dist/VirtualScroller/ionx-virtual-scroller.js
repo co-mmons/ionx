@@ -1,5 +1,6 @@
 import { HTMLElement, forceUpdate, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 import { shallowEqual as shallowEqual$1 } from 'fast-equals';
+import { waitTillHydrated } from 'ionx/utils';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -167,7 +168,7 @@ function clearTimeout(timeout) {
  */
 function px(number) {
   // Fractional pixels are used on "retina" screens.
-  return number.toFixed(2) + 'px';
+  return (number % 1 === 0 ? number : number.toFixed(2)) + 'px';
 }
 
 // A workaround for `<tbody/>` not being able to have `padding`.
@@ -204,113 +205,108 @@ function setTbodyPadding(tbody, beforeItemsHeight, afterItemsHeight) {
   tbody.style.setProperty('--VirtualScroller-paddingBottom', px(afterItemsHeight));
 }
 
+function _classCallCheck$9(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties$9(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass$9(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$9(Constructor.prototype, protoProps); if (staticProps) _defineProperties$9(Constructor, staticProps); return Constructor; }
+
+var ItemsContainer$1 = /*#__PURE__*/function () {
+  /**
+   * Constructs a new "container" from an element.
+   * @param {function} getElement
+   */
+  function ItemsContainer(getElement) {
+    _classCallCheck$9(this, ItemsContainer);
+
+    this.getElement = getElement;
+  }
+  /**
+   * Returns an item element's "top offset", relative to the items `container`'s top edge.
+   * @param  {number} renderedElementIndex — An index of an item relative to the "first shown item index". For example, if the list is showing items from index 8 to index 12 then `renderedElementIndex = 0` would mean the item at index `8`.
+   * @return {number}
+   */
+
+
+  _createClass$9(ItemsContainer, [{
+    key: "getNthRenderedItemTopOffset",
+    value: function getNthRenderedItemTopOffset(renderedElementIndex) {
+      return this.getElement().childNodes[renderedElementIndex].getBoundingClientRect().top - this.getElement().getBoundingClientRect().top;
+    }
+    /**
+     * Returns an item element's height.
+     * @param  {number} renderedElementIndex — An index of an item relative to the "first shown item index". For example, if the list is showing items from index 8 to index 12 then `renderedElementIndex = 0` would mean the item at index `8`.
+     * @return {number}
+     */
+
+  }, {
+    key: "getNthRenderedItemHeight",
+    value: function getNthRenderedItemHeight(renderedElementIndex) {
+      // `offsetHeight` is not precise enough (doesn't return fractional pixels).
+      // return this.getElement().childNodes[renderedElementIndex].offsetHeight
+      return this.getElement().childNodes[renderedElementIndex].getBoundingClientRect().height;
+    }
+    /**
+     * Returns items container height.
+     * @return {number}
+     */
+
+  }, {
+    key: "getHeight",
+    value: function getHeight() {
+      // `offsetHeight` is not precise enough (doesn't return fractional pixels).
+      // return this.getElement().offsetHeight
+      return this.getElement().getBoundingClientRect().height;
+    }
+    /**
+     * Removes all item elements of an items container.
+     */
+
+  }, {
+    key: "clear",
+    value: function clear() {
+      while (this.getElement().firstChild) {
+        this.getElement().removeChild(this.getElement().firstChild);
+      }
+    }
+  }]);
+
+  return ItemsContainer;
+}();
+
+function _typeof$1(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof$1 = function _typeof(obj) { return typeof obj; }; } else { _typeof$1 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof$1(obj); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof$1(call) === "object" || typeof call === "function")) { return call; } else if (call !== void 0) { throw new TypeError("Derived constructors may only return object or undefined"); } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _classCallCheck$8(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties$8(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass$8(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$8(Constructor.prototype, protoProps); if (staticProps) _defineProperties$8(Constructor, staticProps); return Constructor; }
 
-var Screen =
-/*#__PURE__*/
-function () {
-  function Screen() {
-    _classCallCheck$8(this, Screen);
-  }
-
-  _createClass$8(Screen, [{
-    key: "getChildElementTopOffset",
-
-    /**
-     * Returns a child element's "top offset", relative to the `parentElement`'s top edge.
-     * @param  {Element} parentElement
-     * @param  {number} childElementIndex
-     * @return {number}
-     */
-    value: function getChildElementTopOffset(parentElement, childElementIndex) {
-      return parentElement.childNodes[childElementIndex].getBoundingClientRect().top;
-    }
-    /**
-     * Returns a child element's height.
-     * @param  {Element} parentElement
-     * @param  {number} childElementIndex
-     * @return {number}
-     */
-
-  }, {
-    key: "getChildElementHeight",
-    value: function getChildElementHeight(parentElement, childElementIndex) {
-      return this.getElementHeight(parentElement.childNodes[childElementIndex]);
-    }
-    /**
-     * Returns the count of child elements of an element.
-     * @param  {Element} parentElement
-     * @return {number}
-     */
-
-  }, {
-    key: "getChildElementsCount",
-    value: function getChildElementsCount(parentElement) {
-      return parentElement.childNodes.length;
-    }
-    /**
-     * Removes all child elements of an element.
-     * @param  {Element} element
-     */
-
-  }, {
-    key: "clearElement",
-    value: function clearElement(element) {
-      while (element.firstChild) {
-        element.removeChild(element.firstChild);
-      }
-    }
-    /**
-     * Returns an element's height.
-     * @param  {Element} element
-     * @return {number}
-     */
-
-  }, {
-    key: "getElementHeight",
-    value: function getElementHeight(element) {
-      // `offsetHeight` is not precise enough (doesn't return fractional pixels).
-      // return element.offsetHeight
-      return element.getBoundingClientRect().height;
-    }
-  }]);
-
-  return Screen;
-}();
-
-function _typeof$1(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof$1 = function _typeof(obj) { return typeof obj; }; } else { _typeof$1 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof$1(obj); }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof$1(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties$7(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass$7(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$7(Constructor.prototype, protoProps); if (staticProps) _defineProperties$7(Constructor, staticProps); return Constructor; }
-
-var ScrollableContainer =
-/*#__PURE__*/
-function () {
+var ScrollableContainer$1 = /*#__PURE__*/function () {
   /**
    * Constructs a new "scrollable container" from an element.
    * @param {Element} scrollableContainer
+   * @param {func} getItemsContainerElement — Returns items "container" element.
    */
-  function ScrollableContainer(element) {
-    _classCallCheck$7(this, ScrollableContainer);
+  function ScrollableContainer(element, getItemsContainerElement) {
+    _classCallCheck$8(this, ScrollableContainer);
 
     this.element = element;
+    this.getItemsContainerElement = getItemsContainerElement;
   }
   /**
    * Returns the current scroll position.
@@ -318,7 +314,7 @@ function () {
    */
 
 
-  _createClass$7(ScrollableContainer, [{
+  _createClass$8(ScrollableContainer, [{
     key: "getScrollY",
     value: function getScrollY() {
       return this.element.scrollTop;
@@ -366,35 +362,18 @@ function () {
       return this.element.offsetHeight;
     }
     /**
-     * Returns the height of the content in a scrollable container.
-     * For example, a scrollable container can have a height of 500px,
-     * but the content in it could have a height of 5000px,
-     * in which case a vertical scrollbar is rendered, and only
-     * one-tenth of all the items are shown at any given moment.
-     * This function is currently only used when using the
-     * `preserveScrollPositionOfTheBottomOfTheListOnMount` feature.
-     * @return {number}
-     */
-
-  }, {
-    key: "getContentHeight",
-    value: function getContentHeight() {
-      return this.element.scrollHeight;
-    }
-    /**
-     * Returns a "top offset" of an element
+     * Returns a "top offset" of an items container element
      * relative to the "scrollable container"'s top edge.
-     * @param {Element} element
      * @return {number}
      */
 
   }, {
-    key: "getTopOffset",
-    value: function getTopOffset(element) {
+    key: "getItemsContainerTopOffset",
+    value: function getItemsContainerTopOffset() {
       var scrollableContainerTop = this.element.getBoundingClientRect().top;
       var scrollableContainerBorderTopWidth = this.element.clientTop;
-      var top = element.getBoundingClientRect().top;
-      return top - scrollableContainerTop + this.getScrollY() - scrollableContainerBorderTopWidth;
+      var itemsContainerTop = this.getItemsContainerElement().getBoundingClientRect().top;
+      return itemsContainerTop - scrollableContainerTop + this.getScrollY() - scrollableContainerBorderTopWidth;
     } // isVisible() {
     // 	const { top, bottom } = this.element.getBoundingClientRect()
     // 	return bottom > 0 && top < getScreenHeight()
@@ -407,31 +386,27 @@ function () {
      */
 
   }, {
-    key: "addScrollListener",
-    value: function addScrollListener(onScroll) {
+    key: "onScroll",
+    value: function onScroll(_onScroll) {
       var _this = this;
 
-      this.element.addEventListener('scroll', onScroll);
+      this.element.addEventListener('scroll', _onScroll);
       return function () {
-        return _this.element.removeEventListener('scroll', onScroll);
+        return _this.element.removeEventListener('scroll', _onScroll);
       };
     }
     /**
      * Adds a "resize" event listener to the "scrollable container".
      * @param {onResize} Should be called whenever the "scrollable container"'s width or height (potentially) changes.
-     * @param  {Element} options.container — The result of the `getContainerElement()` function that was passed in `VirtualScroller` constructor. For example, DOM renderer uses it to filter-out unrelated "resize" events.
-     * @return {function} Returns a function that stops listening.
+      * @return {function} Returns a function that stops listening.
      */
 
   }, {
     key: "onResize",
-    value: function onResize(_onResize, _ref) {
+    value: function onResize(_onResize) {
       var _this2 = this;
 
-      var container = _ref.container;
-      // Could somehow track DOM Element size.
-      // For now, `scrollableContainer` is supposed to have constant width and height.
-      // (unless window is resized).
+      // Watches "scrollable container"'s dimensions via a `ResizeObserver`.
       // https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
       // https://web.dev/resize-observer/
       var unobserve;
@@ -459,8 +434,8 @@ function () {
       // any "performance implications" of running the listener twice in such case.
 
 
-      var unlistenGlobalResize = addGlobalResizeListener(_onResize, {
-        container: container
+      var unlistenGlobalResize = addGlobalResizeListener$1(_onResize, {
+        itemsContainerElement: this.getItemsContainerElement()
       });
       return function () {
         if (unobserve) {
@@ -474,15 +449,19 @@ function () {
 
   return ScrollableContainer;
 }();
-var ScrollableWindowContainer =
-/*#__PURE__*/
-function (_ScrollableContainer) {
+var ScrollableWindowContainer = /*#__PURE__*/function (_ScrollableContainer) {
   _inherits(ScrollableWindowContainer, _ScrollableContainer);
 
-  function ScrollableWindowContainer() {
-    _classCallCheck$7(this, ScrollableWindowContainer);
+  var _super = _createSuper(ScrollableWindowContainer);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ScrollableWindowContainer).call(this, window));
+  /**
+   * Constructs a new window "scrollable container".
+   * @param {func} getItemsContainerElement — Returns items "container" element.
+   */
+  function ScrollableWindowContainer(getItemsContainerElement) {
+    _classCallCheck$8(this, ScrollableWindowContainer);
+
+    return _super.call(this, window, getItemsContainerElement);
   }
   /**
    * Returns the current scroll position.
@@ -490,7 +469,7 @@ function (_ScrollableContainer) {
    */
 
 
-  _createClass$7(ScrollableWindowContainer, [{
+  _createClass$8(ScrollableWindowContainer, [{
     key: "getScrollY",
     value: function getScrollY() {
       // `window.scrollY` is not supported by Internet Explorer.
@@ -536,47 +515,28 @@ function (_ScrollableContainer) {
       return window.innerHeight;
     }
     /**
-     * Returns the height of the content in a scrollable container.
-     * For example, a scrollable container can have a height of 500px,
-     * but the content in it could have a height of 5000px,
-     * in which case a vertical scrollbar is rendered, and only
-     * one-tenth of all the items are shown at any given moment.
-     * This function is currently only used when using the
-     * `preserveScrollPositionOfTheBottomOfTheListOnMount` feature.
-     * @return {number}
-     */
-
-  }, {
-    key: "getContentHeight",
-    value: function getContentHeight() {
-      return document.documentElement.scrollHeight;
-    }
-    /**
-     * Returns a "top offset" of an element
+     * Returns a "top offset" of an items container element
      * relative to the "scrollable container"'s top edge.
-     * @param {Element} element
      * @return {number}
      */
 
   }, {
-    key: "getTopOffset",
-    value: function getTopOffset(element) {
+    key: "getItemsContainerTopOffset",
+    value: function getItemsContainerTopOffset() {
       var borderTopWidth = document.clientTop || document.body.clientTop || 0;
-      return element.getBoundingClientRect().top + this.getScrollY() - borderTopWidth;
+      return this.getItemsContainerElement().getBoundingClientRect().top + this.getScrollY() - borderTopWidth;
     }
     /**
      * Adds a "resize" event listener to the "scrollable container".
      * @param {onScroll} Should be called whenever the "scrollable container"'s width or height (potentially) changes.
-     * @param  {Element} options.container — The result of the `getContainerElement()` function that was passed in `VirtualScroller` constructor. For example, DOM renderer uses it to filter-out unrelated "resize" events.
      * @return {function} Returns a function that stops listening.
      */
 
   }, {
     key: "onResize",
-    value: function onResize(_onResize2, _ref2) {
-      var container = _ref2.container;
-      return addGlobalResizeListener(_onResize2, {
-        container: container
+    value: function onResize(_onResize2) {
+      return addGlobalResizeListener$1(_onResize2, {
+        itemsContainerElement: this.getItemsContainerElement()
       });
     } // isVisible() {
     // 	return true
@@ -585,16 +545,16 @@ function (_ScrollableContainer) {
   }]);
 
   return ScrollableWindowContainer;
-}(ScrollableContainer);
+}(ScrollableContainer$1);
 /**
  * Adds a "resize" event listener to the `window`.
- * @param {onResize} Should be called whenever the "container"'s width or height (potentially) changes.
- * @param  {Element} options.container — The "container".
+ * @param {onResize} Should be called whenever the "scrollable container"'s width or height (potentially) changes.
+ * @param  {Element} options.itemsContainerElement — The items "container" element, which is not the same as the "scrollable container" element. For example, "scrollable container" could be resized while the list element retaining its size. One such example is a user entering fullscreen mode on an HTML5 `<video/>` element: in that case, a "resize" event is triggered on a window, and window dimensions change to the user's screen size, but such "resize" event can be ignored because the list isn't visible until the user exits fullscreen mode.
  * @return {function} Returns a function that stops listening.
  */
 
-function addGlobalResizeListener(onResize, _ref3) {
-  var container = _ref3.container;
+function addGlobalResizeListener$1(onResize, _ref) {
+  var itemsContainerElement = _ref.itemsContainerElement;
 
   var onResizeListener = function onResizeListener() {
     // By default, `VirtualScroller` always performs a re-layout
@@ -626,7 +586,7 @@ function addGlobalResizeListener(onResize, _ref3) {
       // the layout wouldn't be affected too, so such `resize` event should also be
       // ignored: when `document.fullscreenElement` is inside the `container`.
       //
-      if (document.fullscreenElement.contains(container)) ; else {
+      if (document.fullscreenElement.contains(itemsContainerElement)) ; else {
         // The element is either inside the `container`,
         // Or is in a separate tree.
         // So the `resize` event won't affect the `container`'s dimensions.
@@ -643,30 +603,181 @@ function addGlobalResizeListener(onResize, _ref3) {
   };
 }
 
-const DOMRenderingEngine = {
-  name: 'DOM',
-  createScreen: function createScreen() {
-    return new Screen();
+function _classCallCheck$7(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties$7(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass$7(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$7(Constructor.prototype, protoProps); if (staticProps) _defineProperties$7(Constructor, staticProps); return Constructor; }
+
+var WATCH_LIST_TOP_OFFSET_INTERVAL$1 = 500; // Refreshing for 3 seconds after the initial page load seems reasonable.
+
+var WATCH_LIST_TOP_OFFSET_MAX_DURATION$1 = 3000; // `VirtualScroller` calls `this.layout.layOut()` on mount,
+// but if the page styles are applied after `VirtualScroller` mounts
+// (for example, if styles are applied via javascript, like Webpack does)
+// then the list might not render correctly and it will only show the first item.
+// The reason is that in that case calling `.getListTopOffset()` on mount
+// returns "incorrect" `top` position because the styles haven't been applied yet.
+//
+// For example, consider a page:
+// <div class="page">
+//   <nav class="sidebar">...</nav>
+//   <main>...</main>
+// </div>
+//
+// The sidebar is styled as `position: fixed`, but until
+// the page styles have been applied it's gonna be a regular `<div/>`
+// meaning that `<main/>` will be rendered below the sidebar
+// and will appear offscreen and so it will only render the first item.
+//
+// Then, the page styles are loaded and applied and the sidebar
+// is now `position: fixed` so `<main/>` is now rendered at the top of the page
+// but `VirtualScroller`'s `.render()` has already been called
+// and it won't re-render until the user scrolls or the window is resized.
+//
+// This type of a bug doesn't seem to occur in production, but it can appear
+// in development mode when using Webpack. The workaround `VirtualScroller`
+// implements for such cases is calling `.getListTopOffset()`
+// on the list container DOM element periodically (every second) to check
+// if the `top` coordinate has changed as a result of CSS being applied:
+// if it has then it recalculates the shown item indexes.
+//
+// Maybe this bug could occur in production when using Webpack chunks.
+// That depends on how a style of a chunk is added to the page:
+// if it's added via `javascript` after the page has been rendered
+// then this workaround will also work for that case.
+//
+// Another example would be a page having a really tall expanded "accordion"
+// section, below which a `VirtualScroller` list resides. If the user un-expands
+// such expanded "accordion" section, the list would become visible but
+// it wouldn't get re-rendered because no `scroll` event has occured,
+// and the list only re-renders automatically on `scroll` events.
+// To work around such cases, call `virtualScroller.updateLayout()` method manually.
+// The workaround below could be extended to refresh the list's top coordinate
+// indefinitely and at higher intervals, but why waste CPU time on that.
+// There doesn't seem to be any DOM API for tracking an element's top position.
+// There is `IntersectionObserver` API but it doesn't exactly do that.
+//
+
+var ListTopOffsetWatcher$1 = /*#__PURE__*/function () {
+  function ListTopOffsetWatcher(_ref) {
+    var getListTopOffset = _ref.getListTopOffset,
+        onListTopOffsetChange = _ref.onListTopOffsetChange;
+
+    _classCallCheck$7(this, ListTopOffsetWatcher);
+
+    this.getListTopOffset = getListTopOffset;
+    this.onListTopOffsetChange = onListTopOffsetChange;
+  }
+
+  _createClass$7(ListTopOffsetWatcher, [{
+    key: "onListTopOffset",
+    value: function onListTopOffset(listTopOffset) {
+      if (this.listTopOffsetInsideScrollableContainer === undefined) {
+        // Start periodical checks of the list's top offset
+        // in order to perform a re-layout in case it changes.
+        // See the comments in `ListTopOffsetWatcher.js` file
+        // on why can the list's top offset change, and in which circumstances.
+        this.start();
+      }
+
+      this.listTopOffsetInsideScrollableContainer = listTopOffset;
+    }
+  }, {
+    key: "start",
+    value: function start() {
+      this.isRendered = true;
+      this.watchListTopOffset();
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      this.isRendered = false;
+
+      if (this.watchListTopOffsetTimer) {
+        clearTimeout(this.watchListTopOffsetTimer);
+        this.watchListTopOffsetTimer = undefined;
+      }
+    }
+  }, {
+    key: "watchListTopOffset",
+    value: function watchListTopOffset() {
+      var _this = this;
+
+      var startedAt = Date.now();
+
+      var check = function check() {
+        // If `VirtualScroller` has been unmounted
+        // while `setTimeout()` was waiting, then exit.
+        if (!_this.isRendered) {
+          return;
+        } // Skip comparing `top` coordinate of the list
+        // when this function is called for the first time.
+
+
+        if (_this.listTopOffsetInsideScrollableContainer !== undefined) {
+          // Calling `this.getListTopOffset()` on an element
+          // runs about 0.003 milliseconds on a modern desktop CPU,
+          // so I guess it's fine calling it twice a second.
+          if (_this.getListTopOffset() !== _this.listTopOffsetInsideScrollableContainer) {
+            _this.onListTopOffsetChange();
+          }
+        } // Compare `top` coordinate of the list twice a second
+        // to find out if it has changed as a result of loading CSS styles.
+        // The total duration of 3 seconds would be enough for any styles to load, I guess.
+        // There could be other cases changing the `top` coordinate
+        // of the list (like collapsing an "accordeon" panel above the list
+        // without scrolling the page), but those cases should be handled
+        // by manually calling `.updateLayout()` instance method on `VirtualScroller` instance.
+
+
+        if (Date.now() - startedAt < WATCH_LIST_TOP_OFFSET_MAX_DURATION$1) {
+          _this.watchListTopOffsetTimer = setTimeout$1(check, WATCH_LIST_TOP_OFFSET_INTERVAL$1);
+        }
+      }; // Run the cycle.
+
+
+      check();
+    }
+  }]);
+
+  return ListTopOffsetWatcher;
+}();
+
+const DOMEngine = {
+  createItemsContainer: function createItemsContainer(getItemsContainerElement) {
+    return new ItemsContainer$1(getItemsContainerElement);
   },
-  // Create `scrollableContainer`.
+  // Creates a `scrollableContainer`.
   // On client side, `scrollableContainer` is always created.
   // On server side, `scrollableContainer` is not created (and not used).
-  createScrollableContainer: function createScrollableContainer(scrollableContainer) {
+  createScrollableContainer: function createScrollableContainer(scrollableContainer, getItemsContainerElement) {
     if (scrollableContainer) {
-      return new ScrollableContainer(scrollableContainer);
+      return new ScrollableContainer$1(scrollableContainer, getItemsContainerElement);
     } else if (typeof window !== 'undefined') {
-      return new ScrollableWindowContainer();
+      return new ScrollableWindowContainer(getItemsContainerElement);
     }
+  },
+  watchListTopOffset: function watchListTopOffset(_ref) {
+    var getListTopOffset = _ref.getListTopOffset,
+        onListTopOffsetChange = _ref.onListTopOffsetChange;
+    return new ListTopOffsetWatcher$1({
+      getListTopOffset: getListTopOffset,
+      onListTopOffsetChange: onListTopOffsetChange
+    });
   }
 };
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function log() {
   if (isDebug()) {
@@ -680,13 +791,19 @@ function log() {
   }
 }
 function warn() {
-  var _console2;
+  {
+    var _console2;
 
-  for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    args[_key2] = arguments[_key2];
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    if (warningsAreErrors()) {
+      return reportError.apply(this, args);
+    }
+
+    (_console2 = console).warn.apply(_console2, _toConsumableArray(['[virtual-scroller]'].concat(args)));
   }
-
-  (_console2 = console).warn.apply(_console2, _toConsumableArray(['[virtual-scroller]'].concat(args)));
 }
 function reportError() {
   for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
@@ -715,10 +832,34 @@ function reportError() {
   }
 }
 function isDebug() {
-  if (typeof window !== 'undefined') {
-    return window.VirtualScrollerDebug === true || window.VirtualScrollerDebug === 'debug';
+  var debug = getDebug();
+
+  if (debug !== undefined) {
+    return debug === true || debug === 'debug';
   }
 }
+
+function getDebug() {
+  return getGlobalVariable('VirtualScrollerDebug');
+}
+
+function warningsAreErrors() {
+  return getGlobalVariable('VirtualScrollerWarningsAreErrors');
+}
+
+function getGlobalVariable(name) {
+  if (typeof window !== 'undefined') {
+    return window[name];
+  } else if (typeof global !== 'undefined') {
+    return global[name];
+  }
+}
+
+function ownKeys$3(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread$3(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$3(Object(source), true).forEach(function (key) { _defineProperty$5(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$3(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty$5(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -726,44 +867,63 @@ function _defineProperties$6(target, props) { for (var i = 0; i < props.length; 
 
 function _createClass$6(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$6(Constructor.prototype, protoProps); if (staticProps) _defineProperties$6(Constructor, staticProps); return Constructor; }
 
-var Layout =
-/*#__PURE__*/
-function () {
+var Layout = /*#__PURE__*/function () {
   function Layout(_ref) {
     var bypass = _ref.bypass,
         estimatedItemHeight = _ref.estimatedItemHeight,
         measureItemsBatchSize = _ref.measureItemsBatchSize,
+        getPrerenderMargin = _ref.getPrerenderMargin,
         getVerticalSpacing = _ref.getVerticalSpacing,
+        getVerticalSpacingBeforeResize = _ref.getVerticalSpacingBeforeResize,
         getColumnsCount = _ref.getColumnsCount,
+        getColumnsCountBeforeResize = _ref.getColumnsCountBeforeResize,
         getItemHeight = _ref.getItemHeight,
-        getAverageItemHeight = _ref.getAverageItemHeight;
+        getItemHeightBeforeResize = _ref.getItemHeightBeforeResize,
+        getBeforeResizeItemsCount = _ref.getBeforeResizeItemsCount,
+        getAverageItemHeight = _ref.getAverageItemHeight,
+        getMaxVisibleAreaHeight = _ref.getMaxVisibleAreaHeight,
+        getPreviouslyCalculatedLayout = _ref.getPreviouslyCalculatedLayout;
 
     _classCallCheck$6(this, Layout);
 
     this.bypass = bypass;
     this.estimatedItemHeight = estimatedItemHeight;
     this.measureItemsBatchSize = measureItemsBatchSize;
+    this.getPrerenderMargin = getPrerenderMargin;
     this.getVerticalSpacing = getVerticalSpacing;
+    this.getVerticalSpacingBeforeResize = getVerticalSpacingBeforeResize;
     this.getColumnsCount = getColumnsCount;
+    this.getColumnsCountBeforeResize = getColumnsCountBeforeResize;
     this.getItemHeight = getItemHeight;
+    this.getItemHeightBeforeResize = getItemHeightBeforeResize;
+    this.getBeforeResizeItemsCount = getBeforeResizeItemsCount;
     this.getAverageItemHeight = getAverageItemHeight;
+    this.getMaxVisibleAreaHeight = getMaxVisibleAreaHeight; //
+    // The "previously calculated layout" feature is not currently used.
+    //
+    // The current layout snapshot could be stored as a "previously calculated layout" variable
+    // so that it could theoretically be used when calculating new layout incrementally
+    // rather than from scratch, which would be an optimization.
+    //
+
+    this.getPreviouslyCalculatedLayout = getPreviouslyCalculatedLayout;
   }
 
   _createClass$6(Layout, [{
     key: "getInitialLayoutValues",
     value: function getInitialLayoutValues(_ref2) {
-      var bypass = _ref2.bypass,
-          itemsCount = _ref2.itemsCount,
-          visibleAreaHeightIncludingMargins = _ref2.visibleAreaHeightIncludingMargins;
-      // On server side, at initialization time, there's no "visible area height",
-      // so default to `1` estimated rows count.
-      var estimatedRowsCount = visibleAreaHeightIncludingMargins ? this.getEstimatedRowsCountForHeight(visibleAreaHeightIncludingMargins) : 1;
+      var itemsCount = _ref2.itemsCount,
+          columnsCount = _ref2.columnsCount;
       var firstShownItemIndex;
       var lastShownItemIndex; // If there're no items then `firstShownItemIndex` stays `undefined`.
 
       if (itemsCount > 0) {
         firstShownItemIndex = 0;
-        lastShownItemIndex = this.getLastShownItemIndex(firstShownItemIndex, itemsCount, estimatedRowsCount, bypass);
+        lastShownItemIndex = this.getInitialLastShownItemIndex({
+          itemsCount: itemsCount,
+          columnsCount: columnsCount,
+          firstShownItemIndex: firstShownItemIndex
+        });
       }
 
       return {
@@ -774,21 +934,35 @@ function () {
       };
     }
   }, {
-    key: "getLastShownItemIndex",
-    value: function getLastShownItemIndex(firstShownItemIndex, itemsCount, estimatedRowsCount, bypass) {
-      if (this.bypass || bypass) {
+    key: "getInitialLastShownItemIndex",
+    value: function getInitialLastShownItemIndex(_ref3) {
+      var itemsCount = _ref3.itemsCount,
+          columnsCount = _ref3.columnsCount,
+          firstShownItemIndex = _ref3.firstShownItemIndex;
+
+      if (this.bypass) {
         return itemsCount - 1;
+      } // On server side, at initialization time,
+      // `scrollableContainer` is `undefined`,
+      // so default to `1` estimated rows count.
+
+
+      var estimatedRowsCount = 1;
+
+      if (this.getMaxVisibleAreaHeight()) {
+        estimatedRowsCount = this.getEstimatedRowsCountForHeight(this.getMaxVisibleAreaHeight() + this.getPrerenderMargin());
       }
 
-      return Math.min(firstShownItemIndex + (estimatedRowsCount * this.getColumnsCount() - 1), itemsCount - 1);
+      return Math.min(firstShownItemIndex + (estimatedRowsCount * columnsCount - 1), itemsCount - 1);
     }
   }, {
     key: "getEstimatedRowsCountForHeight",
     value: function getEstimatedRowsCountForHeight(height) {
       var estimatedItemHeight = this.getEstimatedItemHeight();
+      var verticalSpacing = this.getVerticalSpacing();
 
       if (estimatedItemHeight) {
-        return Math.ceil((height + this.getVerticalSpacing()) / (estimatedItemHeight + this.getVerticalSpacing()));
+        return Math.ceil((height + verticalSpacing) / (estimatedItemHeight + verticalSpacing));
       } else {
         // If no items have been rendered yet, and no `estimatedItemHeight` option
         // has been passed, then default to `1` estimated rows count in any `height`.
@@ -807,286 +981,586 @@ function () {
       return this.getAverageItemHeight() || this.estimatedItemHeight || 0;
     }
   }, {
-    key: "updateLayoutForItemsDiff",
-    value: function updateLayoutForItemsDiff(layout, _ref3, _ref4) {
-      var prependedItemsCount = _ref3.prependedItemsCount,
-          appendedItemsCount = _ref3.appendedItemsCount;
-      var itemsCount = _ref4.itemsCount;
-      layout.firstShownItemIndex += prependedItemsCount;
-      layout.lastShownItemIndex += prependedItemsCount;
-      var columnsCount = this.getColumnsCount();
+    key: "getLayoutUpdateForItemsDiff",
+    value: function getLayoutUpdateForItemsDiff(_ref4, _ref5, _ref6) {
+      var firstShownItemIndex = _ref4.firstShownItemIndex,
+          lastShownItemIndex = _ref4.lastShownItemIndex,
+          beforeItemsHeight = _ref4.beforeItemsHeight,
+          afterItemsHeight = _ref4.afterItemsHeight;
+      var prependedItemsCount = _ref5.prependedItemsCount,
+          appendedItemsCount = _ref5.appendedItemsCount;
+      var itemsCount = _ref6.itemsCount,
+          columnsCount = _ref6.columnsCount,
+          shouldRestoreScrollPosition = _ref6.shouldRestoreScrollPosition;
+      // const layoutUpdate = {}
+      // If the layout stays the same, then simply increase
+      // the top and bottom margins proportionally to the amount
+      // of the items added.
+      var averageItemHeight = this.getAverageItemHeight();
+      var verticalSpacing = this.getVerticalSpacing();
 
-      if (prependedItemsCount % columnsCount === 0) {
-        // If the layout stays the same, then simply increase
-        // the top and bottom margins proportionally to the amount
-        // of the items added.
-        var prependedRowsCount = prependedItemsCount / columnsCount;
+      if (appendedItemsCount > 0) {
         var appendedRowsCount = Math.ceil(appendedItemsCount / columnsCount);
-        var averageItemHeight = this.getAverageItemHeight();
-        var verticalSpacing = this.getVerticalSpacing();
-        layout.beforeItemsHeight += prependedRowsCount * (averageItemHeight + verticalSpacing);
-        layout.afterItemsHeight += appendedRowsCount * (verticalSpacing + averageItemHeight);
-      } else {
-        // Rows will be rebalanced as a result of prepending the items,
-        // and the row heights can change as a result, so recalculate
-        // `beforeItemsHeight` and `afterItemsHeight` from scratch.
-        // `this.itemHeights[]` and `firstShownItemIndex`/`lastShownItemIndex`
-        // have already been updated at this point.
-        layout.beforeItemsHeight = this.getBeforeItemsHeight(layout.firstShownItemIndex, layout.lastShownItemIndex);
-        layout.afterItemsHeight = this.getAfterItemsHeight(layout.firstShownItemIndex, layout.lastShownItemIndex, itemsCount);
+        var addedHeightAfter = appendedRowsCount * (verticalSpacing + averageItemHeight);
+        afterItemsHeight += addedHeightAfter; // layoutUpdate = {
+        // 	...layoutUpdate,
+        // 	afterItemsHeight
+        // }
       }
-    }
-  }, {
-    key: "_getVisibleItemIndexes",
-    value: function _getVisibleItemIndexes(visibleAreaTop, visibleAreaBottom, listTopOffset, itemsCount) {
-      var columnsCount = this.getColumnsCount();
-      var firstShownItemIndex;
-      var lastShownItemIndex;
-      var previousRowsHeight = 0;
-      var rowsCount = Math.ceil(itemsCount / columnsCount);
-      var rowIndex = 0;
 
-      while (rowIndex < rowsCount) {
-        var hasMoreRows = itemsCount > (rowIndex + 1) * columnsCount;
-        var verticalSpaceAfterCurrentRow = hasMoreRows ? this.getVerticalSpacing() : 0;
-        var currentRowHeight = 0;
-        var columnIndex = 0;
-        var i = void 0;
+      if (prependedItemsCount > 0) {
+        var prependedRowsCount = Math.ceil(prependedItemsCount / columnsCount);
+        var addedHeightBefore = prependedRowsCount * (averageItemHeight + verticalSpacing);
+        firstShownItemIndex += prependedItemsCount;
+        lastShownItemIndex += prependedItemsCount;
+        beforeItemsHeight += addedHeightBefore; // If the currently shown items position on screen should be preserved
+        // when prepending new items, then it means that:
+        // * The current scroll position should be snapshotted.
+        // * The current list height should be snapshotted.
+        // * All prepended items should be shown so that their height could be
+        //   measured after they're rendered. Based on the prepended items' height,
+        //   the scroll position will be restored so that there's no "jump of content".
 
-        while (columnIndex < columnsCount && (i = rowIndex * columnsCount + columnIndex) < itemsCount) {
-          var itemHeight = this.getItemHeight(i); // If an item that hasn't been shown (and measured) yet is encountered
-          // then show such item and then retry after it has been measured.
-
-          if (itemHeight === undefined) {
-            log("Item index ".concat(i, " lies within the visible area or its \"margins\", but its height hasn't been measured yet. Mark the item as \"shown\", render the list, measure the item's height and redo the layout."));
-
-            if (firstShownItemIndex === undefined) {
-              firstShownItemIndex = rowIndex * columnsCount;
-            }
-
-            var heightLeft = visibleAreaBottom - (listTopOffset + previousRowsHeight);
-            lastShownItemIndex = Math.min((rowIndex + this.getEstimatedRowsCountForHeight(heightLeft)) * columnsCount - 1, // Guard against index overflow.
-            itemsCount - 1);
-            return {
-              firstNonMeasuredItemIndex: i,
-              firstShownItemIndex: firstShownItemIndex,
-              lastShownItemIndex: lastShownItemIndex
-            };
-          }
-
-          currentRowHeight = Math.max(currentRowHeight, itemHeight); // If this is the first item visible
-          // then start showing items from this row.
-
-          if (firstShownItemIndex === undefined) {
-            if (listTopOffset + previousRowsHeight + currentRowHeight > visibleAreaTop) {
-              log('First shown row index', rowIndex);
-              firstShownItemIndex = rowIndex * columnsCount;
-            }
-          } // If this item is the last one visible in the viewport then exit.
-
-
-          if (listTopOffset + previousRowsHeight + currentRowHeight + verticalSpaceAfterCurrentRow > visibleAreaBottom) {
-            log('Last shown row index', rowIndex); // The list height is estimated until all items have been seen,
-            // so it's possible that even when the list DOM element happens
-            // to be in the viewport in reality the list isn't visible
-            // in which case `firstShownItemIndex` will be `undefined`.
-
-            if (firstShownItemIndex !== undefined) {
-              lastShownItemIndex = Math.min( // The index of the last item in the current row.
-              (rowIndex + 1) * columnsCount - 1, // Guards against index overflow.
-              itemsCount - 1);
-            }
-
-            return {
-              firstShownItemIndex: firstShownItemIndex,
-              lastShownItemIndex: lastShownItemIndex
-            };
-          }
-
-          columnIndex++;
+        if (shouldRestoreScrollPosition) {
+          firstShownItemIndex = 0;
+          beforeItemsHeight = 0;
         }
 
-        previousRowsHeight += currentRowHeight; // If there're more rows below the current row, then add vertical spacing.
+        if (prependedItemsCount % columnsCount > 0) {
+          // Rows will be rebalanced as a result of prepending new items,
+          // and row heights can change as a result, so re-layout items
+          // after they've been measured (after the upcoming re-render).
+          //
+          // For example, consider a web page where item rows are `display: flex`.
+          // Suppose there're 3 columns and it shows items from 4 to 6.
+          //
+          // ------------------------------------------
+          // | Apples are  | Bananas    | Cranberries |
+          // | green       |            |             |
+          // ------------------------------------------
+          // | Dates       | Elderberry | Figs are    |
+          // |             |            | tasty       |
+          // ------------------------------------------
+          //
+          // Now, 1 item gets prepended. As a result, all existing rows will have
+          // a different set of items, which means that the row heights will change.
+          //
+          // ------------------------------------------
+          // | Zucchini    | Apples are | Bananas     |
+          // |             | green      |             |
+          // ------------------------------------------
+          // | Cranberries | Dates      | Elderberry  |
+          // ------------------------------------------
+          // | Figs        |
+          // | are tasty   |
+          // ---------------
+          //
+          // As it can be seen above, the second row's height has changed from 2 to 1.
+          // Not only that, but `itemHeights` have changed as well, so if you thought
+          // that the library could easily recalculate row heights using `Math.max()` — 
+          // turns out it's not always the case.
+          //
+          // There could be an explicit opt-in option for automatically recalculating
+          // row heights, but I don't want to write code for such an extremely rare
+          // use case. Instead, use the `getColumnsCount()` parameter function when
+          // fetching previous items.
+          warn('~ Prepended items count', prependedItemsCount, 'is not divisible by Columns Count', columnsCount, '~');
+          warn('Reset Layout');
+          var shownItemsCountBeforeItemsUpdate = lastShownItemIndex - firstShownItemIndex + 1;
+          firstShownItemIndex = 0;
+          beforeItemsHeight = 0;
 
-        previousRowsHeight += verticalSpaceAfterCurrentRow;
-        rowIndex++;
-      } // If there're no more items then the last item is the last one to show.
+          if (!shouldRestoreScrollPosition) {
+            // Limit shown items count if too many items have been prepended.
+            if (prependedItemsCount > shownItemsCountBeforeItemsUpdate) {
+              lastShownItemIndex = this.getInitialLastShownItemIndex({
+                itemsCount: itemsCount,
+                columnsCount: columnsCount,
+                firstShownItemIndex: firstShownItemIndex
+              }); // Approximate `afterItemsHeight` calculation.
+
+              var afterItemsCount = itemsCount - (lastShownItemIndex + 1);
+              afterItemsHeight = Math.ceil(afterItemsCount / columnsCount) * (verticalSpacing + averageItemHeight); // layoutUpdate = {
+              // 	...layoutUpdate,
+              // 	afterItemsHeight
+              // }
+            }
+          }
+        } // layoutUpdate = {
+        // 	...layoutUpdate,
+        // 	beforeItemsHeight,
+        // 	firstShownItemIndex,
+        // 	lastShownItemIndex
+        // }
+
+      } // return layoutUpdate
+      // Overwrite all four props in all scenarios.
+      // The reason is that only this way subsequent `setItems()` calls
+      // will be truly "stateless" when a chain of `setItems()` calls
+      // could be replaced with just the last one in a scenario when
+      // `setState()` calls are "asynchronous" (delayed execution).
+      //
+      // So, for example, the user calls `setItems()` with one set of items.
+      // A `setState()` call has been dispatched but the `state` hasn't been updated yet.
+      // Then the user calls `setItems()` with another set of items.
+      // If this function only returned a minimal set of properties that actually change,
+      // the other layout properties of the second `setItems()` call wouldn't overwrite the ones
+      // scheduled for update during the first `setItems()` call, resulting in an inconsistent `state`.
+      //
+      // For example, the first `setItems()` call does a `setState()` call where it updates
+      // `afterItemsHeight`, and then the second `setItems()` call only updates `beforeItemsHeight`
+      // and `firstShownItemIndex` and `lastShownItemIndex`. If the second `setItems()` call was to
+      // overwrite any effects of the pending-but-not-yet-applied first `setItems()` call, it would
+      // have to call `setState()` with an `afterItemsHeight` property too, even though it hasn't change.
+      // That would be just to revert the change to `afterItemsHeight` state property already scheduled
+      // by the first `setItems()` call.
+      //
 
 
-      if (firstShownItemIndex !== undefined && lastShownItemIndex === undefined) {
-        lastShownItemIndex = itemsCount - 1;
-        log('Last item index (is fully visible)', lastShownItemIndex);
+      return {
+        beforeItemsHeight: beforeItemsHeight,
+        afterItemsHeight: afterItemsHeight,
+        firstShownItemIndex: firstShownItemIndex,
+        lastShownItemIndex: lastShownItemIndex
+      };
+    } // If an item that hasn't been shown (and measured) yet is encountered
+    // then show such item and then retry after it has been measured.
+
+  }, {
+    key: "getItemNotMeasuredIndexes",
+    value: function getItemNotMeasuredIndexes(i, _ref7) {
+      var itemsCount = _ref7.itemsCount,
+          firstShownItemIndex = _ref7.firstShownItemIndex,
+          nonMeasuredAreaHeight = _ref7.nonMeasuredAreaHeight,
+          indexOfTheFirstItemInTheRow = _ref7.indexOfTheFirstItemInTheRow;
+      log('Item index', i, 'height is required for calculations but hasn\'t been measured yet. Mark the item as "shown", rerender the list, measure the item\'s height and redo the layout.');
+      var columnsCount = this.getColumnsCount();
+      var itemsCountToRenderForMeasurement = Math.min(this.getEstimatedRowsCountForHeight(nonMeasuredAreaHeight) * columnsCount, this.measureItemsBatchSize || Infinity);
+
+      if (firstShownItemIndex === undefined) {
+        firstShownItemIndex = indexOfTheFirstItemInTheRow;
       }
 
+      var lastShownItemIndex = Math.min(indexOfTheFirstItemInTheRow + itemsCountToRenderForMeasurement - 1, // Guard against index overflow.
+      itemsCount - 1);
+      return {
+        firstNonMeasuredItemIndex: i,
+        firstShownItemIndex: firstShownItemIndex,
+        lastShownItemIndex: lastShownItemIndex
+      };
+    }
+    /**
+     * Finds the indexes of the currently visible items.
+     * @return {object} `{ firstShownItemIndex: number, lastShownItemIndex: number, firstNonMeasuredItemIndex: number? }`
+     */
+
+  }, {
+    key: "getShownItemIndexes",
+    value: function getShownItemIndexes(_ref8) {
+      var itemsCount = _ref8.itemsCount,
+          visibleAreaTop = _ref8.visibleAreaTop,
+          visibleAreaBottom = _ref8.visibleAreaBottom;
+
+      var indexes = this._getShownItemIndex({
+        itemsCount: itemsCount,
+        fromIndex: 0,
+        visibleAreaTop: visibleAreaTop,
+        visibleAreaBottom: visibleAreaBottom,
+        findFirstShownItemIndex: true
+      });
+
+      if (indexes === null) {
+        return this.getNonVisibleListShownItemIndexes();
+      }
+
+      if (indexes.firstNonMeasuredItemIndex !== undefined) {
+        return indexes;
+      }
+
+      var _indexes = indexes,
+          firstShownItemIndex = _indexes.firstShownItemIndex,
+          beforeItemsHeight = _indexes.beforeItemsHeight;
+      indexes = this._getShownItemIndex({
+        itemsCount: itemsCount,
+        fromIndex: firstShownItemIndex,
+        beforeItemsHeight: beforeItemsHeight,
+        visibleAreaTop: visibleAreaTop,
+        visibleAreaBottom: visibleAreaBottom,
+        findLastShownItemIndex: true
+      });
+
+      if (indexes === null) {
+        return this.getNonVisibleListShownItemIndexes();
+      }
+
+      if (indexes.firstNonMeasuredItemIndex !== undefined) {
+        return indexes;
+      }
+
+      var _indexes2 = indexes,
+          lastShownItemIndex = _indexes2.lastShownItemIndex;
       return {
         firstShownItemIndex: firstShownItemIndex,
         lastShownItemIndex: lastShownItemIndex
       };
-    } // Finds the items which are displayed in the viewport.
-
+    }
   }, {
-    key: "getVisibleItemIndexes",
-    value: function getVisibleItemIndexes(visibleAreaTop, visibleAreaBottom, listTopOffset, itemsCount) {
-      var _this$_getVisibleItem = this._getVisibleItemIndexes(visibleAreaTop, visibleAreaBottom, listTopOffset, itemsCount),
-          firstNonMeasuredItemIndex = _this$_getVisibleItem.firstNonMeasuredItemIndex,
-          firstShownItemIndex = _this$_getVisibleItem.firstShownItemIndex,
-          lastShownItemIndex = _this$_getVisibleItem.lastShownItemIndex;
+    key: "_getShownItemIndex",
+    value: function _getShownItemIndex(parameters) {
+      var beforeResize = parameters.beforeResize,
+          itemsCount = parameters.itemsCount,
+          visibleAreaTop = parameters.visibleAreaTop,
+          visibleAreaBottom = parameters.visibleAreaBottom,
+          findFirstShownItemIndex = parameters.findFirstShownItemIndex,
+          findLastShownItemIndex = parameters.findLastShownItemIndex;
+      var fromIndex = parameters.fromIndex,
+          beforeItemsHeight = parameters.beforeItemsHeight; // This function could potentially also use `this.getPreviouslyCalculatedLayout()`
+      // when `fromIndex` is `0`, it's also assumed to be `0`.
 
-      var redoLayoutAfterMeasuringItemHeights = firstNonMeasuredItemIndex !== undefined; // If some items will be rendered in order to measure their height,
-      // and it's not a `preserveScrollPositionOnPrependItems` case,
-      // then limit the amount of such items being measured in a single pass.
-
-      if (redoLayoutAfterMeasuringItemHeights && this.measureItemsBatchSize) {
-        var maxAllowedLastShownItemIndex = firstNonMeasuredItemIndex + this.measureItemsBatchSize - 1;
-        var columnsCount = this.getColumnsCount();
-        lastShownItemIndex = Math.min( // Also guards against index overflow.
-        lastShownItemIndex, // The index of the last item in the row.
-        Math.ceil(maxAllowedLastShownItemIndex / columnsCount) * columnsCount - 1);
+      if (fromIndex === 0) {
+        beforeItemsHeight = 0;
       }
 
-      return {
-        firstShownItemIndex: firstShownItemIndex,
-        lastShownItemIndex: lastShownItemIndex,
-        redoLayoutAfterMeasuringItemHeights: redoLayoutAfterMeasuringItemHeights
-      };
+      if (beforeItemsHeight === undefined) {
+        throw new Error('[virtual-scroller] `beforeItemsHeight` not passed to `Layout.getShownItemIndexes()` when starting from index ' + fromIndex);
+      } // const backwards = false
+      // while (backwards ? i >= 0 : i < itemsCount) {}
+
+
+      if (!beforeResize) {
+        var beforeResizeItemsCount = this.getBeforeResizeItemsCount();
+
+        if (beforeResizeItemsCount > fromIndex) {
+          // First search for the item in "before resize" items.
+          var _this$_getShownItemIn = this._getShownItemIndex(_objectSpread$3(_objectSpread$3({}, parameters), {}, {
+            beforeResize: true,
+            itemsCount: beforeResizeItemsCount
+          })),
+              notFound = _this$_getShownItemIn.notFound,
+              beforeResizeItemsHeight = _this$_getShownItemIn.beforeItemsHeight,
+              _firstShownItemIndex = _this$_getShownItemIn.firstShownItemIndex,
+              _lastShownItemIndex = _this$_getShownItemIn.lastShownItemIndex; // If the item was not found in "before resize" items
+          // then search in regular items skipping "before resize" ones.
+
+
+          if (notFound) {
+            beforeItemsHeight = beforeResizeItemsHeight;
+            fromIndex += beforeResizeItemsCount;
+          } else {
+            // If the item was found in "before resize" items
+            // then return the result.
+            // Rebalance first / last shown item indexes based on
+            // the current columns count, if required.
+            var _columnsCount = this.getColumnsCount();
+
+            return {
+              firstShownItemIndex: _firstShownItemIndex === undefined ? undefined : Math.floor(_firstShownItemIndex / _columnsCount) * _columnsCount,
+              lastShownItemIndex: _lastShownItemIndex === undefined ? undefined : Math.floor(_lastShownItemIndex / _columnsCount) * _columnsCount,
+              beforeItemsHeight: beforeResizeItemsHeight
+            };
+          }
+        }
+      }
+
+      var columnsCount = beforeResize ? this.getColumnsCountBeforeResize() : this.getColumnsCount();
+      var verticalSpacing = beforeResize ? this.getVerticalSpacingBeforeResize() : this.getVerticalSpacing();
+      var i = fromIndex;
+
+      while (i < itemsCount) {
+        var currentRowFirstItemIndex = i;
+        var hasMoreRows = itemsCount > currentRowFirstItemIndex + columnsCount;
+        var verticalSpacingAfterCurrentRow = hasMoreRows ? verticalSpacing : 0;
+        var currentRowHeight = 0; // Calculate current row height.
+
+        var columnIndex = 0;
+
+        while (columnIndex < columnsCount && i < itemsCount) {
+          var itemHeight = beforeResize ? this.getItemHeightBeforeResize(i) : this.getItemHeight(i); // If this item hasn't been measured yet (or re-measured after a resize)
+          // then mark it as the first non-measured one.
+          //
+          // Can't happen by definition when `beforeResize` parameter is `true`.
+          //
+
+          if (itemHeight === undefined) {
+            return this.getItemNotMeasuredIndexes(i, {
+              itemsCount: itemsCount,
+              firstShownItemIndex: findLastShownItemIndex ? fromIndex : undefined,
+              indexOfTheFirstItemInTheRow: currentRowFirstItemIndex,
+              nonMeasuredAreaHeight: visibleAreaBottom + this.getPrerenderMargin() - beforeItemsHeight
+            });
+          }
+
+          currentRowHeight = Math.max(currentRowHeight, itemHeight);
+          columnIndex++;
+          i++;
+        }
+
+        var itemsHeightFromFirstRowToThisRow = beforeItemsHeight + currentRowHeight;
+        var rowStepsIntoVisibleAreaTop = itemsHeightFromFirstRowToThisRow > visibleAreaTop - this.getPrerenderMargin();
+        var rowStepsOutOfVisibleAreaBottomOrIsAtTheBorder = itemsHeightFromFirstRowToThisRow + verticalSpacingAfterCurrentRow >= visibleAreaBottom + this.getPrerenderMargin(); // if (backwards) {
+        // 	if (findFirstShownItemIndex) {
+        // 		if (rowStepsOutOfVisibleAreaTop) {
+        // 			return {
+        // 				firstShownItemIndex: currentRowFirstItemIndex + columnsCount
+        // 			}
+        // 		}
+        // 	} else if (findLastShownItemIndex) {
+        // 		if (rowStepsIntoVisibleAreaBottom) {
+        // 			return {
+        // 				lastShownItemIndex: currentRowFirstItemIndex + columnsCount - 1
+        // 			}
+        // 		}
+        // 	}
+        // }
+
+        if (findFirstShownItemIndex) {
+          if (rowStepsIntoVisibleAreaTop) {
+            // If item is the first one visible in the viewport
+            // then start showing items from this row.
+            return {
+              firstShownItemIndex: currentRowFirstItemIndex,
+              beforeItemsHeight: beforeItemsHeight
+            };
+          }
+        } else if (findLastShownItemIndex) {
+          if (rowStepsOutOfVisibleAreaBottomOrIsAtTheBorder) {
+            return {
+              lastShownItemIndex: Math.min( // The index of the last item in the current row.
+              currentRowFirstItemIndex + columnsCount - 1, // Guards against index overflow.
+              itemsCount - 1)
+            };
+          }
+        }
+
+        beforeItemsHeight += currentRowHeight + verticalSpacingAfterCurrentRow; // if (backwards) {
+        // 	// Set `i` to be the first item of the current row.
+        // 	i -= columnsCount
+        // 	const prevoiusRowIsBeforeResize = i - 1 < this.getBeforeResizeItemsCount()
+        // 	const previousRowColumnsCount = prevoiusRowIsBeforeResize ? this.getColumnsCountBeforeResize() : this.getColumnsCount()
+        // 	// Set `i` to be the first item of the previous row.
+        // 	i -= previousRowColumnsCount
+        // }
+      } // if (backwards) {
+      // 	if (findFirstShownItemIndex) {
+      // 		warn('The list is supposed to be visible but no visible item has been found (while traversing backwards)')
+      // 		return null
+      // 	} else if (findLastShownItemIndex) {
+      // 		return {
+      // 			firstShownItemIndex: 0
+      // 		}
+      // 	}
+      // }
+
+
+      if (beforeResize) {
+        return {
+          notFound: true,
+          beforeItemsHeight: beforeItemsHeight
+        };
+      } // This case isn't supposed to happen but it could hypothetically happen
+      // because the list height is measured from the user's screen and
+      // not necessarily can be trusted.
+
+
+      if (findFirstShownItemIndex) {
+        warn('The list is supposed to be visible but no visible item has been found');
+        return null;
+      } else if (findLastShownItemIndex) {
+        return {
+          lastShownItemIndex: itemsCount - 1
+        };
+      }
     }
   }, {
     key: "getNonVisibleListShownItemIndexes",
     value: function getNonVisibleListShownItemIndexes() {
-      return {
+      var layout = {
         firstShownItemIndex: 0,
-        lastShownItemIndex: 0,
-        redoLayoutAfterMeasuringItemHeights: this.getItemHeight(0) === undefined
+        lastShownItemIndex: 0
       };
-    }
-  }, {
-    key: "getItemIndexes",
-    value: function getItemIndexes(visibleAreaTop, visibleAreaBottom, listTopOffset, listHeight, itemsCount) {
-      var isVisible = listTopOffset + listHeight > visibleAreaTop && listTopOffset < visibleAreaBottom;
 
-      if (!isVisible) {
-        log('The entire list is off-screen. No items are visible.');
-        return;
-      } // Find the items which are displayed in the viewport.
-
-
-      var indexes = this.getVisibleItemIndexes(visibleAreaTop, visibleAreaBottom, listTopOffset, itemsCount); // The list height is estimated until all items have been seen,
-      // so it's possible that even when the list DOM element happens
-      // to be in the viewport, in reality the list isn't visible
-      // in which case `firstShownItemIndex` will be `undefined`.
-
-      if (indexes.firstShownItemIndex === undefined) {
-        log('The entire list is off-screen. No items are visible.');
-        return;
+      if (this.getItemHeight(0) === undefined) {
+        layout.firstNonMeasuredItemIndex = 0;
       }
 
-      return indexes;
+      return layout;
     }
     /**
      * Measures "before" items height.
-     * @param  {number} firstShownItemIndex — New first shown item index.
-     * @param  {number} lastShownItemIndex — New last shown item index.
+     * @param  {number} beforeItemsCount — Basically, first shown item index.
      * @return {number}
      */
 
   }, {
     key: "getBeforeItemsHeight",
-    value: function getBeforeItemsHeight(firstShownItemIndex, lastShownItemIndex) {
-      var columnsCount = this.getColumnsCount();
-      var firstShownRowIndex = Math.floor(firstShownItemIndex / columnsCount);
-      var beforeItemsHeight = 0; // Add all "before" items height.
+    value: function getBeforeItemsHeight(beforeItemsCount) {
+      var _ref9 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+          beforeResize = _ref9.beforeResize;
 
-      var rowIndex = 0;
+      // This function could potentially also use `this.getPreviouslyCalculatedLayout()`
+      // in order to skip calculating visible item indexes from scratch
+      // and instead just calculate the difference from a "previously calculated layout".
+      //
+      // I did a simple test in a web browser and found out that running the following
+      // piece of code is less than 10 milliseconds:
+      //
+      // var startedAt = Date.now()
+      // var i = 0
+      // while (i < 1000000) {
+      //   i++
+      // }
+      // console.log(Date.now() - startedAt)
+      //
+      // Which becomes negligible in my project's use case (a couple thousands items max).
+      var beforeItemsHeight = 0;
+      var i = 0;
 
-      while (rowIndex < firstShownRowIndex) {
+      if (!beforeResize) {
+        var beforeResizeItemsCount = this.getBeforeResizeItemsCount();
+
+        if (beforeResizeItemsCount > 0) {
+          // First add all "before resize" item heights.
+          beforeItemsHeight = this.getBeforeItemsHeight( // `firstShownItemIndex` (called `beforeItemsCount`) could be greater than
+          // `beforeResizeItemsCount` when the user scrolls down.
+          // `firstShownItemIndex` (called `beforeItemsCount`) could be less than
+          // `beforeResizeItemsCount` when the user scrolls up.
+          Math.min(beforeItemsCount, beforeResizeItemsCount), {
+            beforeResize: true
+          });
+          i = beforeResizeItemsCount;
+        }
+      }
+
+      var columnsCount = beforeResize ? this.getColumnsCountBeforeResize() : this.getColumnsCount();
+      var verticalSpacing = beforeResize ? this.getVerticalSpacingBeforeResize() : this.getVerticalSpacing();
+
+      while (i < beforeItemsCount) {
         var rowHeight = 0;
-        var columnIndex = 0;
+        var columnIndex = 0; // Not checking for `itemsCount` overflow here because `i = beforeItemsCount`
+        // can only start at the start of a row, meaning that when calculating
+        // "before items height" it's not supposed to add item heights from the
+        // last row of items because in that case it would have to iterate from
+        // `i === beforeItemsCount` and that condition is already checked above.
+        // while (i < itemsCount) {
 
         while (columnIndex < columnsCount) {
-          rowHeight = Math.max(rowHeight, this.getItemHeight(rowIndex * columnsCount + columnIndex) || this.getAverageItemHeight());
+          var itemHeight = beforeResize ? this.getItemHeightBeforeResize(i) : this.getItemHeight(i);
+
+          if (itemHeight === undefined) {
+            // `itemHeight` can only be `undefined` when not `beforeResize`.
+            // Use the current "average item height" as a substitute.
+            itemHeight = this.getAverageItemHeight();
+          }
+
+          rowHeight = Math.max(rowHeight, itemHeight);
+          i++;
           columnIndex++;
         }
 
         beforeItemsHeight += rowHeight;
-        beforeItemsHeight += this.getVerticalSpacing();
-        rowIndex++;
+        beforeItemsHeight += verticalSpacing;
       }
 
       return beforeItemsHeight;
     }
     /**
      * Measures "after" items height.
-     * @param  {number} firstShownItemIndex — New first shown item index.
-     * @param  {number} lastShownItemIndex — New last shown item index.
-     * @param  {number} averageItemHeight — Average item height.
-     * @param  {number} verticalSpacing — Item vertical spacing.
+     * @param  {number} lastShownItemIndex — Last shown item index.
      * @param  {number} itemsCount — Items count.
      * @return {number}
      */
 
   }, {
     key: "getAfterItemsHeight",
-    value: function getAfterItemsHeight(firstShownItemIndex, lastShownItemIndex, itemsCount) {
+    value: function getAfterItemsHeight(lastShownItemIndex, itemsCount) {
+      // This function could potentially also use `this.getPreviouslyCalculatedLayout()`
+      // in order to skip calculating visible item indexes from scratch
+      // and instead just calculate the difference from a "previously calculated layout".
+      //
+      // I did a simple test in a web browser and found out that running the following
+      // piece of code is less than 10 milliseconds:
+      //
+      // var startedAt = Date.now()
+      // var i = 0
+      // while (i < 1000000) {
+      //   i++
+      // }
+      // console.log(Date.now() - startedAt)
+      //
+      // Which becomes negligible in my project's use case (a couple thousands items max).
       var columnsCount = this.getColumnsCount();
-      var rowsCount = Math.ceil(itemsCount / columnsCount);
-      var lastShownRowIndex = Math.floor(lastShownItemIndex / columnsCount);
       var afterItemsHeight = 0;
-      var rowIndex = lastShownRowIndex + 1;
+      var i = lastShownItemIndex + 1;
 
-      while (rowIndex < rowsCount) {
+      while (i < itemsCount) {
         var rowHeight = 0;
         var columnIndex = 0;
-        var i = void 0;
 
-        while (columnIndex < columnsCount && (i = rowIndex * columnsCount + columnIndex) < itemsCount) {
-          rowHeight = Math.max(rowHeight, this.getItemHeight(i) || this.getAverageItemHeight());
+        while (columnIndex < columnsCount && i < itemsCount) {
+          var itemHeight = this.getItemHeight(i);
+
+          if (itemHeight === undefined) {
+            itemHeight = this.getAverageItemHeight();
+          }
+
+          rowHeight = Math.max(rowHeight, itemHeight);
+          i++;
           columnIndex++;
         } // Add all "after" items height.
 
 
         afterItemsHeight += this.getVerticalSpacing();
         afterItemsHeight += rowHeight;
-        rowIndex++;
       }
 
       return afterItemsHeight;
     }
     /**
-     * Finds the indexes of the currently visible items.
-     * @return {object} `{ firstShownItemIndex: number, lastShownItemIndex: number, redoLayoutAfterMeasuringItemHeights: boolean }`
+     * Returns the items's top offset relative to the top edge of the first item.
+     * @param {number} i — Item index
+     * @return {[number]} Returns `undefined` if any of the previous items haven't been rendered yet.
      */
 
   }, {
-    key: "getShownItemIndexes",
-    value: function getShownItemIndexes(_ref5) {
-      var listHeight = _ref5.listHeight,
-          itemsCount = _ref5.itemsCount,
-          visibleAreaIncludingMargins = _ref5.visibleAreaIncludingMargins,
-          listTopOffsetInsideScrollableContainer = _ref5.listTopOffsetInsideScrollableContainer;
+    key: "getItemTopOffset",
+    value: function getItemTopOffset(i) {
+      var topOffsetInsideScrollableContainer = 0;
+      var beforeResizeItemsCount = this.getBeforeResizeItemsCount();
+      var beforeResizeRowsCount = beforeResizeItemsCount === 0 ? 0 : Math.ceil(beforeResizeItemsCount / this.getColumnsCountBeforeResize());
+      var maxBeforeResizeRowsCount = i < beforeResizeItemsCount ? Math.floor(i / this.getColumnsCountBeforeResize()) : beforeResizeRowsCount;
+      var beforeResizeRowIndex = 0;
 
-      if (this.bypass) {
-        return {
-          firstShownItemIndex: 0,
-          lastShownItemIndex: itemsCount - 1
-        };
-      } // Finds the indexes of the items that are currently visible
-      // (or close to being visible) in the scrollable container.
-      // For scrollable containers other than the main screen, it could also
-      // check the visibility of such scrollable container itself, because it
-      // might be not visible.
-      // If such kind of an optimization would hypothetically be implemented,
-      // then it would also require listening for "scroll" events on the screen.
-      // Overall, I suppose that such "actual visibility" feature would be
-      // a very minor optimization and not something I'd deal with.
+      while (beforeResizeRowIndex < maxBeforeResizeRowsCount) {
+        var rowHeight = this.getItemHeightBeforeResize(beforeResizeRowIndex * this.getColumnsCountBeforeResize());
+        topOffsetInsideScrollableContainer += rowHeight;
+        topOffsetInsideScrollableContainer += this.getVerticalSpacingBeforeResize();
+        beforeResizeRowIndex++;
+      }
 
+      var itemRowIndex = Math.floor((i - beforeResizeItemsCount) / this.getColumnsCount());
+      var rowIndex = 0;
 
-      return this.getItemIndexes(visibleAreaIncludingMargins.top, visibleAreaIncludingMargins.bottom, listTopOffsetInsideScrollableContainer, listHeight, itemsCount) || this.getNonVisibleListShownItemIndexes();
-    }
-  }, {
-    key: "showItemsFromTheStart",
-    value: function showItemsFromTheStart(layout) {
-      layout.firstShownItemIndex = 0;
-      layout.beforeItemsHeight = 0;
+      while (rowIndex < itemRowIndex) {
+        var _rowHeight = 0;
+        var columnIndex = 0;
+
+        while (columnIndex < this.getColumnsCount()) {
+          var itemHeight = this.getItemHeight(beforeResizeItemsCount + rowIndex * this.getColumnsCount() + columnIndex);
+
+          if (itemHeight === undefined) {
+            return;
+          }
+
+          _rowHeight = Math.max(_rowHeight, itemHeight);
+          columnIndex++;
+        }
+
+        topOffsetInsideScrollableContainer += _rowHeight;
+        topOffsetInsideScrollableContainer += this.getVerticalSpacing();
+        rowIndex++;
+      }
+
+      return topOffsetInsideScrollableContainer;
     }
   }]);
 
@@ -1096,140 +1570,31 @@ var LAYOUT_REASON = {
   SCROLL: 'scroll',
   STOPPED_SCROLLING: 'stopped scrolling',
   MANUAL: 'manual',
-  MOUNT: 'mount',
-  ITEM_HEIGHT_NOT_MEASURED: 'some item height wasn\'t measured',
-  RESIZE: 'resize',
+  MOUNTED: 'mounted',
+  ACTUAL_ITEM_HEIGHTS_HAVE_BEEN_MEASURED: 'actual item heights have been measured',
+  VIEWPORT_WIDTH_CHANGED: 'viewport width changed',
+  VIEWPORT_HEIGHT_CHANGED: 'viewport height changed',
+  VIEWPORT_SIZE_UNCHANGED: 'viewport size unchanged',
   ITEM_HEIGHT_CHANGED: 'item height changed',
   ITEMS_CHANGED: 'items changed',
   TOP_OFFSET_CHANGED: 'list top offset changed'
 };
-
-function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties$5(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass$5(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$5(Constructor.prototype, protoProps); if (staticProps) _defineProperties$5(Constructor, staticProps); return Constructor; }
-// but if the page styles are applied after `VirtualScroller` mounts
-// (for example, if styles are applied via javascript, like Webpack does)
-// then the list might not render correctly and will only show the first item.
-// The reason for that would be that calling `.getListTopOffsetInsideScrollableContainer()`
-// on mount returns "incorrect" `top` position because the styles haven't been applied yet.
-// For example, consider a page:
-// <div class="page">
-//   <nav class="sidebar">...</nav>
-//   <main>...</main>
-// </div>
-// The sidebar is styled as `position: fixed`, but until
-// the page styles have been applied it's gonna be a regular `<div/>`
-// meaning that `<main/>` will be rendered below the sidebar
-// and will appear offscreen and so it will only render the first item.
-// Then, the page styles are loaded and applied and the sidebar
-// is now `position: fixed` so `<main/>` is now rendered at the top of the page
-// but `VirtualScroller`'s `.render()` has already been called
-// and it won't re-render until the user scrolls or the window is resized.
-// This type of a bug doesn't occur in production, but it can appear
-// in development mode when using Webpack. The workaround `VirtualScroller`
-// implements for such cases is calling `.getListTopOffsetInsideScrollableContainer()`
-// on the list container DOM element periodically (every second) to check
-// if the `top` coordinate has changed as a result of CSS being applied:
-// if it has then it recalculates the shown item indexes.
-
-var WaitForStylesToLoad =
-/*#__PURE__*/
-function () {
-  function WaitForStylesToLoad(_ref) {
-    var updateLayout = _ref.updateLayout,
-        getListTopOffsetInsideScrollableContainer = _ref.getListTopOffsetInsideScrollableContainer;
-
-    _classCallCheck$5(this, WaitForStylesToLoad);
-
-    this.updateLayout = updateLayout;
-    this.getListTopOffsetInsideScrollableContainer = getListTopOffsetInsideScrollableContainer;
-  }
-
-  _createClass$5(WaitForStylesToLoad, [{
-    key: "onGotListTopOffset",
-    value: function onGotListTopOffset(listTopOffset) {
-      if (this.listTopOffsetInsideScrollableContainer === undefined) {
-        // Start periodical checks of the list's top offset
-        // in order to perform a re-layout in case it changes.
-        // See the comments in `WaitForStylesToLoad.js` file
-        // on why can the list's top offset change, and in which circumstances.
-        this.start();
-      }
-
-      this.listTopOffsetInsideScrollableContainer = listTopOffset;
-    }
-  }, {
-    key: "start",
-    value: function start() {
-      this.isRendered = true;
-      this.watchListTopOffset();
-    }
-  }, {
-    key: "stop",
-    value: function stop() {
-      this.isRendered = false;
-      clearTimeout(this.watchListTopOffsetTimer);
-    }
-  }, {
-    key: "watchListTopOffset",
-    value: function watchListTopOffset() {
-      var _this = this;
-
-      var startedAt = Date.now();
-
-      var check = function check() {
-        // If `VirtualScroller` has been unmounted
-        // while `setTimeout()` was waiting, then exit.
-        if (!_this.isRendered) {
-          return;
-        } // Skip comparing `top` coordinate of the list
-        // when this function is called for the first time.
-
-
-        if (_this.listTopOffsetInsideScrollableContainer !== undefined) {
-          // Calling `this.getListTopOffsetInsideScrollableContainer()`
-          // on an element is about 0.003 milliseconds on a modern desktop CPU,
-          // so I guess it's fine calling it twice a second.
-          if (_this.getListTopOffsetInsideScrollableContainer() !== _this.listTopOffsetInsideScrollableContainer) {
-            _this.updateLayout({
-              reason: LAYOUT_REASON.TOP_OFFSET_CHANGED
-            });
-          }
-        } // Compare `top` coordinate of the list twice a second
-        // to find out if it has changed as a result of loading CSS styles.
-        // The total duration of 3 seconds would be enough for any styles to load, I guess.
-        // There could be other cases changing the `top` coordinate
-        // of the list (like collapsing an "accordeon" panel above the list
-        // without scrolling the page), but those cases should be handled
-        // by manually calling `.updateLayout()` instance method on `VirtualScroller` instance.
-
-
-        if (Date.now() - startedAt < WATCH_LIST_TOP_OFFSET_MAX_DURATION) {
-          _this.watchListTopOffsetTimer = setTimeout$1(check, WATCH_LIST_TOP_OFFSET_INTERVAL);
-        }
-      }; // Run the cycle.
-
-
-      check();
-    }
-  }]);
-
-  return WaitForStylesToLoad;
-}();
-var WATCH_LIST_TOP_OFFSET_INTERVAL = 500;
-var WATCH_LIST_TOP_OFFSET_MAX_DURATION = 3000;
 
 // For some weird reason, in Chrome, `setTimeout()` would lag up to a second (or more) behind.
 /**
  * Same as `lodash`'s `debounce()` for functions with no arguments.
  * @param  {function} func
  * @param  {number} interval
+ * @param  {function} [options.onStart]
+ * @param  {function} [options.onStop]
  * @return {function}
  */
 
 function debounce(func, interval) {
+  var _ref = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {},
+      onStart = _ref.onStart,
+      onStop = _ref.onStop;
+
   var timeout;
   return function () {
     var _this = this;
@@ -1238,36 +1603,52 @@ function debounce(func, interval) {
       args[_key] = arguments[_key];
     }
 
-    clearTimeout(timeout);
-    timeout = setTimeout$1(function () {
-      return func.apply(_this, args);
-    }, interval);
+    return new Promise(function (resolve) {
+      if (timeout) {
+        clearTimeout(timeout);
+      } else {
+        if (onStart) {
+          onStart();
+        }
+      }
+
+      timeout = setTimeout$1(function () {
+        timeout = undefined;
+
+        if (onStop) {
+          onStop();
+        }
+
+        func.apply(_this, args);
+        resolve();
+      }, interval);
+    });
   };
 }
 
-function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck$5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties$4(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function _defineProperties$5(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function _createClass$4(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$4(Constructor.prototype, protoProps); if (staticProps) _defineProperties$4(Constructor, staticProps); return Constructor; }
+function _createClass$5(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$5(Constructor.prototype, protoProps); if (staticProps) _defineProperties$5(Constructor, staticProps); return Constructor; }
 
-function _defineProperty$2(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _defineProperty$4(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var Resize =
-/*#__PURE__*/
-function () {
+var Resize = /*#__PURE__*/function () {
   function Resize(_ref) {
     var _this = this;
 
     var bypass = _ref.bypass,
         scrollableContainer = _ref.scrollableContainer,
-        getContainerElement = _ref.getContainerElement,
-        updateLayout = _ref.updateLayout,
-        resetStateAndLayout = _ref.resetStateAndLayout;
+        onStart = _ref.onStart,
+        onStop = _ref.onStop,
+        onHeightChange = _ref.onHeightChange,
+        onWidthChange = _ref.onWidthChange,
+        onNoChange = _ref.onNoChange;
 
-    _classCallCheck$4(this, Resize);
+    _classCallCheck$5(this, Resize);
 
-    _defineProperty$2(this, "onResize", debounce(function () {
+    _defineProperty$4(this, "_onResize", function () {
       // If `VirtualScroller` has been unmounted
       // while `debounce()`'s `setTimeout()` was waiting, then exit.
       if (!_this.isRendered) {
@@ -1283,32 +1664,34 @@ function () {
         if (_this.scrollableContainerHeight === prevScrollableContainerHeight) {
           // The dimensions of the container didn't change,
           // so there's no need to re-layout anything.
-          return;
+          _this.onNoChange();
         } else {
           // Scrollable container height has changed,
           // so just recalculate shown item indexes.
           // No need to perform a re-layout from scratch.
-          _this.updateLayout({
-            reason: LAYOUT_REASON.RESIZE
-          });
+          _this.onHeightChange(prevScrollableContainerHeight, _this.scrollableContainerHeight);
         }
       } else {
         // Reset item heights, because if scrollable container's width (or height)
         // has changed, then the list width (or height) most likely also has changed,
         // and also some CSS `@media()` rules might have been added or removed.
         // So re-render the list entirely.
-        _this.resetStateAndLayout();
+        _this.onWidthChange(prevScrollableContainerWidth, _this.scrollableContainerWidth);
       }
-    }, SCROLLABLE_CONTAINER_RESIZE_DEBOUNCE_INTERVAL));
+    });
 
     this.bypass = bypass;
     this.scrollableContainer = scrollableContainer;
-    this.getContainerElement = getContainerElement;
-    this.updateLayout = updateLayout;
-    this.resetStateAndLayout = resetStateAndLayout;
+    this.onHeightChange = onHeightChange;
+    this.onWidthChange = onWidthChange;
+    this.onNoChange = onNoChange;
+    this.onResize = debounce(this._onResize, SCROLLABLE_CONTAINER_RESIZE_DEBOUNCE_INTERVAL, {
+      onStart: onStart,
+      onStop: onStop
+    });
   }
 
-  _createClass$4(Resize, [{
+  _createClass$5(Resize, [{
     key: "listen",
     value: function listen() {
       if (this.bypass) {
@@ -1318,9 +1701,7 @@ function () {
       this.isRendered = true;
       this.scrollableContainerWidth = this.scrollableContainer.getWidth();
       this.scrollableContainerHeight = this.scrollableContainer.getHeight();
-      this.scrollableContainerUnlistenResize = this.scrollableContainer.onResize(this.onResize, {
-        container: this.getContainerElement()
-      });
+      this.scrollableContainerUnlistenResize = this.scrollableContainer.onResize(this.onResize);
     }
   }, {
     key: "stop",
@@ -1329,6 +1710,7 @@ function () {
 
       if (this.scrollableContainerUnlistenResize) {
         this.scrollableContainerUnlistenResize();
+        this.scrollableContainerUnlistenResize = undefined;
       }
     }
     /**
@@ -1341,108 +1723,424 @@ function () {
 }();
 var SCROLLABLE_CONTAINER_RESIZE_DEBOUNCE_INTERVAL = 250;
 
+function ownKeys$2(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread$2(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$2(Object(source), true).forEach(function (key) { _defineProperty$3(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$2(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty$3(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck$4(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties$4(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass$4(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$4(Constructor.prototype, protoProps); if (staticProps) _defineProperties$4(Constructor, staticProps); return Constructor; }
+
+var BeforeResize = /*#__PURE__*/function () {
+  function BeforeResize(_ref) {
+    var getState = _ref.getState,
+        getVerticalSpacing = _ref.getVerticalSpacing,
+        getColumnsCount = _ref.getColumnsCount;
+
+    _classCallCheck$4(this, BeforeResize);
+
+    this.getState = getState;
+    this.getVerticalSpacing = getVerticalSpacing;
+    this.getColumnsCount = getColumnsCount;
+  } // Possibly clean up "before resize" property in state.
+  // "Before resize" state property is cleaned up when all "before resize" item heights
+  // have been re-measured in an asynchronous `this.setState({ beforeResize: undefined })` call.
+  // If `VirtualScroller` state was snapshotted externally before that `this.setState()` call
+  // has been applied, then "before resize" property might have not been cleaned up properly.
+
+
+  _createClass$4(BeforeResize, [{
+    key: "onInitialState",
+    value: function onInitialState(state) {
+      if (state) {
+        if (state.beforeResize) {
+          if (state.beforeResize.itemHeights.length === 0) {
+            state.beforeResize = undefined;
+          }
+        }
+
+        if (state.beforeResize) {
+          this._includesBeforeResizeInState = true;
+        }
+      }
+    } // Cleans up "before resize" item heights and adjusts the scroll position accordingly.
+    //
+    // Hypothetically, it could also wait for the user to stop scrolling and only then
+    // adjust the scroll position. The rationale is that if `window.scrollTo()` is called
+    // while the user is scrolling, the user would occasionally experience "lost" mouse wheel
+    // events when scrolling with a mouse wheel.
+    //
+    // Seems like Twitter's website waits for the user to stop scrolling before applying
+    // the scroll position correction after a window resize. This library could do that too,
+    // but that would require rewriting "before items height" top padding calculation
+    // so that it doesn't re-calculate it on every re-render and instead does so incrementally,
+    // and then, when the user stops, it re-calculates it from scratch removing the error
+    // and adjusting the scroll position accordingly so that there's no "jump of content".
+    //
+    // But, seems like it works fine as it is and there's no need to rewrite anything.
+    //
+
+  }, {
+    key: "cleanUpBeforeResizeItemHeights",
+    value: function cleanUpBeforeResizeItemHeights(prevState) {
+      var _this$getState = this.getState(),
+          firstShownItemIndex = _this$getState.firstShownItemIndex,
+          lastShownItemIndex = _this$getState.lastShownItemIndex,
+          itemHeights = _this$getState.itemHeights,
+          beforeResize = _this$getState.beforeResize; // If there're "before resize" properties in `state`
+      // then it means that the corresponding items are waiting to be
+      // re-measured after container resize. Since the resize,
+      // some of those non-re-measured items might have just been measured,
+      // so see if that's true, and if it is, remove those now-obsolete
+      // "before resize" item heights and ajust the scroll position
+      // so that there's no "content jumping".
+
+
+      if (beforeResize) {
+        // If the user has scrolled up to reveal a previously hidden item
+        // that has not yet been re-measured after a previous resize.
+        if (firstShownItemIndex < beforeResize.itemHeights.length) {
+          log('~ Clean up "before resize" item heights and correct scroll position ~'); // Some of the "before" items have been un-hidden and re-measured.
+          // Un-hiding those items would result in a "jump of content"
+          // because "before resize" heights of those un-hidden items
+          // could (and most likely will) be different from the current ones,
+          // or because "before resize" columns count is different from
+          // the current one.
+          // To prevent a "jump of content", calculate the scroll position
+          // difference and adjust the scroll position.
+          // The height of the item rows that have transitioned
+          // from hidden to shown.
+
+          var newlyShownItemRowsHeight = 0; // Some of the `itemHeights` between the current `firstShownItemIndex` and
+          // the previous `firstShownItemIndex` could stay `undefined` if the user
+          // scrolled "abruptly": for example, by using a `window.scrollTo()` call.
+          // In that case, the items below the visible ones won't be rendered and measured.
+          // In such case, limit the items being iterated over to the current `lastShownItemIndex`
+          // rather than the previous `firstShownItemIndex`.
+
+          var prevFirstReMeasuredItemsRowIndex = Math.floor(beforeResize.itemHeights.length / this.getColumnsCount());
+          var newlyShownItemsToIndex = Math.min(prevFirstReMeasuredItemsRowIndex * this.getColumnsCount() - 1, lastShownItemIndex);
+          var i = firstShownItemIndex;
+
+          while (i <= newlyShownItemsToIndex) {
+            // Calculate newly shown row height.
+            var rowHeight = 0;
+            var columnIndex = 0;
+
+            while (columnIndex < this.getColumnsCount() && i <= newlyShownItemsToIndex) {
+              var itemHeight = itemHeights[i];
+
+              if (itemHeight === undefined) {
+                // `itemHeight` can only be `undefined` when not `beforeResize`.
+                // Use the current "average item height" as a substitute.
+                itemHeight = this.getAverageItemHeight();
+              }
+
+              rowHeight = Math.max(rowHeight, itemHeight);
+              i++;
+              columnIndex++;
+            } // Append to the total "newly shown item rows height".
+
+
+            newlyShownItemRowsHeight += rowHeight;
+            newlyShownItemRowsHeight += this.getVerticalSpacing();
+          } // The height of the "before resize" item rows
+          // that will be "cleaned up" in this function call.
+
+
+          var cleanedUpBeforeResizeItemRowsHeight = 0; // Some of the `beforeResize` item rows might have been skipped if the user
+          // scrolled up "abruptly": for example, by using a `window.scrollTo()` call.
+          // In that case, the "before resize" items below the bottom border of the screen
+          // shouldn't be accounted for when calculating the scrollbar adjustment shift
+          // because items after `lastShownItemIndex` aren't participating in the calculation
+          // of `newlyShownItemRowsHeight`.
+
+          var maxParticipatingBeforeResizeItemsCount = Math.min(beforeResize.itemHeights.length, lastShownItemIndex + 1);
+          var participatingBeforeResizeItemRowsCount = Math.ceil(maxParticipatingBeforeResizeItemsCount / beforeResize.columnsCount);
+          var firstCleanedUpBeforeResizeItemsRowIndex = firstShownItemIndex === 0 ? 0 : Math.floor((firstShownItemIndex - 1) / beforeResize.columnsCount) + 1;
+          var k = firstCleanedUpBeforeResizeItemsRowIndex;
+
+          while (k < participatingBeforeResizeItemRowsCount) {
+            var _rowHeight = beforeResize.itemHeights[k * beforeResize.columnsCount];
+            cleanedUpBeforeResizeItemRowsHeight += _rowHeight;
+            cleanedUpBeforeResizeItemRowsHeight += beforeResize.verticalSpacing;
+            k++;
+          } // Schedule an asynchronous `this.setState()` call that will update
+          // `beforeResize` property of `state`. Ideally, it should be updated
+          // immediately, but since `this.setState()` calls are asynchronous,
+          // the code updates just the underlying `beforeResize.itemHeights`
+          // array immediately instead, which is still a hack but still a lesser one.
+
+
+          if (firstShownItemIndex === 0) {
+            log('Drop all "before resize" item heights');
+          } else {
+            var firstDroppedBeforeResizeItemIndex = firstShownItemIndex;
+            var lastDroppedBeforeResizeItemIndex = beforeResize.itemHeights.length - 1;
+
+            if (firstDroppedBeforeResizeItemIndex === lastDroppedBeforeResizeItemIndex) {
+              log('For item index', firstDroppedBeforeResizeItemIndex, '— drop "before resize" height', beforeResize.itemHeights[firstDroppedBeforeResizeItemIndex]);
+            } else {
+              log('For item indexes from', firstDroppedBeforeResizeItemIndex, 'to', lastDroppedBeforeResizeItemIndex, '— drop "before resize" heights', beforeResize.itemHeights.slice(firstDroppedBeforeResizeItemIndex));
+            }
+          } // Immediately update `beforeResize.itemHeights`
+          // so that the component isn't left in an inconsistent state
+          // before a `this.setState()` call below is applied.
+
+
+          beforeResize.itemHeights.splice(firstShownItemIndex, beforeResize.itemHeights.length - firstShownItemIndex); // Return the "scroll by" amount that would correct the scroll position.
+          // Also return a state update.
+
+          return {
+            scrollBy: newlyShownItemRowsHeight - cleanedUpBeforeResizeItemRowsHeight,
+            beforeResize: firstShownItemIndex === 0 ? undefined : _objectSpread$2({}, beforeResize)
+          };
+        }
+      }
+    } // Snapshots "before resize" values in order to preserve the currently
+    // shown items' vertical position on screen so that there's no "content jumping".
+    //
+    // `newFirstShownItemIndex` is `> 0`.
+    //
+
+  }, {
+    key: "snapshotBeforeResizeItemHeights",
+    value: function snapshotBeforeResizeItemHeights(_ref2) {
+      var firstShownItemIndex = _ref2.firstShownItemIndex,
+          newFirstShownItemIndex = _ref2.newFirstShownItemIndex;
+      var columnsCount = this.getColumnsCount();
+      var verticalSpacing = this.getVerticalSpacing();
+      this._includesBeforeResizeInState = true;
+
+      var _this$getState2 = this.getState(),
+          prevBeforeResize = _this$getState2.beforeResize,
+          itemHeights = _this$getState2.itemHeights;
+
+      var prevBeforeResizeItemsCount = prevBeforeResize ? prevBeforeResize.itemHeights.length : 0; // If there already are "before resize" values in `state`
+      // then it means that those should be merged with the new ones.
+      //
+      // `beforeResize.itemHeights` could be empty in an edge case
+      // when there's a pending state update that sets `beforeResize`
+      // to `undefined`, and in that case empty `beforeResize.itemHeights`
+      // signals about that type of a situation.
+      //
+
+      if (prevBeforeResizeItemsCount > 0) {
+        // Because the "previous" before resize values might have been captured
+        // for a window width corresponding to a layout with a different columns count
+        // and different vertical spacing, re-calculate those item heights as if
+        // they corresponded to the current columns count and current vertical spacing,
+        // since "previous" and "new" before resize item heights are gonna be merged.
+        if (prevBeforeResize.columnsCount !== columnsCount || prevBeforeResize.verticalSpacing !== verticalSpacing) {
+          var prevBeforeResizeBeforeItemsHeight = 0;
+          var prevBeforeResizeItemRowsCount = Math.ceil(prevBeforeResizeItemsCount / prevBeforeResize.columnsCount);
+          var rowIndex = 0;
+
+          while (rowIndex < prevBeforeResizeItemRowsCount) {
+            // Since all "before resize" item heights are equal within a row,
+            // the height of the first "before resize" item in a row is that row's height.
+            var rowHeight = prevBeforeResize.itemHeights[rowIndex * prevBeforeResize.columnsCount];
+            prevBeforeResizeBeforeItemsHeight += rowHeight;
+            prevBeforeResizeBeforeItemsHeight += prevBeforeResize.verticalSpacing;
+            rowIndex++;
+          }
+
+          var newBeforeResizeAdditionalBeforeItemsHeight = 0;
+          var i = firstShownItemIndex;
+
+          while (i < newFirstShownItemIndex) {
+            var _rowHeight2 = 0;
+            var k = 0;
+
+            while (k < columnsCount && i < newFirstShownItemIndex) {
+              _rowHeight2 = Math.max(_rowHeight2, itemHeights[i]);
+              k++;
+              i++;
+            }
+
+            newBeforeResizeAdditionalBeforeItemsHeight += _rowHeight2;
+            newBeforeResizeAdditionalBeforeItemsHeight += verticalSpacing;
+          }
+
+          var newBeforeResizeBeforeItemsHeight = prevBeforeResizeBeforeItemsHeight + newBeforeResizeAdditionalBeforeItemsHeight;
+          var newBeforeResizeBeforeItemRowsCount = Math.ceil(newFirstShownItemIndex / columnsCount);
+          return new Array(newFirstShownItemIndex).fill( // Re-calculate "before resize" item heights so that "previous" and "new" ones
+          // correspond to the same (new) columns count.
+          // Also don't occasionally set item heights to `< 0`.
+          Math.max(0, newBeforeResizeBeforeItemsHeight / newBeforeResizeBeforeItemRowsCount - verticalSpacing));
+        } else {
+          // Add new item heights to the previously snapshotted ones.
+          return prevBeforeResize.itemHeights.concat(equalizeItemHeights(itemHeights, newFirstShownItemIndex, columnsCount).slice(prevBeforeResize.itemHeights.length));
+        }
+      } else {
+        return equalizeItemHeights(itemHeights, newFirstShownItemIndex, columnsCount);
+      }
+    }
+  }, {
+    key: "shouldIncludeBeforeResizeValuesInState",
+    value: function shouldIncludeBeforeResizeValuesInState() {
+      return this._includesBeforeResizeInState;
+    }
+  }]);
+
+  return BeforeResize;
+}(); // Equalizes all item heights within a given row, for each row.
+
+function equalizeItemHeights(itemHeights, maxItemsCount, columnsCount) {
+  itemHeights = itemHeights.slice(0, Math.ceil(maxItemsCount / columnsCount) * columnsCount);
+  var rowIndex = 0;
+
+  while (rowIndex * columnsCount < maxItemsCount) {
+    // Calculate row height.
+    var rowHeight = 0;
+    var k = 0;
+
+    while (k < columnsCount) {
+      rowHeight = Math.max(rowHeight, itemHeights[rowIndex * columnsCount + k]);
+      k++;
+    } // Equalize all item heights within the row.
+
+
+    k = 0;
+
+    while (k < columnsCount) {
+      itemHeights[rowIndex * columnsCount + k] = rowHeight;
+      k++;
+    } // Proceed with the next row.
+
+
+    rowIndex++;
+  }
+
+  return itemHeights.slice(0, maxItemsCount);
+}
+
 function _classCallCheck$3(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties$3(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass$3(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$3(Constructor.prototype, protoProps); if (staticProps) _defineProperties$3(Constructor, staticProps); return Constructor; }
 
-function _defineProperty$1(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _defineProperty$2(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var Scroll =
-/*#__PURE__*/
-function () {
+var Scroll = /*#__PURE__*/function () {
   function Scroll(_ref) {
     var _this = this;
 
     var bypass = _ref.bypass,
         scrollableContainer = _ref.scrollableContainer,
-        updateLayout = _ref.updateLayout,
+        itemsContainer = _ref.itemsContainer,
+        onScroll = _ref.onScroll,
         initialScrollPosition = _ref.initialScrollPosition,
         onScrollPositionChange = _ref.onScrollPositionChange,
         isImmediateLayoutScheduled = _ref.isImmediateLayoutScheduled,
         hasNonRenderedItemsAtTheTop = _ref.hasNonRenderedItemsAtTheTop,
         hasNonRenderedItemsAtTheBottom = _ref.hasNonRenderedItemsAtTheBottom,
-        getLatestLayoutVisibleAreaIncludingMargins = _ref.getLatestLayoutVisibleAreaIncludingMargins,
-        preserveScrollPositionOfTheBottomOfTheListOnMount = _ref.preserveScrollPositionOfTheBottomOfTheListOnMount;
+        getLatestLayoutVisibleArea = _ref.getLatestLayoutVisibleArea,
+        getListTopOffset = _ref.getListTopOffset,
+        getPrerenderMargin = _ref.getPrerenderMargin,
+        onScrolledToTop = _ref.onScrolledToTop,
+        waitForScrollingToStop = _ref.waitForScrollingToStop;
 
     _classCallCheck$3(this, Scroll);
 
-    _defineProperty$1(this, "updateScrollPosition", function () {
-      _this.onScrollPositionChange(_this.getScrollY());
+    _defineProperty$2(this, "scrollByY", function (scrollByY) {
+      _this.scrollToY(_this.getScrollY() + scrollByY);
     });
 
-    _defineProperty$1(this, "onScroll", function () {
-      // Prefer not performing a re-layout while the user is scrolling (if possible).
+    _defineProperty$2(this, "onScrollListener", function () {
+      if (_this.onScrollPositionChange) {
+        _this.onScrollPositionChange(_this.getScrollY());
+      } // If the user has scrolled up to the top of the items container.
+      // (this option isn't currently used)
+
+
+      if (_this.onScrolledToTop) {
+        if (_this.getScrollY() < _this.getListTopOffset()) {
+          _this.onScrolledToTop();
+        }
+      }
+
+      if (_this.bypass) {
+        return;
+      }
+
+      if (_this.ignoreScrollEvents) {
+        return;
+      } // Prefer not performing a re-layout while the user is scrolling (if possible).
       // If the user doesn't scroll too far and then stops for a moment,
       // then a mid-scroll re-layout could be delayed until such a brief stop:
       // presumably, this results in better (smoother) scrolling performance,
       // delaying the work to when it doesn't introduce any stutter or "jank".
-      // Reset `this.onUserStopsScrollingTimer` (will be re-created below).
-      _this.cancelOnUserStopsScrollingTimer(); // See whether rendering "new" previous/next items is required
-      // right now, or it can wait until the user stops scrolling.
+      // Reset `this.onStopScrollingTimer` (will be re-created below).
+
+
+      _this.cancelOnStopScrollingTimer(); // See if the latest "layout" (the currently rendered set of items)
+      // is still sufficient in order to show all the items that're
+      // currently inside the viewport. If there're some non-rendered items
+      // that're visible in the current viewport, then those items
+      // should be rendered "immediately" rather than waiting until
+      // the user stops scrolling.
 
 
       var forceUpdate = // If the items have been rendered at least once
-      _this.getLatestLayoutVisibleAreaIncludingMargins() && ( // If the user has scrolled up past the extra "margin"
-      _this.getScrollY() < _this.getLatestLayoutVisibleAreaIncludingMargins().top && // and if there're any previous non-rendered items to render.
-      _this.hasNonRenderedItemsAtTheTop() || // If the user has scrolled down past the extra "margin"
-      _this.getScrollY() + _this.scrollableContainer.getHeight() > _this.getLatestLayoutVisibleAreaIncludingMargins().bottom && // and if there're any next non-rendered items to render.
-      _this.hasNonRenderedItemsAtTheBottom());
+      _this.getLatestLayoutVisibleArea() && ( // If the user has scrolled up past the "prerender margin"
+      // and there're some non-rendered items at the top,
+      // then force a re-layout.
+      //
+      // (during these calculations we assume that the list's top coordinate
+      //  hasn't changed since previous layout; even if that's not exactly true,
+      //  the items will be re-layout when the user stops scrolling anyway)
+      //
+      _this.getScrollY() < _this.getLatestLayoutVisibleArea().top - _this.getPrerenderMargin() && _this.hasNonRenderedItemsAtTheTop() || // If the user has scrolled down past the "prerender margin"
+      // and there're any non-rendered items left at the end,
+      // then force a re-layout.
+      //
+      // (during these calculations we assume that the list's top coordinate
+      //  hasn't changed since previous layout; even if that's not exactly true,
+      //  the items will be re-layout when the user stops scrolling anyway)
+      //
+      _this.getScrollY() + _this.scrollableContainer.getHeight() > _this.getLatestLayoutVisibleArea().bottom + _this.getPrerenderMargin() && _this.hasNonRenderedItemsAtTheBottom());
 
       if (forceUpdate) {
-        log('The user has scrolled far enough: force re-layout');
+        log('The user has scrolled far enough: perform a re-layout');
       } else {
-        log('The user hasn\'t scrolled too much: delay re-layout');
+        log('The user is scrolling: perform a re-layout when they stop scrolling');
       }
 
-      if (!forceUpdate) {
-        // If a re-layout is already scheduled at the next "frame",
-        // don't schedule a "re-layout when user stops scrolling" timer.
-        if (_this.isImmediateLayoutScheduled()) {
-          return;
-        }
+      if (forceUpdate || _this.waitForScrollingToStop === false) {
+        return _this.onScroll();
+      } // If a re-layout is already scheduled at the next "frame",
+      // don't schedule a "re-layout when user stops scrolling" timer.
 
-        _this.onUserStopsScrollingTimer = setTimeout$1(function () {
-          _this.onUserStopsScrollingTimer = undefined;
 
-          _this.updateLayout({
-            reason: LAYOUT_REASON.STOPPED_SCROLLING
-          });
-        }, // "scroll" events are usually dispatched every 16 milliseconds
-        // for 60fps refresh rate, so waiting for 100 milliseconds feels
-        // reasonable: that would be about 6 frames of inactivity period,
-        // which could mean that either the user has stopped scrolling
-        // (for a moment) or the browser is lagging and stuttering
-        // (skipping frames due to high load).
-        // If the user continues scrolling then this timeout is constantly
-        // refreshed (cancelled and then re-created).
-        WAIT_FOR_USER_TO_STOP_SCROLLING_TIMEOUT);
+      if (_this.isImmediateLayoutScheduled()) {
         return;
       }
 
-      _this.updateLayout({
-        reason: LAYOUT_REASON.SCROLL
-      });
+      _this.onScrollOnStopScrolling = true;
+
+      _this.watchOnStopScrolling();
     });
 
     this.bypass = bypass;
     this.scrollableContainer = scrollableContainer;
-    this.updateLayout = updateLayout;
+    this.itemsContainer = itemsContainer;
+    this.onScroll = onScroll;
     this.initialScrollPosition = initialScrollPosition;
     this.onScrollPositionChange = onScrollPositionChange;
     this.isImmediateLayoutScheduled = isImmediateLayoutScheduled;
     this.hasNonRenderedItemsAtTheTop = hasNonRenderedItemsAtTheTop;
     this.hasNonRenderedItemsAtTheBottom = hasNonRenderedItemsAtTheBottom;
-    this.getLatestLayoutVisibleAreaIncludingMargins = getLatestLayoutVisibleAreaIncludingMargins;
-
-    if (preserveScrollPositionOfTheBottomOfTheListOnMount) {
-      if (scrollableContainer) {
-        this.preserveScrollPositionOfTheBottomOfTheListOnMount = {
-          scrollableContainerContentHeight: scrollableContainer.getContentHeight()
-        };
-      }
-    }
+    this.getLatestLayoutVisibleArea = getLatestLayoutVisibleArea;
+    this.getListTopOffset = getListTopOffset;
+    this.getPrerenderMargin = getPrerenderMargin;
+    this.onScrolledToTop = onScrolledToTop;
+    this.waitForScrollingToStop = waitForScrollingToStop;
   }
 
   _createClass$3(Scroll, [{
@@ -1453,71 +2151,113 @@ function () {
       }
 
       if (this.onScrollPositionChange) {
-        this.updateScrollPosition();
-        this.removeScrollPositionListener = this.scrollableContainer.addScrollListener(this.updateScrollPosition);
+        this.onScrollPositionChange(this.getScrollY());
       }
 
-      if (!this.bypass) {
-        this.removeScrollListener = this.scrollableContainer.addScrollListener(this.onScroll);
-      }
-
-      if (this.preserveScrollPositionOfTheBottomOfTheListOnMount) {
-        this.scrollToY(this.getScrollY() + (this.scrollableContainer.getContentHeight() - this.preserveScrollPositionOfTheBottomOfTheListOnMount.scrollableContainerContentHeight));
-      }
+      this.stopListeningToScroll = this.scrollableContainer.onScroll(this.onScrollListener);
     }
   }, {
     key: "stop",
     value: function stop() {
-      if (this.removeScrollPositionListener) {
-        this.removeScrollPositionListener();
+      if (this.stopReportingScrollPositionChange) {
+        this.stopReportingScrollPositionChange();
+        this.stopReportingScrollPositionChange = undefined;
       }
 
-      if (this.removeScrollListener) {
-        this.removeScrollListener();
+      if (this.stopListeningToScroll) {
+        this.stopListeningToScroll();
+        this.stopListeningToScroll = undefined;
       }
 
-      this.cancelOnUserStopsScrollingTimer();
+      if (this.onStopScrollingListener) {
+        this.onStopScrollingListener = undefined;
+      }
+
+      if (this.onScrollOnStopScrolling) {
+        this.onScrollOnStopScrolling = undefined;
+      }
+
+      this.cancelOnStopScrollingTimer();
     }
   }, {
     key: "scrollToY",
     value: function scrollToY(scrollY) {
+      this.ignoreScrollEvents = true;
       this.scrollableContainer.scrollToY(scrollY);
-    }
-  }, {
-    key: "scrollByY",
-    value: function scrollByY(_scrollByY) {
-      this.scrollToY(this.getScrollY() + _scrollByY);
+      this.ignoreScrollEvents = undefined;
     }
   }, {
     key: "getScrollY",
     value: function getScrollY() {
       return this.scrollableContainer.getScrollY();
     }
-    /**
-     * Updates the current scroll Y position in state.
-     */
-
   }, {
-    key: "cancelOnUserStopsScrollingTimer",
-    value: function cancelOnUserStopsScrollingTimer() {
-      if (this.onUserStopsScrollingTimer) {
-        clearTimeout(this.onUserStopsScrollingTimer);
-        this.onUserStopsScrollingTimer = undefined;
+    key: "cancelOnStopScrollingTimer",
+    value: function cancelOnStopScrollingTimer() {
+      if (this.onStopScrollingTimer) {
+        clearTimeout(this.onStopScrollingTimer);
+        this.onStopScrollingTimer = undefined;
       }
     }
   }, {
-    key: "onLayout",
-    value: function onLayout() {
+    key: "cancelScheduledLayout",
+    value: function cancelScheduledLayout() {
       // Cancel a "re-layout when user stops scrolling" timer.
-      this.cancelOnUserStopsScrollingTimer();
+      this.cancelOnStopScrollingTimer();
     }
   }, {
-    key: "getVisibleAreaBounds",
+    key: "watchOnStopScrolling",
+    value: function watchOnStopScrolling() {
+      var _this2 = this;
 
+      this.onStopScrollingTimer = setTimeout$1(function () {
+        _this2.onStopScrollingTimer = undefined;
+
+        if (_this2.onScrollOnStopScrolling) {
+          _this2.onScrollOnStopScrolling = undefined;
+
+          _this2.onScroll({
+            delayed: true
+          });
+        }
+
+        if (_this2.onStopScrollingListener) {
+          var onStopScrollingListener = _this2.onStopScrollingListener;
+          _this2.onStopScrollingListener = undefined; // `onStopScrollingListener()` may hypothetically schedule
+          // another `onStopScrolling()` listener, so set
+          // `this.onStopScrollingListener` to `undefined` before
+          // calling it rather than after.
+
+          log('~ The user has stopped scrolling ~');
+          onStopScrollingListener();
+        }
+      }, // "scroll" events are usually dispatched every 16 milliseconds
+      // for 60fps refresh rate, so waiting for 100 milliseconds feels
+      // reasonable: that would be about 6 frames of inactivity period,
+      // which could mean that either the user has stopped scrolling
+      // (for a moment) or the browser is lagging and stuttering
+      // (skipping frames due to high load).
+      // If the user continues scrolling then this timeout is constantly
+      // refreshed (cancelled and then re-created).
+      ON_STOP_SCROLLING_INACTIVE_PERIOD);
+    } // (this function isn't currently used)
+
+  }, {
+    key: "onStopScrolling",
+    value: function onStopScrolling(onStopScrollingListener) {
+      this.onStopScrollingListener = onStopScrollingListener;
+
+      if (!this.onStopScrollingTimer) {
+        this.watchOnStopScrolling();
+      }
+    }
     /**
      * Returns visible area coordinates relative to the scrollable container.
      * @return {object} `{ top: number, bottom: number }`
      */
+
+  }, {
+    key: "getVisibleAreaBounds",
     value: function getVisibleAreaBounds() {
       var scrollY = this.getScrollY();
       return {
@@ -1531,7 +2271,7 @@ function () {
 
   return Scroll;
 }();
-var WAIT_FOR_USER_TO_STOP_SCROLLING_TIMEOUT = 100;
+var ON_STOP_SCROLLING_INACTIVE_PERIOD = 100;
 
 function _classCallCheck$2(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1539,19 +2279,15 @@ function _defineProperties$2(target, props) { for (var i = 0; i < props.length; 
 
 function _createClass$2(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$2(Constructor.prototype, protoProps); if (staticProps) _defineProperties$2(Constructor, staticProps); return Constructor; }
 
-var RestoreScroll =
-/*#__PURE__*/
-function () {
-  function RestoreScroll(_ref) {
-    var screen = _ref.screen,
-        getContainerElement = _ref.getContainerElement,
-        scrollBy = _ref.scrollBy;
+var ListHeightChangeWatcher = /*#__PURE__*/function () {
+  function ListHeightChangeWatcher(_ref) {
+    var itemsContainer = _ref.itemsContainer,
+        getListTopOffset = _ref.getListTopOffset;
 
-    _classCallCheck$2(this, RestoreScroll);
+    _classCallCheck$2(this, ListHeightChangeWatcher);
 
-    this.screen = screen;
-    this.getContainerElement = getContainerElement;
-    this.scrollBy = scrollBy;
+    this.itemsContainer = itemsContainer;
+    this.getListTopOffset = getListTopOffset;
   }
   /**
    * `<ReactVirtualScroller/>` calls this method.
@@ -1561,9 +2297,9 @@ function () {
    */
 
 
-  _createClass$2(RestoreScroll, [{
-    key: "captureScroll",
-    value: function captureScroll(_ref2) {
+  _createClass$2(ListHeightChangeWatcher, [{
+    key: "snapshot",
+    value: function snapshot(_ref2) {
       var previousItems = _ref2.previousItems,
           newItems = _ref2.newItems,
           prependedItemsCount = _ref2.prependedItemsCount;
@@ -1577,10 +2313,7 @@ function () {
 
       if (prependedItemsCount === 0) {
         return;
-      }
-
-      var container = this.getContainerElement();
-      var firstItemTopOffset = this.screen.getChildElementTopOffset(container, 0); // The first item is supposed to be shown when the user clicks
+      } // The first item is supposed to be shown when the user clicks
       // "Show previous items" button. If it isn't shown though,
       // could still calculate the first item's top position using
       // the values from `itemHeights` and `verticalSpacing`.
@@ -1595,51 +2328,66 @@ function () {
       // If the scroll position has already been captured for restoration,
       // then don't capture it the second time.
       // Capturing scroll position could happen when using `<ReactVirtualScroller/>`
-      // because it calls `.captureScroll()` inside `ReactVirtualScroller.render()`
+      // because it calls `ListHeightChangeWatcher.snapshot()` inside `ReactVirtualScroller.render()`
       // which is followed by `<VirtualScroller/>`'s `.componentDidUpdate()`
-      // that also calls `.captureScroll()` with the same arguments,
-      // so that second call to `.captureScroll()` is ignored.
-      // Calling `.captureScroll()` inside `ReactVirtualScroller.render()`
+      // that also calls `ListHeightChangeWatcher.snapshot()` with the same arguments,
+      // so that second call to `ListHeightChangeWatcher.snapshot()` is ignored.
+      // Calling `ListHeightChangeWatcher.snapshot()` inside `ReactVirtualScroller.render()`
       // is done to prevent scroll Y position from jumping
       // when showing the first page of the "Previous items".
       // See the long section of comments in `ReactVirtualScroller.render()`
-      // method for more info on why is `.captureScroll()` called there.
+      // method for more info on why is `ListHeightChangeWatcher.snapshot()` called there.
 
-      if (this.restoreScrollAfterRenderValues && this.restoreScrollAfterRenderValues.previousItems === previousItems && this.restoreScrollAfterRenderValues.newItems === newItems) {
+
+      if (this._snapshot && this._snapshot.previousItems === previousItems && this._snapshot.newItems === newItems) {
         return;
       }
 
-      this.restoreScrollAfterRenderValues = {
+      this._snapshot = {
         previousItems: previousItems,
         newItems: newItems,
-        index: prependedItemsCount,
-        visibleAreaTop: firstItemTopOffset
+        itemIndex: prependedItemsCount,
+        itemTopOffset: this.itemsContainer.getNthRenderedItemTopOffset(0),
+        // Snapshot list top offset inside the scrollable container too
+        // because it's common to hide the "Show previous items" button
+        // when the user has browsed to the top of the list, which causes
+        // the list's top position to shift upwards due to the button
+        // no longer being rendered. Tracking list top offset doesn't
+        // fit here that well, but it makes sense in real-world applications.
+        listTopOffset: this.getListTopOffset()
       };
     }
   }, {
     key: "getAnchorItemIndex",
     value: function getAnchorItemIndex() {
-      return this.restoreScrollAfterRenderValues.index;
+      return this._snapshot.itemIndex;
     }
   }, {
-    key: "shouldRestoreScrollAfterRender",
-    value: function shouldRestoreScrollAfterRender() {
-      return this.restoreScrollAfterRenderValues !== undefined;
+    key: "hasSnapshot",
+    value: function hasSnapshot() {
+      return this._snapshot !== undefined;
     }
   }, {
-    key: "getScrollDifference",
-    value: function getScrollDifference() {
-      var _this$restoreScrollAf = this.restoreScrollAfterRenderValues,
-          index = _this$restoreScrollAf.index,
-          visibleAreaTop = _this$restoreScrollAf.visibleAreaTop;
-      this.restoreScrollAfterRenderValues = undefined; // `firstShownItemIndex` is supposed to be `0` here.
+    key: "getListBottomOffsetChange",
+    value: function getListBottomOffsetChange() {
+      var _this$_snapshot = this._snapshot,
+          itemIndex = _this$_snapshot.itemIndex,
+          itemTopOffset = _this$_snapshot.itemTopOffset,
+          listTopOffset = _this$_snapshot.listTopOffset; // `firstShownItemIndex` is supposed to be `0` at this point,
+      // so `renderedElementIndex` would be the same as the `itemIndex`.
 
-      var newVisibleAreaTop = this.screen.getChildElementTopOffset(this.getContainerElement(), index);
-      return newVisibleAreaTop - visibleAreaTop;
+      var itemTopOffsetNew = this.itemsContainer.getNthRenderedItemTopOffset(itemIndex);
+      var listTopOffsetNew = this.getListTopOffset();
+      return itemTopOffsetNew - itemTopOffset + (listTopOffsetNew - listTopOffset);
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      this._snapshot = undefined;
     }
   }]);
 
-  return RestoreScroll;
+  return ListHeightChangeWatcher;
 }();
 
 function _classCallCheck$1(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1648,14 +2396,11 @@ function _defineProperties$1(target, props) { for (var i = 0; i < props.length; 
 
 function _createClass$1(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties$1(Constructor.prototype, protoProps); if (staticProps) _defineProperties$1(Constructor, staticProps); return Constructor; }
 
-var ItemHeights =
-/*#__PURE__*/
-function () {
-  function ItemHeights(screen, getContainerElement, getItemHeight, setItemHeight) {
+var ItemHeights = /*#__PURE__*/function () {
+  function ItemHeights(container, getItemHeight, setItemHeight) {
     _classCallCheck$1(this, ItemHeights);
 
-    this.screen = screen;
-    this.getContainerElement = getContainerElement;
+    this.container = container;
     this._get = getItemHeight;
     this._set = setItemHeight;
     this.reset();
@@ -1723,15 +2468,7 @@ function () {
   }, {
     key: "_measureItemHeight",
     value: function _measureItemHeight(i, firstShownItemIndex) {
-      var container = this.getContainerElement();
-
-      if (container) {
-        var elementIndex = i - firstShownItemIndex;
-
-        if (elementIndex >= 0 && elementIndex < this.screen.getChildElementsCount(container)) {
-          return this.screen.getChildElementHeight(container, elementIndex);
-        }
-      }
+      return this.container.getNthRenderedItemHeight(i - firstShownItemIndex);
     }
     /**
      * Measures item heights:
@@ -1755,7 +2492,8 @@ function () {
   }, {
     key: "measureItemHeights",
     value: function measureItemHeights(firstShownItemIndex, lastShownItemIndex) {
-      // If no items are rendered, don't measure anything.
+      log('~ Measure item heights ~'); // If no items are rendered, don't measure anything.
+
       if (firstShownItemIndex === undefined) {
         return;
       } // Reset `this.measuredItemsHeight` if it's not a "continuous" measured items list:
@@ -1791,11 +2529,10 @@ function () {
         // // then the user might have clicked that "Show more" button.
         if (this._get(i) === undefined) {
           nonPreviouslyMeasuredItemIndexes.push(i);
-          log('Item', i, 'hasn\'t been previously measured');
 
           var height = this._measureItemHeight(i, firstShownItemIndex);
 
-          log('Height', height);
+          log('Item index', i, 'height', height);
 
           this._set(i, height); // Update average item height calculation variables
           // related to the previously measured items
@@ -1844,7 +2581,7 @@ function () {
           var _height = this._measureItemHeight(i, firstShownItemIndex);
 
           if (previousHeight !== _height) {
-            warn('Item', i, 'height was', previousHeight, 'before it was hidden, but, after showing it again, its height is', _height, '. Perhaps you forgot to persist the item\'s state by calling `onItemStateChange(i, newState)` when it changed, and that state got lost when the item element was unmounted, which resulted in a different height when the item was shown again, but with the missing state.');
+            warn('Item index', i, 'height was', previousHeight, 'before it was hidden, but, after showing it again, its height is', _height, '. Perhaps you forgot to persist the item\'s state by calling `onItemStateChange(i, newState)` when it changed, and that state got lost when the item element was unmounted, which resulted in a different height when the item was shown again, but with the missing state.');
           }
         }
 
@@ -2009,17 +2746,17 @@ function findInArray(array, element, isEqual) {
 }
 
 function getVerticalSpacing(_ref) {
-  var container = _ref.container,
-      screen = _ref.screen;
+  var itemsContainer = _ref.itemsContainer,
+      renderedItemsCount = _ref.renderedItemsCount;
 
-  if (screen.getChildElementsCount(container) > 1) {
-    var firstShownRowTopOffset = screen.getChildElementTopOffset(container, 0);
-    var firstShownRowHeight = screen.getChildElementHeight(container, 0);
+  if (renderedItemsCount > 1) {
+    var firstShownRowTopOffset = itemsContainer.getNthRenderedItemTopOffset(0);
+    var firstShownRowHeight = itemsContainer.getNthRenderedItemHeight(0);
     var i = 1;
 
-    while (i < screen.getChildElementsCount(container)) {
-      var itemTopOffset = screen.getChildElementTopOffset(container, i);
-      var itemHeight = screen.getChildElementHeight(container, i); // If next row is detected.
+    while (i < renderedItemsCount) {
+      var itemTopOffset = itemsContainer.getNthRenderedItemTopOffset(i);
+      var itemHeight = itemsContainer.getNthRenderedItemHeight(i); // If next row is detected.
 
       if (itemTopOffset !== firstShownRowTopOffset) {
         // Measure inter-row spacing.
@@ -2035,7 +2772,7 @@ function getVerticalSpacing(_ref) {
 
 // https://github.com/lodash/lodash/issues/2340
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 /**
@@ -2088,7 +2825,52 @@ function shallowEqual(objA, objB) {
   return true;
 }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function ownKeys$1(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread$1(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys$1(Object(source), true).forEach(function (key) { _defineProperty$1(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys$1(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty$1(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+// Creates a snapshot of a `state` or a partial update of a `state`.
+// Is only used for logging state snapshots for later debug.
+//
+// When `state` is output to the browser console via `console.log()`,
+// it is explorable in real time. That also means that if that `state`
+// is modified later, the user will see the modified state, not the
+// original one. In the current implementation, `state` is not strictly
+// "immutable": things like individual item heights (including "before resize" ones)
+// or states are updated in-place — `state.itemHeights[i] = newItemHeight` or
+// `state.itemStates[i] = newItemState`. That's because those `state` properties
+// are the ones that don’t affect the presentation, so there's no need to re-render
+// the list when those do change — updating those properties is just an effect of
+// some change rather than cause for one.
+//
+// So, when outputting `state` via `console.log()` for debug, it makes sense to
+// snapshot it so that the developer, while debugging later, sees the correct
+// item heights or item states.
+//
+function getStateSnapshot(state) {
+  var stateSnapshot = _objectSpread$1({}, state);
+
+  if (state.itemHeights) {
+    stateSnapshot.itemHeights = state.itemHeights.slice();
+  }
+
+  if (state.itemStates) {
+    stateSnapshot.itemStates = state.itemStates.slice();
+  }
+
+  if (state.beforeResize) {
+    stateSnapshot.beforeResize = _objectSpread$1({}, state.beforeResize);
+    stateSnapshot.beforeResize.itemHeights = state.beforeResize.itemHeights.slice();
+  }
+
+  return stateSnapshot;
+}
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2098,28 +2880,50 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var VirtualScroller =
-/*#__PURE__*/
-function () {
+var VirtualScroller = /*#__PURE__*/function () {
   /**
-   * @param  {function} getContainerElement — Returns the container DOM `Element`.
+   * @param  {function} getItemsContainerElement — Returns the container DOM `Element`.
    * @param  {any[]} items — The list of items.
    * @param  {Object} [options] — See README.md.
    * @return {VirtualScroller}
    */
-  function VirtualScroller(getContainerElement, items) {
+  function VirtualScroller(getItemsContainerElement, items) {
     var _this = this;
 
     var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     _classCallCheck(this, VirtualScroller);
 
-    _defineProperty(this, "getListTopOffsetInsideScrollableContainer", function () {
-      var listTopOffset = _this.scrollableContainer.getTopOffset(_this.getContainerElement());
+    _defineProperty(this, "getActualColumnsCountForState", function () {
+      return _this._getColumnsCount ? _this._getColumnsCount(_this.scrollableContainer) : undefined;
+    });
 
-      _this.waitForStylesToLoad.onGotListTopOffset(listTopOffset);
+    _defineProperty(this, "getVerticalSpacing", function () {
+      return _this.verticalSpacing || 0;
+    });
+
+    _defineProperty(this, "getListTopOffsetInsideScrollableContainer", function () {
+      var listTopOffset = _this.scrollableContainer.getItemsContainerTopOffset();
+
+      if (_this.listTopOffsetWatcher) {
+        _this.listTopOffsetWatcher.onListTopOffset(listTopOffset);
+      }
 
       return listTopOffset;
+    });
+
+    _defineProperty(this, "stop", function () {
+      _this.isRendered = false;
+
+      _this.resize.stop();
+
+      _this.scroll.stop();
+
+      if (_this.listTopOffsetWatcher) {
+        _this.listTopOffsetWatcher.stop();
+      }
+
+      _this.cancelLayoutTimer({});
     });
 
     _defineProperty(this, "willUpdateState", function (newState, prevState) {
@@ -2151,99 +2955,165 @@ function () {
       }
 
       log('~ Rendered ~');
-      _this.newItemsPending = undefined;
-      _this.layoutResetPending = undefined;
-      var redoLayoutReason = _this.redoLayoutReason;
-      _this.redoLayoutReason = undefined;
-      var previousItems = prevState.items;
-      var newItems = newState.items;
 
-      if (newItems !== previousItems) {
-        var layoutNeedsReCalculating = true;
-
-        var itemsDiff = _this.getItemsDiff(previousItems, newItems); // If it's an "incremental" update.
-
-
-        if (itemsDiff) {
-          var prependedItemsCount = itemsDiff.prependedItemsCount;
-
-          if (prependedItemsCount > 0) {
-            // The call to `.onPrepend()` must precede
-            // the call to `.measureItemHeights()`
-            // which is called in `.onRendered()`.
-            _this.itemHeights.onPrepend(prependedItemsCount);
-
-            if (_this.restoreScroll.shouldRestoreScrollAfterRender()) {
-              layoutNeedsReCalculating = false;
-              log('~ Restore Scroll Position ~');
-
-              var scrollByY = _this.restoreScroll.getScrollDifference();
-
-              if (scrollByY) {
-                log('Scroll down by', scrollByY);
-
-                _this.scroll.scrollByY(scrollByY);
-              } else {
-                log('Scroll position hasn\'t changed');
-              }
-            }
-          }
-        } else {
-          _this.itemHeights.reset();
-
-          _this.itemHeights.initialize(_this.getState().itemHeights);
-        }
-
-        if (layoutNeedsReCalculating) {
-          redoLayoutReason = LAYOUT_REASON.ITEMS_CHANGED;
-        }
-      } // Call `.onRendered()` if shown items configuration changed.
-
-
-      if (newState.firstShownItemIndex !== prevState.firstShownItemIndex || newState.lastShownItemIndex !== prevState.lastShownItemIndex || newState.items !== prevState.items) {
-        _this.onRenderedNewLayout();
+      if (isDebug()) {
+        log('State', getStateSnapshot(newState));
       }
 
-      if (redoLayoutReason) {
-        return _this.redoLayoutRightAfterRender({
-          reason: redoLayoutReason
+      var layoutUpdateReason;
+
+      if (_this.firstNonMeasuredItemIndex !== undefined) {
+        layoutUpdateReason = LAYOUT_REASON.ACTUAL_ITEM_HEIGHTS_HAVE_BEEN_MEASURED;
+      }
+
+      if (_this.resetLayoutAfterResize) {
+        layoutUpdateReason = LAYOUT_REASON.VIEWPORT_WIDTH_CHANGED;
+      } // If `this.resetLayoutAfterResize` flag was reset after calling
+      // `this.measureItemHeightsAndSpacingAndUpdateTablePadding()`
+      // then there would be a bug because
+      // `this.measureItemHeightsAndSpacingAndUpdateTablePadding()`
+      // calls `this.setState({ verticalSpacing })` which calls
+      // `this.didUpdateState()` immediately, so `this.resetLayoutAfterResize`
+      // flag wouldn't be reset by that time and would trigger things
+      // like `this.itemHeights.reset()` a second time.
+      //
+      // So, instead read the value of `this.resetLayoutAfterResize` flag
+      // and reset it right away to prevent any such potential bugs.
+      //
+
+
+      var resetLayoutAfterResize = _this.resetLayoutAfterResize; // Reset `this.firstNonMeasuredItemIndex`.
+
+      _this.firstNonMeasuredItemIndex = undefined; // Reset `this.resetLayoutAfterResize` flag.
+
+      _this.resetLayoutAfterResize = undefined; // Reset `this.newItemsWillBeRendered` flag.
+
+      _this.newItemsWillBeRendered = undefined; // Reset `this.itemHeightsThatChangedWhileNewItemsWereBeingRendered`.
+
+      _this.itemHeightsThatChangedWhileNewItemsWereBeingRendered = undefined; // Reset `this.itemStatesThatChangedWhileNewItemsWereBeingRendered`.
+
+      _this.itemStatesThatChangedWhileNewItemsWereBeingRendered = undefined;
+
+      if (resetLayoutAfterResize) {
+        // Reset measured item heights on viewport width change.
+        _this.itemHeights.reset(); // Reset `verticalSpacing` (will be re-measured).
+
+
+        _this.verticalSpacing = undefined;
+      }
+
+      var previousItems = prevState.items;
+      var newItems = newState.items; // Even if `this.newItemsWillBeRendered` flag is `true`,
+      // `newItems` could still be equal to `previousItems`.
+      // For example, when `setState()` calls don't update `state` immediately
+      // and a developer first calls `setItems(newItems)` and then calls `setItems(oldItems)`:
+      // in that case, `this.newItemsWillBeRendered` flag will be `true` but the actual `items`
+      // in state wouldn't have changed due to the first `setState()` call being overwritten
+      // by the second `setState()` call (that's called "batching state updates" in React).
+
+      if (newItems !== previousItems) {
+        var itemsDiff = _this.getItemsDiff(previousItems, newItems);
+
+        if (itemsDiff) {
+          // The call to `.onPrepend()` must precede the call to `.measureItemHeights()`
+          // which is called in `.onRendered()`.
+          // `this.itemHeights.onPrepend()` updates `firstMeasuredItemIndex`
+          // and `lastMeasuredItemIndex` of `this.itemHeights`.
+          var prependedItemsCount = itemsDiff.prependedItemsCount;
+
+          _this.itemHeights.onPrepend(prependedItemsCount);
+        } else {
+          _this.itemHeights.reset(); // `newState.itemHeights` is an array of `undefined`s.
+
+
+          _this.itemHeights.initialize(newState.itemHeights);
+        }
+
+        if (!resetLayoutAfterResize) {
+          // The call to `this.onNewItemsRendered()` must precede the call to
+          // `.measureItemHeights()` which is called in `.onRendered()` because
+          // `this.onNewItemsRendered()` updates `firstMeasuredItemIndex` and
+          // `lastMeasuredItemIndex` of `this.itemHeights` in case of a prepend.
+          //
+          // If after prepending items the scroll position
+          // should be "restored" so that there's no "jump" of content
+          // then it means that all previous items have just been rendered
+          // in a single pass, and there's no need to update layout again.
+          //
+          if (_this.onNewItemsRendered(itemsDiff, newState) !== 'SEAMLESS_PREPEND') {
+            layoutUpdateReason = LAYOUT_REASON.ITEMS_CHANGED;
+          }
+        }
+      }
+
+      var stateUpdate; // Re-measure item heights.
+      // Also, measure vertical spacing (if not measured) and fix `<table/>` padding.
+      //
+      // This block should go after `if (newItems !== previousItems) {}`
+      // because `this.itemHeights` can get `.reset()` there, which would
+      // discard all the measurements done here, and having currently shown
+      // item height measurements is required.
+      //
+
+      if (newState.firstShownItemIndex !== prevState.firstShownItemIndex || newState.lastShownItemIndex !== prevState.lastShownItemIndex || newState.items !== prevState.items || resetLayoutAfterResize) {
+        var verticalSpacingStateUpdate = _this.measureItemHeightsAndSpacingAndUpdateTablePadding();
+
+        if (verticalSpacingStateUpdate) {
+          stateUpdate = _objectSpread(_objectSpread({}, stateUpdate), verticalSpacingStateUpdate);
+        }
+      } // Clean up "before resize" item heights and adjust the scroll position accordingly.
+      // Calling `this.beforeResize.cleanUpBeforeResizeItemHeights()` might trigger
+      // a `this.setState()` call but that wouldn't matter because `beforeResize`
+      // properties have already been modified directly in `state` (a hacky technique)
+
+
+      var cleanedUpBeforeResize = _this.beforeResize.cleanUpBeforeResizeItemHeights(prevState);
+
+      if (cleanedUpBeforeResize !== undefined) {
+        var scrollBy = cleanedUpBeforeResize.scrollBy,
+            beforeResize = cleanedUpBeforeResize.beforeResize;
+        log('Correct scroll position by', scrollBy);
+
+        _this.scroll.scrollByY(scrollBy);
+
+        stateUpdate = _objectSpread(_objectSpread({}, stateUpdate), {}, {
+          beforeResize: beforeResize
         });
+      }
+
+      if (layoutUpdateReason) {
+        _this.updateStateRightAfterRender({
+          stateUpdate: stateUpdate,
+          reason: layoutUpdateReason
+        });
+      } else if (stateUpdate) {
+        _this.setState(stateUpdate);
       }
     });
 
-    _defineProperty(this, "updateShownItemIndexes", function () {
-      log('~ Layout results ' + (_this.bypass ? '(bypass) ' : '') + '~');
+    _defineProperty(this, "updateShownItemIndexes", function (_ref) {
+      var stateUpdate = _ref.stateUpdate;
+      var startedAt = Date.now(); // Get shown item indexes.
 
-      var visibleAreaIncludingMargins = _this.getVisibleAreaBoundsIncludingMargins();
-
-      _this.latestLayoutVisibleAreaIncludingMargins = visibleAreaIncludingMargins;
-
-      var listTopOffsetInsideScrollableContainer = _this.getListTopOffsetInsideScrollableContainer(); // Get shown item indexes.
-
-
-      var _this$layout$getShown = _this.layout.getShownItemIndexes({
-        listHeight: _this.screen.getElementHeight(_this.getContainerElement()),
-        itemsCount: _this.getItemsCount(),
-        visibleAreaIncludingMargins: visibleAreaIncludingMargins,
-        listTopOffsetInsideScrollableContainer: listTopOffsetInsideScrollableContainer
-      }),
-          firstShownItemIndex = _this$layout$getShown.firstShownItemIndex,
-          lastShownItemIndex = _this$layout$getShown.lastShownItemIndex,
-          redoLayoutAfterMeasuringItemHeights = _this$layout$getShown.redoLayoutAfterMeasuringItemHeights; // If scroll position is scheduled to be restored after render,
+      var _this$getShownItemInd = _this.getShownItemIndexes(),
+          firstShownItemIndex = _this$getShownItemInd.firstShownItemIndex,
+          lastShownItemIndex = _this$getShownItemInd.lastShownItemIndex,
+          shownItemsHeight = _this$getShownItemInd.shownItemsHeight,
+          firstNonMeasuredItemIndex = _this$getShownItemInd.firstNonMeasuredItemIndex; // If scroll position is scheduled to be restored after render,
       // then the "anchor" item must be rendered, and all of the prepended
       // items before it, all in a single pass. This way, all of the
       // prepended items' heights could be measured right after the render
       // has finished, and the scroll position can then be immediately restored.
 
 
-      if (_this.restoreScroll.shouldRestoreScrollAfterRender()) {
-        if (lastShownItemIndex < _this.restoreScroll.getAnchorItemIndex()) {
-          lastShownItemIndex = _this.restoreScroll.getAnchorItemIndex();
+      if (_this.listHeightChangeWatcher.hasSnapshot()) {
+        if (lastShownItemIndex < _this.listHeightChangeWatcher.getAnchorItemIndex()) {
+          lastShownItemIndex = _this.listHeightChangeWatcher.getAnchorItemIndex();
         } // `firstShownItemIndex` is always `0` when prepending items.
         // And `lastShownItemIndex` always covers all prepended items in this case.
         // None of the prepended items have been rendered before,
         // so their heights are unknown. The code at the start of this function
-        // did therefore set `redoLayoutAfterMeasuringItemHeights` to `true`
+        // did therefore set `firstNonMeasuredItemIndex` to non-`undefined`
         // in order to render just the first prepended item in order to
         // measure it, and only then make a decision on how many other
         // prepended items to render. But since we've instructed the code
@@ -2255,7 +3125,7 @@ function () {
         // right after the first one.
 
 
-        redoLayoutAfterMeasuringItemHeights = false;
+        firstNonMeasuredItemIndex = undefined;
       } // Validate the heights of items to be hidden on next render.
       // For example, a user could click a "Show more" button,
       // or an "Expand YouTube video" button, which would result
@@ -2265,17 +3135,26 @@ function () {
 
 
       if (!_this.validateWillBeHiddenItemHeightsAreAccurate(firstShownItemIndex, lastShownItemIndex)) {
-        // Redo layout, now with the correct item heights.
-        log('~ Some of the will-be-hidden item heights have changed since they\'ve last been measured. Redo layout. ~');
-        return _this.updateShownItemIndexes();
+        log('~ Because some of the will-be-hidden item heights (listed above) have changed since they\'ve last been measured, redo layout. ~'); // Redo layout, now with the correct item heights.
+
+        return _this.updateShownItemIndexes({
+          stateUpdate: stateUpdate
+        });
       } // Measure "before" items height.
 
 
-      var beforeItemsHeight = _this.layout.getBeforeItemsHeight(firstShownItemIndex, lastShownItemIndex); // Measure "after" items height.
+      var beforeItemsHeight = _this.layout.getBeforeItemsHeight(firstShownItemIndex); // Measure "after" items height.
 
 
-      var afterItemsHeight = _this.layout.getAfterItemsHeight(firstShownItemIndex, lastShownItemIndex, _this.getItemsCount()); // Debugging.
+      var afterItemsHeight = _this.layout.getAfterItemsHeight(lastShownItemIndex, _this.getItemsCount());
 
+      var layoutDuration = Date.now() - startedAt; // Debugging.
+
+      log('~ Layout values ' + (_this.bypass ? '(bypass) ' : '') + '~');
+
+      if (layoutDuration < SLOW_LAYOUT_DURATION) ; else {
+        warn('Layout calculated in', layoutDuration, 'ms');
+      }
 
       if (_this._getColumnsCount) {
         log('Columns count', _this.getColumnsCount());
@@ -2285,56 +3164,123 @@ function () {
       log('Last shown item index', lastShownItemIndex);
       log('Before items height', beforeItemsHeight);
       log('After items height (actual or estimated)', afterItemsHeight);
-      log('Average item height (calculated on previous render)', _this.itemHeights.getAverage());
+      log('Average item height (used for estimated after items height calculation)', _this.itemHeights.getAverage());
 
       if (isDebug()) {
         log('Item heights', _this.getState().itemHeights.slice());
         log('Item states', _this.getState().itemStates.slice());
-      }
-
-      if (redoLayoutAfterMeasuringItemHeights) {
-        // `this.redoLayoutReason` will be detected in `didUpdateState()`.
-        // `didUpdateState()` is triggered by `this.setState()` below.
-        _this.redoLayoutReason = LAYOUT_REASON.ITEM_HEIGHT_NOT_MEASURED;
       } // Optionally preload items to be rendered.
 
 
-      _this.onBeforeShowItems(_this.getState().items, _this.getState().itemHeights, firstShownItemIndex, lastShownItemIndex); // Render.
+      _this.onBeforeShowItems(_this.getState().items, _this.getState().itemHeights, firstShownItemIndex, lastShownItemIndex); // Set `this.firstNonMeasuredItemIndex`.
 
 
-      _this.setState({
+      _this.firstNonMeasuredItemIndex = firstNonMeasuredItemIndex; // Set "previously calculated layout".
+      //
+      // The "previously calculated layout" feature is not currently used.
+      //
+      // The current layout snapshot could be stored as a "previously calculated layout" variable
+      // so that it could theoretically be used when calculating new layout incrementally
+      // rather than from scratch, which would be an optimization.
+      //
+      // Currently, this feature is not used, and `shownItemsHeight` property
+      // is not returned at all, so don't set any "previously calculated layout".
+      //
+
+      if (shownItemsHeight === undefined) {
+        _this.previouslyCalculatedLayout = undefined;
+      } else {
+        // If "previously calculated layout" feature would be implmeneted,
+        // then this code would set "previously calculate layout" instance variable.
+        //
+        // What for would this instance variable be used?
+        //
+        // Instead of using a `this.previouslyCalculatedLayout` instance variable,
+        // this code could use `this.getState()` because it reflects what's currently on screen,
+        // but there's a single edge case when it could go out of sync —
+        // updating item heights externally via `.onItemHeightChange(i)`.
+        //
+        // If, for example, an item height was updated externally via `.onItemHeightChange(i)`
+        // then `this.getState().itemHeights` would get updated immediately but
+        // `this.getState().beforeItemsHeight` or `this.getState().afterItemsHeight`
+        // would still correspond to the previous item height, so those would be "stale".
+        // On the other hand, same values in `this.previouslyCalculatedLayout` instance variable
+        // can also be updated immediately, so they won't go out of sync with the updated item height.
+        // That seems the only edge case when using a separate `this.previouslyCalculatedLayout`
+        // instance variable instead of using `this.getState()` would theoretically be justified.
+        //
+        _this.previouslyCalculatedLayout = {
+          firstShownItemIndex: firstShownItemIndex,
+          lastShownItemIndex: lastShownItemIndex,
+          beforeItemsHeight: beforeItemsHeight,
+          shownItemsHeight: shownItemsHeight
+        };
+      } // Update `VirtualScroller` state.
+      // `VirtualScroller` automatically re-renders on state updates.
+      //
+      // All `state` properties updated here should be overwritten in
+      // the implementation of `setItems()` and `onResize()` methods
+      // so that the `state` is not left in an inconsistent state
+      // whenever there're concurrent `setState()` updates that could
+      // possibly conflict with one another — instead, those state updates
+      // should overwrite each other in terms of priority.
+      // These "on scroll" updates have the lowest priority compared to
+      // the state updates originating from `setItems()` and `onResize()` methods.
+      //
+
+
+      _this.setState(_objectSpread({
         firstShownItemIndex: firstShownItemIndex,
         lastShownItemIndex: lastShownItemIndex,
         beforeItemsHeight: beforeItemsHeight,
-        afterItemsHeight: afterItemsHeight // // Average item height is stored in state to differentiate between
-        // // the initial state and "anything has been measured already" state.
-        // averageItemHeight: this.itemHeights.getAverage()
-
-      });
+        afterItemsHeight: afterItemsHeight
+      }, stateUpdate));
     });
 
-    _defineProperty(this, "onUpdateShownItemIndexes", function (_ref) {
-      var reason = _ref.reason;
+    _defineProperty(this, "onUpdateShownItemIndexes", function (_ref2) {
+      var reason = _ref2.reason,
+          stateUpdate = _ref2.stateUpdate;
 
-      // If there're no items then there's no need to re-layout anything.
+      // In case of "don't do anything".
+      var skip = function skip() {
+        if (stateUpdate) {
+          _this.setState(stateUpdate);
+        }
+      }; // If new `items` have been set and are waiting to be applied,
+      // or if the viewport width has changed requiring a re-layout,
+      // then temporarily stop all other updates like "on scroll" updates.
+      // This prevents `state` being inconsistent, because, for example,
+      // both `setItems()` and this function could update `VirtualScroller` state
+      // and having them operate in parallel could result in incorrectly calculated
+      // `beforeItemsHeight` / `afterItemsHeight` / `firstShownItemIndex` /
+      // `lastShownItemIndex`, because, when operating in parallel, this function
+      // would have different `items` than the `setItems()` function, so their
+      // results could diverge.
+
+
+      if (_this.newItemsWillBeRendered || _this.resetLayoutAfterResize || _this.isResizing) {
+        return skip();
+      } // If there're no items then there's no need to re-layout anything.
+
+
       if (_this.getItemsCount() === 0) {
-        return;
+        return skip();
       } // Cancel a "re-layout when user stops scrolling" timer.
 
 
-      _this.scroll.onLayout(); // Cancel a re-layout that is scheduled to run at the next "frame",
+      _this.scroll.cancelScheduledLayout(); // Cancel a re-layout that is scheduled to run at the next "frame",
       // because a re-layout will be performed right now.
 
 
-      if (_this.layoutTimer) {
-        clearTimeout(_this.layoutTimer);
-        _this.layoutTimer = undefined;
-      } // Perform a re-layout.
+      stateUpdate = _this.cancelLayoutTimer({
+        stateUpdate: stateUpdate
+      }); // Perform a re-layout.
 
+      log("~ Update Layout (on ".concat(reason, ") ~"));
 
-      log("~ Calculate Layout (on ".concat(reason, ") ~"));
-
-      _this.updateShownItemIndexes();
+      _this.updateShownItemIndexes({
+        stateUpdate: stateUpdate
+      });
     });
 
     _defineProperty(this, "updateLayout", function () {
@@ -2347,12 +3293,8 @@ function () {
       return _this.updateLayout();
     });
 
-    var getState = options.getState,
-        setState = options.setState,
-        onStateChange = options.onStateChange,
+    var onStateChange = options.onStateChange,
         customState = options.customState,
-        preserveScrollPositionAtBottomOnMount = options.preserveScrollPositionAtBottomOnMount,
-        preserveScrollPositionOfTheBottomOfTheListOnMount = options.preserveScrollPositionOfTheBottomOfTheListOnMount,
         initialScrollPosition = options.initialScrollPosition,
         onScrollPositionChange = options.onScrollPositionChange,
         measureItemsBatchSize = options.measureItemsBatchSize,
@@ -2360,14 +3302,17 @@ function () {
         getColumnsCount = options.getColumnsCount,
         getItemId = options.getItemId,
         tbody = options.tbody,
-        _useTimeoutInRenderLoop = options._useTimeoutInRenderLoop;
+        _useTimeoutInRenderLoop = options._useTimeoutInRenderLoop,
+        _waitForScrollingToStop = options._waitForScrollingToStop;
+    var getState = options.getState,
+        setState = options.setState;
     var bypass = options.bypass,
         estimatedItemHeight = options.estimatedItemHeight,
         onItemInitialRender = options.onItemInitialRender,
         onItemFirstRender = options.onItemFirstRender,
         scrollableContainer = options.scrollableContainer,
         state = options.state,
-        renderingEngine = options.renderingEngine;
+        engine = options.engine;
     log('~ Initialize ~'); // If `state` is passed then use `items` from `state`
     // instead of the `items` argument.
 
@@ -2383,23 +3328,42 @@ function () {
     // For example, React Native, `<canvas/>`, etc.
 
 
-    if (!renderingEngine) {
-      renderingEngine = DOMRenderingEngine;
+    if (!engine) {
+      engine = DOMEngine;
+    } // Sometimes, when `new VirtualScroller()` instance is created,
+    // `getItemsContainerElement()` might not be ready to return the "container" DOM Element yet
+    // (for example, because it's not rendered yet). That's the reason why it's a getter function.
+    // For example, in React `<VirtualScroller/>` component, a `VirtualScroller`
+    // instance is created in the React component's `constructor()`, and at that time
+    // the container Element is not yet available. The container Element is available
+    // in `componentDidMount()`, but `componentDidMount()` is not executed on server,
+    // which would mean that React `<VirtualScroller/>` wouldn't render at all
+    // on server side, while with the `getItemsContainerElement()` approach, on server side,
+    // it still "renders" a list with a predefined amount of items in it by default.
+    // (`initiallyRenderedItemsCount`, or `1`).
+
+
+    this.getItemsContainerElement = getItemsContainerElement;
+    this.itemsContainer = engine.createItemsContainer(getItemsContainerElement); // Remove any accidental text nodes from container (like whitespace).
+    // Also guards against cases when someone accidentally tries
+    // using `VirtualScroller` on a non-empty element.
+
+    if (getItemsContainerElement()) {
+      this.itemsContainer.clear();
     }
 
-    this.screen = renderingEngine.createScreen();
-    this.scrollableContainer = renderingEngine.createScrollableContainer(scrollableContainer); // if (margin === undefined) {
-    // 	// Renders items which are outside of the screen by this "margin".
+    this.scrollableContainer = engine.createScrollableContainer(scrollableContainer, getItemsContainerElement); // if (prerenderMargin === undefined) {
+    // 	// Renders items which are outside of the screen by this "prerender margin".
     // 	// Is the screen height by default: seems to be the optimal value
     // 	// for "Page Up" / "Page Down" navigation and optimized mouse wheel scrolling.
-    // 	margin = this.scrollableContainer ? this.scrollableContainer.getHeight() : 0
+    // 	prerenderMargin = this.scrollableContainer ? this.scrollableContainer.getHeight() : 0
     // }
     // Work around `<tbody/>` not being able to have `padding`.
     // https://gitlab.com/catamphetamine/virtual-scroller/-/issues/1
 
     if (tbody) {
-      if (renderingEngine.name !== 'DOM') {
-        throw new Error('`tbody` option is only supported for DOM rendering engine');
+      if (engine !== DOMEngine) {
+        throw new Error('[virtual-scroller] `tbody` option is only supported for DOM rendering engine');
       }
 
       log('~ <tbody/> detected ~');
@@ -2446,7 +3410,7 @@ function () {
       };
     }
 
-    this.initialItems = items; // this.margin = margin
+    this.initialItems = items; // this.prerenderMargin = prerenderMargin
 
     this.onStateChange = onStateChange;
     this._getColumnsCount = getColumnsCount;
@@ -2455,95 +3419,149 @@ function () {
       this.onItemInitialRender = onItemInitialRender;
     } // `onItemFirstRender(i)` is deprecated, use `onItemInitialRender(item)` instead.
     else if (onItemFirstRender) {
-        this.onItemInitialRender = function (item) {
-          warn('`onItemFirstRender(i)` is deprecated, use `onItemInitialRender(item)` instead.');
+      this.onItemInitialRender = function (item) {
+        warn('`onItemFirstRender(i)` is deprecated, use `onItemInitialRender(item)` instead.');
 
-          var _this$getState = _this.getState(),
-              items = _this$getState.items;
+        var _this$getState = _this.getState(),
+            items = _this$getState.items;
 
-          var i = items.indexOf(item); // The `item` could also be non-found due to the inconsistency bug:
-          // The reason is that `i` can be non-consistent with the `items`
-          // passed to `<VirtualScroller/>` in React due to `setState()` not being
-          // instanteneous: when new `items` are passed to `<VirtualScroller/>`,
-          // `VirtualScroller.setState({ items })` is called, and if `onItemFirstRender(i)`
-          // is called after the aforementioned `setState()` is called but before it finishes,
-          // `i` would point to an index in "previous" `items` while the application
-          // would assume that `i` points to an index in the "new" `items`,
-          // resulting in an incorrect item being assumed by the application
-          // or even in an "array index out of bounds" error.
+        var i = items.indexOf(item); // The `item` could also be non-found due to the inconsistency bug:
+        // The reason is that `i` can be non-consistent with the `items`
+        // passed to `<VirtualScroller/>` in React due to `setState()` not being
+        // instanteneous: when new `items` are passed to `<VirtualScroller/>`,
+        // `VirtualScroller.setState({ items })` is called, and if `onItemFirstRender(i)`
+        // is called after the aforementioned `setState()` is called but before it finishes,
+        // `i` would point to an index in "previous" `items` while the application
+        // would assume that `i` points to an index in the "new" `items`,
+        // resulting in an incorrect item being assumed by the application
+        // or even in an "array index out of bounds" error.
 
-          if (i >= 0) {
-            onItemFirstRender(i);
-          }
-        };
-      }
+        if (i >= 0) {
+          onItemFirstRender(i);
+        }
+      };
+    }
 
     log('Items count', items.length);
 
     if (estimatedItemHeight) {
       log('Estimated item height', estimatedItemHeight);
-    }
+    } // There're three main places where state is updated:
+    //
+    // * On scroll.
+    // * On window resize.
+    // * On set new items.
+    //
+    // State updates may be "asynchronous" (like in React), in which case the
+    // corresponding operation is "pending" until the state update is applied.
+    //
+    // If there's a "pending" window resize or a "pending" update of the set of items,
+    // then "on scroll" updates aren't dispatched.
+    //
+    // If there's a "pending" on scroll update and the window is resize or a new set
+    // of items is set, then that "pending" on scroll update gets overwritten.
+    //
+    // If there's a "pending" update of the set of items, then window resize handler
+    // sees that "pending" update and dispatches its own state update so that the
+    // "pending" state update originating from `setItems()` is not lost.
+    //
+    // If there's a "pending" window resize, and a new set of items is set,
+    // then the state update of the window resize handler gets overwritten.
+    // Create default `getState()`/`setState()` functions.
 
-    if (setState) {
-      this.getState = getState;
 
-      this.setState = function (state) {
-        log('Set state', state);
-        setState(state, {
-          willUpdateState: _this.willUpdateState,
-          didUpdateState: _this.didUpdateState
-        });
-      };
-    } else {
-      this.getState = function () {
+    if (!getState) {
+      getState = function getState() {
         return _this.state;
       };
 
-      this.setState = function (state) {
-        log('Set state', state);
-
-        var prevState = _this.getState(); // Because this variant of `.setState()` is "synchronous" (immediate),
+      setState = function setState(stateUpdate, _ref3) {
+        var willUpdateState = _ref3.willUpdateState,
+            didUpdateState = _ref3.didUpdateState;
+        var prevState = getState(); // Because this variant of `.setState()` is "synchronous" (immediate),
         // it can be written like `...prevState`, and no state updates would be lost.
         // But if it was "asynchronous" (not immediate), then `...prevState`
         // wouldn't work in all cases, because it could be stale in cases
         // when more than a single `setState()` call is made before
         // the state actually updates, making `prevState` stale.
 
+        var newState = _objectSpread(_objectSpread({}, prevState), stateUpdate);
 
-        var newState = _objectSpread({}, prevState, state);
+        willUpdateState(newState, prevState);
+        _this.state = newState; // // Is only used in tests.
+        // if (this._onStateUpdate) {
+        // 	this._onStateUpdate(stateUpdate)
+        // }
 
-        _this.willUpdateState(newState, prevState);
-
-        _this.state = newState;
-
-        _this.didUpdateState(prevState);
+        didUpdateState(prevState);
       };
     }
 
+    this.getState = getState;
+
+    this.setState = function (stateUpdate) {
+      if (isDebug()) {
+        log('Set state', getStateSnapshot(stateUpdate));
+      }
+
+      setState(stateUpdate, {
+        willUpdateState: _this.willUpdateState,
+        didUpdateState: _this.didUpdateState
+      });
+    };
+
     if (state) {
-      log('Initial state (passed)', state);
-    } // Sometimes, when `new VirtualScroller()` instance is created,
-    // `getContainerElement()` might not be ready to return the "container" DOM Element yet
-    // (for example, because it's not rendered yet). That's the reason why it's a getter function.
-    // For example, in React `<VirtualScroller/>` component, a `VirtualScroller`
-    // instance is created in the React component's `constructor()`, and at that time
-    // the container Element is not yet available. The container Element is available
-    // in `componentDidMount()`, but `componentDidMount()` is not executed on server,
-    // which would mean that React `<VirtualScroller/>` wouldn't render at all
-    // on server side, while with the `getContainerElement()` approach, on server side,
-    // it still "renders" a list with a predefined amount of items in it by default.
-    // (`initiallyRenderedItemsCount`, or `1`).
+      if (isDebug()) {
+        log('Initial state (passed)', getStateSnapshot(state));
+      }
+    } // Check if the current `columnsCount` matches the one from state.
+    // For example, a developer might snapshot `VirtualScroller` state
+    // when the user navigates from the page containing the list
+    // in order to later restore the list's state when the user goes "Back".
+    // But, the user might have also resized the window while being on that
+    // "other" page, and when they come "Back", their snapshotted state
+    // no longer qualifies. Well, it does qualify, but only partially.
+    // For example, `itemStates` are still valid, but first and last shown
+    // item indexes aren't.
 
 
-    this.getContainerElement = getContainerElement; // Remove any accidental text nodes from container (like whitespace).
-    // Also guards against cases when someone accidentally tries
-    // using `VirtualScroller` on a non-empty element.
+    if (state) {
+      var shouldResetLayout;
+      var columnsCountForState = this.getActualColumnsCountForState();
 
-    if (getContainerElement()) {
-      this.screen.clearElement(getContainerElement());
-    }
+      if (columnsCountForState !== state.columnsCount) {
+        warn('~ Columns Count changed from', state.columnsCount || 1, 'to', columnsCountForState || 1, '~');
+        shouldResetLayout = true;
+      }
 
-    this.itemHeights = new ItemHeights(this.screen, this.getContainerElement, function (i) {
+      var columnsCount = this.getActualColumnsCount();
+      var firstShownItemIndex = Math.floor(state.firstShownItemIndex / columnsCount) * columnsCount;
+
+      if (firstShownItemIndex !== state.firstShownItemIndex) {
+        warn('~ First Shown Item Index', state.firstShownItemIndex, 'is not divisible by Columns Count', columnsCount, '~');
+        shouldResetLayout = true;
+      }
+
+      if (shouldResetLayout) {
+        warn('Reset Layout');
+        state = _objectSpread(_objectSpread({}, state), this.getInitialLayoutState(state.items));
+      }
+    } // Reset `verticalSpacing` so that it re-measures it after the list
+    // has been rendered initially. The rationale is that the `state`
+    // can't be "trusted" in a sense that the user might have resized
+    // their window after the `state` has been snapshotted, and changing
+    // window width might have activated different CSS `@media()` "queries"
+    // resulting in a potentially different vertical spacing.
+
+
+    if (state) {
+      state = _objectSpread(_objectSpread({}, state), {}, {
+        verticalSpacing: undefined
+      });
+    } // Create `ItemHeights` instance.
+
+
+    this.itemHeights = new ItemHeights(this.itemsContainer, function (i) {
       return _this.getState().itemHeights[i];
     }, function (i, height) {
       return _this.getState().itemHeights[i] = height;
@@ -2557,57 +3575,88 @@ function () {
       bypass: bypass,
       estimatedItemHeight: estimatedItemHeight,
       measureItemsBatchSize: measureItemsBatchSize === undefined ? 50 : measureItemsBatchSize,
+      getPrerenderMargin: function getPrerenderMargin() {
+        return _this.getPrerenderMargin();
+      },
       getVerticalSpacing: function getVerticalSpacing() {
         return _this.getVerticalSpacing();
+      },
+      getVerticalSpacingBeforeResize: function getVerticalSpacingBeforeResize() {
+        return _this.getVerticalSpacingBeforeResize();
       },
       getColumnsCount: function getColumnsCount() {
         return _this.getColumnsCount();
       },
+      getColumnsCountBeforeResize: function getColumnsCountBeforeResize() {
+        return _this.getState().beforeResize && _this.getState().beforeResize.columnsCount;
+      },
       getItemHeight: function getItemHeight(i) {
         return _this.getState().itemHeights[i];
       },
+      getItemHeightBeforeResize: function getItemHeightBeforeResize(i) {
+        return _this.getState().beforeResize && _this.getState().beforeResize.itemHeights[i];
+      },
+      getBeforeResizeItemsCount: function getBeforeResizeItemsCount() {
+        return _this.getState().beforeResize ? _this.getState().beforeResize.itemHeights.length : 0;
+      },
       getAverageItemHeight: function getAverageItemHeight() {
         return _this.itemHeights.getAverage();
+      },
+      getMaxVisibleAreaHeight: function getMaxVisibleAreaHeight() {
+        return _this.scrollableContainer && _this.scrollableContainer.getHeight();
+      },
+      //
+      // The "previously calculated layout" feature is not currently used.
+      //
+      // The current layout snapshot could be stored as a "previously calculated layout" variable
+      // so that it could theoretically be used when calculating new layout incrementally
+      // rather than from scratch, which would be an optimization.
+      //
+      getPreviouslyCalculatedLayout: function getPreviouslyCalculatedLayout() {
+        return _this.previouslyCalculatedLayout;
       }
     });
     this.resize = new Resize({
       bypass: bypass,
       scrollableContainer: this.scrollableContainer,
-      getContainerElement: this.getContainerElement,
-      updateLayout: function updateLayout(_ref2) {
-        var reason = _ref2.reason;
-        return _this.onUpdateShownItemIndexes({
-          reason: reason
+      onStart: function onStart() {
+        log('~ Scrollable container resize started ~');
+        _this.isResizing = true;
+      },
+      onStop: function onStop() {
+        log('~ Scrollable container resize finished ~');
+        _this.isResizing = undefined;
+      },
+      onNoChange: function onNoChange() {
+        // There might have been some missed `this.onUpdateShownItemIndexes()` calls
+        // due to setting `this.isResizing` flag to `true` during the resize.
+        // So, update shown item indexes just in case.
+        _this.onUpdateShownItemIndexes({
+          reason: LAYOUT_REASON.VIEWPORT_SIZE_UNCHANGED
         });
       },
-      resetStateAndLayout: function resetStateAndLayout() {
-        // Reset item heights, because if scrollable container's width (or height)
-        // has changed, then the list width (or height) most likely also has changed,
-        // and also some CSS `@media()` rules might have been added or removed.
-        // So re-render the list entirely.
-        log('~ Scrollable container size changed, re-measure item heights. ~');
-        _this.redoLayoutReason = LAYOUT_REASON.RESIZE; // `this.layoutResetPending` flag will be cleared in `didUpdateState()`.
+      onHeightChange: function onHeightChange() {
+        return _this.onUpdateShownItemIndexes({
+          reason: LAYOUT_REASON.VIEWPORT_HEIGHT_CHANGED
+        });
+      },
+      onWidthChange: function onWidthChange(prevWidth, newWidth) {
+        log('~ Scrollable container width changed from', prevWidth, 'to', newWidth, '~');
 
-        _this.layoutResetPending = true;
-        log('Reset state'); // Calling `this.setState(state)` will trigger `didUpdateState()`.
-        // `didUpdateState()` will detect `this.redoLayoutReason`.
-
-        _this.setState(_this.getInitialLayoutState(_this.newItemsPending || _this.getState().items));
+        _this.onResize();
       }
     });
-
-    if (preserveScrollPositionAtBottomOnMount) {
-      warn('`preserveScrollPositionAtBottomOnMount` option/property has been renamed to `preserveScrollPositionOfTheBottomOfTheListOnMount`');
-    }
-
-    this.preserveScrollPositionOfTheBottomOfTheListOnMount = preserveScrollPositionOfTheBottomOfTheListOnMount || preserveScrollPositionAtBottomOnMount;
     this.scroll = new Scroll({
       bypass: this.bypass,
       scrollableContainer: this.scrollableContainer,
-      updateLayout: function updateLayout(_ref3) {
-        var reason = _ref3.reason;
-        return _this.onUpdateShownItemIndexes({
-          reason: reason
+      itemsContainer: this.itemsContainer,
+      waitForScrollingToStop: _waitForScrollingToStop,
+      onScroll: function onScroll() {
+        var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+            delayed = _ref4.delayed;
+
+        _this.onUpdateShownItemIndexes({
+          reason: delayed ? LAYOUT_REASON.STOPPED_SCROLLING : LAYOUT_REASON.SCROLL
         });
       },
       initialScrollPosition: initialScrollPosition,
@@ -2621,24 +3670,52 @@ function () {
       hasNonRenderedItemsAtTheBottom: function hasNonRenderedItemsAtTheBottom() {
         return _this.getState().lastShownItemIndex < _this.getItemsCount() - 1;
       },
-      getLatestLayoutVisibleAreaIncludingMargins: function getLatestLayoutVisibleAreaIncludingMargins() {
-        return _this.latestLayoutVisibleAreaIncludingMargins;
+      getLatestLayoutVisibleArea: function getLatestLayoutVisibleArea() {
+        return _this.latestLayoutVisibleArea;
       },
-      preserveScrollPositionOfTheBottomOfTheListOnMount: this.preserveScrollPositionOfTheBottomOfTheListOnMount
+      getListTopOffset: this.getListTopOffsetInsideScrollableContainer,
+      getPrerenderMargin: function getPrerenderMargin() {
+        return _this.getPrerenderMargin();
+      }
     });
-    this.restoreScroll = new RestoreScroll({
-      screen: this.screen,
-      getContainerElement: this.getContainerElement
+    this.listHeightChangeWatcher = new ListHeightChangeWatcher({
+      itemsContainer: this.itemsContainer,
+      getListTopOffset: this.getListTopOffsetInsideScrollableContainer
     });
-    this.waitForStylesToLoad = new WaitForStylesToLoad({
-      updateLayout: function updateLayout(_ref4) {
-        var reason = _ref4.reason;
-        return _this.onUpdateShownItemIndexes({
-          reason: reason
-        });
-      },
-      getListTopOffsetInsideScrollableContainer: this.getListTopOffsetInsideScrollableContainer
-    });
+
+    if (engine.watchListTopOffset) {
+      this.listTopOffsetWatcher = engine.watchListTopOffset({
+        getListTopOffset: this.getListTopOffsetInsideScrollableContainer,
+        onListTopOffsetChange: function onListTopOffsetChange(_ref5) {
+          return _this.onUpdateShownItemIndexes({
+            reason: LAYOUT_REASON.TOP_OFFSET_CHANGED
+          });
+        }
+      });
+    }
+
+    this.beforeResize = new BeforeResize({
+      getState: this.getState,
+      getVerticalSpacing: this.getVerticalSpacing,
+      getColumnsCount: this.getColumnsCount
+    }); // Possibly clean up "before resize" property in state.
+    // "Before resize" state property is cleaned up when all "before resize" item heights
+    // have been re-measured in an asynchronous `this.setState({ beforeResize: undefined })` call.
+    // If `VirtualScroller` state was snapshotted externally before that `this.setState()` call
+    // has been applied, then "before resize" property might have not been cleaned up properly.
+
+    this.beforeResize.onInitialState(state); // `this.verticalSpacing` acts as a "true" source for vertical spacing value.
+    // Vertical spacing is also stored in `state` but `state` updates could be
+    // "asynchronous" (not applied immediately) and `this.onUpdateShownItemIndexes()`
+    // requires vertical spacing to be correct at any time, without any delays.
+    // So, vertical spacing is also duplicated in `state`, but the "true" source
+    // is still `this.verticalSpacing`.
+    //
+    // `this.verticalSpacing` must be initialized before calling `this.getInitialState()`.
+    //
+
+    this.verticalSpacing = state ? state.verticalSpacing : undefined; // Set initial `state`.
+
     this.setState(state || this.getInitialState(customState));
   }
   /**
@@ -2653,63 +3730,64 @@ function () {
     value: function getInitialState(customState) {
       var items = this.initialItems;
 
-      var state = _objectSpread({}, customState, this.getInitialLayoutState(items), {
+      var state = _objectSpread(_objectSpread(_objectSpread({}, customState), this.getInitialLayoutState(items)), {}, {
         items: items,
         itemStates: new Array(items.length)
       });
 
-      log('Initial state (autogenerated)', state);
+      if (isDebug()) {
+        log('Initial state (autogenerated)', getStateSnapshot(state));
+      }
+
       log('First shown item index', state.firstShownItemIndex);
       log('Last shown item index', state.lastShownItemIndex);
       return state;
-    }
-  }, {
-    key: "getInitialLayoutValues",
-    value: function getInitialLayoutValues(_ref5) {
-      var itemsCount = _ref5.itemsCount,
-          bypass = _ref5.bypass;
-      return this.layout.getInitialLayoutValues({
-        bypass: bypass,
-        itemsCount: itemsCount,
-        visibleAreaHeightIncludingMargins: this.scrollableContainer && 2 * this.getMargin() + this.scrollableContainer.getHeight()
-      });
     }
   }, {
     key: "getInitialLayoutState",
     value: function getInitialLayoutState(items) {
       var itemsCount = items.length;
 
-      var _this$getInitialLayou = this.getInitialLayoutValues({
+      var _this$layout$getIniti = this.layout.getInitialLayoutValues({
         itemsCount: itemsCount,
-        bypass: this.preserveScrollPositionOfTheBottomOfTheListOnMount
+        columnsCount: this.getColumnsCount()
       }),
-          firstShownItemIndex = _this$getInitialLayou.firstShownItemIndex,
-          lastShownItemIndex = _this$getInitialLayou.lastShownItemIndex,
-          beforeItemsHeight = _this$getInitialLayou.beforeItemsHeight,
-          afterItemsHeight = _this$getInitialLayou.afterItemsHeight;
+          firstShownItemIndex = _this$layout$getIniti.firstShownItemIndex,
+          lastShownItemIndex = _this$layout$getIniti.lastShownItemIndex,
+          beforeItemsHeight = _this$layout$getIniti.beforeItemsHeight,
+          afterItemsHeight = _this$layout$getIniti.afterItemsHeight;
 
       var itemHeights = new Array(itemsCount); // Optionally preload items to be rendered.
 
-      this.onBeforeShowItems(items, itemHeights, firstShownItemIndex, lastShownItemIndex); // This "initial" state object must include all possible state properties
-      // because `this.setState()` gets called with this state on window resize,
-      // when `VirtualScroller` gets reset.
-      // Item states aren't included here because the state of all items should be
-      // preserved on window resize.
-
+      this.onBeforeShowItems(items, itemHeights, firstShownItemIndex, lastShownItemIndex);
       return {
         itemHeights: itemHeights,
-        columnsCount: this._getColumnsCount ? this._getColumnsCount(this.scrollableContainer) : undefined,
-        verticalSpacing: undefined,
+        columnsCount: this.getActualColumnsCountForState(),
+        verticalSpacing: this.verticalSpacing,
         firstShownItemIndex: firstShownItemIndex,
         lastShownItemIndex: lastShownItemIndex,
         beforeItemsHeight: beforeItemsHeight,
         afterItemsHeight: afterItemsHeight
       };
-    }
+    } // Bind to `this` in order to prevent bugs when this function is passed by reference
+    // and then called with its `this` being unintentionally `window` resulting in
+    // the `if` condition being "falsy".
+
   }, {
-    key: "getVerticalSpacing",
-    value: function getVerticalSpacing() {
-      return this.getState() && this.getState().verticalSpacing || 0;
+    key: "getActualColumnsCount",
+    value: function getActualColumnsCount() {
+      return this.getActualColumnsCountForState() || 1;
+    } // Bind to `this` in order to prevent bugs when this function is passed by reference
+    // and then called with its `this` being unintentionally `window` resulting in
+    // the `if` condition being "falsy".
+
+  }, {
+    key: "getVerticalSpacingBeforeResize",
+    value: function getVerticalSpacingBeforeResize() {
+      // `beforeResize.verticalSpacing` can be `undefined`.
+      // For example, if `this.setState({ verticalSpacing })` call hasn't been applied
+      // before the resize happened (in case of an "asynchronous" state update).
+      return this.getState().beforeResize && this.getState().beforeResize.verticalSpacing || 0;
     }
   }, {
     key: "getColumnsCount",
@@ -2722,15 +3800,19 @@ function () {
       return this.getState().items.length;
     }
   }, {
-    key: "getMargin",
-    value: function getMargin() {
-      // `VirtualScroller` also items that are outside of the screen
-      // by the amount of this "render ahead margin" (both on top and bottom).
-      // The default "render ahead margin" is equal to the screen height:
+    key: "getPrerenderMargin",
+    value: function getPrerenderMargin() {
+      // The list component renders not only the items that're currently visible
+      // but also the items that lie within some extra vertical margin (called
+      // "prerender margin") on top and bottom for future scrolling: this way,
+      // there'll be significantly less layout recalculations as the user scrolls,
+      // because now it doesn't have to recalculate layout on each scroll event.
+      // By default, the "prerender margin" is equal to the screen height:
       // this seems to be the optimal value for "Page Up" / "Page Down" navigation
       // and optimized mouse wheel scrolling (a user is unlikely to continuously
-      // scroll past the height of a screen, and when they stop scrolling,
-      // the list is re-rendered).
+      // scroll past the screen height, because they'd stop to read through
+      // the newly visible items first, and when they do stop scrolling, that's
+      // when layout gets recalculated).
       var renderAheadMarginRatio = 1; // in scrollable container heights.
 
       return this.scrollableContainer.getHeight() * renderAheadMarginRatio;
@@ -2786,49 +3868,81 @@ function () {
       // otherwise `DOMVirtualScroller` would enter an infinite re-render loop.
 
       this.isRendered = true;
-      this.onRenderedNewLayout();
+      var stateUpdate = this.measureItemHeightsAndSpacingAndUpdateTablePadding();
       this.resize.listen();
       this.scroll.listen(); // Work around `<tbody/>` not being able to have `padding`.
       // https://gitlab.com/catamphetamine/virtual-scroller/-/issues/1
 
       if (this.tbody) {
-        addTbodyStyles(this.getContainerElement());
-      }
+        addTbodyStyles(this.getItemsContainerElement());
+      } // Re-calculate layout and re-render the list.
+      // Do that even if when an initial `state` parameter, containing layout values,
+      // has been passed. The reason is that the `state` parameter can't be "trusted"
+      // in a way that it could have been snapshotted for another window width and
+      // the user might have resized their window since then.
 
-      if (this.preserveScrollPositionOfTheBottomOfTheListOnMount) ; else {
-        this.onUpdateShownItemIndexes({
-          reason: LAYOUT_REASON.MOUNT
-        });
-      }
+
+      this.onUpdateShownItemIndexes({
+        reason: LAYOUT_REASON.MOUNTED,
+        stateUpdate: stateUpdate
+      });
     }
   }, {
-    key: "onRenderedNewLayout",
-    value: function onRenderedNewLayout() {
-      // Update item vertical spacing.
-      this.measureVerticalSpacing(); // Measure "newly shown" item heights.
+    key: "measureItemHeightsAndSpacingAndUpdateTablePadding",
+    value: function measureItemHeightsAndSpacingAndUpdateTablePadding() {
+      // Measure "newly shown" item heights.
       // Also re-validate already measured items' heights.
+      this.itemHeights.measureItemHeights(this.getState().firstShownItemIndex, this.getState().lastShownItemIndex); // Update item vertical spacing.
 
-      this.itemHeights.measureItemHeights(this.getState().firstShownItemIndex, this.getState().lastShownItemIndex); // Update `<tbody/>` `padding`.
+      var verticalSpacing = this.measureVerticalSpacing(); // Update `<tbody/>` `padding`.
       // (`<tbody/>` is different in a way that it can't have `margin`, only `padding`).
       // https://gitlab.com/catamphetamine/virtual-scroller/-/issues/1
 
       if (this.tbody) {
-        setTbodyPadding(this.getContainerElement(), this.getState().beforeItemsHeight, this.getState().afterItemsHeight);
+        setTbodyPadding(this.getItemsContainerElement(), this.getState().beforeItemsHeight, this.getState().afterItemsHeight);
+      } // Return a state update.
+
+
+      if (verticalSpacing !== undefined) {
+        return {
+          verticalSpacing: verticalSpacing
+        };
       }
     }
   }, {
-    key: "getVisibleAreaBoundsIncludingMargins",
-    value: function getVisibleAreaBoundsIncludingMargins() {
+    key: "getVisibleArea",
+    value: function getVisibleArea() {
       var visibleArea = this.scroll.getVisibleAreaBounds();
-      visibleArea.top -= this.getMargin();
-      visibleArea.bottom += this.getMargin();
-      return visibleArea;
+      this.latestLayoutVisibleArea = visibleArea; // Subtract the top offset of the list inside the scrollable container.
+
+      var listTopOffsetInsideScrollableContainer = this.getListTopOffsetInsideScrollableContainer();
+      return {
+        top: visibleArea.top - listTopOffsetInsideScrollableContainer,
+        bottom: visibleArea.bottom - listTopOffsetInsideScrollableContainer
+      };
     }
     /**
      * Returns the list's top offset relative to the scrollable container's top edge.
      * @return {number}
      */
 
+  }, {
+    key: "getItemScrollPosition",
+    value:
+    /**
+     * Returns the items's top offset relative to the scrollable container's top edge.
+     * @param {number} i — Item index
+     * @return {[number]} Returns the item's scroll Y position. Returns `undefined` if any of the previous items haven't been rendered yet.
+     */
+    function getItemScrollPosition(i) {
+      var itemTopOffsetInList = this.layout.getItemTopOffset(i);
+
+      if (itemTopOffsetInList === undefined) {
+        return;
+      }
+
+      return this.getListTopOffsetInsideScrollableContainer() + itemTopOffsetInList;
+    }
   }, {
     key: "onUnmount",
     value: function onUnmount() {
@@ -2842,17 +3956,40 @@ function () {
       this.stop();
     }
   }, {
-    key: "stop",
-    value: function stop() {
-      this.isRendered = false;
-      this.resize.stop();
-      this.scroll.stop();
-      this.waitForStylesToLoad.stop();
+    key: "cancelLayoutTimer",
+    value: function cancelLayoutTimer(_ref6) {
+      var stateUpdate = _ref6.stateUpdate;
 
       if (this.layoutTimer) {
         clearTimeout(this.layoutTimer);
-        this.layoutTimer = undefined;
+        this.layoutTimer = undefined; // Merge state updates.
+
+        if (stateUpdate || this.layoutTimerStateUpdate) {
+          stateUpdate = _objectSpread(_objectSpread({}, this.layoutTimerStateUpdate), stateUpdate);
+          this.layoutTimerStateUpdate = undefined;
+          return stateUpdate;
+        }
+      } else {
+        return stateUpdate;
       }
+    }
+  }, {
+    key: "scheduleLayoutTimer",
+    value: function scheduleLayoutTimer(_ref7) {
+      var _this2 = this;
+
+      var reason = _ref7.reason,
+          stateUpdate = _ref7.stateUpdate;
+      this.layoutTimerStateUpdate = stateUpdate;
+      this.layoutTimer = setTimeout$1(function () {
+        _this2.layoutTimerStateUpdate = undefined;
+        _this2.layoutTimer = undefined;
+
+        _this2.onUpdateShownItemIndexes({
+          reason: reason,
+          stateUpdate: stateUpdate
+        });
+      }, 0);
     }
     /**
      * Should be called right before `state` is updated.
@@ -2861,11 +3998,111 @@ function () {
      */
 
   }, {
-    key: "redoLayoutRightAfterRender",
-    value: function redoLayoutRightAfterRender(_ref6) {
-      var _this2 = this;
+    key: "onNewItemsRendered",
+    value: // After a new set of items has been rendered:
+    //
+    // * Restores scroll position when using `preserveScrollPositionOnPrependItems`
+    //   and items have been prepended.
+    //
+    // * Applies any "pending" `itemHeights` updates — those ones that happened
+    //   while an asynchronous `setState()` call in `setItems()` was pending.
+    //
+    // * Either creates or resets the snapshot of the current layout.
+    //
+    //   The current layout snapshot could be stored as a "previously calculated layout" variable
+    //   so that it could theoretically be used when calculating new layout incrementally
+    //   rather than from scratch, which would be an optimization.
+    //
+    //   The "previously calculated layout" feature is not currently used.
+    //
+    function onNewItemsRendered(itemsDiff, newLayout) {
+      // If it's an "incremental" update.
+      if (itemsDiff) {
+        var prependedItemsCount = itemsDiff.prependedItemsCount;
 
-      var reason = _ref6.reason;
+        var _this$getState2 = this.getState(),
+            itemHeights = _this$getState2.itemHeights,
+            itemStates = _this$getState2.itemStates; // See if any items' heights changed while new items were being rendered.
+
+
+        if (this.itemHeightsThatChangedWhileNewItemsWereBeingRendered) {
+          for (var _i = 0, _Object$keys = Object.keys(this.itemHeightsThatChangedWhileNewItemsWereBeingRendered); _i < _Object$keys.length; _i++) {
+            var i = _Object$keys[_i];
+            itemHeights[prependedItemsCount + parseInt(i)] = this.itemHeightsThatChangedWhileNewItemsWereBeingRendered[i];
+          }
+        } // See if any items' states changed while new items were being rendered.
+
+
+        if (this.itemStatesThatChangedWhileNewItemsWereBeingRendered) {
+          for (var _i2 = 0, _Object$keys2 = Object.keys(this.itemStatesThatChangedWhileNewItemsWereBeingRendered); _i2 < _Object$keys2.length; _i2++) {
+            var _i3 = _Object$keys2[_i2];
+            itemStates[prependedItemsCount + parseInt(_i3)] = this.itemStatesThatChangedWhileNewItemsWereBeingRendered[_i3];
+          }
+        }
+
+        if (prependedItemsCount === 0) {
+          // Adjust `this.previouslyCalculatedLayout`.
+          if (this.previouslyCalculatedLayout) {
+            if (this.previouslyCalculatedLayout.firstShownItemIndex === newLayout.firstShownItemIndex && this.previouslyCalculatedLayout.lastShownItemIndex === newLayout.lastShownItemIndex) ; else {
+              warn('Unexpected (non-matching) "firstShownItemIndex" or "lastShownItemIndex" encountered in "didUpdateState()" after appending items');
+              warn('Previously calculated layout', this.previouslyCalculatedLayout);
+              warn('New layout', newLayout);
+              this.previouslyCalculatedLayout = undefined;
+            }
+          }
+
+          return 'SEAMLESS_APPEND';
+        } else {
+          if (this.listHeightChangeWatcher.hasSnapshot()) {
+            if (newLayout.firstShownItemIndex === 0) {
+              // Restore (adjust) scroll position.
+              log('~ Restore Scroll Position ~');
+              var listBottomOffsetChange = this.listHeightChangeWatcher.getListBottomOffsetChange({
+                beforeItemsHeight: newLayout.beforeItemsHeight
+              });
+              this.listHeightChangeWatcher.reset();
+
+              if (listBottomOffsetChange) {
+                log('Scroll down by', listBottomOffsetChange);
+                this.scroll.scrollByY(listBottomOffsetChange);
+              } else {
+                log('Scroll position hasn\'t changed');
+              } // Create new `this.previouslyCalculatedLayout`.
+
+
+              if (this.previouslyCalculatedLayout) {
+                if (this.previouslyCalculatedLayout.firstShownItemIndex === 0 && this.previouslyCalculatedLayout.lastShownItemIndex === newLayout.lastShownItemIndex - prependedItemsCount) {
+                  this.previouslyCalculatedLayout = {
+                    beforeItemsHeight: 0,
+                    shownItemsHeight: this.previouslyCalculatedLayout.shownItemsHeight + listBottomOffsetChange,
+                    firstShownItemIndex: 0,
+                    lastShownItemIndex: newLayout.lastShownItemIndex
+                  };
+                } else {
+                  warn('Unexpected (non-matching) "firstShownItemIndex" or "lastShownItemIndex" encountered in "didUpdateState()" after prepending items');
+                  warn('Previously calculated layout', this.previouslyCalculatedLayout);
+                  warn('New layout', newLayout);
+                  this.previouslyCalculatedLayout = undefined;
+                }
+              }
+
+              return 'SEAMLESS_PREPEND';
+            } else {
+              warn("Unexpected \"firstShownItemIndex\" ".concat(newLayout.firstShownItemIndex, " encountered in \"didUpdateState()\" after prepending items. Expected 0."));
+            }
+          }
+        }
+      } // Reset `this.previouslyCalculatedLayout` in any case other than
+      // SEAMLESS_PREPEND or SEAMLESS_APPEND.
+
+
+      this.previouslyCalculatedLayout = undefined;
+    }
+  }, {
+    key: "updateStateRightAfterRender",
+    value: function updateStateRightAfterRender(_ref8) {
+      var reason = _ref8.reason,
+          stateUpdate = _ref8.stateUpdate;
 
       // In React, `setTimeout()` is used to prevent a React error:
       // "Maximum update depth exceeded.
@@ -2874,63 +4111,79 @@ function () {
       //  React limits the number of nested updates to prevent infinite loops."
       if (this._useTimeoutInRenderLoop) {
         // Cancel a previously scheduled re-layout.
-        if (this.layoutTimer) {
-          clearTimeout(this.layoutTimer);
-        } // Schedule a new re-layout.
+        stateUpdate = this.cancelLayoutTimer({
+          stateUpdate: stateUpdate
+        }); // Schedule a new re-layout.
 
-
-        this.layoutTimer = setTimeout$1(function () {
-          _this2.layoutTimer = undefined;
-
-          _this2.onUpdateShownItemIndexes({
-            reason: reason
-          });
-        }, 0);
+        this.scheduleLayoutTimer({
+          reason: reason,
+          stateUpdate: stateUpdate
+        });
       } else {
         this.onUpdateShownItemIndexes({
-          reason: reason
+          reason: reason,
+          stateUpdate: stateUpdate
         });
       }
     }
   }, {
     key: "measureVerticalSpacing",
     value: function measureVerticalSpacing() {
-      if (this.getState().verticalSpacing === undefined) {
+      if (this.verticalSpacing === undefined) {
+        var _this$getState3 = this.getState(),
+            firstShownItemIndex = _this$getState3.firstShownItemIndex,
+            lastShownItemIndex = _this$getState3.lastShownItemIndex;
+
         log('~ Measure item vertical spacing ~');
         var verticalSpacing = getVerticalSpacing({
-          container: this.getContainerElement(),
-          screen: this.screen
+          itemsContainer: this.itemsContainer,
+          renderedItemsCount: lastShownItemIndex - firstShownItemIndex + 1
         });
 
         if (verticalSpacing === undefined) {
           log('Not enough items rendered to measure vertical spacing');
         } else {
           log('Item vertical spacing', verticalSpacing);
-          this.setState({
-            verticalSpacing: verticalSpacing
-          });
+          this.verticalSpacing = verticalSpacing;
+
+          if (verticalSpacing !== 0) {
+            return verticalSpacing;
+          }
         }
       }
     }
   }, {
     key: "remeasureItemHeight",
     value: function remeasureItemHeight(i) {
-      var _this$getState2 = this.getState(),
-          firstShownItemIndex = _this$getState2.firstShownItemIndex;
+      var _this$getState4 = this.getState(),
+          firstShownItemIndex = _this$getState4.firstShownItemIndex;
 
       return this.itemHeights.remeasureItemHeight(i, firstShownItemIndex);
     }
   }, {
     key: "onItemStateChange",
-    value: function onItemStateChange(i, itemState) {
+    value: function onItemStateChange(i, newItemState) {
       if (isDebug()) {
         log('~ Item state changed ~');
-        log('Item', i);
+        log('Item', i); // Uses `JSON.stringify()` here instead of just outputting the JSON objects as is
+        // because outputting JSON objects as is would show different results later when
+        // the developer inspects those in the web browser console if those state objects
+        // get modified in between they've been output to the console and the developer
+        // decided to inspect them.
+
         log('Previous state' + '\n' + JSON.stringify(this.getState().itemStates[i], null, 2));
-        log('New state' + '\n' + JSON.stringify(itemState, null, 2));
+        log('New state' + '\n' + JSON.stringify(newItemState, null, 2));
       }
 
-      this.getState().itemStates[i] = itemState;
+      this.getState().itemStates[i] = newItemState; // Schedule the item state update for after the new items have been rendered.
+
+      if (this.newItemsWillBeRendered) {
+        if (!this.itemStatesThatChangedWhileNewItemsWereBeingRendered) {
+          this.itemStatesThatChangedWhileNewItemsWereBeingRendered = {};
+        }
+
+        this.itemStatesThatChangedWhileNewItemsWereBeingRendered[String(i)] = newItemState;
+      }
     }
   }, {
     key: "onItemHeightChange",
@@ -2938,18 +4191,13 @@ function () {
       log('~ Re-measure item height ~');
       log('Item', i);
 
-      var _this$getState3 = this.getState(),
-          itemHeights = _this$getState3.itemHeights;
+      var _this$getState5 = this.getState(),
+          itemHeights = _this$getState5.itemHeights,
+          firstShownItemIndex = _this$getState5.firstShownItemIndex,
+          lastShownItemIndex = _this$getState5.lastShownItemIndex; // Check if the item is still rendered.
 
-      var previousHeight = itemHeights[i];
 
-      if (previousHeight === undefined) {
-        return reportError("\"onItemHeightChange()\" has been called for item ".concat(i, ", but that item hasn't been rendered before."));
-      }
-
-      var newHeight = this.remeasureItemHeight(i); // Check if the item is still rendered.
-
-      if (newHeight === undefined) {
+      if (!(i >= firstShownItemIndex && i <= lastShownItemIndex)) {
         // There could be valid cases when an item is no longer rendered
         // by the time `.onItemHeightChange(i)` gets called.
         // For example, suppose there's a list of several items on a page,
@@ -2978,15 +4226,61 @@ function () {
         return warn('The item is no longer rendered. This is not necessarily a bug, and could happen, for example, when there\'re several `onItemHeightChange(i)` calls issued at the same time.');
       }
 
+      var previousHeight = itemHeights[i];
+
+      if (previousHeight === undefined) {
+        return reportError("\"onItemHeightChange()\" has been called for item ".concat(i, ", but that item hasn't been rendered before."));
+      }
+
+      var newHeight = this.remeasureItemHeight(i);
       log('Previous height', previousHeight);
       log('New height', newHeight);
 
       if (previousHeight !== newHeight) {
-        log('~ Item height has changed ~'); // log('Item', i)
+        log('~ Item height has changed ~'); // Update or reset previously calculated layout.
+
+        this.updatePreviouslyCalculatedLayoutOnItemHeightChange(i, previousHeight, newHeight); // Recalculate layout.
 
         this.onUpdateShownItemIndexes({
           reason: LAYOUT_REASON.ITEM_HEIGHT_CHANGED
-        });
+        }); // Schedule the item height update for after the new items have been rendered.
+
+        if (this.newItemsWillBeRendered) {
+          if (!this.itemHeightsThatChangedWhileNewItemsWereBeingRendered) {
+            this.itemHeightsThatChangedWhileNewItemsWereBeingRendered = {};
+          }
+
+          this.itemHeightsThatChangedWhileNewItemsWereBeingRendered[String(i)] = newHeight;
+        }
+      }
+    } // Updates the snapshot of the current layout when an item's height changes.
+    //
+    // The "previously calculated layout" feature is not currently used.
+    //
+    // The current layout snapshot could be stored as a "previously calculated layout" variable
+    // so that it could theoretically be used when calculating new layout incrementally
+    // rather than from scratch, which would be an optimization.
+    //
+
+  }, {
+    key: "updatePreviouslyCalculatedLayoutOnItemHeightChange",
+    value: function updatePreviouslyCalculatedLayoutOnItemHeightChange(i, previousHeight, newHeight) {
+      if (this.previouslyCalculatedLayout) {
+        var heightDifference = newHeight - previousHeight;
+
+        if (i < this.previouslyCalculatedLayout.firstShownItemIndex) {
+          // Patch `this.previouslyCalculatedLayout`'s `.beforeItemsHeight`.
+          this.previouslyCalculatedLayout.beforeItemsHeight += heightDifference;
+        } else if (i > this.previouslyCalculatedLayout.lastShownItemIndex) {
+          // Could patch `.afterItemsHeight` of `this.previouslyCalculatedLayout` here,
+          // if `.afterItemsHeight` property existed in `this.previouslyCalculatedLayout`.
+          if (this.previouslyCalculatedLayout.afterItemsHeight !== undefined) {
+            this.previouslyCalculatedLayout.afterItemsHeight += heightDifference;
+          }
+        } else {
+          // Patch `this.previouslyCalculatedLayout`'s shown items height.
+          this.previouslyCalculatedLayout.shownItemsHeight += newHeight - previousHeight;
+        }
       }
     }
     /**
@@ -3041,8 +4335,14 @@ function () {
           var actualItemHeight = this.remeasureItemHeight(i);
 
           if (actualItemHeight !== previouslyMeasuredItemHeight) {
+            if (isValid) {
+              log('~ Validate will-be-hidden item heights. ~'); // Update or reset previously calculated layout.
+
+              this.updatePreviouslyCalculatedLayoutOnItemHeightChange(i, previouslyMeasuredItemHeight, actualItemHeight);
+            }
+
             isValid = false;
-            warn('Item', i, 'will be unmounted at next render because it\'s no longer visible. Its height has changed from', previouslyMeasuredItemHeight, 'to', actualItemHeight, 'since it was last measured. This is not necessarily a bug, and could happen, for example, when there\'re several `onItemHeightChange(i)` calls issued at the same time, and the first one triggers a re-layout before the rest of them have had a chance to be executed.');
+            warn('Item index', i, 'is no longer visible and will be unmounted. Its height has changed from', previouslyMeasuredItemHeight, 'to', actualItemHeight, 'since it was last measured. This is not necessarily a bug, and could happen, for example, on screen width change, or when there\'re several `onItemHeightChange(i)` calls issued at the same time, and the first one triggers a re-layout before the rest of them have had a chance to be executed.');
           }
         }
 
@@ -3051,23 +4351,65 @@ function () {
 
       return isValid;
     }
+  }, {
+    key: "getShownItemIndexes",
+    value: function getShownItemIndexes() {
+      var itemsCount = this.getItemsCount();
+
+      var _this$getVisibleArea = this.getVisibleArea(),
+          visibleAreaTop = _this$getVisibleArea.top,
+          visibleAreaBottom = _this$getVisibleArea.bottom;
+
+      if (this.bypass) {
+        return {
+          firstShownItemIndex: 0,
+          lastShownItemIndex: itemsCount - 1 // shownItemsHeight: this.getState().itemHeights.reduce((sum, itemHeight) => sum + itemHeight, 0)
+
+        };
+      } // Find the indexes of the items that are currently visible
+      // (or close to being visible) in the scrollable container.
+      // For scrollable containers other than the main screen, it could also
+      // check the visibility of such scrollable container itself, because it
+      // might be not visible.
+      // If such kind of an optimization would hypothetically be implemented,
+      // then it would also require listening for "scroll" events on the screen.
+      // Overall, I suppose that such "actual visibility" feature would be
+      // a very minor optimization and not something I'd deal with.
+
+
+      var isVisible = visibleAreaTop < this.itemsContainer.getHeight() && visibleAreaBottom > 0;
+
+      if (!isVisible) {
+        log('The entire list is off-screen. No items are visible.');
+        return this.layout.getNonVisibleListShownItemIndexes();
+      } // Get shown item indexes.
+
+
+      return this.layout.getShownItemIndexes({
+        itemsCount: this.getItemsCount(),
+        visibleAreaTop: visibleAreaTop,
+        visibleAreaBottom: visibleAreaBottom
+      });
+    }
     /**
      * Updates the "from" and "to" shown item indexes.
      * If the list is visible and some of the items being shown are new
      * and are required to be measured first, then
-     * `redoLayoutAfterMeasuringItemHeights` is `true`.
+     * `firstNonMeasuredItemIndex` is defined.
      * If the list is visible and all items being shown have been encountered
-     * (and measured) before, then `redoLayoutAfterMeasuringItemHeights` is `false`.
+     * (and measured) before, then `firstNonMeasuredItemIndex` is `undefined`.
+     *
+     * The `stateUpdate` parameter is just an optional "additional" state update.
      */
 
   }, {
     key: "updateItems",
-
+    value:
     /**
      * @deprecated
      * `.updateItems()` has been renamed to `.setItems()`.
      */
-    value: function updateItems(newItems, options) {
+    function updateItems(newItems, options) {
       return this.setItems(newItems, options);
     }
     /**
@@ -3082,32 +4424,55 @@ function () {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       // * @param  {object} [newCustomState] — If `customState` was passed to `getInitialState()`, this `newCustomState` updates it.
-      var _this$getState4 = this.getState(),
-          previousItems = _this$getState4.items;
+      var _this$getState6 = this.getState(),
+          previousItems = _this$getState6.items; // Even if `newItems` are equal to `this.state.items`,
+      // still perform a `setState()` call, because, if `setState()` calls
+      // were "asynchronous", there could be a situation when a developer
+      // first calls `setItems(newItems)` and then `setItems(oldItems)`:
+      // if this function did `return` `if (newItems === this.state.items)`
+      // then `setState({ items: newItems })` would be scheduled as part of
+      // `setItems(newItems)` call, but the subsequent `setItems(oldItems)` call
+      // wouldn't do anything resulting in `newItems` being set as a result,
+      // and that wouldn't be what the developer intended.
 
-      var _this$getState5 = this.getState(),
-          itemStates = _this$getState5.itemStates,
-          itemHeights = _this$getState5.itemHeights;
+
+      var _this$getState7 = this.getState(),
+          itemStates = _this$getState7.itemStates;
+
+      var _ref9 = this.resetLayoutAfterResize ? this.resetLayoutAfterResize.stateUpdate : this.getState(),
+          itemHeights = _ref9.itemHeights;
 
       log('~ Update items ~');
-      var layout;
-      var itemsDiff = this.getItemsDiff(previousItems, newItems); // If it's an "incremental" update.
+      var layoutUpdate;
+      var itemsUpdateInfo; // Compare the new items to the current items.
 
-      if (itemsDiff && !this.layoutResetPending) {
-        var _this$getState6 = this.getState(),
-            firstShownItemIndex = _this$getState6.firstShownItemIndex,
-            lastShownItemIndex = _this$getState6.lastShownItemIndex,
-            beforeItemsHeight = _this$getState6.beforeItemsHeight,
-            afterItemsHeight = _this$getState6.afterItemsHeight;
+      var itemsDiff = this.getItemsDiff(previousItems, newItems); // See if it's an "incremental" items update.
 
-        layout = {
+      if (itemsDiff) {
+        var _ref10 = this.resetLayoutAfterResize ? this.resetLayoutAfterResize.stateUpdate : this.getState(),
+            firstShownItemIndex = _ref10.firstShownItemIndex,
+            lastShownItemIndex = _ref10.lastShownItemIndex,
+            beforeItemsHeight = _ref10.beforeItemsHeight,
+            afterItemsHeight = _ref10.afterItemsHeight;
+
+        var shouldRestoreScrollPosition = firstShownItemIndex === 0 && ( // `preserveScrollPosition` option name is deprecated,
+        // use `preserveScrollPositionOnPrependItems` instead.
+        options.preserveScrollPositionOnPrependItems || options.preserveScrollPosition);
+        var prependedItemsCount = itemsDiff.prependedItemsCount,
+            appendedItemsCount = itemsDiff.appendedItemsCount;
+        layoutUpdate = this.layout.getLayoutUpdateForItemsDiff({
           firstShownItemIndex: firstShownItemIndex,
           lastShownItemIndex: lastShownItemIndex,
           beforeItemsHeight: beforeItemsHeight,
           afterItemsHeight: afterItemsHeight
-        };
-        var prependedItemsCount = itemsDiff.prependedItemsCount,
-            appendedItemsCount = itemsDiff.appendedItemsCount;
+        }, {
+          prependedItemsCount: prependedItemsCount,
+          appendedItemsCount: appendedItemsCount
+        }, {
+          itemsCount: newItems.length,
+          columnsCount: this.getActualColumnsCount(),
+          shouldRestoreScrollPosition: shouldRestoreScrollPosition
+        });
 
         if (prependedItemsCount > 0) {
           log('Prepend', prependedItemsCount, 'items');
@@ -3115,6 +4480,34 @@ function () {
 
           if (itemStates) {
             itemStates = new Array(prependedItemsCount).concat(itemStates);
+          } // Restore scroll position after prepending items (if requested).
+
+
+          if (shouldRestoreScrollPosition) {
+            log('Will restore scroll position');
+            this.listHeightChangeWatcher.snapshot({
+              previousItems: previousItems,
+              newItems: newItems,
+              prependedItemsCount: prependedItemsCount
+            }); // "Seamless prepend" scenario doesn't result in a re-layout,
+            // so if any "non measured item" is currently pending,
+            // it doesn't get reset and will be handled after `state` is updated.
+
+            if (this.firstNonMeasuredItemIndex !== undefined) {
+              this.firstNonMeasuredItemIndex += prependedItemsCount;
+            }
+          } else {
+            log('Reset layout'); // Reset layout because none of the prepended items have been measured.
+
+            layoutUpdate = this.layout.getInitialLayoutValues({
+              itemsCount: newItems.length,
+              columnsCount: this.getActualColumnsCount()
+            }); // Unschedule a potentially scheduled layout update
+            // after measuring a previously non-measured item
+            // because the list will be re-layout anyway
+            // due to the new items being set.
+
+            this.firstNonMeasuredItemIndex = undefined;
           }
         }
 
@@ -3127,60 +4520,687 @@ function () {
           }
         }
 
-        this.layout.updateLayoutForItemsDiff(layout, itemsDiff, {
-          itemsCount: newItems.length
-        });
-
-        if (prependedItemsCount > 0) {
-          // `preserveScrollPosition` option name is deprecated,
-          // use `preserveScrollPositionOnPrependItems` instead.
-          if (options.preserveScrollPositionOnPrependItems || options.preserveScrollPosition) {
-            if (this.getState().firstShownItemIndex === 0) {
-              this.restoreScroll.captureScroll({
-                previousItems: previousItems,
-                newItems: newItems,
-                prependedItemsCount: prependedItemsCount
-              });
-              this.layout.showItemsFromTheStart(layout);
-            }
-          }
-        }
+        itemsUpdateInfo = {
+          prepend: prependedItemsCount > 0,
+          append: appendedItemsCount > 0
+        };
       } else {
         log('Items have changed, and', itemsDiff ? 'a re-layout from scratch has been requested.' : 'it\'s not a simple append and/or prepend.', 'Rerender the entire list from scratch.');
         log('Previous items', previousItems);
-        log('New items', newItems);
+        log('New items', newItems); // Reset item heights and item states.
+
         itemHeights = new Array(newItems.length);
         itemStates = new Array(newItems.length);
-        layout = this.getInitialLayoutValues({
-          itemsCount: newItems.length
-        });
+        layoutUpdate = this.layout.getInitialLayoutValues({
+          itemsCount: newItems.length,
+          columnsCount: this.getActualColumnsCount()
+        }); // Unschedule a potentially scheduled layout update
+        // after measuring a previously non-measured item
+        // because the list will be re-layout from scratch
+        // due to the new items being set.
+
+        this.firstNonMeasuredItemIndex = undefined; // Also reset any potential pending scroll position restoration.
+        // For example, imagine a developer first called `.setItems(incrementalItemsUpdate)`
+        // and then called `.setItems(differentItems)` and there was no state update
+        // in between those two calls. This could happen because state updates aren't
+        // required to be "synchronous". On other words, calling `this.setState()`
+        // doesn't necessarily mean that the state is applied immediately.
+        // Imagine also that such "delayed" state updates could be batched,
+        // like they do in React inside event handlers (though that doesn't apply to this case):
+        // https://github.com/facebook/react/issues/10231#issuecomment-316644950
+        // If `this.listHeightChangeWatcher` wasn't reset on `.setItems(differentItems)`
+        // and if the second `this.setState()` call overwrites the first one
+        // then it would attempt to restore scroll position in a situation when
+        // it should no longer do that. Hence the reset here.
+
+        this.listHeightChangeWatcher.reset();
+        itemsUpdateInfo = {
+          replace: true
+        };
       }
 
-      log('~ Update state ~');
-      log('First shown item index', layout.firstShownItemIndex);
-      log('Last shown item index', layout.lastShownItemIndex);
-      log('Before items height', layout.beforeItemsHeight);
-      log('After items height (actual or estimated)', layout.afterItemsHeight); // Optionally preload items to be rendered.
+      log('~ Update state ~'); // const layoutValuesAfterUpdate = {
+      // 	...this.getState(),
+      // 	...layoutUpdate
+      // }
+      // `layoutUpdate` is equivalent to `layoutValuesAfterUpdate` because
+      // `layoutUpdate` contains all the relevant properties.
 
-      this.onBeforeShowItems(newItems, itemHeights, layout.firstShownItemIndex, layout.lastShownItemIndex); // `this.newItemsPending` will be cleared in `didUpdateState()`.
+      log('First shown item index', layoutUpdate.firstShownItemIndex);
+      log('Last shown item index', layoutUpdate.lastShownItemIndex);
+      log('Before items height', layoutUpdate.beforeItemsHeight);
+      log('After items height (actual or estimated)', layoutUpdate.afterItemsHeight); // Optionally preload items to be rendered.
+      //
+      // `layoutUpdate` is equivalent to `layoutValuesAfterUpdate` because
+      // `layoutUpdate` contains all the relevant properties.
+      //
 
-      this.newItemsPending = newItems; // Update state.
+      this.onBeforeShowItems(newItems, itemHeights, layoutUpdate.firstShownItemIndex, layoutUpdate.lastShownItemIndex); // `this.newItemsWillBeRendered` signals that new `items` are being rendered,
+      // and that `VirtualScroller` should temporarily stop all other updates.
+      //
+      // `this.newItemsWillBeRendered` is cleared in `didUpdateState()`.
+      //
+      // The values in `this.newItemsWillBeRendered` are used, for example,
+      // in `.onResize()` handler in order to not break state consistency when
+      // state updates are "asynchronous" (delayed) and there's a window resize event
+      // in between calling `setState()` below and that call actually being applied.
+      //
 
-      this.setState(_objectSpread({}, layout, {
+      this.newItemsWillBeRendered = _objectSpread(_objectSpread({}, itemsUpdateInfo), {}, {
+        count: newItems.length,
+        // `layoutUpdate` now contains all layout-related properties, even if those that
+        // didn't change. So `firstShownItemIndex` is always in `this.newItemsWillBeRendered`.
+        layout: layoutUpdate
+      }); // `layoutUpdate` now contains all layout-related properties, even if those that
+      // didn't change. So this part is no longer relevant.
+      //
+      // // If `firstShownItemIndex` is gonna be modified as a result of setting new items
+      // // then keep that "new" `firstShownItemIndex` in order for it to be used by
+      // // `onResize()` handler when it calculates "new" `firstShownItemIndex`
+      // // based on the new columns count (corresponding to the new window width).
+      // if (layoutUpdate.firstShownItemIndex !== undefined) {
+      // 	this.newItemsWillBeRendered = {
+      // 		...this.newItemsWillBeRendered,
+      // 		firstShownItemIndex: layoutUpdate.firstShownItemIndex
+      // 	}
+      // }
+      // Update `VirtualScroller` state.
+      //
+      // This state update should overwrite all the `state` properties
+      // that are also updated in the "on scroll" handler (`getShownItemIndexes()`):
+      //
+      // * `firstShownItemIndex`
+      // * `lastShownItemIndex`
+      // * `beforeItemsHeight`
+      // * `afterItemsHeight`
+      //
+      // That's because this `setState()` update has a higher priority
+      // than that of the "on scroll" handler, so it should overwrite
+      // any potential state changes dispatched by the "on scroll" handler.
+      //
+
+      var newState = _objectSpread(_objectSpread({}, layoutUpdate), {}, {
         items: newItems,
         itemStates: itemStates,
         itemHeights: itemHeights
-      }));
+      }); // Introduced `shouldIncludeBeforeResizeValuesInState()` getter just to prevent
+      // cluttering `state` with `beforeResize: undefined` property if `beforeResize`
+      // hasn't ever been set in `state` previously.
+
+
+      if (this.beforeResize.shouldIncludeBeforeResizeValuesInState()) {
+        if (this.shouldDiscardBeforeResizeItemHeights()) {
+          // Reset "before resize" item heights because now there're new items prepended
+          // with unknown heights, or completely new items with unknown heights, so
+          // `beforeItemsHeight` value won't be preserved anyway.
+          newState.beforeResize = undefined;
+        } else {
+          // Overwrite `beforeResize` property in `state` even if it wasn't modified
+          // because state updates could be "asynchronous" and in that case there could be
+          // some previous `setState()` call from some previous `setItems()` call that
+          // hasn't yet been applied, and that previous call might have scheduled setting
+          // `state.beforeResize` property to `undefined` in order to reset it, but this
+          // next `setState()` call might not require resetting `state.beforeResize` property
+          // so it should undo resetting it by simply overwriting it with its normal value.
+          newState.beforeResize = this.resetLayoutAfterResize ? this.resetLayoutAfterResize.stateUpdate.beforeResize : this.getState().beforeResize;
+        }
+      } // `newState` should also overwrite all `state` properties that're updated in `onResize()`
+      // because `setItems()`'s state updates always overwrite `onResize()`'s state updates.
+      // (The least-priority ones are `onScroll()` state updates, but those're simply skipped
+      // if there's a pending `setItems()` or `onResize()` update).
+      //
+      // `state` property exceptions:
+      //
+      // `verticalSpacing` property is not updated here because it's fine setting it to
+      // `undefined` in `onResize()` — it will simply be re-measured after the component re-renders.
+      //
+      // `columnsCount` property is also not updated here because by definition it's only
+      // updated in `onResize()`.
+      // Render.
+
+
+      this.setState(newState);
     }
   }, {
     key: "getItemsDiff",
     value: function getItemsDiff$1(previousItems, newItems) {
       return getItemsDiff(previousItems, newItems, this.isItemEqual);
+    } // Returns whether "before resize" item heights should be discarded
+    // as a result of calling `setItems()` with a new set of items
+    // when an asynchronous `setState()` call inside that function
+    // hasn't been applied yet.
+    //
+    // If `setItems()` update was an "incremental" one and no items
+    // have been prepended, then `firstShownItemIndex` is preserved,
+    // and all items' heights before it should be kept in order to
+    // preserve the top offset of the first shown item so that there's
+    // no "content jumping".
+    //
+    // If `setItems()` update was an "incremental" one but there're
+    // some prepended items, then it means that now there're new items
+    // with unknown heights at the top, so the top offset of the first
+    // shown item won't be preserved because there're no "before resize"
+    // heights of those items.
+    //
+    // If `setItems()` update was not an "incremental" one, then don't
+    // attempt to restore previous item heights after a potential window
+    // width change because all item heights have been reset.
+    //
+
+  }, {
+    key: "shouldDiscardBeforeResizeItemHeights",
+    value: function shouldDiscardBeforeResizeItemHeights() {
+      if (this.newItemsWillBeRendered) {
+        var _this$newItemsWillBeR = this.newItemsWillBeRendered,
+            prepend = _this$newItemsWillBeR.prepend,
+            replace = _this$newItemsWillBeR.replace;
+        return prepend || replace;
+      }
+    }
+  }, {
+    key: "onResize",
+    value: function onResize() {
+      // Reset "previously calculated layout".
+      //
+      // The "previously calculated layout" feature is not currently used.
+      //
+      // The current layout snapshot could be stored as a "previously calculated layout" variable
+      // so that it could theoretically be used when calculating new layout incrementally
+      // rather than from scratch, which would be an optimization.
+      //
+      this.previouslyCalculatedLayout = undefined; // Cancel any potential scheduled scroll position restoration.
+
+      this.listHeightChangeWatcher.reset(); // Get the most recent items count.
+      // If there're a "pending" `setItems()` call then use the items count from that call
+      // instead of using the count of currently shown `items` from `state`.
+      // A `setItems()` call is "pending" when `setState()` operation is "asynchronous", that is
+      // when `setState()` calls aren't applied immediately, like in React.
+
+      var itemsCount = this.newItemsWillBeRendered ? this.newItemsWillBeRendered.count : this.getState().itemHeights.length; // If layout values have been calculated as a result of a "pending" `setItems()` call,
+      // then don't discard those new layout values and use them instead of the ones from `state`.
+      //
+      // A `setItems()` call is "pending" when `setState()` operation is "asynchronous", that is
+      // when `setState()` calls aren't applied immediately, like in React.
+      //
+
+      var layout = this.newItemsWillBeRendered ? this.newItemsWillBeRendered.layout : this.getState(); // Update `VirtualScroller` state.
+
+      var newState = {
+        // This state update should also overwrite all the `state` properties
+        // that are also updated in the "on scroll" handler (`getShownItemIndexes()`):
+        //
+        // * `firstShownItemIndex`
+        // * `lastShownItemIndex`
+        // * `beforeItemsHeight`
+        // * `afterItemsHeight`
+        //
+        // That's because this `setState()` update has a higher priority
+        // than that of the "on scroll" handler, so it should overwrite
+        // any potential state changes dispatched by the "on scroll" handler.
+        //
+        // All these properties might have changed, but they're not
+        // recalculated here becase they'll be recalculated after
+        // this new state is applied (rendered).
+        //
+        firstShownItemIndex: layout.firstShownItemIndex,
+        lastShownItemIndex: layout.lastShownItemIndex,
+        beforeItemsHeight: layout.beforeItemsHeight,
+        afterItemsHeight: layout.afterItemsHeight,
+        // Reset item heights, because if scrollable container's width (or height)
+        // has changed, then the list width (or height) most likely also has changed,
+        // and also some CSS `@media()` rules might have been added or removed.
+        // So re-render the list entirely.
+        itemHeights: new Array(itemsCount),
+        columnsCount: this.getActualColumnsCountForState(),
+        // Re-measure vertical spacing after render because new CSS styles
+        // might be applied for the new window width.
+        verticalSpacing: undefined
+      };
+      var firstShownItemIndex = layout.firstShownItemIndex,
+          lastShownItemIndex = layout.lastShownItemIndex; // Get the `columnsCount` for the new window width.
+
+      var newColumnsCount = this.getActualColumnsCount(); // Re-calculate `firstShownItemIndex` and `lastShownItemIndex`
+      // based on the new `columnsCount` so that the whole row is visible.
+
+      var newFirstShownItemIndex = Math.floor(firstShownItemIndex / newColumnsCount) * newColumnsCount;
+      var newLastShownItemIndex = Math.ceil((lastShownItemIndex + 1) / newColumnsCount) * newColumnsCount - 1; // Potentially update `firstShownItemIndex` if it needs to be adjusted in order to
+      // correspond to the new `columnsCount`.
+
+      if (newFirstShownItemIndex !== firstShownItemIndex) {
+        log('Columns Count changed from', this.getState().columnsCount || 1, 'to', newColumnsCount);
+        log('First Shown Item Index needs to change from', firstShownItemIndex, 'to', newFirstShownItemIndex);
+      } // Always rewrite `firstShownItemIndex` and `lastShownItemIndex`
+      // as part of the `state` update, even if it hasn't been modified.
+      //
+      // The reason is that there could be two subsequent `onResize()` calls:
+      // the first one could be user resizing the window to half of its width,
+      // resulting in an "asynchronous" `setState()` call, and then, before that
+      // `setState()` call is applied, a second resize event happens when the user
+      // has resized the window back to its original width, meaning that the
+      // `columnsCount` is back to its original value.
+      // In that case, the final `newFirstShownItemIndex` will be equal to the
+      // original `firstShownItemIndex` that was in `state` before the user
+      // has started resizing the window, so, in the end, `state.firstShownItemIndex`
+      // property wouldn't have changed, but it still has to be part of the final
+      // state update in order to overwrite the previous update of `firstShownItemIndex`
+      // property that has been scheduled to be applied in state after the first resize
+      // happened.
+      //
+
+
+      newState.firstShownItemIndex = newFirstShownItemIndex;
+      newState.lastShownItemIndex = newLastShownItemIndex;
+      var verticalSpacing = this.getVerticalSpacing();
+      var columnsCount = this.getColumnsCount(); // `beforeResize` is always overwritten in `state` here.
+      // (once it has started being tracked in `state`)
+
+      if (this.shouldDiscardBeforeResizeItemHeights() || newFirstShownItemIndex === 0) {
+        if (this.beforeResize.shouldIncludeBeforeResizeValuesInState()) {
+          newState.beforeResize = undefined;
+        }
+      } // Snapshot "before resize" values in order to preserve the currently
+      // shown items' vertical position on screen so that there's no "content jumping".
+      else {
+        // Keep "before resize" values in order to preserve the currently
+        // shown items' vertical position on screen so that there's no
+        // "content jumping". These "before resize" values will be discarded
+        // when (if) the user scrolls back to the top of the list.
+        newState.beforeResize = {
+          verticalSpacing: verticalSpacing,
+          columnsCount: columnsCount,
+          itemHeights: this.beforeResize.snapshotBeforeResizeItemHeights({
+            firstShownItemIndex: firstShownItemIndex,
+            newFirstShownItemIndex: newFirstShownItemIndex,
+            newColumnsCount: newColumnsCount
+          })
+        };
+      } // `this.resetLayoutAfterResize` tells `VirtualScroller` that it should
+      // temporarily stop other updates (like "on scroll" updates) and wait
+      // for the new `state` to be applied, after which the `didUpdateState()`
+      // function will clear this flag and perform a re-layout.
+
+
+      this.resetLayoutAfterResize = {
+        stateUpdate: newState
+      }; // Rerender.
+
+      this.setState(newState);
     }
   }]);
 
   return VirtualScroller;
 }();
+var SLOW_LAYOUT_DURATION = 15; // in milliseconds.
+
+class ItemsContainer {
+	/**
+	 * Constructs a new "container" from an element.
+	 * @param {function} getElement
+	 */
+	constructor(getElement) {
+		this.getElement = getElement;
+	}
+
+	/**
+	 * Returns an item element's "top offset", relative to the items `container`'s top edge.
+	 * @param  {number} renderedElementIndex — An index of an item relative to the "first shown item index". For example, if the list is showing items from index 8 to index 12 then `renderedElementIndex = 0` would mean the item at index `8`.
+	 * @return {number}
+	 */
+	getNthRenderedItemTopOffset(renderedElementIndex) {
+		return this.getElement().childNodes[renderedElementIndex].getBoundingClientRect().top - this.getElement().getBoundingClientRect().top
+	}
+
+	/**
+	 * Returns an item element's height.
+	 * @param  {number} renderedElementIndex — An index of an item relative to the "first shown item index". For example, if the list is showing items from index 8 to index 12 then `renderedElementIndex = 0` would mean the item at index `8`.
+	 * @return {number}
+	 */
+	getNthRenderedItemHeight(renderedElementIndex) {
+		// `offsetHeight` is not precise enough (doesn't return fractional pixels).
+		// return this.getElement().childNodes[renderedElementIndex].offsetHeight
+		return this.getElement().childNodes[renderedElementIndex].getBoundingClientRect().height
+	}
+
+	/**
+	 * Returns items container height.
+	 * @return {number}
+	 */
+	getHeight() {
+		// `offsetHeight` is not precise enough (doesn't return fractional pixels).
+		// return this.getElement().offsetHeight
+		return this.getElement().getBoundingClientRect().height
+	}
+
+	/**
+	 * Removes all item elements of an items container.
+	 */
+	clear() {
+		while (this.getElement().firstChild) {
+			this.getElement().removeChild(this.getElement().firstChild);
+		}
+	}
+}
+
+class ScrollableContainer {
+	/**
+	 * Constructs a new "scrollable container" from an element.
+	 * @param {Element} scrollableContainer
+	 * @param {func} getItemsContainerElement — Returns items "container" element.
+	 */
+	constructor(element, getItemsContainerElement) {
+		this.element = element;
+		this.getItemsContainerElement = getItemsContainerElement;
+	}
+
+	/**
+	 * Returns the current scroll position.
+	 * @return {number}
+	 */
+	getScrollY() {
+		return this.element.scrollTop
+	}
+
+	/**
+	 * Scrolls to a specific position.
+	 * @param {number} scrollY
+	 */
+	scrollToY(scrollY) {
+		// IE 11 doesn't seem to have a `.scrollTo()` method.
+		// https://gitlab.com/catamphetamine/virtual-scroller/-/issues/10
+		// https://stackoverflow.com/questions/39908825/window-scrollto-is-not-working-in-internet-explorer-11
+		if (this.element.scrollTo) {
+			this.element.scrollTo(0, scrollY);
+		} else {
+			this.element.scrollTop = scrollY;
+		}
+	}
+
+	/**
+	 * Returns "scrollable container" width,
+	 * i.e. the available width for its content.
+	 * @return {number}
+	 */
+	getWidth() {
+		return this.element.offsetWidth
+	}
+
+	/**
+	 * Returns the height of the "scrollable container" itself.
+	 * Not to be confused with the height of "scrollable container"'s content.
+	 * @return {number}
+	 */
+	getHeight() {
+		// if (!this.element && !precise) {
+		// 	return getScreenHeight()
+		// }
+		return this.element.offsetHeight
+	}
+
+	/**
+	 * Returns a "top offset" of an items container element
+	 * relative to the "scrollable container"'s top edge.
+	 * @return {number}
+	 */
+	getItemsContainerTopOffset() {
+		const scrollableContainerTop = this.element.getBoundingClientRect().top;
+		const scrollableContainerBorderTopWidth = this.element.clientTop;
+		const itemsContainerTop = this.getItemsContainerElement().getBoundingClientRect().top;
+		return (itemsContainerTop - scrollableContainerTop) + this.getScrollY() - scrollableContainerBorderTopWidth
+	}
+
+	// isVisible() {
+	// 	const { top, bottom } = this.element.getBoundingClientRect()
+	// 	return bottom > 0 && top < getScreenHeight()
+	// }
+
+	/**
+	 * Adds a "scroll" event listener to the "scrollable container".
+	 * @param {onScroll} Should be called whenever the scroll position inside the "scrollable container" (potentially) changes.
+	 * @return {function} Returns a function that stops listening.
+	 */
+	onScroll(onScroll) {
+		this.element.addEventListener('scroll', onScroll);
+		return () => this.element.removeEventListener('scroll', onScroll)
+	}
+
+	/**
+	 * Adds a "resize" event listener to the "scrollable container".
+	 * @param {onResize} Should be called whenever the "scrollable container"'s width or height (potentially) changes.
+   * @return {function} Returns a function that stops listening.
+	 */
+	onResize(onResize) {
+		// Watches "scrollable container"'s dimensions via a `ResizeObserver`.
+		// https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+		// https://web.dev/resize-observer/
+		let unobserve;
+		if (typeof ResizeObserver !== 'undefined') {
+			const resizeObserver = new ResizeObserver((entries) => {
+
+                const page = this.getItemsContainerElement()?.closest(".ion-page");
+                if (page && page.classList.contains("ion-page-hidden")) {
+                    return;
+                }
+				// // If `entry.contentBoxSize` property is supported by the web browser.
+				// if (entry.contentBoxSize) {
+				// 	// https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry/contentBoxSize
+				// 	const width = entry.contentBoxSize.inlineSize
+				// 	const height = entry.contentBoxSize.blockSize
+				// }
+				onResize();
+			});
+			resizeObserver.observe(this.element);
+			unobserve = () => resizeObserver.unobserve(this.element);
+		}
+		// I guess, if window is resized, `onResize()` will be triggered twice:
+		// once for window resize, and once for the scrollable container resize.
+		// But `onResize()` also has an internal check: if the container size
+		// hasn't changed since the previous time `onResize()` has been called,
+		// then `onResize()` doesn't do anything, so, I guess, there shouldn't be
+		// any "performance implications" of running the listener twice in such case.
+		const unlistenGlobalResize = addGlobalResizeListener(onResize, {
+			itemsContainerElement: this.getItemsContainerElement()
+		});
+		return () => {
+			if (unobserve) {
+				unobserve();
+			}
+			unlistenGlobalResize();
+		}
+	}
+}
+
+/**
+ * Adds a "resize" event listener to the `window`.
+ * @param {onResize} Should be called whenever the "scrollable container"'s width or height (potentially) changes.
+ * @param  {Element} options.itemsContainerElement — The items "container" element, which is not the same as the "scrollable container" element. For example, "scrollable container" could be resized while the list element retaining its size. One such example is a user entering fullscreen mode on an HTML5 `<video/>` element: in that case, a "resize" event is triggered on a window, and window dimensions change to the user's screen size, but such "resize" event can be ignored because the list isn't visible until the user exits fullscreen mode.
+ * @return {function} Returns a function that stops listening.
+ */
+function addGlobalResizeListener(onResize, { itemsContainerElement }) {
+	const onResizeListener = () => {
+		// By default, `VirtualScroller` always performs a re-layout
+		// on window `resize` event. But browsers (Chrome, Firefox)
+		// [trigger](https://developer.mozilla.org/en-US/docs/Web/API/Window/fullScreen#Notes)
+		// window `resize` event also when a user switches into fullscreen mode:
+		// for example, when a user is watching a video and double-clicks on it
+		// to maximize it. And also when the user goes out of the fullscreen mode.
+		// Each such fullscreen mode entering/exiting will trigger window `resize`
+		// event that will it turn trigger a re-layout of `VirtualScroller`,
+		// resulting in bad user experience. To prevent that, such cases are filtered out.
+		// Some other workaround:
+		// https://stackoverflow.com/questions/23770449/embedded-youtube-video-fullscreen-or-causing-resize
+		if (document.fullscreenElement) {
+			// If the fullscreened element doesn't contain the list
+			// (and is not the list itself), then the layout hasn't been affected,
+			// so don't perform a re-layout.
+			//
+			// For example, suppose there's a list of items, and some item contains a video.
+			// If, upon clicking such video, it plays inline, and the user enters
+			// fullscreen mode while playing such inline video, then the layout won't be
+			// affected, and so such `resize` event should be ignored: when
+			// `document.fullscreenElement` is in a separate "branch" relative to the
+			// `container`.
+			//
+			// Another scenario: suppose that upon click, the video doesn't play inline,
+			// but instead a "Slideshow" component is open, with the video shown at the
+			// center of the screen in an overlay. If then the user enters fullscreen mode,
+			// the layout wouldn't be affected too, so such `resize` event should also be
+			// ignored: when `document.fullscreenElement` is inside the `container`.
+			//
+			if (document.fullscreenElement.contains(itemsContainerElement)) ; else {
+				// The element is either inside the `container`,
+				// Or is in a separate tree.
+				// So the `resize` event won't affect the `container`'s dimensions.
+				return
+			}
+		}
+		onResize();
+	};
+	window.addEventListener('resize', onResizeListener);
+	return () => window.removeEventListener('resize', onResizeListener)
+}
+
+// For some weird reason, in Chrome, `setTimeout()` would lag up to a second (or more) behind.
+
+// Refreshing two times every seconds seems reasonable.
+const WATCH_LIST_TOP_OFFSET_INTERVAL = 500;
+
+// Refreshing for 3 seconds after the initial page load seems reasonable.
+const WATCH_LIST_TOP_OFFSET_MAX_DURATION = 3000;
+
+// `VirtualScroller` calls `this.layout.layOut()` on mount,
+// but if the page styles are applied after `VirtualScroller` mounts
+// (for example, if styles are applied via javascript, like Webpack does)
+// then the list might not render correctly and it will only show the first item.
+// The reason is that in that case calling `.getListTopOffset()` on mount
+// returns "incorrect" `top` position because the styles haven't been applied yet.
+//
+// For example, consider a page:
+// <div class="page">
+//   <nav class="sidebar">...</nav>
+//   <main>...</main>
+// </div>
+//
+// The sidebar is styled as `position: fixed`, but until
+// the page styles have been applied it's gonna be a regular `<div/>`
+// meaning that `<main/>` will be rendered below the sidebar
+// and will appear offscreen and so it will only render the first item.
+//
+// Then, the page styles are loaded and applied and the sidebar
+// is now `position: fixed` so `<main/>` is now rendered at the top of the page
+// but `VirtualScroller`'s `.render()` has already been called
+// and it won't re-render until the user scrolls or the window is resized.
+//
+// This type of a bug doesn't seem to occur in production, but it can appear
+// in development mode when using Webpack. The workaround `VirtualScroller`
+// implements for such cases is calling `.getListTopOffset()`
+// on the list container DOM element periodically (every second) to check
+// if the `top` coordinate has changed as a result of CSS being applied:
+// if it has then it recalculates the shown item indexes.
+//
+// Maybe this bug could occur in production when using Webpack chunks.
+// That depends on how a style of a chunk is added to the page:
+// if it's added via `javascript` after the page has been rendered
+// then this workaround will also work for that case.
+//
+// Another example would be a page having a really tall expanded "accordion"
+// section, below which a `VirtualScroller` list resides. If the user un-expands
+// such expanded "accordion" section, the list would become visible but
+// it wouldn't get re-rendered because no `scroll` event has occured,
+// and the list only re-renders automatically on `scroll` events.
+// To work around such cases, call `virtualScroller.updateLayout()` method manually.
+// The workaround below could be extended to refresh the list's top coordinate
+// indefinitely and at higher intervals, but why waste CPU time on that.
+// There doesn't seem to be any DOM API for tracking an element's top position.
+// There is `IntersectionObserver` API but it doesn't exactly do that.
+//
+class ListTopOffsetWatcher {
+	constructor({
+		getListTopOffset,
+		onListTopOffsetChange
+	}) {
+		this.getListTopOffset = getListTopOffset;
+		this.onListTopOffsetChange = onListTopOffsetChange;
+	}
+
+	onListTopOffset(listTopOffset) {
+		if (this.listTopOffsetInsideScrollableContainer === undefined) {
+			// Start periodical checks of the list's top offset
+			// in order to perform a re-layout in case it changes.
+			// See the comments in `ListTopOffsetWatcher.js` file
+			// on why can the list's top offset change, and in which circumstances.
+			this.start();
+		}
+		this.listTopOffsetInsideScrollableContainer = listTopOffset;
+	}
+
+	start() {
+		this.isRendered = true;
+		this.watchListTopOffset();
+	}
+
+	stop() {
+		this.isRendered = false;
+
+		if (this.watchListTopOffsetTimer) {
+			clearTimeout(this.watchListTopOffsetTimer);
+			this.watchListTopOffsetTimer = undefined;
+		}
+	}
+
+	watchListTopOffset() {
+		const startedAt = Date.now();
+		const check = () => {
+			// If `VirtualScroller` has been unmounted
+			// while `setTimeout()` was waiting, then exit.
+			if (!this.isRendered) {
+				return
+			}
+			// Skip comparing `top` coordinate of the list
+			// when this function is called for the first time.
+			if (this.listTopOffsetInsideScrollableContainer !== undefined) {
+				// Calling `this.getListTopOffset()` on an element
+				// runs about 0.003 milliseconds on a modern desktop CPU,
+				// so I guess it's fine calling it twice a second.
+				if (this.getListTopOffset() !== this.listTopOffsetInsideScrollableContainer) {
+					this.onListTopOffsetChange();
+				}
+			}
+			// Compare `top` coordinate of the list twice a second
+			// to find out if it has changed as a result of loading CSS styles.
+			// The total duration of 3 seconds would be enough for any styles to load, I guess.
+			// There could be other cases changing the `top` coordinate
+			// of the list (like collapsing an "accordeon" panel above the list
+			// without scrolling the page), but those cases should be handled
+			// by manually calling `.updateLayout()` instance method on `VirtualScroller` instance.
+			if (Date.now() - startedAt < WATCH_LIST_TOP_OFFSET_MAX_DURATION) {
+				this.watchListTopOffsetTimer = setTimeout$1(check, WATCH_LIST_TOP_OFFSET_INTERVAL);
+			}
+		};
+		// Run the cycle.
+		check();
+	}
+}
+
+const engine = {
+	createItemsContainer(getItemsContainerElement) {
+		return new ItemsContainer(getItemsContainerElement)
+	},
+	// Creates a `scrollableContainer`.
+	// On client side, `scrollableContainer` is always created.
+	// On server side, `scrollableContainer` is not created (and not used).
+	createScrollableContainer(scrollableContainer, getItemsContainerElement) {
+        return new ScrollableContainer(scrollableContainer, getItemsContainerElement)
+	},
+	watchListTopOffset({
+		getListTopOffset,
+		onListTopOffsetChange
+	}) {
+		return new ListTopOffsetWatcher({
+			getListTopOffset,
+			onListTopOffsetChange
+		})
+	}
+};
 
 const virtualScrollerComponentCss = "ionx-virtual-scroller{display:block}";
 
@@ -3196,9 +5216,16 @@ let VirtualScrollerComponent = class extends HTMLElement {
   }
   connectedCallback() {
     const container = this.element;
+    this.element.closest(".ion-page").addEventListener("ionViewDidLeave", () => {
+      this.paused = true;
+    });
+    this.element.closest(".ion-page").addEventListener("ionViewDidEnter", () => {
+      this.paused = false;
+    });
     this.state = {};
     this.scroller = new VirtualScroller(() => container, this.items, {
       tbody: false,
+      engine,
       scrollableContainer: this.element.closest("ion-content").shadowRoot.querySelector(".inner-scroll"),
       getItemId: this.itemKey ? (item) => this.itemKey(item) : undefined,
       getState: () => this.state,
@@ -3211,10 +5238,15 @@ let VirtualScrollerComponent = class extends HTMLElement {
           this.state = newState;
           forceUpdate(this);
         }
+      },
+      shouldUpdateLayoutOnScreenResize: () => {
+        console.log("lallasl");
+        return !!this.paused;
       }
     });
   }
-  componentDidLoad() {
+  async componentDidLoad() {
+    await waitTillHydrated(this.element.closest("ion-content"));
     setTimeout(() => this.scroller.listen());
   }
   componentDidRender() {

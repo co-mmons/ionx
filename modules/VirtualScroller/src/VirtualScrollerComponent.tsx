@@ -1,7 +1,9 @@
 import {Component, ComponentInterface, Element, forceUpdate, h, Host, Prop, Watch} from "@stencil/core";
 import {shallowEqual} from "fast-equals";
+import {waitTillHydrated} from "ionx/utils";
 import VirtualScroller from "virtual-scroller";
 import {VirtualScrollerState} from "./VirtualScrollerState";
+import engine from "./engine.js";
 
 @Component({
     tag: "ionx-virtual-scroller",
@@ -33,11 +35,13 @@ export class VirtualScrollerComponent implements ComponentInterface {
 
     didUpdateState: (prevState: VirtualScrollerState) => void;
 
-    scroller: VirtualScroller;
+    scroller: VirtualScroller<HTMLElement, any>;
 
     beforeItemsHeight: number;
 
     afterItemsHeight: number;
+
+    paused: boolean;
 
     @Watch("items")
     itemsChanged(newItems: any[]) {
@@ -48,14 +52,23 @@ export class VirtualScrollerComponent implements ComponentInterface {
     connectedCallback() {
         const container = this.element;
 
+        this.element.closest(".ion-page").addEventListener("ionViewDidLeave", () => {
+            this.paused = true;
+        });
+
+        this.element.closest(".ion-page").addEventListener("ionViewDidEnter", () => {
+            this.paused = false;
+        });
+
         this.state = {};
 
         this.scroller = new VirtualScroller(() => container, this.items, {
             tbody: false,
+            engine,
             scrollableContainer: this.element.closest("ion-content").shadowRoot.querySelector(".inner-scroll"),
             getItemId: this.itemKey ? (item) => this.itemKey(item) : undefined,
-            getState: () => this.state,
-            setState: (state: any, callbacks: {willUpdateState: (niu, prev) => void, didUpdateState: (prev) => void}) => {
+            getState: () => this.state as any,
+            setState: (state: any, callbacks?: {willUpdateState: (niu, prev) => void, didUpdateState: (prev) => void}) => {
 
                 this.prevState = this.state;
 
@@ -67,12 +80,18 @@ export class VirtualScrollerComponent implements ComponentInterface {
                     this.state = newState;
                     forceUpdate(this);
                 }
+            },
+
+            shouldUpdateLayoutOnScreenResize: () => {
+                console.log("lallasl");
+                return !!this.paused
             }
-        });
+        } as any);
 
     }
 
-    componentDidLoad() {
+    async componentDidLoad() {
+        await waitTillHydrated(this.element.closest("ion-content"));
         setTimeout(() => this.scroller.listen());
     }
 

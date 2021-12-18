@@ -19,7 +19,7 @@
     },
     "peerDependencies": {
         "@capacitor/core": "^3.3.0",
-        "@ionic/core": "^5.5.0",
+        "@ionic/core": "^5.9.0",
         "@stencil/core": "github:CODE-AND-MORE/stencil-core-build",
         "bignumber.js": "^9.0.0",
         "fast-equals": "^2.0.0",

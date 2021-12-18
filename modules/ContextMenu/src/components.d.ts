@@ -10,6 +10,8 @@ export namespace Components {
     interface IonxContextMenu {
         "items": ContextMenuItem[];
     }
+    interface IonxModuleTest {
+    }
 }
 declare global {
     interface HTMLIonxContextMenuElement extends Components.IonxContextMenu, HTMLStencilElement {
@@ -18,16 +20,26 @@ declare global {
         prototype: HTMLIonxContextMenuElement;
         new (): HTMLIonxContextMenuElement;
     };
+    interface HTMLIonxModuleTestElement extends Components.IonxModuleTest, HTMLStencilElement {
+    }
+    var HTMLIonxModuleTestElement: {
+        prototype: HTMLIonxModuleTestElement;
+        new (): HTMLIonxModuleTestElement;
+    };
     interface HTMLElementTagNameMap {
         "ionx-context-menu": HTMLIonxContextMenuElement;
+        "ionx-module-test": HTMLIonxModuleTestElement;
     }
 }
 declare namespace LocalJSX {
     interface IonxContextMenu {
         "items": ContextMenuItem[];
     }
+    interface IonxModuleTest {
+    }
     interface IntrinsicElements {
         "ionx-context-menu": IonxContextMenu;
+        "ionx-module-test": IonxModuleTest;
     }
 }
 export { LocalJSX as JSX };
@@ -35,6 +47,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ionx-context-menu": LocalJSX.IonxContextMenu & JSXBase.HTMLAttributes<HTMLIonxContextMenuElement>;
+            "ionx-module-test": LocalJSX.IonxModuleTest & JSXBase.HTMLAttributes<HTMLIonxModuleTestElement>;
         }
     }
 }
