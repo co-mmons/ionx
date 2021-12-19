@@ -14,8 +14,9 @@ export declare class VirtualScrollerComponent implements ComponentInterface {
   scroller: VirtualScroller<HTMLElement, any>;
   beforeItemsHeight: number;
   afterItemsHeight: number;
-  paused: boolean;
-  itemsChanged(newItems: any[]): void;
+  initScroller(): void;
+  itemsChanged(items: any[], _old: any): void;
+  componentShouldUpdate(_new: any, _old: any, propName: string): boolean | void;
   connectedCallback(): void;
   componentDidLoad(): Promise<void>;
   componentDidRender(): void;

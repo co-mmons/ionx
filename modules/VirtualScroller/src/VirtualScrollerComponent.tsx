@@ -2,8 +2,8 @@ import {Component, ComponentInterface, Element, forceUpdate, h, Host, Prop, Watc
 import {shallowEqual} from "fast-equals";
 import {waitTillHydrated} from "ionx/utils";
 import VirtualScroller from "virtual-scroller";
-import {VirtualScrollerState} from "./VirtualScrollerState";
 import engine from "./engine.js";
+import {VirtualScrollerState} from "./VirtualScrollerState";
 
 @Component({
     tag: "ionx-virtual-scroller",
@@ -41,28 +41,9 @@ export class VirtualScrollerComponent implements ComponentInterface {
 
     afterItemsHeight: number;
 
-    paused: boolean;
+    initScroller() {
 
-    @Watch("items")
-    itemsChanged(newItems: any[]) {
-        const {preserveScrollPositionOnPrependItems} = this;
-        this.scroller.setItems(newItems, {preserveScrollPositionOnPrependItems});
-    }
-
-    connectedCallback() {
-        const container = this.element;
-
-        this.element.closest(".ion-page").addEventListener("ionViewDidLeave", () => {
-            this.paused = true;
-        });
-
-        this.element.closest(".ion-page").addEventListener("ionViewDidEnter", () => {
-            this.paused = false;
-        });
-
-        this.state = {};
-
-        this.scroller = new VirtualScroller(() => container, this.items, {
+        this.scroller = new VirtualScroller(() => this.element, this.items, {
             tbody: false,
             engine,
             scrollableContainer: this.element.closest("ion-content").shadowRoot.querySelector(".inner-scroll"),
@@ -79,15 +60,38 @@ export class VirtualScrollerComponent implements ComponentInterface {
                     this.didUpdateState = callbacks.didUpdateState;
                     this.state = newState;
                     forceUpdate(this);
-                }
-            },
 
-            shouldUpdateLayoutOnScreenResize: () => {
-                console.log("lallasl");
-                return !!this.paused
+                    if (!this.state.items || this.state.items.length === 0) {
+                        this.scroller.stop();
+                        this.scroller = undefined;
+                    }
+                }
             }
         } as any);
 
+    }
+
+    @Watch("items")
+    itemsChanged(items: any[], _old: any) {
+
+        if (Array.isArray(items) && items.length > 0 && !this.scroller) {
+            this.initScroller();
+            setTimeout(() => this.scroller.listen());
+        } else {
+            const {preserveScrollPositionOnPrependItems} = this;
+            this.scroller.setItems(items, {preserveScrollPositionOnPrependItems});
+        }
+    }
+
+    componentShouldUpdate(_new: any, _old: any, propName: string): boolean | void {
+        if (propName === "items") {
+            return false;
+        }
+    }
+
+    connectedCallback() {
+        this.state = {};
+        this.initScroller();
     }
 
     async componentDidLoad() {
@@ -107,11 +111,11 @@ export class VirtualScrollerComponent implements ComponentInterface {
     }
 
     disconnectedCallback() {
-        this.scroller.stop();
-
+        this.scroller?.stop();
     }
 
     render() {
+        console.debug("[ionx-virtual-scroller] render")
 
         const {items, firstShownItemIndex, lastShownItemIndex, beforeItemsHeight, afterItemsHeight, itemHeights} = this.state;
 
@@ -122,7 +126,9 @@ export class VirtualScrollerComponent implements ComponentInterface {
 
         const itemsToRender: [item: any, index: number][] = [];
         for (let i = firstShownItemIndex; i <= lastShownItemIndex; i++) {
-            itemsToRender.push([items[i], i]);
+            if (items.length > i) {
+                itemsToRender.push([items[i], i]);
+            }
         }
 
         return <Host style={{display: "block", paddingTop: `${this.beforeItemsHeight}px`, paddingBottom: `${this.afterItemsHeight}px`}}>

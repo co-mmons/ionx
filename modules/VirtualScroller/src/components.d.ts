@@ -6,6 +6,12 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface IonxTest {
+    }
+    interface IonxTestPage1 {
+    }
+    interface IonxTestPage2 {
+    }
     interface IonxVirtualScroller {
         "estimatedItemHeight": number;
         "itemKey"?: (item: any) => any;
@@ -15,6 +21,24 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
+    }
+    var HTMLIonxTestElement: {
+        prototype: HTMLIonxTestElement;
+        new (): HTMLIonxTestElement;
+    };
+    interface HTMLIonxTestPage1Element extends Components.IonxTestPage1, HTMLStencilElement {
+    }
+    var HTMLIonxTestPage1Element: {
+        prototype: HTMLIonxTestPage1Element;
+        new (): HTMLIonxTestPage1Element;
+    };
+    interface HTMLIonxTestPage2Element extends Components.IonxTestPage2, HTMLStencilElement {
+    }
+    var HTMLIonxTestPage2Element: {
+        prototype: HTMLIonxTestPage2Element;
+        new (): HTMLIonxTestPage2Element;
+    };
     interface HTMLIonxVirtualScrollerElement extends Components.IonxVirtualScroller, HTMLStencilElement {
     }
     var HTMLIonxVirtualScrollerElement: {
@@ -22,10 +46,19 @@ declare global {
         new (): HTMLIonxVirtualScrollerElement;
     };
     interface HTMLElementTagNameMap {
+        "ionx-test": HTMLIonxTestElement;
+        "ionx-test-page1": HTMLIonxTestPage1Element;
+        "ionx-test-page2": HTMLIonxTestPage2Element;
         "ionx-virtual-scroller": HTMLIonxVirtualScrollerElement;
     }
 }
 declare namespace LocalJSX {
+    interface IonxTest {
+    }
+    interface IonxTestPage1 {
+    }
+    interface IonxTestPage2 {
+    }
     interface IonxVirtualScroller {
         "estimatedItemHeight"?: number;
         "itemKey"?: (item: any) => any;
@@ -34,6 +67,9 @@ declare namespace LocalJSX {
         "renderItem"?: (item: any, index: number) => any;
     }
     interface IntrinsicElements {
+        "ionx-test": IonxTest;
+        "ionx-test-page1": IonxTestPage1;
+        "ionx-test-page2": IonxTestPage2;
         "ionx-virtual-scroller": IonxVirtualScroller;
     }
 }
@@ -41,6 +77,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
+            "ionx-test-page1": LocalJSX.IonxTestPage1 & JSXBase.HTMLAttributes<HTMLIonxTestPage1Element>;
+            "ionx-test-page2": LocalJSX.IonxTestPage2 & JSXBase.HTMLAttributes<HTMLIonxTestPage2Element>;
             "ionx-virtual-scroller": LocalJSX.IonxVirtualScroller & JSXBase.HTMLAttributes<HTMLIonxVirtualScrollerElement>;
         }
     }

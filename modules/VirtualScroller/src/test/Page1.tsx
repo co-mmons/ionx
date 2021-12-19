@@ -14,7 +14,11 @@ export class Page1 {
     element: HTMLElement;
 
     @State()
-    items = new Array(100).fill(undefined).map((_v, id)=> ({id, label: loremIpsum.substr(0, Math.random() * 400)}));
+    items = new Array(1000).fill(undefined).map((_v, id)=> ({id, label: loremIpsum.substr(0, Math.random() * 400)}));
+
+    componentShouldUpdate() {
+
+    }
 
     renderItem(item: any) {
         return <ion-item key={item.id} href="/page2">
@@ -33,6 +37,8 @@ export class Page1 {
                     <ion-button onClick={() => this.items = [{id: 0, label: "ahahah"}].concat(this.items.slice().splice(1))}>change first item</ion-button>
 
                     <ion-button onClick={() => this.items = this.items.slice().splice(1)}>remove first item</ion-button>
+
+                    <ion-button onClick={() => this.items = (this.items.length > 0 ? [] : new Array(1000).fill(undefined).map((_v, id)=> ({id, label: loremIpsum.substr(0, Math.random() * 400)})))}>new</ion-button>
 
                 </div>
                 <ion-list lines="full">

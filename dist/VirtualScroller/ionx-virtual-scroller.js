@@ -5210,20 +5210,8 @@ let VirtualScrollerComponent = class extends HTMLElement {
     this.__registerHost();
     this.preserveScrollPositionOnPrependItems = true;
   }
-  itemsChanged(newItems) {
-    const { preserveScrollPositionOnPrependItems } = this;
-    this.scroller.setItems(newItems, { preserveScrollPositionOnPrependItems });
-  }
-  connectedCallback() {
-    const container = this.element;
-    this.element.closest(".ion-page").addEventListener("ionViewDidLeave", () => {
-      this.paused = true;
-    });
-    this.element.closest(".ion-page").addEventListener("ionViewDidEnter", () => {
-      this.paused = false;
-    });
-    this.state = {};
-    this.scroller = new VirtualScroller(() => container, this.items, {
+  initScroller() {
+    this.scroller = new VirtualScroller(() => this.element, this.items, {
       tbody: false,
       engine,
       scrollableContainer: this.element.closest("ion-content").shadowRoot.querySelector(".inner-scroll"),
@@ -5237,13 +5225,33 @@ let VirtualScrollerComponent = class extends HTMLElement {
           this.didUpdateState = callbacks.didUpdateState;
           this.state = newState;
           forceUpdate(this);
+          if (!this.state.items || this.state.items.length === 0) {
+            console.log("stooooppp");
+            this.scroller.stop();
+            this.scroller = undefined;
+          }
         }
-      },
-      shouldUpdateLayoutOnScreenResize: () => {
-        console.log("lallasl");
-        return !!this.paused;
       }
     });
+  }
+  itemsChanged(items, _old) {
+    if (Array.isArray(items) && items.length > 0 && !this.scroller) {
+      this.initScroller();
+      setTimeout(() => this.scroller.listen());
+    }
+    else {
+      const { preserveScrollPositionOnPrependItems } = this;
+      this.scroller.setItems(items, { preserveScrollPositionOnPrependItems });
+    }
+  }
+  componentShouldUpdate(_new, _old, propName) {
+    if (propName === "items") {
+      return false;
+    }
+  }
+  connectedCallback() {
+    this.state = {};
+    this.initScroller();
   }
   async componentDidLoad() {
     await waitTillHydrated(this.element.closest("ion-content"));
@@ -5258,9 +5266,10 @@ let VirtualScrollerComponent = class extends HTMLElement {
     }
   }
   disconnectedCallback() {
-    this.scroller.stop();
+    this.scroller?.stop();
   }
   render() {
+    console.debug("[ionx-virtual-scroller] render");
     const { items, firstShownItemIndex, lastShownItemIndex, beforeItemsHeight, afterItemsHeight, itemHeights } = this.state;
     if (itemHeights.find(h => typeof h === "number") || items.length === 0) {
       this.beforeItemsHeight = beforeItemsHeight;
@@ -5268,7 +5277,9 @@ let VirtualScrollerComponent = class extends HTMLElement {
     }
     const itemsToRender = [];
     for (let i = firstShownItemIndex; i <= lastShownItemIndex; i++) {
-      itemsToRender.push([items[i], i]);
+      if (items.length > i) {
+        itemsToRender.push([items[i], i]);
+      }
     }
     return h(Host, { style: { display: "block", paddingTop: `${this.beforeItemsHeight}px`, paddingBottom: `${this.afterItemsHeight}px` } }, itemsToRender.map(item => this.renderItem(item[0], item[1])));
   }
