@@ -1,6 +1,7 @@
 @import "../Popover/src/context-menu-list";
 
 @mixin ionx-html-editor-menu-popover {
+    overflow: initial !important;
 
     ion-list {
         @include ionx-popover-context-menu-list;

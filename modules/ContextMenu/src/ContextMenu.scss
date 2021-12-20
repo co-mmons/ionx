@@ -1,6 +1,8 @@
 @import "../Popover/src/context-menu-list";
 
 :host {
+    overflow: initial !important;
+
     ion-list {
         @include ionx-popover-context-menu-list;
     }
