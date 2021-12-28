@@ -12,6 +12,8 @@ export class Test {
 
             <ionx-width-breakpoints>
                 <small>test</small>
+
+                <div hide-when="=xs">hide test</div>
             </ionx-width-breakpoints>
 
         </Host>

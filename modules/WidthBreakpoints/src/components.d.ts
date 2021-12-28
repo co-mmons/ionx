@@ -6,12 +6,20 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface IonxTest {
+    }
     interface IonxWidthBreakpoints {
         "accessorName": string;
         "prefetch": boolean;
     }
 }
 declare global {
+    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
+    }
+    var HTMLIonxTestElement: {
+        prototype: HTMLIonxTestElement;
+        new (): HTMLIonxTestElement;
+    };
     interface HTMLIonxWidthBreakpointsElement extends Components.IonxWidthBreakpoints, HTMLStencilElement {
     }
     var HTMLIonxWidthBreakpointsElement: {
@@ -19,15 +27,19 @@ declare global {
         new (): HTMLIonxWidthBreakpointsElement;
     };
     interface HTMLElementTagNameMap {
+        "ionx-test": HTMLIonxTestElement;
         "ionx-width-breakpoints": HTMLIonxWidthBreakpointsElement;
     }
 }
 declare namespace LocalJSX {
+    interface IonxTest {
+    }
     interface IonxWidthBreakpoints {
         "accessorName"?: string;
         "prefetch"?: boolean;
     }
     interface IntrinsicElements {
+        "ionx-test": IonxTest;
         "ionx-width-breakpoints": IonxWidthBreakpoints;
     }
 }
@@ -35,6 +47,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
             "ionx-width-breakpoints": LocalJSX.IonxWidthBreakpoints & JSXBase.HTMLAttributes<HTMLIonxWidthBreakpointsElement>;
         }
     }
