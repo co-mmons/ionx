@@ -14453,7 +14453,7 @@ function findBlockMarks(state, markType) {
   return marks;
 }
 
-const alignmentMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}";
+const alignmentMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}";
 
 let AlignmentMenu = class extends HTMLElement$1 {
   constructor() {
@@ -14509,7 +14509,7 @@ function findMarksInSelection(state, markType, attrs) {
   return findMarks(doc, from, to, markType, attrs);
 }
 
-const insertMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
+const insertMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
 let InsertMenu = class extends HTMLElement$1 {
   constructor() {
@@ -14557,7 +14557,7 @@ function findNodeStartEnd(doc, pos) {
   return { start, end };
 }
 
-const linkMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
+const linkMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
 defineIonxLinkEditor();
 let LinkMenu = class extends HTMLElement$1 {
@@ -19729,7 +19729,7 @@ function wrapInList(nodeType) {
   return autoJoin(wrapInList$1(nodeType), (before, after) => before.type === after.type && before.type === nodeType);
 }
 
-const listMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
+const listMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
 let ListMenu = class extends HTMLElement$1 {
   constructor() {
@@ -19765,7 +19765,7 @@ let ListMenu = class extends HTMLElement$1 {
   static get style() { return listMenuCss; }
 };
 
-const paragraphMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
+const paragraphMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
 
 let ParagraphMenu = class extends HTMLElement$1 {
   constructor() {
@@ -19918,7 +19918,7 @@ function toggleInlineMark(markType, attrs) {
   };
 }
 
-const textMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0;--inner-border-width:0}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}:host input[type=color]{width:20px;height:20px;border:1px solid var(--ion-border-color);background-color:transparent;margin:0 0 0 8px;outline:none}:host ion-button[slot=end]{margin:0}";
+const textMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}:host input[type=color]{width:20px;height:20px;border:1px solid var(--ion-border-color);background-color:transparent;margin:0 0 0 8px;outline:none}:host ion-button[slot=end]{margin:0}";
 
 let TextMenu = class extends HTMLElement$1 {
   constructor() {

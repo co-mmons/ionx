@@ -11,9 +11,6 @@ export async function showContextMenu(target: HTMLElement | Event, items: Contex
         event: target instanceof HTMLElement ? {target} as any : target
     });
 
-    popover.arrow = false;
-    popover.offsetLeft
-
     await popover.present();
 
     popover.animated = false;

@@ -84,4 +84,4 @@ export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;
 
 export type { Components, JSX };
 
-export * from './types';
+export * from './types/components';

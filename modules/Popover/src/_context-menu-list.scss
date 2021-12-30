@@ -2,8 +2,21 @@
     margin: 0;
     padding: 0;
 
+    ion-item {
+        --border-width: 0 0 var(--ionx-border-width) 0;
+        --inner-border-width: 0;
+        --inner-padding-start: 0;
+        --inner-padding-end: 0;
+        --padding-start: 16px;
+        --padding-end: 16px;
+    }
+
     & > ion-item.item:last-child, & > *:last-child > ion-item.item:last-child {
         --border-width: 0;
-        --inner-border-width: 0;
+    }
+
+    ion-item > [slot=start] {
+        margin-right: 16px;
+        margin-left: 0px;
     }
 }
