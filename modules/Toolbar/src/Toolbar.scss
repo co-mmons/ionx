@@ -1,5 +1,3 @@
-@import "../../styles/src/hide-when-media-width-breakpoint-mixin";
-
 :host {
     display: block;
 
@@ -97,8 +95,6 @@
             content: '\A';
             white-space: pre;
         }
-
-        @include ionx-hide-when("hide-when");
     }
 }
 

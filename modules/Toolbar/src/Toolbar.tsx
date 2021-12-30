@@ -2,6 +2,7 @@ import type {Components as ionic} from "@ionic/core";
 import {waitTill} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten, matchesMediaBreakpoint} from "ionx/utils";
+import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {ToolbarButtonType} from "./ToolbarButtonType";
 import {ToolbarTitleWrap} from "./ToolbarTitleWrap";
 
@@ -40,6 +41,8 @@ export class Toolbar {
             }
         }
     }
+
+    breakpoints: WidthBreakpointsContainer;
 
     toolbarElement: HTMLElement;
 
@@ -128,6 +131,8 @@ export class Toolbar {
 
     connectedCallback() {
 
+        this.breakpoints = new WidthBreakpointsContainer(this.element);
+
         if (this.titleWrap === "collapse") {
             this.enableCollapsibleTitle();
         }
@@ -137,6 +142,9 @@ export class Toolbar {
     disconnectedCallback() {
         this.disableCollapsibleTitle();
         this.toolbarElement = undefined;
+
+        this.breakpoints.disconnect();
+        this.breakpoints = undefined;
     }
 
     render() {

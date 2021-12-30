@@ -10,7 +10,7 @@ const modules = [
     "forms/TooltipErrorPresenter",
 
     "Loading",
-    "Toolbar",
+    ["Toolbar", ["WidthBreakpoints"]],
 
     "Dialog",
     "ContextMenu",
@@ -38,7 +38,7 @@ const modules = [
     "Swiper",
     "VirtualScroller",
     "Checkbox",
-    "WidthBreakpoints",
+    ["WidthBreakpoints", ["utils"]],
 
     "LinkEditor",
     "HtmlEditor",

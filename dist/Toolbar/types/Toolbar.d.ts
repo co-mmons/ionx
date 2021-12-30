@@ -1,5 +1,6 @@
 import type { Components as ionic } from "@ionic/core";
 import { EventUnlisten } from "ionx/utils";
+import { WidthBreakpointsContainer } from "ionx/WidthBreakpoints";
 import { ToolbarButtonType } from "./ToolbarButtonType";
 import { ToolbarTitleWrap } from "./ToolbarTitleWrap";
 export declare class Toolbar {
@@ -10,6 +11,7 @@ export declare class Toolbar {
   defaultBackHref: string;
   titleWrap: ToolbarTitleWrap;
   titleWrapChanged(niu: ToolbarTitleWrap, old: ToolbarTitleWrap): void;
+  breakpoints: WidthBreakpointsContainer;
   toolbarElement: HTMLElement;
   get contentElement(): HTMLElement & ionic.IonContent;
   unlistenScroll: EventUnlisten;
