@@ -42,7 +42,8 @@ export class Col {
                 style[`--size-${bp.name}`] = style[bp.name];
                 style[`--grow-${bp.name}`] = "0";
                 style[`--shrink-${bp.name}`] = "0";
-                style[`--basis-${bp.name}`] = "var(---width)";
+            } else {
+                style[`--basis-${bp.name}`] = "0";
             }
 
             delete style[bp.name];

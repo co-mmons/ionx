@@ -22,14 +22,14 @@ ionx-grid-col {
     ---shrink-xl: var(--ionx-width-breakpoints-xl) var(--shrink-xl, 1);
     ---shrink-xxl: var(--ionx-width-breakpoints-xxl) var(--shrink-xxl, 1);
 
-    ---basis-xs: var(--ionx-width-breakpoints-xs) var(--basis-xs, 0);
-    ---basis-sm: var(--ionx-width-breakpoints-sm) var(--basis-sm, 0);
-    ---basis-md: var(--ionx-width-breakpoints-md) var(--basis-md, 0);
-    ---basis-lg: var(--ionx-width-breakpoints-lg) var(--basis-lg, 0);
-    ---basis-xl: var(--ionx-width-breakpoints-xl) var(--basis-xl, 0);
-    ---basis-xxl: var(--ionx-width-breakpoints-xxl) var(--basis-xxl, 0);
+    ---basis-xs: var(--ionx-width-breakpoints-xs) var(--basis-xs, var(---width));
+    ---basis-sm: var(--ionx-width-breakpoints-sm) var(--basis-sm, var(---width));
+    ---basis-md: var(--ionx-width-breakpoints-md) var(--basis-md, var(---width));
+    ---basis-lg: var(--ionx-width-breakpoints-lg) var(--basis-lg, var(---width));
+    ---basis-xl: var(--ionx-width-breakpoints-xl) var(--basis-xl, var(---width));
+    ---basis-xxl: var(--ionx-width-breakpoints-xxl) var(--basis-xxl, var(---width));
 
-    ---width: calc(calc(var(---size, 12) / 12) * (100% - var(--col-margin-start, 8px) - var(--col-margin-end, 8px)));
+    ---width: calc((calc(var(---size, 12) / 12) * 100%) - var(--col-margin-start, 8px) - var(--col-margin-end, 8px));
 
     @include ionx-width-breakpoints-set-prop("---size", "-size");
     @include ionx-width-breakpoints-set-prop("---grow", "-grow");
