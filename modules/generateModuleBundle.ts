@@ -58,10 +58,17 @@ export function generateModuleBundle() {
 
             if (params.defineFunctionName) {
                 code += `\nexport function ${params.defineFunctionName}() {`;
-                code += `\n\tif (typeof customElements === "undefined") { return; }`;
-                code += `\n\t[${elemClass.map(elem => `{tagName: "${elem.tagName}", clazz: ${elem.className}}`).join(", ")}].forEach(elem => {`;
-                code += `\n\t\tif (!customElements.get(elem.tagName)) { customElements.define(elem.tagName, elem.clazz) }`;
-                code += `\n\t});\n}`;
+            } else {
+                code += `\n(function() {`;
+            }
+
+            code += `\n\tif (typeof customElements === "undefined") { return; }`;
+            code += `\n\t[${elemClass.map(elem => `{tagName: "${elem.tagName}", clazz: ${elem.className}}`).join(", ")}].forEach(elem => {`;
+            code += `\n\t\tif (!customElements.get(elem.tagName)) { customElements.define(elem.tagName, elem.clazz) }`;
+            code += `\n\t});\n}`;
+
+            if (!params.defineFunctionName) {
+                code += `\n)();`;
             }
 
             index.code = code;

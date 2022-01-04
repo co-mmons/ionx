@@ -7,3 +7,10 @@ const containerTagName = "ionx-width-breakpoints";
 export { containerTagName };
 
 import {IonxWidthBreakpoints} from "./ionx-width-breakpoints";
+(function() {
+	if (typeof customElements === "undefined") { return; }
+	[{tagName: "ionx-width-breakpoints", clazz: IonxWidthBreakpoints}].forEach(elem => {
+		if (!customElements.get(elem.tagName)) { customElements.define(elem.tagName, elem.clazz) }
+	});
+}
+)();

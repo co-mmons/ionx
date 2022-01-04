@@ -1,0 +1,46 @@
+@import "../WidthBreakpoints/src/styles/set-prop";
+
+ionx-grid-col {
+    ---size-xs: var(--ionx-width-breakpoints-xs) var(--size-xs, 12);
+    ---size-sm: var(--ionx-width-breakpoints-sm) var(--size-sm, 12);
+    ---size-md: var(--ionx-width-breakpoints-md) var(--size-md, 12);
+    ---size-lg: var(--ionx-width-breakpoints-lg) var(--size-lg, 12);
+    ---size-xl: var(--ionx-width-breakpoints-xl) var(--size-xl, 12);
+    ---size-xxl: var(--ionx-width-breakpoints-xxl) var(--size-xxl, 12);
+
+    ---grow-xs: var(--ionx-width-breakpoints-xs) var(--grow-xs, 1);
+    ---grow-sm: var(--ionx-width-breakpoints-sm) var(--grow-sm, 1);
+    ---grow-md: var(--ionx-width-breakpoints-md) var(--grow-md, 1);
+    ---grow-lg: var(--ionx-width-breakpoints-lg) var(--grow-lg, 1);
+    ---grow-xl: var(--ionx-width-breakpoints-xl) var(--grow-xl, 1);
+    ---grow-xxl: var(--ionx-width-breakpoints-xxl) var(--grow-xxl, 1);
+
+    ---shrink-xs: var(--ionx-width-breakpoints-xs) var(--shrink-xs, 1);
+    ---shrink-sm: var(--ionx-width-breakpoints-sm) var(--shrink-sm, 1);
+    ---shrink-md: var(--ionx-width-breakpoints-md) var(--shrink-md, 1);
+    ---shrink-lg: var(--ionx-width-breakpoints-lg) var(--shrink-lg, 1);
+    ---shrink-xl: var(--ionx-width-breakpoints-xl) var(--shrink-xl, 1);
+    ---shrink-xxl: var(--ionx-width-breakpoints-xxl) var(--shrink-xxl, 1);
+
+    ---basis-xs: var(--ionx-width-breakpoints-xs) var(--basis-xs, 0);
+    ---basis-sm: var(--ionx-width-breakpoints-sm) var(--basis-sm, 0);
+    ---basis-md: var(--ionx-width-breakpoints-md) var(--basis-md, 0);
+    ---basis-lg: var(--ionx-width-breakpoints-lg) var(--basis-lg, 0);
+    ---basis-xl: var(--ionx-width-breakpoints-xl) var(--basis-xl, 0);
+    ---basis-xxl: var(--ionx-width-breakpoints-xxl) var(--basis-xxl, 0);
+
+    ---width: calc(calc(var(---size, 12) / 12) * (100% - var(--col-margin-start, 8px) - var(--col-margin-end, 8px)));
+
+    @include ionx-width-breakpoints-set-prop("---size", "-size");
+    @include ionx-width-breakpoints-set-prop("---grow", "-grow");
+    @include ionx-width-breakpoints-set-prop("---shrink", "-shrink");
+    @include ionx-width-breakpoints-set-prop("---basis", "-basis");
+
+    box-sizing: border-box;
+    position: relative;
+    min-height: 1px; // prevent columns from collapsing when empty
+    flex: var(---grow) var(---shrink) var(---basis);
+    width: var(---width);
+    max-width: var(---width);
+    margin: var(--col-margin-top, 8px) var(--col-margin-end, 8px) var(--col-margin-bottom, 8px) var(--col-margin-start, 8px);
+}

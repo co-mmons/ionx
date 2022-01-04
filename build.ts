@@ -39,6 +39,7 @@ const modules = [
     "VirtualScroller",
     "Checkbox",
     ["WidthBreakpoints", ["utils"]],
+    ["Grid", ["WidthBreakpoints"]],
 
     "LinkEditor",
     "HtmlEditor",
