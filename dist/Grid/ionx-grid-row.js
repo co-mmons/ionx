@@ -1,6 +1,6 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 
-const rowCss = "ionx-grid-row{display:flex;flex-wrap:wrap;margin:var(--row-margin-top, 8px) var(--row-margin-end, 8px) var(--row-margin-bottom, 8px) var(--row-margin-start, 8px)}";
+const rowCss = "ionx-grid-row{display:flex;flex-wrap:wrap}";
 
 let Row = class extends HTMLElement {
   constructor() {

@@ -1,7 +1,7 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
-const gridCss = "ionx-grid{display:block}";
+const gridCss = "ionx-grid{display:block;margin:var(--grid-margin-top, 8px) var(--grid-margin-end, 8px) var(--grid-margin-bottom, 8px) var(--grid-margin-start, 8px)}";
 
 let Grid = class extends HTMLElement {
   constructor() {
