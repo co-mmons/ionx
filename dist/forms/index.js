@@ -39,9 +39,7 @@ class FormControlImpl {
     this.name = name;
     this.touched$ = false;
     this.dirty$ = false;
-    this.disabled$ = false;
     this.valid$ = true;
-    this.readonly$ = false;
     this.stateChanges$ = new Subject();
   }
   //
@@ -391,8 +389,12 @@ class FormControlImpl {
           }
         }
         if (state.statusChange) {
-          this.element$["disabled"] = state.status.disabled;
-          this.element$["readonly"] = state.status.readonly;
+          if (typeof state.status.disabled === "boolean") {
+            this.element$["disabled"] = state.status.disabled;
+          }
+          if (typeof state.status.readonly === "boolean") {
+            this.element$["readonly"] = state.status.readonly;
+          }
         }
       }
     }
@@ -529,21 +531,31 @@ class FormController {
     for (const control of Object.values(this.controls)) {
       control.markAsDirty();
     }
+    return this;
   }
   markAsPristine() {
     for (const control of Object.values(this.controls)) {
       control.markAsPristine();
     }
+    return this;
   }
   markAsTouched() {
     for (const control of Object.values(this.controls)) {
       control.markAsTouched();
     }
+    return this;
   }
   markAsUntouched() {
     for (const control of Object.values(this.controls)) {
       control.markAsUntouched();
     }
+    return this;
+  }
+  markAsReadonly() {
+    for (const control of this.list()) {
+      control.markAsReadonly();
+    }
+    return this;
   }
   state() {
     const state = {

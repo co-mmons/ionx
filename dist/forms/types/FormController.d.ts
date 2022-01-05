@@ -65,10 +65,11 @@ export declare class FormController<Controls extends {
   get untouched(): boolean;
   get valid(): boolean;
   get invalid(): boolean;
-  markAsDirty(): void;
-  markAsPristine(): void;
-  markAsTouched(): void;
-  markAsUntouched(): void;
+  markAsDirty(): this;
+  markAsPristine(): this;
+  markAsTouched(): this;
+  markAsUntouched(): this;
+  markAsReadonly(): this;
   state(): FormState;
   setStates(states: {
     [controlName: string]: FormControlState;

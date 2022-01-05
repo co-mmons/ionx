@@ -157,28 +157,45 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         return this.status?.invalid || false;
     }
 
-    markAsDirty() {
+    markAsDirty(): this {
         for (const control of Object.values(this.controls)) {
             control.markAsDirty();
         }
+
+        return this;
     }
 
-    markAsPristine() {
+    markAsPristine(): this {
         for (const control of Object.values(this.controls)) {
             control.markAsPristine();
         }
+
+        return this;
     }
 
-    markAsTouched() {
+    markAsTouched(): this {
         for (const control of Object.values(this.controls)) {
             control.markAsTouched();
         }
+
+        return this;
     }
 
-    markAsUntouched() {
+    markAsUntouched(): this {
         for (const control of Object.values(this.controls)) {
             control.markAsUntouched();
         }
+
+        return this;
+    }
+
+    markAsReadonly(): this {
+
+        for (const control of this.list()) {
+            control.markAsReadonly();
+        }
+
+        return this;
     }
 
     state(): FormState {

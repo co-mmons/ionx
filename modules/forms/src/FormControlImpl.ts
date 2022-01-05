@@ -345,8 +345,6 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private dirty$ = false;
 
-    private disabled$ = false;
-
     private valid$ = true;
 
     private value$: Value;
@@ -355,7 +353,9 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private validated$: boolean;
 
-    private readonly$ = false;
+    private disabled$: boolean;
+
+    private readonly$: boolean;
 
     private stateChanges$ = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
 
@@ -495,8 +495,14 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
                 }
 
                 if (state.statusChange) {
-                    this.element$["disabled"] = state.status.disabled;
-                    this.element$["readonly"] = state.status.readonly;
+
+                    if (typeof state.status.disabled === "boolean") {
+                        this.element$["disabled"] = state.status.disabled;
+                    }
+
+                    if (typeof state.status.readonly === "boolean") {
+                        this.element$["readonly"] = state.status.readonly;
+                    }
                 }
             }
         }

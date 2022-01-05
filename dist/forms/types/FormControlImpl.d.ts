@@ -70,11 +70,11 @@ export declare class FormControlImpl<Value = any> implements FormControl<Value> 
   private validators$;
   private touched$;
   private dirty$;
-  private disabled$;
   private valid$;
   private value$;
   private error$;
   private validated$;
+  private disabled$;
   private readonly$;
   private stateChanges$;
   private applyState;
