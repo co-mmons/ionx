@@ -41,6 +41,7 @@ class FormControlImpl {
     this.dirty$ = false;
     this.disabled$ = false;
     this.valid$ = true;
+    this.readonly$ = false;
     this.stateChanges$ = new Subject();
   }
   //
@@ -63,6 +64,12 @@ class FormControlImpl {
   }
   get disabled() {
     return this.disabled$;
+  }
+  get readonly() {
+    return !!this.readonly$;
+  }
+  get mutable() {
+    return !this.readonly$;
   }
   get valid() {
     return this.valid$;
@@ -123,6 +130,12 @@ class FormControlImpl {
   markAsPristine() {
     this.applyState({ dirty: false });
   }
+  markAsReadonly() {
+    this.applyState({ readonly: true });
+  }
+  markAsMutable() {
+    this.applyState({ readonly: false });
+  }
   setValidators(validators) {
     this.validators$ = Array.isArray(validators) ? validators.slice() : (validators ? [validators] : []);
   }
@@ -161,6 +174,8 @@ class FormControlImpl {
       pristine: this.pristine,
       touched: this.touched,
       untouched: this.untouched,
+      readonly: this.readonly,
+      mutable: !this.readonly,
       valid: this.valid,
       error: this.error$
     };
@@ -297,10 +312,13 @@ class FormControlImpl {
     if ((statusChange || valueChange) && (!options || !options.preventEvent)) {
       this.fireStateChange({ status, value });
     }
-    return { valueChange: valueChange, statusChange: statusChange };
+    return { valueChange: valueChange, statusChange };
   }
   onElementChange(ev) {
     if (ev.target !== this.element$) {
+      return;
+    }
+    if (this.disabled || this.readonly) {
       return;
     }
     const value = "checked" in ev.detail ? ev.detail.checked : ev.detail.value;
@@ -374,6 +392,7 @@ class FormControlImpl {
         }
         if (state.statusChange) {
           this.element$["disabled"] = state.status.disabled;
+          this.element$["readonly"] = state.status.readonly;
         }
       }
     }

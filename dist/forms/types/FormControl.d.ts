@@ -15,6 +15,8 @@ export interface FormControl<Value = any> {
   readonly untouched: boolean;
   readonly disabled: boolean;
   readonly enabled: boolean;
+  readonly readonly: boolean;
+  readonly mutable: boolean;
   readonly value: Value;
   readonly stateChanges: Observable<{
     current: FormControlReadonlyState<Value>;
@@ -29,6 +31,8 @@ export interface FormControl<Value = any> {
   }): void;
   enable(): void;
   disable(): void;
+  markAsReadonly(): void;
+  markAsMutable(): void;
   markAsDirty(): void;
   markAsPristine(): void;
   markAsTouched(): void;

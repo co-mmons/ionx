@@ -8,6 +8,8 @@ export interface FormControlStatus {
   readonly enabled: boolean;
   valid: boolean;
   readonly invalid: boolean;
+  readonly: boolean;
+  readonly mutable: boolean;
   error: FormValidationError;
 }
 export interface FormControlReadonlyStatus extends Readonly<FormControlStatus> {

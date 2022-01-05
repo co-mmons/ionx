@@ -13,6 +13,8 @@ export declare class FormControlImpl<Value = any> implements FormControl<Value> 
   get pristine(): boolean;
   get enabled(): boolean;
   get disabled(): boolean;
+  get readonly(): boolean;
+  get mutable(): boolean;
   get valid(): boolean;
   get invalid(): boolean;
   get value(): Value;
@@ -33,6 +35,8 @@ export declare class FormControlImpl<Value = any> implements FormControl<Value> 
   markAsTouched(): void;
   markAsUntouched(): void;
   markAsPristine(): void;
+  markAsReadonly(): void;
+  markAsMutable(): void;
   setValidators(validators: FormValidator | FormValidator[]): void;
   getValidators(): FormValidator[];
   clearValidators(): void;
@@ -71,6 +75,7 @@ export declare class FormControlImpl<Value = any> implements FormControl<Value> 
   private value$;
   private error$;
   private validated$;
+  private readonly$;
   private stateChanges$;
   private applyState;
   private onElementChange;

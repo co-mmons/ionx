@@ -14,6 +14,7 @@ interface ApplyState<Value = any> {
     touched?: boolean;
     dirty?: boolean;
     disabled?: boolean;
+    readonly?: boolean;
     valid?: boolean;
     value?: Value;
 }
@@ -52,6 +53,14 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     get disabled() {
         return this.disabled$;
+    }
+
+    get readonly() {
+        return !!this.readonly$;
+    }
+
+    get mutable() {
+        return !this.readonly$;
     }
 
     get valid() {
@@ -128,6 +137,14 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         this.applyState({dirty: false});
     }
 
+    markAsReadonly() {
+        this.applyState({readonly: true});
+    }
+
+    markAsMutable() {
+        this.applyState({readonly: false});
+    }
+
     setValidators(validators: FormValidator | FormValidator[]) {
         this.validators$ = Array.isArray(validators) ? validators.slice() : (validators ? [validators] : []);
     }
@@ -175,6 +192,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             pristine: this.pristine,
             touched: this.touched,
             untouched: this.untouched,
+            readonly: this.readonly,
+            mutable: !this.readonly,
             valid: this.valid,
             error: this.error$
         }
@@ -336,6 +355,8 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private validated$: boolean;
 
+    private readonly$ = false;
+
     private stateChanges$ = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
 
     private applyState(state: ApplyState, options?: {preventEvent?: boolean, trigger?: "elementValueChange"}): {valueChange: boolean, statusChange: boolean} {
@@ -377,12 +398,16 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
             this.fireStateChange({status, value});
         }
 
-        return {valueChange: valueChange, statusChange: statusChange};
+        return {valueChange: valueChange, statusChange};
     }
 
     private onElementChange(ev: CustomEvent) {
 
         if (ev.target !== this.element$) {
+            return;
+        }
+
+        if (this.disabled || this.readonly) {
             return;
         }
 
@@ -471,6 +496,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
                 if (state.statusChange) {
                     this.element$["disabled"] = state.status.disabled;
+                    this.element$["readonly"] = state.status.readonly;
                 }
             }
         }
