@@ -70,6 +70,7 @@ export declare class FormController<Controls extends {
   markAsTouched(): this;
   markAsUntouched(): this;
   markAsReadonly(): this;
+  markAsMutable(): this;
   state(): FormState;
   setStates(states: {
     [controlName: string]: FormControlState;

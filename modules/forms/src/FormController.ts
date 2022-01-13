@@ -198,6 +198,15 @@ export class FormController<Controls extends {[name: string]: {value?: any, vali
         return this;
     }
 
+    markAsMutable(): this {
+
+        for (const control of this.list()) {
+            control.markAsMutable();
+        }
+
+        return this;
+    }
+
     state(): FormState {
 
         const state = {

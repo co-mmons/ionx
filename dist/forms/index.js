@@ -166,14 +166,14 @@ class FormControlImpl {
   status() {
     return {
       dirty: this.dirty,
-      disabled: this.disabled,
+      disabled: this.disabled$,
       enabled: this.enabled,
       invalid: this.invalid,
       pristine: this.pristine,
       touched: this.touched,
       untouched: this.untouched,
-      readonly: this.readonly,
-      mutable: !this.readonly,
+      readonly: this.readonly$,
+      mutable: !this.readonly$,
       valid: this.valid,
       error: this.error$
     };
@@ -554,6 +554,12 @@ class FormController {
   markAsReadonly() {
     for (const control of this.list()) {
       control.markAsReadonly();
+    }
+    return this;
+  }
+  markAsMutable() {
+    for (const control of this.list()) {
+      control.markAsMutable();
     }
     return this;
   }

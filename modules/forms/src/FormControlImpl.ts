@@ -186,14 +186,14 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
     status(): FormControlReadonlyStatus {
         return {
             dirty: this.dirty,
-            disabled: this.disabled,
+            disabled: this.disabled$,
             enabled: this.enabled,
             invalid: this.invalid,
             pristine: this.pristine,
             touched: this.touched,
             untouched: this.untouched,
-            readonly: this.readonly,
-            mutable: !this.readonly,
+            readonly: this.readonly$,
+            mutable: !this.readonly$,
             valid: this.valid,
             error: this.error$
         }
