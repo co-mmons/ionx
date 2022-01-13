@@ -145,7 +145,7 @@
     padding: 0;
 
     &.list-lines-full > {
-        ion-item:first-child, ion-reorder-group:first-child > ion-item:first-child {
+        ion-item:first-child, ion-reorder-group:first-child > ion-item:first-child, ion-radio-group:first-child > ion-item:first-child {
             --border-width: var(--ionx-border-width) 0 var(--ionx-border-width) 0;
         }
     }
@@ -161,7 +161,7 @@
             --padding-end: 0;
         }
 
-        > ion-item:first-child, ion-reorder-group:first-child > ion-item:first-child {
+        > ion-item:first-child, ion-reorder-group:first-child > ion-item:first-child, ion-radio-group:first-child > ion-item:first-child {
             --inner-border-width: var(--ionx-border-width) 0 var(--ionx-border-width) 0;
         }
     }
