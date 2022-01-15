@@ -1,9 +1,8 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { modalController } from '@ionic/core';
-import { Subject } from 'rxjs';
-import { first } from 'rxjs/operators';
 import { prefetchComponent } from 'ionx/utils';
+import { Subject, firstValueFrom } from 'rxjs';
 import { HtmlString } from '@co.mmons/js-utils/core';
 
 async function showDialog(options) {
@@ -57,7 +56,7 @@ let Dialog = class extends HTMLElement {
    * A promise resolved when dialog was fully presented.
    */
   onDidEnter() {
-    return __classPrivateFieldGet(this, _Dialog_didEnter, "f").pipe(first()).toPromise();
+    return firstValueFrom(__classPrivateFieldGet(this, _Dialog_didEnter, "f"));
   }
   ionDidEnter() {
     __classPrivateFieldGet(this, _Dialog_didEnter, "f").next(true);

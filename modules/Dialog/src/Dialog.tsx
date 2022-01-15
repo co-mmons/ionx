@@ -1,9 +1,8 @@
 import {HtmlString} from "@co.mmons/js-utils/core";
 import {OverlayEventDetail} from "@ionic/core";
 import {Component, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
-import {Subject} from "rxjs";
-import {first} from "rxjs/operators";
 import {prefetchComponent} from "ionx/utils";
+import {firstValueFrom, Subject} from "rxjs";
 import {DialogButton} from "./DialogButton";
 import {DialogOptions} from "./DialogOptions";
 
@@ -87,7 +86,7 @@ export class Dialog implements DialogOptions {
      */
     @Method()
     onDidEnter(): Promise<true> {
-        return this.#didEnter.pipe(first()).toPromise();
+        return firstValueFrom(this.#didEnter);
     }
 
     @Listen("ionViewDidEnter")
