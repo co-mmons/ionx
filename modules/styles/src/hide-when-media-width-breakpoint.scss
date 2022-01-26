@@ -1,0 +1,5 @@
+@import "./hide-when-media-width-breakpoint-mixin";
+
+[ionx-hide-when^="@"] {
+    @include ionx-hide-when-media-width-breakpoint("ionx-hide-when", "@");
+}

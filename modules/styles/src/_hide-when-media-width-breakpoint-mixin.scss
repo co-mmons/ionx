@@ -2,35 +2,35 @@
 @use "sass:math";
 @import "./width-breakpoints";
 
-@mixin ionx-hide-when-media-width-breakpoint($attr-name, $breakpoints: $ionx-width-breakpoints) {
+@mixin ionx-hide-when-media-width-breakpoint($attr-name, $prefix: "@", $breakpoints: $ionx-width-breakpoints) {
 
     @each $breakpoint, $widths in $breakpoints {
 
-        &[#{$attr-name}="=#{$breakpoint}"] {
+        &[#{$attr-name}="#{$prefix}=#{$breakpoint}"] {
             @media (min-width: list.nth($widths, 1)) and (max-width: list.nth($widths, 2)) {
                 display: none;
             }
         }
 
-        &[#{$attr-name}=">=#{$breakpoint}"] {
+        &[#{$attr-name}="#{$prefix}>=#{$breakpoint}"] {
             @media (min-width: list.nth($widths, 1)) {
                 display: none;
             }
         }
 
-        &[#{$attr-name}="<=#{$breakpoint}"] {
+        &[#{$attr-name}="#{$prefix}<=#{$breakpoint}"] {
             @media (max-width: list.nth($widths, 2)) {
                 display: none;
             }
         }
 
-        &[#{$attr-name}=">#{$breakpoint}"] {
+        &[#{$attr-name}="#{$prefix}>#{$breakpoint}"] {
             @media (min-width: list.nth($widths, 2) + 1) {
                 display: none;
             }
         }
 
-        &[#{$attr-name}="<#{$breakpoint}"] {
+        &[#{$attr-name}="#{$prefix}<#{$breakpoint}"] {
             @media (max-width: list.nth($widths, 1) - 1) {
                 display: none;
             }

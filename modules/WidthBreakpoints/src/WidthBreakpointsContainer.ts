@@ -18,6 +18,12 @@ export class WidthBreakpointsContainer {
     private resized() {
 
         const element = this.element;
+
+        const page = this.element.closest(".ion-page");
+        if (page && page.classList.contains("ion-page-hidden")) {
+            return;
+        }
+
         const style = element.style;
         const {width} = element.getBoundingClientRect();
 

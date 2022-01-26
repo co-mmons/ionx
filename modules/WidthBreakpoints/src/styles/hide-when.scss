@@ -1,6 +1,6 @@
 @import "./set-prop";
 
-[ionx-hide-when] {
+[ionx-hide-when]:not([ionx-hide-when^="@"]) {
     --ionx-hide-when--display-xs: var(--ionx-width-breakpoints-xs) var(--ionx-hide-when-display, initial);
     --ionx-hide-when--display-sm: var(--ionx-width-breakpoints-sm) var(--ionx-hide-when-display, initial);
     --ionx-hide-when--display-md: var(--ionx-width-breakpoints-md) var(--ionx-hide-when-display, initial);
@@ -12,6 +12,9 @@
 
 [ionx-hide-when="=xs"] {
     --ionx-hide-when--display-xs: var(--ionx-width-breakpoints-xs) none;
+}
+
+[ionx-hide-when="=xs"] {
 }
 
 [ionx-hide-when="=sm"] {
