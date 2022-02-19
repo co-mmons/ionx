@@ -1,6 +1,6 @@
 import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { intl, setMessages, MessageRef } from '@co.mmons/js-intl';
+import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import { TimeZoneDate, timeZoneOffset, sleep } from '@co.mmons/js-utils/core';
 import { popoverController, isPlatform } from '@ionic/core';
 import { addEventListener } from 'ionx/utils';
@@ -247,7 +247,7 @@ async function loadIntlMessages() {
   if (loaded.includes(intl.locale)) {
     return;
   }
-  setMessages("ionx/DateTime", intl.locale, await importJson());
+  setGlobalValues("ionx/DateTime", intl.locale, await importJson());
   loaded.push(intl.locale);
 }
 

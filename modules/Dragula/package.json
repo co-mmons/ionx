@@ -2,5 +2,8 @@
     "scripts": {
         "build": "stencil build --ts --config stencil.config.build.ts"
     },
+    "peerDependencies": {
+        "dragula": "^3.7.3"
+    },
     "types": "../../dist/Dragula/index.d.ts"
 }

@@ -42,7 +42,7 @@ function contextMenuToggleButton(items, options) {
   return func.bind(func);
 }
 
-const contextMenuCss = ".sc-ionx-context-menu-h ion-list.sc-ionx-context-menu{margin:0;padding:0}.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu>ion-item.item.sc-ionx-context-menu:last-child,.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu>*.sc-ionx-context-menu:last-child>ion-item.item.sc-ionx-context-menu:last-child{--border-width:0;--inner-border-width:0}";
+const contextMenuCss = ".sc-ionx-context-menu-h{overflow:initial !important}.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu{margin:0;padding:0}.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu ion-item.sc-ionx-context-menu{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu>ion-item.item.sc-ionx-context-menu:last-child,.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu>*.sc-ionx-context-menu:last-child>ion-item.item.sc-ionx-context-menu:last-child{--border-width:0}.sc-ionx-context-menu-h ion-list.sc-ionx-context-menu ion-item.sc-ionx-context-menu>[slot=start].sc-ionx-context-menu{margin-right:16px;margin-left:0px}";
 
 let ContextMenu = class extends HTMLElement$1 {
   constructor() {

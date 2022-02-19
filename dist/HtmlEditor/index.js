@@ -2,7 +2,7 @@ import { HTMLElement as HTMLElement$1, createEvent, h, Host, Fragment as Fragmen
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { loadIonxLinkEditorIntl, defineIonxLinkEditor, showLinkEditor } from 'ionx/LinkEditor';
-import { intl, setMessages, MessageRef } from '@co.mmons/js-intl';
+import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import { popoverController, isPlatform } from '@ionic/core';
 import { deepEqual, shallowEqual } from 'fast-equals';
 import { addEventListener } from 'ionx/utils';
@@ -13471,7 +13471,7 @@ async function loadIntlMessages() {
   if (loaded.includes(intl.locale)) {
     return;
   }
-  setMessages("ionx/HtmlEditor", intl.locale, await importJson());
+  setGlobalValues("ionx/HtmlEditor", intl.locale, await importJson());
   loaded.push(intl.locale);
 }
 

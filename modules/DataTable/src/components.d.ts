@@ -30,8 +30,6 @@ export namespace Components {
         "sortingApply": (order: "asc" | "desc" | false) => void;
         "sortingEnabled": boolean;
     }
-    interface IonxTest {
-    }
 }
 declare global {
     interface HTMLIonxDataTableElement extends Components.IonxDataTable, HTMLStencilElement {
@@ -52,17 +50,10 @@ declare global {
         prototype: HTMLIonxDataTableThElement;
         new (): HTMLIonxDataTableThElement;
     };
-    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
-    }
-    var HTMLIonxTestElement: {
-        prototype: HTMLIonxTestElement;
-        new (): HTMLIonxTestElement;
-    };
     interface HTMLElementTagNameMap {
         "ionx-data-table": HTMLIonxDataTableElement;
         "ionx-data-table-search-filter": HTMLIonxDataTableSearchFilterElement;
         "ionx-data-table-th": HTMLIonxDataTableThElement;
-        "ionx-test": HTMLIonxTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -86,13 +77,10 @@ declare namespace LocalJSX {
         "sortingApply"?: (order: "asc" | "desc" | false) => void;
         "sortingEnabled"?: boolean;
     }
-    interface IonxTest {
-    }
     interface IntrinsicElements {
         "ionx-data-table": IonxDataTable;
         "ionx-data-table-search-filter": IonxDataTableSearchFilter;
         "ionx-data-table-th": IonxDataTableTh;
-        "ionx-test": IonxTest;
     }
 }
 export { LocalJSX as JSX };
@@ -102,7 +90,6 @@ declare module "@stencil/core" {
             "ionx-data-table": LocalJSX.IonxDataTable & JSXBase.HTMLAttributes<HTMLIonxDataTableElement>;
             "ionx-data-table-search-filter": LocalJSX.IonxDataTableSearchFilter & JSXBase.HTMLAttributes<HTMLIonxDataTableSearchFilterElement>;
             "ionx-data-table-th": LocalJSX.IonxDataTableTh & JSXBase.HTMLAttributes<HTMLIonxDataTableThElement>;
-            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
         }
     }
 }

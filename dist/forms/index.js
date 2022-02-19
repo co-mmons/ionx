@@ -6,7 +6,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { waitTill } from '@co.mmons/js-utils/core';
 import { isHydrated, addEventListener } from 'ionx/utils';
 import scrollIntoView from 'scroll-into-view';
-import { intl, setMessages, MessageRef } from '@co.mmons/js-intl';
+import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import ExtendableError from 'ts-error';
 
 let loaded = [];
@@ -29,7 +29,7 @@ async function loadIntlMessages() {
   if (loaded.includes(intl.locale)) {
     return;
   }
-  setMessages("ionx/forms", intl.locale, await importJson());
+  setGlobalValues("ionx/forms", intl.locale, await importJson());
   loaded.push(intl.locale);
 }
 

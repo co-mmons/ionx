@@ -1,6 +1,6 @@
 import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { MessageRef, intl, setMessages } from '@co.mmons/js-intl';
+import { MessageRef, intl, setGlobalValues } from '@co.mmons/js-intl';
 import { Enum } from '@co.mmons/js-utils/core';
 import { FormValidationError, validEmail, defineIonxForms, FormController, required } from 'ionx/forms';
 import { defineIonxDialog, showDialog } from 'ionx/Dialog';
@@ -170,7 +170,7 @@ async function loadIntlMessages() {
   if (loaded.includes(intl.locale)) {
     return;
   }
-  setMessages("ionx/LinkEditor", intl.locale, await importJson());
+  setGlobalValues("ionx/LinkEditor", intl.locale, await importJson());
   loaded.push(intl.locale);
 }
 

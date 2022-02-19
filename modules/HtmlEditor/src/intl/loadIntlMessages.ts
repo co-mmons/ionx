@@ -1,4 +1,4 @@
-import {intl, setMessages} from "@co.mmons/js-intl";
+import {intl, setGlobalValues} from "@co.mmons/js-intl";
 
 let loaded: string[] = [];
 
@@ -17,7 +17,7 @@ export async function loadIntlMessages() {
         return;
     }
 
-    setMessages("ionx/HtmlEditor", intl.locale, await importJson());
+    setGlobalValues("ionx/HtmlEditor", intl.locale, await importJson());
 
     loaded.push(intl.locale);
 }
