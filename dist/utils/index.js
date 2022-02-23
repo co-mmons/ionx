@@ -1,3 +1,5 @@
+export { MediaBreakpoint } from "./MediaBreakpoint";
+export { ObservableComponentDisconnectHook } from "./ObservableComponentDisconnectHook";
 export { addComponentDisconnectHook, getComponentDisconnectHook, removeComponentDisconnectHook } from "./componentDisconnectHooks";
 export { addEventListener } from "./addEventListener";
 export { applyPartStyles } from "./applyPartStyles";
@@ -7,7 +9,6 @@ export { loadScript } from "./loadScript";
 export { markTagNameAsHydratable, markTagPrefixAsHydratable } from "./markAsHydratable";
 export { matchesMediaBreakpoints, matchesMediaBreakpoint } from "./matchesMediaBreakpoints";
 export { matchesMediaQuery } from "./matchesMediaQuery";
-export { MediaBreakpoint } from "./MediaBreakpoint";
 export { prefetchComponent } from "./prefetchComponent";
 export { waitTillHydrated } from "./waitTillHydrated";
 export { windowSize } from "./windowSize";
