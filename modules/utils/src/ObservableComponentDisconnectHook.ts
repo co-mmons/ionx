@@ -2,9 +2,9 @@ import {ComponentInterface, forceUpdate} from "@stencil/core";
 import {Observable, Subscription} from "rxjs";
 import {ComponentDisconnectHook} from "./componentDisconnectHooks";
 
-export class ObservableComponentDisconnectHook implements ComponentDisconnectHook {
+export class ObservableComponentDisconnectHook<Value = any> implements ComponentDisconnectHook {
 
-    constructor(private component: ComponentInterface, observable: Observable<any>) {
+    constructor(private component: ComponentInterface, observable: Observable<Value>) {
         this.subscription = observable.subscribe(value => {
             this.$value = value;
             this.$valueChanged = this.$hasValue;
@@ -13,9 +13,9 @@ export class ObservableComponentDisconnectHook implements ComponentDisconnectHoo
         }, () => [this.update(), this.disconnect()], () => [this.update(), this.disconnect()]);
     }
 
-    private $value: any;
+    private $value: Value;
 
-    get value(): any {
+    get value(): Value {
         return this.$value;
     }
 

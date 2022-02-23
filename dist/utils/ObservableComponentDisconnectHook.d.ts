@@ -1,11 +1,11 @@
 import { ComponentInterface } from "@stencil/core";
 import { Observable } from "rxjs";
 import { ComponentDisconnectHook } from "./componentDisconnectHooks";
-export declare class ObservableComponentDisconnectHook implements ComponentDisconnectHook {
+export declare class ObservableComponentDisconnectHook<Value = any> implements ComponentDisconnectHook {
     private component;
-    constructor(component: ComponentInterface, observable: Observable<any>);
+    constructor(component: ComponentInterface, observable: Observable<Value>);
     private $value;
-    get value(): any;
+    get value(): Value;
     private $hasValue;
     get hasValue(): boolean;
     private $valueChanged;
