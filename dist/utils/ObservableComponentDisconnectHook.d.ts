@@ -4,6 +4,8 @@ import { ComponentDisconnectHook } from "./componentDisconnectHooks";
 export declare class ObservableComponentDisconnectHook<Value = any> implements ComponentDisconnectHook {
     private component;
     constructor(component: ComponentInterface, observable: Observable<Value>);
+    private $error;
+    get error(): any;
     private $value;
     get value(): Value;
     private $hasValue;

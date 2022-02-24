@@ -6,11 +6,27 @@ export class ObservableComponentDisconnectHook<Value = any> implements Component
 
     constructor(private component: ComponentInterface, observable: Observable<Value>) {
         this.subscription = observable.subscribe(value => {
+            this.$error = undefined;
             this.$value = value;
             this.$valueChanged = this.$hasValue;
             this.$hasValue = true;
             this.update()
-        }, () => [this.update(), this.disconnect()], () => [this.update(), this.disconnect()]);
+
+        }, error => {
+            this.$error = error;
+            this.update();
+            this.disconnect();
+
+        }, () => {
+            this.update()
+            this.disconnect()
+        });
+    }
+
+    private $error: any;
+
+    get error(): any {
+        return this.$error;
     }
 
     private $value: Value;
@@ -38,6 +54,7 @@ export class ObservableComponentDisconnectHook<Value = any> implements Component
     }
 
     disconnect(): void {
+        this.$error = undefined;
         this.$valueChanged = false;
         this.$hasValue = false;
         this.$value = undefined;

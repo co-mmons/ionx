@@ -5,11 +5,22 @@ export class ObservableComponentDisconnectHook {
         this.$hasValue = false;
         this.$valueChanged = false;
         this.subscription = observable.subscribe(value => {
+            this.$error = undefined;
             this.$value = value;
             this.$valueChanged = this.$hasValue;
             this.$hasValue = true;
             this.update();
-        }, () => [this.update(), this.disconnect()], () => [this.update(), this.disconnect()]);
+        }, error => {
+            this.$error = error;
+            this.update();
+            this.disconnect();
+        }, () => {
+            this.update();
+            this.disconnect();
+        });
+    }
+    get error() {
+        return this.$error;
     }
     get value() {
         return this.$value;
@@ -24,6 +35,7 @@ export class ObservableComponentDisconnectHook {
         forceUpdate(this.component);
     }
     disconnect() {
+        this.$error = undefined;
         this.$valueChanged = false;
         this.$hasValue = false;
         this.$value = undefined;

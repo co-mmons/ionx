@@ -4,7 +4,7 @@ export { addComponentDisconnectHook, getComponentDisconnectHook, removeComponent
 export { addEventListener } from "./addEventListener";
 export { applyPartStyles } from "./applyPartStyles";
 export { isHydrated, isChildrenHydrated } from "./isHydrated";
-export { isReady, isChildrenReady, markAsReady, markAsUnready } from "./readyStateChangeEvent";
+export * from "./ready";
 export { loadScript } from "./loadScript";
 export { markTagNameAsHydratable, markTagPrefixAsHydratable } from "./markAsHydratable";
 export { matchesMediaBreakpoints, matchesMediaBreakpoint } from "./matchesMediaBreakpoints";
