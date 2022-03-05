@@ -243,7 +243,7 @@ export class SelectOverlay implements ComponentInterface {
 
     onCheck(item: SelectItem, checked: boolean) {
 
-        const valuesBefore = this.values.slice();
+        const valuesBefore = (this.multiple && this.checkValidator && checked && this.values.slice()) || undefined;
 
         VALUES: {
 
@@ -271,7 +271,7 @@ export class SelectOverlay implements ComponentInterface {
         }
 
         if (this.multiple && this.checkValidator) {
-            this.values = this.checkValidator(item.value, checked, valuesBefore) || [];
+            this.values = this.checkValidator(item.value, checked, valuesBefore ?? this.values.slice()) || [];
         }
 
         if (!this.multiple) {

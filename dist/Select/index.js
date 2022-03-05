@@ -443,7 +443,7 @@ let SelectOverlay = class extends HTMLElement {
     this.onCheck(item, !wasChecked);
   }
   onCheck(item, checked) {
-    const valuesBefore = this.values.slice();
+    const valuesBefore = (this.multiple && this.checkValidator && checked && this.values.slice()) || undefined;
     VALUES: {
       for (let i = 0; i < this.values.length; i++) {
         if (isEqualValue(this.values[i], item.value, this.comparator)) {
@@ -466,7 +466,7 @@ let SelectOverlay = class extends HTMLElement {
       }
     }
     if (this.multiple && this.checkValidator) {
-      this.values = this.checkValidator(item.value, checked, valuesBefore) || [];
+      this.values = this.checkValidator(item.value, checked, valuesBefore ?? this.values.slice()) || [];
     }
     if (!this.multiple) {
       this.ok();
