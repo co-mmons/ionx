@@ -374,9 +374,9 @@ export class SelectOverlay implements ComponentInterface {
             return;
         }
 
-        if (item.group) {
+        const label = item.overlayLabel ?? item.label;
 
-            const label = item.overlayLabel ?? item.label;
+        if (item.group) {
 
             return <ion-item
                 key={`group:${item.id}`}
@@ -385,7 +385,7 @@ export class SelectOverlay implements ComponentInterface {
                 detailIcon={this.expandedGroups[item.id] ? "chevron-up" : "chevron-down"}
                 onClick={() => this.toggleGroup(item as SelectGroupItem)}>
 
-                <ion-label>{(label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)}</ion-label>
+                <ion-label>{(label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)}</ion-label>
 
                 {this.loadingGroups[item.id] && <ion-spinner name="dots" slot="end"/>}
 
@@ -400,7 +400,7 @@ export class SelectOverlay implements ComponentInterface {
                 checked={this.values.findIndex(v => isEqualValue(v, item.value, this.comparator)) > -1}
                 onClick={ev => this.onClick(ev, item)}/>}
 
-            <ion-label>{(item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)}</ion-label>
+            <ion-label>{(label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)}</ion-label>
 
         </ion-item>
     }
