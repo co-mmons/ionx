@@ -65,10 +65,10 @@ function valueLabel(items, value, props) {
       if (items[i].label) {
         return items[i].label instanceof MessageRef ? intl.message(items[i].label) : items[i].label;
       }
-      return props.formatter ? props.formatter(value) : `${value}`;
+      return props.formatter ? props.formatter(value, false) : `${value}`;
     }
   }
-  return props.formatter ? props.formatter(value) : `${value}`;
+  return props.formatter ? props.formatter(value, false) : `${value}`;
 }
 
 const selectCss = ".sc-ionx-select-h{--select-placeholder-opacity:.5;--select-dropdown-icon-opacity:.5;--select-disabled-opacity:.5;padding:var(--select-padding-top, 0px) var(--select-padding-end, 0px) var(--select-padding-bottom, 0px) var(--select-padding-start, 0px);display:inline-block;overflow:hidden;color:var(--color);font-family:var(--ion-font-family, inherit);max-width:100%;position:relative;outline:none;cursor:pointer}.sc-ionx-select-h::-moz-focus-inner{border:0}.sc-ionx-select-h .ionx--inner.sc-ionx-select{display:flex;position:relative;align-items:center}.sc-ionx-select-h .sc-ionx-select-s>[slot=icon]{margin-right:8px}.sc-ionx-select-h .ionx--dropdown.sc-ionx-select{position:relative;width:16px;height:20px}.sc-ionx-select-h .ionx--dropdown.sc-ionx-select .ionx--dropdown-inner.sc-ionx-select{top:50%;right:0px;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--select-dropdown-icon-opacity, 0.5);pointer-events:none}.sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-select-h .ionx--text.ionx--placeholder-visible.sc-ionx-select{opacity:var(--select-placeholder-opacity, 0.5)}.ionx--disabled.sc-ionx-select-h{opacity:var(--select-disabled-opacity, 0.5);pointer-events:none}.ionx--readonly.sc-ionx-select-h{opacity:1;pointer-events:none}.ionx--readonly.sc-ionx-select-h .select-icon.sc-ionx-select{display:none}[white-space-normal].sc-ionx-select-h .ionx--text.sc-ionx-select,[ionx--white-space=normal].sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:normal !important;overflow:auto}.in-item.sc-ionx-select-h{position:static}.sc-ionx-select-h ion-reorder-group.sc-ionx-select{overflow:hidden}.sc-ionx-select-h ion-item.sc-ionx-select{--padding-start:0;--padding-end:0;--inner-padding-start:0;--inner-padding-end:0}.sc-ionx-select-h ion-item.sc-ionx-select:last-child{--inner-border-width:0}.sc-ionx-select-h ion-item.sc-ionx-select ion-reorder.sc-ionx-select{margin-right:0}ion-toolbar.sc-ionx-select-h,ion-toolbar .sc-ionx-select-h{color:var(--ion-toolbar-color);--icon-color:var(--ion-toolbar-color);--select-padding-start:16px;--select-padding-end:16px}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{align-self:flex-start;--select-padding-top:8px;--select-padding-bottom:8px;--select-padding-start:0px}ionx-form-field.sc-ionx-select-h .ionx--text.sc-ionx-select,ionx-form-field .sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked.sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked .sc-ionx-select-h .ionx--text.sc-ionx-select{max-width:calc(100% - 16px);flex:initial}[slot-container=default]>.sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{width:100%}[slot-container=default]>.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked .sc-ionx-select-h ion-reorder-group.sc-ionx-select{width:100%}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h{--select-padding-start:16px;--select-padding-end:16px}";
@@ -322,7 +322,7 @@ let SelectOverlay = class extends HTMLElement {
       const items = [];
       for (let i = 0; i < this.items.length; i++) {
         if (!this.items[i].divider) {
-          const label = (this.items[i].label instanceof MessageRef ? intl.message(this.items[i].label) : this.items[i].label) || (this.labelFormatter ? this.labelFormatter(this.items[i].value) : `${this.items[i].value}`);
+          const label = (this.items[i].label instanceof MessageRef ? intl.message(this.items[i].label) : this.items[i].label) || (this.labelFormatter ? this.labelFormatter(this.items[i].value, true) : `${this.items[i].value}`);
           if (this.searchTest) {
             if (!this.searchTest(query, this.items[i].value, label)) {
               continue;
@@ -546,7 +546,8 @@ let SelectOverlay = class extends HTMLElement {
       return;
     }
     if (item.group) {
-      return h("ion-item", { key: `group:${item.id}`, button: true, detail: true, detailIcon: this.expandedGroups[item.id] ? "chevron-up" : "chevron-down", onClick: () => this.toggleGroup(item) }, h("ion-label", null, (item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)), this.loadingGroups[item.id] && h("ion-spinner", { name: "dots", slot: "end" }));
+      const label = item.overlayLabel ?? item.label;
+      return h("ion-item", { key: `group:${item.id}`, button: true, detail: true, detailIcon: this.expandedGroups[item.id] ? "chevron-up" : "chevron-down", onClick: () => this.toggleGroup(item) }, h("ion-label", null, (label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)), this.loadingGroups[item.id] && h("ion-spinner", { name: "dots", slot: "end" }));
     }
     return h("ion-item", { key: index, ...{ [indexAttribute]: index }, class: { "ionx--divider": item.divider } }, !item.divider && h("ion-checkbox", { class: "sc-ionx-select-overlay", slot: "start", checked: this.values.findIndex(v => isEqualValue(v, item.value, this.comparator)) > -1, onClick: ev => this.onClick(ev, item) }), h("ion-label", null, (item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)));
   }

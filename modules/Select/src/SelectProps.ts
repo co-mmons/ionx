@@ -85,7 +85,7 @@ export namespace SelectProps {
     }
 
     export interface LabelFormatterFn {
-        (value: any): string;
+        (value: any, overlay?: boolean): string;
     }
 
     export type Overlay = "popover" | "modal";

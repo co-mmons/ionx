@@ -108,7 +108,7 @@ export namespace Components {
         "comparator": ValueComparator;
         "empty": boolean;
         "items": SelectItem[];
-        "labelFormatter"?: (value: any) => string;
+        "labelFormatter"?: SelectProps.LabelFormatterFn;
         "lazyItems": () => Promise<Array<SelectValueItem | SelectDividerItem>>;
         "multiple": boolean;
         "overlay": "modal" | "popover";
@@ -235,7 +235,7 @@ declare namespace LocalJSX {
         "comparator"?: ValueComparator;
         "empty"?: boolean;
         "items"?: SelectItem[];
-        "labelFormatter"?: (value: any) => string;
+        "labelFormatter"?: SelectProps.LabelFormatterFn;
         "lazyItems"?: () => Promise<Array<SelectValueItem | SelectDividerItem>>;
         "multiple"?: boolean;
         "overlay": "modal" | "popover";

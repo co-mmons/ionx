@@ -13,7 +13,7 @@
 | `comparator`           | `comparator`    |             | `"deepEqual" \| "toString" \| ((a: any, b: any) => number \| boolean)` | `undefined` |
 | `empty`                | `empty`         |             | `boolean`                                                              | `undefined` |
 | `items`                | --              |             | `SelectItem[]`                                                         | `undefined` |
-| `labelFormatter`       | --              |             | `(value: any) => string`                                               | `undefined` |
+| `labelFormatter`       | --              |             | `LabelFormatterFn`                                                     | `undefined` |
 | `lazyItems`            | --              |             | `() => Promise<(SelectValueItem<any> \| SelectDividerItem)[]>`         | `undefined` |
 | `multiple`             | `multiple`      |             | `boolean`                                                              | `undefined` |
 | `overlay` _(required)_ | `overlay`       |             | `"modal" \| "popover"`                                                 | `undefined` |

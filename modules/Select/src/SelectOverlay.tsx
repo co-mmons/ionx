@@ -11,6 +11,7 @@ import {isEqualValue} from "./isEqualValue";
 import {SelectDividerItem} from "./SelectDividerItem";
 import {SelectGroupItem} from "./SelectGroupItem";
 import {SelectItem} from "./SelectItem";
+import {SelectProps} from "./SelectProps";
 import {SelectValueItem} from "./SelectValueItem";
 import {ValueComparator} from "./ValueComparator";
 
@@ -66,7 +67,7 @@ export class SelectOverlay implements ComponentInterface {
     checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
 
     @Prop()
-    labelFormatter?: (value: any) => string;
+    labelFormatter?: SelectProps.LabelFormatterFn;
 
     @State()
     didEnter = false;
@@ -93,7 +94,7 @@ export class SelectOverlay implements ComponentInterface {
             for (let i = 0; i < this.items.length; i++) {
                 if (!this.items[i].divider) {
 
-                    const label = (this.items[i].label instanceof MessageRef ? intl.message(this.items[i].label) : this.items[i].label) || (this.labelFormatter ? this.labelFormatter(this.items[i].value) : `${this.items[i].value}`);
+                    const label = (this.items[i].label instanceof MessageRef ? intl.message(this.items[i].label) : this.items[i].label) || (this.labelFormatter ? this.labelFormatter(this.items[i].value, true) : `${this.items[i].value}`);
 
                     if (this.searchTest) {
                         if (!this.searchTest(query, this.items[i].value, label)) {
@@ -374,6 +375,9 @@ export class SelectOverlay implements ComponentInterface {
         }
 
         if (item.group) {
+
+            const label = item.overlayLabel ?? item.label;
+
             return <ion-item
                 key={`group:${item.id}`}
                 button={true}
@@ -381,7 +385,7 @@ export class SelectOverlay implements ComponentInterface {
                 detailIcon={this.expandedGroups[item.id] ? "chevron-up" : "chevron-down"}
                 onClick={() => this.toggleGroup(item as SelectGroupItem)}>
 
-                <ion-label>{(item.label ? (item.label instanceof MessageRef ? intl.message(item.label) : item.label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)}</ion-label>
+                <ion-label>{(label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value) : `${item.value}`)}</ion-label>
 
                 {this.loadingGroups[item.id] && <ion-spinner name="dots" slot="end"/>}
 

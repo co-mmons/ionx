@@ -2,6 +2,7 @@ import { ComponentInterface } from "@stencil/core";
 import { SelectDividerItem } from "./SelectDividerItem";
 import { SelectGroupItem } from "./SelectGroupItem";
 import { SelectItem } from "./SelectItem";
+import { SelectProps } from "./SelectProps";
 import { SelectValueItem } from "./SelectValueItem";
 import { ValueComparator } from "./ValueComparator";
 export declare class SelectOverlay implements ComponentInterface {
@@ -18,7 +19,7 @@ export declare class SelectOverlay implements ComponentInterface {
   empty: boolean;
   comparator: ValueComparator;
   checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
-  labelFormatter?: (value: any) => string;
+  labelFormatter?: SelectProps.LabelFormatterFn;
   didEnter: boolean;
   expandedGroups: {
     [groupId: string]: boolean;
