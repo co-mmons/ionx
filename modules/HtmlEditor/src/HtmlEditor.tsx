@@ -1,16 +1,16 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import {Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Method, Prop, Watch} from "@stencil/core";
-import {LinkScheme, loadIonxLinkEditorIntl} from "ionx/LinkEditor";
-import {baseKeymap} from "prosemirror-commands";
-import {gapCursor} from "prosemirror-gapcursor";
+import {loadIonxLinkEditorIntl} from "ionx/LinkEditor";
+import {Keymap} from "prosemirror-commands";
 import {history} from "prosemirror-history";
 import {keymap} from "prosemirror-keymap";
 import {DOMParser, DOMSerializer, Schema} from "prosemirror-model";
 import {EditorState, Plugin, Transaction} from "prosemirror-state";
 import {EditorView} from "prosemirror-view";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
-import {buildKeymap} from "./prosemirror/keymap";
-import {schema} from "./prosemirror/schema";
+import {undoRedoKeymap} from "./keymaps";
+import {MarkSpecExtended, NodeSpecExtended} from "./schema";
+import {ToolbarItem} from "./toolbar/ToolbarItem";
 import {findScrollParent} from "./utils/findScrollParent";
 import {fixIonItemOverflow} from "./utils/fixIonItemOverflow";
 import {scrollIntoView} from "./utils/scrollIntoView";
@@ -36,7 +36,19 @@ export class HtmlEditor implements ComponentInterface {
     value: string;
 
     @Prop()
-    linkSchemes: LinkScheme[];
+    schema: Schema;
+
+    @Prop()
+    plugins: Plugin[];
+
+    @Prop()
+    keymap: Keymap;
+
+    @Prop()
+    historyDisabled: boolean;
+
+    @Prop()
+    toolbarItems: ToolbarItem[];
 
     /**
      * @internal
@@ -50,6 +62,16 @@ export class HtmlEditor implements ComponentInterface {
     @Method()
     async getView() {
         return this.view;
+    }
+
+    @Method()
+    async getState(): Promise<EditorState<Schema>> {
+        return this.view.state;
+    }
+
+    @Method()
+    async getScheme(): Promise<Schema> {
+        return this.view.state.schema;
     }
 
     @Method()
@@ -80,11 +102,7 @@ export class HtmlEditor implements ComponentInterface {
 
     private scrollParent: HTMLElement;
 
-    private schema: Schema;
-
-    private plugins: Plugin[];
-
-    private view: EditorView;
+    private view: EditorView<Schema>;
 
     @Watch("value")
     protected valueChanged(value: string, old: string) {
@@ -120,18 +138,25 @@ export class HtmlEditor implements ComponentInterface {
         const container = this.element.getElementsByClassName("ionx--prosemirror");
         await waitTill(() => container.length > 0, 1);
 
-        this.schema = schema;
+        const plugins = [
 
-        this.plugins = [
-            keymap(buildKeymap(schema)),
-            keymap(baseKeymap),
-            gapCursor(),
-            history()
+            ...Object.values(this.schema.nodes)
+                .filter(node => node.spec instanceof NodeSpecExtended && node.spec.keymap)
+                .map(node => keymap((node.spec as NodeSpecExtended).keymap(this.schema))),
+
+            ...Object.values(this.schema.marks)
+                .filter(mark => mark.spec instanceof MarkSpecExtended && mark.spec.keymap)
+                .map(mark => keymap((mark.spec as MarkSpecExtended).keymap(this.schema))),
+
+            ...(!this.historyDisabled ? [keymap(undoRedoKeymap)] : []),
+            keymap(this.keymap),
+            ...(this.plugins ?? []),
+            ...(!this.historyDisabled ? [history()] : [])
         ];
 
         const state = EditorState.create({
             schema: this.schema,
-            plugins: this.plugins,
+            plugins: plugins,
             doc: this.editorDocument(this.value ? this.value : "<div></div>")
         });
 
@@ -224,7 +249,11 @@ export class HtmlEditor implements ComponentInterface {
 
     render() {
         return <Host>
-            {!this.readonly && <ionx-html-editor-toolbar/>}
+
+            {!this.readonly && <ionx-html-editor-toolbar
+                items={this.toolbarItems}
+                historyDisabled={this.historyDisabled}/>}
+
             <div class="ionx--prosemirror"/>
         </Host>
     }

@@ -1,4 +1,10 @@
-import {Component, Host, h} from "@stencil/core";
+import {Component, h, Host} from "@stencil/core";
+import {baseKeymap} from "../keymaps";
+import {InsertLinkMenuItem} from "../menus";
+
+import {buildSchema, FontSizeMark, ParagraphNode, StrongMark} from "../schema";
+import {TextToolbarItem} from "../toolbar";
+import {InsertToolbarItem} from "../toolbar/InsertToolbarItem";
 
 @Component({
     tag: "ionx-html-editor-test"
@@ -7,7 +13,7 @@ export class HtmlEditorTest {
 
     private value = `
 <p>
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ipsum risus, pharetra id odio dictum, eleifend interdum erat. Curabitur vitae vulputate ex, scelerisque dapibus sem. Morbi facilisis dolor mi, quis volutpat erat aliquet et. Curabitur in neque neque. Quisque sollicitudin lacus metus, non convallis risus tristique ut. Praesent rhoncus gravida elementum. Proin faucibus in nisl ut suscipit. Morbi neque augue, imperdiet a eleifend eu, laoreet fringilla augue. Praesent vestibulum condimentum eros, ac consequat purus.
+Lorem <app-template-string props="{}"></app-template-string> ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ipsum risus, pharetra id odio dictum, eleifend interdum erat. Curabitur vitae vulputate ex, scelerisque dapibus sem. Morbi facilisis dolor mi, quis volutpat erat aliquet et. Curabitur in neque neque. Quisque sollicitudin lacus metus, non convallis risus tristique ut. Praesent rhoncus gravida elementum. Proin faucibus in nisl ut suscipit. Morbi neque augue, imperdiet a eleifend eu, laoreet fringilla augue. Praesent vestibulum condimentum eros, ac consequat purus.
 </p>
 <p>
 Vivamus non aliquet sem. Duis quis dolor ut lectus sollicitudin fringilla id sed dui. Suspendisse sit amet consequat justo. In hac habitasse platea dictumst. Pellentesque augue nisl, consectetur sagittis nunc eu, luctus lobortis nisl. Donec quam eros, auctor et consectetur ac, venenatis ut odio. Donec malesuada ullamcorper ipsum quis pretium. Duis lacinia efficitur leo ut ultrices. Vivamus tincidunt elit vitae facilisis lobortis. Nunc ac sapien eget leo consectetur mattis. Mauris in rutrum justo, ut dictum augue.
@@ -24,7 +30,11 @@ Aliquam faucibus dignissim dolor, at laoreet orci auctor sed. Morbi quis diam en
 
     render() {
         return <Host>
-            <ionx-html-editor value={this.value}/>
+            <ionx-html-editor
+                schema={buildSchema(new ParagraphNode(), new StrongMark(), new FontSizeMark())}
+                keymap={baseKeymap}
+                toolbarItems={[new TextToolbarItem(), new InsertToolbarItem(InsertLinkMenuItem)]}
+                value={this.value}/>
         </Host>
     }
 }

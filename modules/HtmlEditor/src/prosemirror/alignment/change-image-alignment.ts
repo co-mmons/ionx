@@ -5,8 +5,8 @@ export const changeImageAlignment = (align?: AlignmentState): Command => (
     state,
     dispatch,
 ) => {
-    const { from, to } = state.selection;
 
+    const {from, to} = state.selection;
     const tr = state.tr;
 
     state.doc.nodesBetween(from, to, (node, pos) => {

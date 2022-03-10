@@ -1,7 +1,15 @@
 @import "~prosemirror-view/style/prosemirror";
+@import "~prosemirror-gapcursor/style/gapcursor.css";
 
 ionx-html-editor {
     display: block;
+
+    app-template-string {
+        display: inline-block;
+        width: 1em;
+        height: 0.8em;
+        background: red;
+    }
 }
 
 ionx-html-editor > .ionx--prosemirror > .ProseMirror {

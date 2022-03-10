@@ -1,0 +1,28 @@
+@import "../../../Popover/src/context-menu-list";
+
+@mixin ionx-html-editor-menu-popover {
+    overflow: initial !important;
+
+    ion-list {
+        @include ionx-popover-context-menu-list;
+
+        ion-item.item ion-label {
+            white-space: normal;
+
+            small {
+                display: block;
+                line-height: 1;
+            }
+        }
+
+        ion-item-divider {
+            --background: transparent;
+            --color: var(--ion-text-color);
+            --padding-start: 16px;
+            --padding-end: 16px;
+            font-size: calc(var(--ionx-default-font-size, 16px) * 0.75);
+            font-weight: 500;
+            opacity: .5;
+        }
+    }
+}

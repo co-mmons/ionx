@@ -5,16 +5,25 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { LinkScheme } from "ionx/LinkEditor";
+import { Schema } from "prosemirror-model";
+import { EditorState, Plugin } from "prosemirror-state";
+import { Keymap } from "prosemirror-commands";
+import { ToolbarItem } from "./toolbar/ToolbarItem";
 import { EditorView } from "prosemirror-view";
-import { HtmlEditorFeatures } from "./HtmlEditorFeatures";
+import { InsertMenuItem } from "./menus/InsertMenuItem";
 export namespace Components {
     interface IonxHtmlEditor {
         "disabled": boolean;
-        "getView": () => Promise<EditorView<any>>;
-        "linkSchemes": LinkScheme[];
+        "getScheme": () => Promise<Schema>;
+        "getState": () => Promise<EditorState<Schema>>;
+        "getView": () => Promise<EditorView<Schema<any, any>>>;
+        "historyDisabled": boolean;
+        "keymap": Keymap;
+        "plugins": Plugin[];
         "readonly": boolean;
+        "schema": Schema;
         "setFocus": () => Promise<void>;
+        "toolbarItems": ToolbarItem[];
         "value": string;
     }
     interface IonxHtmlEditorAlignmentMenu {
@@ -22,6 +31,7 @@ export namespace Components {
     }
     interface IonxHtmlEditorInsertMenu {
         "editor": HTMLIonxHtmlEditorElement;
+        "items": InsertMenuItem[];
     }
     interface IonxHtmlEditorLinkMenu {
         "editor": HTMLIonxHtmlEditorElement;
@@ -32,11 +42,14 @@ export namespace Components {
     interface IonxHtmlEditorParagraphMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
+    interface IonxHtmlEditorTest {
+    }
     interface IonxHtmlEditorTextMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
     interface IonxHtmlEditorToolbar {
-        "features": HtmlEditorFeatures;
+        "historyDisabled": boolean;
+        "items": ToolbarItem[];
     }
 }
 declare global {
@@ -76,6 +89,12 @@ declare global {
         prototype: HTMLIonxHtmlEditorParagraphMenuElement;
         new (): HTMLIonxHtmlEditorParagraphMenuElement;
     };
+    interface HTMLIonxHtmlEditorTestElement extends Components.IonxHtmlEditorTest, HTMLStencilElement {
+    }
+    var HTMLIonxHtmlEditorTestElement: {
+        prototype: HTMLIonxHtmlEditorTestElement;
+        new (): HTMLIonxHtmlEditorTestElement;
+    };
     interface HTMLIonxHtmlEditorTextMenuElement extends Components.IonxHtmlEditorTextMenu, HTMLStencilElement {
     }
     var HTMLIonxHtmlEditorTextMenuElement: {
@@ -95,6 +114,7 @@ declare global {
         "ionx-html-editor-link-menu": HTMLIonxHtmlEditorLinkMenuElement;
         "ionx-html-editor-list-menu": HTMLIonxHtmlEditorListMenuElement;
         "ionx-html-editor-paragraph-menu": HTMLIonxHtmlEditorParagraphMenuElement;
+        "ionx-html-editor-test": HTMLIonxHtmlEditorTestElement;
         "ionx-html-editor-text-menu": HTMLIonxHtmlEditorTextMenuElement;
         "ionx-html-editor-toolbar": HTMLIonxHtmlEditorToolbarElement;
     }
@@ -102,10 +122,14 @@ declare global {
 declare namespace LocalJSX {
     interface IonxHtmlEditor {
         "disabled"?: boolean;
-        "linkSchemes"?: LinkScheme[];
+        "historyDisabled"?: boolean;
+        "keymap"?: Keymap;
         "onEditorSelectionChange"?: (event: CustomEvent<any>) => void;
         "onIonChange"?: (event: CustomEvent<{value: string}>) => void;
+        "plugins"?: Plugin[];
         "readonly"?: boolean;
+        "schema"?: Schema;
+        "toolbarItems"?: ToolbarItem[];
         "value"?: string;
     }
     interface IonxHtmlEditorAlignmentMenu {
@@ -113,6 +137,7 @@ declare namespace LocalJSX {
     }
     interface IonxHtmlEditorInsertMenu {
         "editor": HTMLIonxHtmlEditorElement;
+        "items": InsertMenuItem[];
     }
     interface IonxHtmlEditorLinkMenu {
         "editor": HTMLIonxHtmlEditorElement;
@@ -123,11 +148,14 @@ declare namespace LocalJSX {
     interface IonxHtmlEditorParagraphMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
+    interface IonxHtmlEditorTest {
+    }
     interface IonxHtmlEditorTextMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
     interface IonxHtmlEditorToolbar {
-        "features"?: HtmlEditorFeatures;
+        "historyDisabled"?: boolean;
+        "items"?: ToolbarItem[];
     }
     interface IntrinsicElements {
         "ionx-html-editor": IonxHtmlEditor;
@@ -136,6 +164,7 @@ declare namespace LocalJSX {
         "ionx-html-editor-link-menu": IonxHtmlEditorLinkMenu;
         "ionx-html-editor-list-menu": IonxHtmlEditorListMenu;
         "ionx-html-editor-paragraph-menu": IonxHtmlEditorParagraphMenu;
+        "ionx-html-editor-test": IonxHtmlEditorTest;
         "ionx-html-editor-text-menu": IonxHtmlEditorTextMenu;
         "ionx-html-editor-toolbar": IonxHtmlEditorToolbar;
     }
@@ -150,6 +179,7 @@ declare module "@stencil/core" {
             "ionx-html-editor-link-menu": LocalJSX.IonxHtmlEditorLinkMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorLinkMenuElement>;
             "ionx-html-editor-list-menu": LocalJSX.IonxHtmlEditorListMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorListMenuElement>;
             "ionx-html-editor-paragraph-menu": LocalJSX.IonxHtmlEditorParagraphMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorParagraphMenuElement>;
+            "ionx-html-editor-test": LocalJSX.IonxHtmlEditorTest & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorTestElement>;
             "ionx-html-editor-text-menu": LocalJSX.IonxHtmlEditorTextMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorTextMenuElement>;
             "ionx-html-editor-toolbar": LocalJSX.IonxHtmlEditorToolbar & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorToolbarElement>;
         }

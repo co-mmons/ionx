@@ -1,9 +1,6 @@
 import { MarkSpec, NodeSpec, Schema } from "prosemirror-model";
 export declare const nodes: {
-  doc: {
-    content: string;
-    marks: string;
-  };
+  doc: NodeSpec;
   paragraph: NodeSpec;
   blockquote: NodeSpec;
   horizontalRule: NodeSpec;
@@ -14,6 +11,7 @@ export declare const nodes: {
   orderedList: NodeSpec;
   listItem: NodeSpec;
   youtube: NodeSpec;
+  TemplateString: NodeSpec;
 };
 export declare const marks: {
   link: MarkSpec;
@@ -24,4 +22,4 @@ export declare const marks: {
   textColor: MarkSpec;
   underline: MarkSpec;
 };
-export declare const schema: Schema<"text" | "paragraph" | "heading" | "doc" | "blockquote" | "horizontalRule" | "hardBreak" | "bulletList" | "orderedList" | "listItem" | "youtube", "alignment" | "link" | "em" | "strong" | "fontSize" | "textColor" | "underline">;
+export declare const schema: Schema<"text" | "paragraph" | "heading" | "doc" | "blockquote" | "horizontalRule" | "hardBreak" | "bulletList" | "orderedList" | "listItem" | "youtube" | "TemplateString", "alignment" | "link" | "em" | "strong" | "fontSize" | "textColor" | "underline">;

@@ -3,6 +3,7 @@ export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client'
 import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { loadIonxLinkEditorIntl, defineIonxLinkEditor, showLinkEditor } from 'ionx/LinkEditor';
 import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
+import { unserialize } from '@co.mmons/js-utils/json';
 import { popoverController, isPlatform } from '@ionic/core';
 import { deepEqual, shallowEqual } from 'fast-equals';
 import { addEventListener } from 'ionx/utils';
@@ -14063,6 +14064,31 @@ const paragraph = {
   }
 };
 
+const TemplateString = {
+  attrs: {},
+  group: "inline",
+  inline: true,
+  draggable: true,
+  toDOM: (node) => {
+    return [
+      "app-template-string",
+      { "props": JSON.stringify(node.attrs.props) }
+    ];
+  },
+  parseDOM: [
+    {
+      tag: "app-template-string",
+      getAttrs: (dom) => {
+        // @ts-ignore
+        const info = unserialize(JSON.parse(dom.getAttribute("props")));
+        return {
+          "props": info
+        };
+      },
+    }
+  ]
+};
+
 const nodes = {
   doc: {
     content: "block+",
@@ -14086,7 +14112,8 @@ const nodes = {
     content: "paragraph block*",
     marks: "alignment"
   }),
-  youtube
+  youtube,
+  TemplateString
 };
 const marks = {
   link: {
@@ -14226,7 +14253,7 @@ function scrollToCaret(parent) {
   }
 }
 
-const htmlEditorCss = ".ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}img.ProseMirror-separator{display:inline !important;border:none !important;margin:0 !important}ionx-html-editor{display:block}ionx-html-editor>.ionx--prosemirror>.ProseMirror{outline:none;user-select:text}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>.ionx--prosemirror>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>.ionx--prosemirror>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>.ionx--prosemirror>.ProseMirror p:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1{font-size:130%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h2{font-size:125%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h3{font-size:120%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h4{font-size:115%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h5{font-size:110%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{font-size:105%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror ul:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
+const htmlEditorCss = ".ProseMirror-gapcursor{display:none;pointer-events:none;position:absolute}.ProseMirror-gapcursor:after{content:\"\";display:block;position:absolute;top:-2px;width:20px;border-top:1px solid black;animation:ProseMirror-cursor-blink 1.1s steps(2, start) infinite}@keyframes ProseMirror-cursor-blink{to{visibility:hidden}}.ProseMirror-focused .ProseMirror-gapcursor{display:block}.ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}img.ProseMirror-separator{display:inline !important;border:none !important;margin:0 !important}ionx-html-editor{display:block}ionx-html-editor app-template-string{display:inline-block;width:1em;height:0.8em;background:red}ionx-html-editor>.ionx--prosemirror>.ProseMirror{outline:none;user-select:text}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>.ionx--prosemirror>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>.ionx--prosemirror>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>.ionx--prosemirror>.ProseMirror p:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1{font-size:130%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h2{font-size:125%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h3{font-size:120%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h4{font-size:115%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h5{font-size:110%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{font-size:105%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror ul:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
 
 let HtmlEditor = class extends HTMLElement$1 {
   constructor() {
@@ -19464,7 +19491,7 @@ filter([
   // list items might have multiple paragraphs; only do this at the first one
   isFirstChildOfParent,
   canOutdent,
-], chainCommands(deletePreviousEmptyListItem, outdentList())), 
+], chainCommands(deletePreviousEmptyListItem, outdentList())),
 // if we"re just inside a paragraph node (or gapcursor is shown) and backspace, then try to join
 // the text to the previous list item, if one exists
 filter([isEmptySelectionAtStart, canToJoinToPreviousListItem], joinToPreviousListItem));
@@ -19971,7 +19998,7 @@ let TextMenu = class extends HTMLElement$1 {
   connectedCallback() {
     this.editor.getView().then(view => {
       this.boldActivated = isMarkActive(view.state, schema.marks.strong);
-      this.italicActivated = isMarkActive(view.state, schema.marks.em);
+      this.emphasisActivated = isMarkActive(view.state, schema.marks.em);
       this.underlineActivated = isMarkActive(view.state, schema.marks.underline);
       this.activeColor = findMarksInSelection(view.state, schema.marks.textColor).map(mark => mark.attrs.color)
         .find(color => !!color);
@@ -19991,7 +20018,7 @@ let TextMenu = class extends HTMLElement$1 {
     });
   }
   render() {
-    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggle("bold") }, h("ion-label", { style: { fontWeight: "bold" } }, intl.message `ionx/HtmlEditor#Bold|text`), this.boldActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("italic") }, h("ion-label", { style: { fontStyle: "italic" } }, intl.message `ionx/HtmlEditor#Italic|text`), this.italicActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("underline") }, h("ion-label", { style: { textDecoration: "underline" } }, intl.message `ionx/HtmlEditor#Underline|text`), this.underlineActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeColor || "#000000", onInput: ev => this.toggleColor(ev.target.value) }), this.activeColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor() }, h("ion-icon", { name: "close", slot: "icon-only" }))), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
+    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggle("bold") }, h("ion-label", { style: { fontWeight: "bold" } }, intl.message `ionx/HtmlEditor#Bold|text`), this.boldActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("italic") }, h("ion-label", { style: { fontStyle: "italic" } }, intl.message `ionx/HtmlEditor#Italic|text`), this.emphasisActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("underline") }, h("ion-label", { style: { textDecoration: "underline" } }, intl.message `ionx/HtmlEditor#Underline|text`), this.underlineActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeColor || "#000000", onInput: ev => this.toggleColor(ev.target.value) }), this.activeColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor() }, h("ion-icon", { name: "close", slot: "icon-only" }))), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
   }
   static get style() { return textMenuCss; }
 };
@@ -20060,7 +20087,7 @@ let Toolbar = class extends HTMLElement$1 {
     this.activeFeatures.text = anyMarkActive(view.state, [schema.marks.strong, schema.marks.em, schema.marks.underline, schema.marks.fontSize, schema.marks.textColor]);
     this.activeFeatures.list = !!dist.findParentNode(predicate => predicate.hasMarkup(schema.nodes.orderedList) || predicate.hasMarkup(schema.nodes.bulletList))(view.state.selection);
     this.activeFeatures.alignment = isBlockMarkActive(view.state, schema.marks.alignment);
-    this.activeFeatures.paragraph = !!dist.findParentNodeOfType(schema.nodes.heading)(view.state.selection);
+    this.activeFeatures.ParagraphNode = !!dist.findParentNodeOfType(schema.nodes.heading)(view.state.selection);
     this.activeFeatures.link = isMarkActive(view.state, schema.marks.link);
   }
   connectedCallback() {
