@@ -43,7 +43,7 @@ export class ParagraphNode extends NodeSpecExtended {
     configure(schema: OrderedSchemaSpec) {
 
         schema.marks.forEach((_markName, mark) => {
-            if (isMarkFromGroup(mark, "textFormat")) {
+            if (isMarkFromGroup(mark, "textFormat") || ["link"].includes(mark.name)) {
                 this.allowMark(mark);
             }
         })
