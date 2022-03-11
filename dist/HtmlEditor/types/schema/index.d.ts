@@ -14,6 +14,7 @@ export { NodeSpecExtended } from "./NodeSpecExtended";
 export { OrderedListNode } from "./OrderedListNode";
 export { OrderedSchemaSpec } from "./OrderedSchemaSpec";
 export { ParagraphNode } from "./ParagraphNode";
+export { Schema } from "prosemirror-model";
 export { StrikethroughMark } from "./StrikethroughMark";
 export { StrongMark } from "./StrongMark";
 export { SubscriptMark } from "./SubscriptMark";

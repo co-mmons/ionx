@@ -17,9 +17,9 @@
         "prosemirror-state": "^1.3.4",
         "prosemirror-tables": "^1.1.1",
         "prosemirror-utils": "^0.9.6",
-        "prosemirror-view": "^1.18.1"
-    },
-    "devDependencies": {
+        "prosemirror-view": "^1.18.1",
+        "orderedmap": "^1.1.0",
+        "@types/orderedmap": "^1.0.0",
         "@types/prosemirror-commands": "^1.0.4",
         "@types/prosemirror-dropcursor": "^1.0.1",
         "@types/prosemirror-gapcursor": "^1.0.3",

@@ -9,7 +9,7 @@ import {TextNode} from "./TextNode";
 
 export type MarkSpecOrNodeSpec = NodeSpecExtended | MarkSpecExtended | AssignableType<NodeSpecExtended> | AssignableType<MarkSpecExtended>;
 
-export function buildSchemaWithOptions(options: {topNode?: string}, ...specs: MarkSpecOrNodeSpec[]) {
+export function buildSchemaWithOptions(options: {topNode?: string}, ...specs: MarkSpecOrNodeSpec[]): Schema {
 
     let marks: OrderedMap<MarkSpecExtended> = OrderedMap.from({});
     let nodes: OrderedMap<NodeSpecExtended> = OrderedMap.from({});
