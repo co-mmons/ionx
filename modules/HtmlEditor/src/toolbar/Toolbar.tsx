@@ -9,10 +9,15 @@ import {EditorView} from "prosemirror-view";
 import {ToolbarItem} from "./ToolbarItem";
 
 interface Button {
+    labelVisible: boolean;
+    iconVisible: boolean;
     label: string;
+    iconSrc: string;
+    iconName: string;
     active: boolean;
     menuComponent: string;
     menuComponentProps: any | ((view: EditorView<Schema>) => any | Promise<any>);
+    handler: (view: EditorView<Schema>) => any;
 }
 
 @Component({
@@ -67,9 +72,7 @@ export class Toolbar implements ComponentInterface {
         this.editor.setFocus();
     }
 
-    async showMenu(event: Event, item: ToolbarItem) {
-
-        const view = await this.editor.getView();
+    async showMenu(view: EditorView<Schema>, item: ToolbarItem) {
 
         const popover = await popoverController.create({
             component: item.menuComponent,
@@ -95,6 +98,30 @@ export class Toolbar implements ComponentInterface {
         }
     }
 
+    async handleItemClick(_event: MouseEvent, item: Button) {
+
+        const view = await this.editor.getView();
+
+        if (item.menuComponent) {
+            this.showMenu(view, item);
+        } else if (item.handler) {
+            try {
+                let result = item.handler(view);
+                if (result instanceof Promise) {
+                    result = await result;
+                }
+
+                if (result !== false) {
+                    view.focus();
+                }
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+    }
+
     async forceUpdate(onlyIfChange = false) {
 
         const view = await this.editor.getView();
@@ -110,10 +137,15 @@ export class Toolbar implements ComponentInterface {
         this.canRedo = redoDepth(view.state) > 0;
 
         this.buttons = this.items?.filter(item => !item.isVisible || item.isVisible(view)).map(item => ({
+            labelVisible: item.labelVisible,
+            iconVisible: item.iconVisible,
             label: item.label instanceof MessageRef ? translate(intl, item.label) : item.label,
             active: item.isActive?.(view) || false,
+            iconName: item.iconName,
+            iconSrc: item.iconSrc,
             menuComponent: item.menuComponent,
-            menuComponentProps: typeof item.menuComponentProps === "function" ? item.menuComponentProps.bind(item) : item.menuComponentProps
+            menuComponentProps: typeof item.menuComponentProps === "function" ? item.menuComponentProps.bind(item) : item.menuComponentProps,
+            handler: item.handler ? item.handler.bind(item) : undefined
         }));
 
         if (!onlyIfChange || wasCanUndo !== this.canUndo || wasCanRedo !== this.canRedo || !deepEqual(this.buttons, prevButtons)) {
@@ -141,13 +173,20 @@ export class Toolbar implements ComponentInterface {
         return <Host>
 
             {this.buttons?.map(item => <ion-button
-                    size="small"
-                    fill={item.active ? "outline" : "clear"}
-                    onClick={ev => this.showMenu(ev, item)}>
-                    <ion-icon name="caret-down" slot="end"/>
-                    <span>{item.label}</span>
-                </ion-button>
-            )}
+                size="small"
+                fill={item.active ? "outline" : "clear"}
+                onClick={ev => this.handleItemClick(ev, item)}>
+
+                {(item.iconSrc || item.iconName) && item.iconVisible !== false && <ion-icon
+                    name={item.iconName}
+                    src={item.iconSrc}
+                    slot={item.labelVisible !== false ? "start" : "icon-only"}
+                    size={item.labelVisible !== false ? "small" : undefined}/>}
+
+                {item.menuComponent && <ion-icon name="caret-down" slot="end"/>}
+
+                {item.labelVisible !== false && <span>{item.label}</span>}
+            </ion-button>)}
 
             {!this.historyDisabled && <div class="buttons-group">
 

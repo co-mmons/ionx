@@ -3,9 +3,13 @@ import {EditorView} from "prosemirror-view";
 import {isMarkActive} from "../prosemirror/active";
 import {ToolbarItem} from "./ToolbarItem";
 
-export class LinkToolbarItem extends ToolbarItem {
+export class LinkMenuToolbarItem extends ToolbarItem {
     label = new MessageRef("ionx/LinkEditor", "Link");
     menuComponent = "ionx-html-editor-link-menu";
+
+    isActive() {
+        return true;
+    }
 
     isVisible(view: EditorView): boolean {
         const {marks} = view.state.schema;

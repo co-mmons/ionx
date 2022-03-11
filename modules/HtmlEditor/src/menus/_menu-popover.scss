@@ -15,14 +15,31 @@
             }
         }
 
-        ion-item-divider {
+        ion-item-divider.item {
             --background: transparent;
-            --color: var(--ion-text-color);
+            --color: rgb(var(--ion-text-color-rgb), .5);
             --padding-start: 16px;
             --padding-end: 16px;
+            --padding-top: 20px;
+            --inner-border-width: 0;
+            --border-width: 0;
             font-size: calc(var(--ionx-default-font-size, 16px) * 0.75);
             font-weight: 500;
-            opacity: .5;
+            border-bottom: var(--ionx-border-width) solid var(--ion-border-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        ion-icon[slot=start], ion-icon[slot=end] {
+            font-size: 1.2em;
+        }
+
+        ion-icon[slot=start] {
+            margin-right: 8px;
+        }
+
+        ion-icon[slot=end] {
+            margin-right: 0;
         }
     }
 }

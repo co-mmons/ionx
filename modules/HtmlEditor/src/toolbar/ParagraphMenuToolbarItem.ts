@@ -4,7 +4,7 @@ import {findParentNodeOfType} from "prosemirror-utils";
 import {EditorView} from "prosemirror-view";
 import {ToolbarItem} from "./ToolbarItem";
 
-export class ParagraphToolbarItem extends ToolbarItem {
+export class ParagraphMenuToolbarItem extends ToolbarItem {
     label = new MessageRef("ionx/HtmlEditor", "Paragraph");
     menuComponent = "ionx-html-editor-paragraph-menu";
 

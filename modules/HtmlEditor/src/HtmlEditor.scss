@@ -37,10 +37,6 @@ ionx-html-editor > .ionx--prosemirror > .ProseMirror {
         margin: 16px 0 0 0;
     }
 
-    p:first-child {
-        margin-top: 0;
-    }
-
     h1 {
         font-size: 130%;
     }
@@ -70,11 +66,7 @@ ionx-html-editor > .ionx--prosemirror > .ProseMirror {
         margin-bottom: 8px;
     }
 
-    h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child {
-        margin-top: 0;
-    }
-
-    ul:first-child {
+    p:first-child, ul:first-child, ol:first-child, h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child {
         margin-top: 0;
     }
 }

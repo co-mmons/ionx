@@ -14,7 +14,10 @@ export {NodeSpecExtended} from "./NodeSpecExtended";
 export {OrderedListNode} from "./OrderedListNode";
 export {OrderedSchemaSpec} from "./OrderedSchemaSpec";
 export {ParagraphNode} from "./ParagraphNode";
+export {StrikethroughMark} from "./StrikethroughMark";
 export {StrongMark} from "./StrongMark";
+export {SubscriptMark} from "./SubscriptMark";
+export {SuperscriptMark} from "./SuperscriptMark"
 export {TextBackgroundColorMark} from "./TextBackgroundColorMark"
 export {TextForegroundColorMark} from "./TextForegroundColorMark";
 export {TextNode} from "./TextNode";

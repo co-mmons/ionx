@@ -18,7 +18,7 @@ export namespace Components {
         "getState": () => Promise<EditorState<Schema>>;
         "getView": () => Promise<EditorView<Schema<any, any>>>;
         "historyDisabled": boolean;
-        "keymap": Keymap;
+        "keymap": Keymap | Keymap[];
         "plugins": Plugin[];
         "readonly": boolean;
         "schema": Schema;
@@ -123,7 +123,7 @@ declare namespace LocalJSX {
     interface IonxHtmlEditor {
         "disabled"?: boolean;
         "historyDisabled"?: boolean;
-        "keymap"?: Keymap;
+        "keymap"?: Keymap | Keymap[];
         "onEditorSelectionChange"?: (event: CustomEvent<any>) => void;
         "onIonChange"?: (event: CustomEvent<{value: string}>) => void;
         "plugins"?: Plugin[];

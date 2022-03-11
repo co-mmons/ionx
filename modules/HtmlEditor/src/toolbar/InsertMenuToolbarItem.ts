@@ -2,7 +2,7 @@ import {MessageRef} from "@co.mmons/js-intl";
 import {InsertMenuItem, InsertMenuItemFactory} from "../menus";
 import {ToolbarItem} from "./ToolbarItem";
 
-export class InsertToolbarItem extends ToolbarItem {
+export class InsertMenuToolbarItem extends ToolbarItem {
 
     constructor(...items: Array<InsertMenuItem | InsertMenuItemFactory>) {
         super();
@@ -20,11 +20,20 @@ export class InsertToolbarItem extends ToolbarItem {
         for (let item of this.items) {
 
             if (typeof item === "function") {
-                item = item(view);
-            }
 
-            // can be nullish, e.g. if a factory checks for a mark in schema
-            if (item) {
+                const itms = item(view);
+
+                if (Array.isArray(itms)) {
+                    for (const i of itms) {
+                        if (i) {
+                            items.push(i);
+                        }
+                    }
+                } else if (itms) {
+                    items.push(itms);
+                }
+
+            } else if (item) {
                 items.push(item);
             }
         }

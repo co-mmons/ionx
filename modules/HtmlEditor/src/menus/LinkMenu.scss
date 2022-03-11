@@ -1,16 +1,5 @@
-@import "../../../Popover/src/context-menu-list";
+@import "menu-popover";
 
 :host {
-    ion-list {
-        @include ionx-popover-context-menu-list;
-    }
-
-    ion-item-divider {
-        --background: transparent;
-        border-bottom: 0;
-        font-size: 13px;
-        font-weight: 400;
-        --color: var(--ion-text-color);
-        opacity: .5;
-    }
+    @include ionx-html-editor-menu-popover;
 }

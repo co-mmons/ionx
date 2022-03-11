@@ -1,3 +1,4 @@
+import {isMarkFromGroup} from "../prosemirror/utils/isMarkFromGroup";
 import {NodeSpecExtended} from "./NodeSpecExtended";
 import {OrderedSchemaSpec} from "./OrderedSchemaSpec";
 
@@ -41,10 +42,10 @@ export class ParagraphNode extends NodeSpecExtended {
 
     configure(schema: OrderedSchemaSpec) {
 
-        for (const mark of ["alignment", "emphasis", "strong", "underline", "fontSize", "link", "textColor"]) {
-            if (schema.marks.get(mark)) {
+        schema.marks.forEach((_markName, mark) => {
+            if (isMarkFromGroup(mark, "textFormat")) {
                 this.allowMark(mark);
             }
-        }
+        })
     }
 }

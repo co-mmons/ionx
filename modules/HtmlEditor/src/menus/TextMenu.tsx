@@ -1,12 +1,21 @@
-import {intl, translate} from "@co.mmons/js-intl";
+import {intl, MessageRef, translate} from "@co.mmons/js-intl";
 import {popoverController} from "@ionic/core";
-import {Component, Fragment, h, Listen, Prop, State} from "@stencil/core";
+import {Component, Fragment, h, Prop, State} from "@stencil/core";
 import {toggleMark} from "prosemirror-commands";
 import {isMarkActive} from "../prosemirror/active";
 import {toggleInlineMark} from "../prosemirror/commands/toogleInlineMark";
 import {findMarksInSelection} from "../prosemirror/utils/findMarksInSelection";
 import {isMarkFromGroup} from "../prosemirror/utils/isMarkFromGroup";
 import {FontSize} from "./FontSize";
+
+const simpleMarks = [
+    {name: "strong", style: {fontWeight: "bold"}, label: new MessageRef("ionx/HtmlEditor", "Bold|text")},
+    {name: "emphasis", style: {fontStyle: "italic"}, label: new MessageRef("ionx/HtmlEditor", "Italic|text")},
+    {name: "underline", style: {textDecoration: "underline"}, label: new MessageRef("ionx/HtmlEditor", "Underline|text")},
+    {name: "strikethrough", style: {textDecoration: "line-through"}, label: new MessageRef("ionx/HtmlEditor", "Strikethrough|text")},
+    {name: "superscript", label: new MessageRef("ionx/HtmlEditor", "Superscript|text"), sublabel: `<sup>xyz</sup>`},
+    {name: "subscript", label: new MessageRef("ionx/HtmlEditor", "Subscript|text"), sublabel: `<sub>xyz</sub>`}
+]
 
 @Component({
     tag: "ionx-html-editor-text-menu",
@@ -18,15 +27,11 @@ export class TextMenu {
     @Prop()
     editor!: HTMLIonxHtmlEditorElement;
 
-    strongActivated: boolean;
-
-    emphasisActivated: boolean;
-
-    underlineActivated: boolean;
-
     activeFontSize: FontSize;
 
     marks: string[];
+
+    activeMarks: string[];
 
     @State()
     activeForegroundColor: string;
@@ -46,7 +51,8 @@ export class TextMenu {
             command(view.state, t => view.dispatch(t));
         }
 
-        popoverController.dismiss();
+        await popoverController.dismiss();
+        view.focus();
     }
 
     async toggleFontSize(size?: FontSize) {
@@ -62,7 +68,8 @@ export class TextMenu {
             toggleMark(state.schema.marks.fontSize)(state, view.dispatch);
         }
 
-        popoverController.dismiss();
+        await popoverController.dismiss();
+        view.focus();
     }
 
     async toggleColor(mark: "textForegroundColor" | "textBackgroundColor", color?: string) {
@@ -81,13 +88,9 @@ export class TextMenu {
             toggleInlineMark(marks[mark], {color})(state, view.dispatch);
         } else {
             toggleMark(marks[mark])(state, view.dispatch);
-            popoverController.dismiss();
+            await popoverController.dismiss();
+            view.focus();
         }
-    }
-
-    @Listen("ionViewDidLeave")
-    didDismiss() {
-        this.editor.setFocus();
     }
 
     connectedCallback() {
@@ -97,12 +100,18 @@ export class TextMenu {
             const {state} = view;
             const {marks} = state.schema;
 
-            this.marks = Object.entries(marks).filter(([_markName, mark]) => isMarkFromGroup(mark, "textFormat"))
-                .map(([markName]) => markName);
+            this.activeMarks = [];
+            this.marks = [];
 
-            this.strongActivated = marks.strong && isMarkActive(state, marks.strong);
-            this.emphasisActivated = marks.emphasis && isMarkActive(state, marks.emphasis);
-            this.underlineActivated = marks.underline && isMarkActive(state, marks.underline);
+            for (const [markName, mark] of Object.entries(marks)) {
+                if (isMarkFromGroup(mark, "textFormat")) {
+                    this.marks.push(markName);
+
+                    if (isMarkActive(state, mark)) {
+                        this.activeMarks.push(markName);
+                    }
+                }
+            }
 
             this.activeForegroundColor = marks.textForegroundColor && findMarksInSelection(state, marks.textForegroundColor).map(mark => mark.attrs.color)
                 .find(color => !!color);
@@ -139,20 +148,10 @@ export class TextMenu {
 
         return <ion-list lines="full">
 
-            {this.marks.includes("strong") && <ion-item button detail={false} onClick={() => this.toggle("strong")}>
-                <ion-label style={{fontWeight: "bold"}}>{translate(intl, "ionx/HtmlEditor#Bold|text")}</ion-label>
-                {this.strongActivated && <ion-icon name="checkmark" slot="end"/>}
-            </ion-item>}
-
-            {this.marks.includes("emphasis") && <ion-item button detail={false} onClick={() => this.toggle("emphasis")}>
-                <ion-label style={{fontStyle: "italic"}}>{translate(intl, "ionx/HtmlEditor#Italic|text")}</ion-label>
-                {this.emphasisActivated && <ion-icon name="checkmark" slot="end"/>}
-            </ion-item>}
-
-            {this.marks.includes("underline") && <ion-item button detail={false} onClick={() => this.toggle("underline")}>
-                <ion-label style={{textDecoration: "underline"}}>{intl.message`ionx/HtmlEditor#Underline|text`}</ion-label>
-                {this.underlineActivated && <ion-icon name="checkmark" slot="end"/>}
-            </ion-item>}
+            {simpleMarks.map(mark => this.marks.includes(mark.name) && <ion-item button detail={false} onClick={() => this.toggle(mark.name)}>
+                <ion-label style={mark.style}>{translate(intl, mark.label)}{mark.sublabel && <span innerHTML={mark.sublabel}/>}</ion-label>
+                {this.activeMarks.includes(mark.name) && <ion-icon name="checkmark" slot="end"/>}
+            </ion-item>)}
 
             {this.marks.includes("textForegroundColor") && <ion-item detail={false}>
                 <ion-label>{intl.message`ionx/HtmlEditor#Text color`}</ion-label>

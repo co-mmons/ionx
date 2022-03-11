@@ -42,7 +42,7 @@ export class HtmlEditor implements ComponentInterface {
     plugins: Plugin[];
 
     @Prop()
-    keymap: Keymap;
+    keymap: Keymap | Keymap[];
 
     @Prop()
     historyDisabled: boolean;
@@ -149,7 +149,7 @@ export class HtmlEditor implements ComponentInterface {
                 .map(mark => keymap((mark.spec as MarkSpecExtended).keymap(this.schema))),
 
             ...(!this.historyDisabled ? [keymap(undoRedoKeymap)] : []),
-            keymap(this.keymap),
+            ...(Array.isArray(this.keymap) ? this.keymap.map(km => keymap(km)) : (this.keymap ? [keymap(this.keymap)] : [])),
             ...(this.plugins ?? []),
             ...(!this.historyDisabled ? [history()] : [])
         ];

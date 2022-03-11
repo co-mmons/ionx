@@ -1,15 +1,33 @@
-import {MessageRef} from "@co.mmons/js-intl";
+import {toggleMark} from "prosemirror-commands";
 import {Schema} from "prosemirror-model";
 import {EditorView} from "prosemirror-view";
-import {anyMarkActive} from "../prosemirror/active";
-import {isMarkFromGroup} from "../prosemirror/utils/isMarkFromGroup";
+import {isMarkActive} from "../prosemirror/active";
 import {ToolbarItem} from "./ToolbarItem";
 
-export class TextToolbarItem extends ToolbarItem {
-    label = new MessageRef("ionx/HtmlEditor", "Text");
-    menuComponent = "ionx-html-editor-text-menu";
+export abstract class TextToolbarItem extends ToolbarItem {
+
+    protected constructor(public readonly markName: string) {
+        super();
+    }
+
+    labelVisible = false;
+
+    isVisible(view: EditorView<Schema>): boolean {
+        return !!view.state.schema.marks[this.markName];
+    }
 
     isActive(view: EditorView): boolean {
-        return anyMarkActive(view.state, Object.values((view.state.schema as Schema).marks).filter(mark => isMarkFromGroup(mark, "textFormat")));
+        return isMarkActive(view.state, view.state.schema.marks[this.markName]);
+    }
+
+    handler(view: EditorView<Schema>) {
+
+        const {marks} = view.state.schema;
+
+        const command = toggleMark(marks[this.markName]);
+
+        if (command(view.state)) {
+            command(view.state, t => view.dispatch(t));
+        }
     }
 }

@@ -5,7 +5,7 @@ const ul = "ul";
 const domSpec = [ul, 0] as DOMOutputSpecArray;
 
 export class BulletListNode extends NodeSpecExtended {
-    readonly name: string = "ul";
+    readonly name: string = "bulletList";
 
     content = "listItem+";
     group = "block";
