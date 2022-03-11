@@ -1,25 +1,49 @@
-import {DOMOutputSpecArray, ParseRule} from "prosemirror-model";
+import {DOMOutputSpecArray, Node, ParseRule} from "prosemirror-model";
 import {NodeSpecExtended} from "./NodeSpecExtended";
 
 export class HeadingNode extends NodeSpecExtended {
 
     readonly name: string = "heading";
 
-    attrs = {level: {default: 1}};
+    attrs = {
+        level: {default: 1},
+        indent: {default: null}
+    }
+
     content = "inline*";
     group = "block";
     defining = true;
 
+    private getAttrs(node: HTMLElement) {
+        const level = parseInt(node.tagName.substring(1));
+        const indent = node.style.textIndent || null;
+        return {level, indent: indent && !indent.startsWith("0") ? indent : null};
+    }
+
     parseDOM: ParseRule[] = [
-        {tag: "h1", attrs: {level: 1}},
-        {tag: "h2", attrs: {level: 2}},
-        {tag: "h3", attrs: {level: 3}},
-        {tag: "h4", attrs: {level: 4}},
-        {tag: "h5", attrs: {level: 5}},
-        {tag: "h6", attrs: {level: 6}}
+        {tag: "h1", getAttrs: this.getAttrs},
+        {tag: "h2", getAttrs: this.getAttrs},
+        {tag: "h3", getAttrs: this.getAttrs},
+        {tag: "h4", getAttrs: this.getAttrs},
+        {tag: "h5", getAttrs: this.getAttrs},
+        {tag: "h6", getAttrs: this.getAttrs}
     ]
 
-    toDOM(node) {
-        return ["h" + node.attrs.level, 0] as DOMOutputSpecArray
+    toDOM(node: Node) {
+
+        const {indent} = node.attrs;
+        const attrs = {};
+
+        const style: string[] = [];
+
+        if (indent) {
+            style.push(`text-indent: ${indent}`);
+        }
+
+        if (style.length) {
+            attrs["style"] = style.join(";");
+        }
+
+        return [`h${node.attrs.level}`, attrs, 0] as DOMOutputSpecArray;
     }
 }

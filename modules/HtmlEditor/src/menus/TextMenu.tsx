@@ -18,7 +18,7 @@ export class TextMenu {
     @Prop()
     editor!: HTMLIonxHtmlEditorElement;
 
-    boldActivated: boolean;
+    strongActivated: boolean;
 
     emphasisActivated: boolean;
 
@@ -29,7 +29,10 @@ export class TextMenu {
     marks: string[];
 
     @State()
-    activeColor: string;
+    activeForegroundColor: string;
+
+    @State()
+    activeBackgroundColor: string;
 
     async toggle(markName: string) {
 
@@ -62,17 +65,22 @@ export class TextMenu {
         popoverController.dismiss();
     }
 
-    async toggleColor(color?: string) {
+    async toggleColor(mark: "textForegroundColor" | "textBackgroundColor", color?: string) {
 
-        this.activeColor = color;
+        if (mark === "textForegroundColor") {
+            this.activeForegroundColor = color;
+        } else {
+            this.activeBackgroundColor = color;
+        }
 
         const view = await this.editor.getView();
         const {state} = view;
+        const {marks} = state.schema;
 
         if (color) {
-            toggleInlineMark(state.schema.marks.TextColorMark, {color})(state, view.dispatch);
+            toggleInlineMark(marks[mark], {color})(state, view.dispatch);
         } else {
-            toggleMark(state.schema.marks.TextColorMark)(state, view.dispatch);
+            toggleMark(marks[mark])(state, view.dispatch);
             popoverController.dismiss();
         }
     }
@@ -92,11 +100,14 @@ export class TextMenu {
             this.marks = Object.entries(marks).filter(([_markName, mark]) => isMarkFromGroup(mark, "textFormat"))
                 .map(([markName]) => markName);
 
-            this.boldActivated = marks.strong && isMarkActive(state, marks.strong);
+            this.strongActivated = marks.strong && isMarkActive(state, marks.strong);
             this.emphasisActivated = marks.emphasis && isMarkActive(state, marks.emphasis);
             this.underlineActivated = marks.underline && isMarkActive(state, marks.underline);
 
-            this.activeColor = marks.textColor && findMarksInSelection(state, marks.textColor).map(mark => mark.attrs.color)
+            this.activeForegroundColor = marks.textForegroundColor && findMarksInSelection(state, marks.textForegroundColor).map(mark => mark.attrs.color)
+                .find(color => !!color);
+
+            this.activeBackgroundColor = marks.textBackgroundColor && findMarksInSelection(state, marks.textBackgroundColor).map(mark => mark.attrs.color)
                 .find(color => !!color);
 
             this.activeFontSize = undefined;
@@ -130,7 +141,7 @@ export class TextMenu {
 
             {this.marks.includes("strong") && <ion-item button detail={false} onClick={() => this.toggle("strong")}>
                 <ion-label style={{fontWeight: "bold"}}>{translate(intl, "ionx/HtmlEditor#Bold|text")}</ion-label>
-                {this.boldActivated && <ion-icon name="checkmark" slot="end"/>}
+                {this.strongActivated && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>}
 
             {this.marks.includes("emphasis") && <ion-item button detail={false} onClick={() => this.toggle("emphasis")}>
@@ -143,11 +154,19 @@ export class TextMenu {
                 {this.underlineActivated && <ion-icon name="checkmark" slot="end"/>}
             </ion-item>}
 
-            {this.marks.includes("textColor") && <ion-item detail={false}>
+            {this.marks.includes("textForegroundColor") && <ion-item detail={false}>
                 <ion-label>{intl.message`ionx/HtmlEditor#Text color`}</ion-label>
-                <input slot="end" type="color" value={this.activeColor || "#000000"} onInput={ev => this.toggleColor((ev.target as HTMLInputElement).value)}/>
-                {this.activeColor && <ion-button slot="end" fill="clear" size="small" onClick={() => this.toggleColor()}>
-                    <ion-icon name="close" slot="icon-only"/>
+                <input slot="end" type="color" value={this.activeForegroundColor || "#000000"} onInput={ev => this.toggleColor("textForegroundColor", (ev.target as HTMLInputElement).value)}/>
+                {this.activeForegroundColor && <ion-button slot="end" fill="clear" size="small" onClick={() => this.toggleColor("textForegroundColor")}>
+                    <ion-icon name="backspace" slot="icon-only" size="small"/>
+                </ion-button>}
+            </ion-item>}
+
+            {this.marks.includes("textBackgroundColor") && <ion-item detail={false}>
+                <ion-label>{intl.message`ionx/HtmlEditor#Background color`}</ion-label>
+                <input slot="end" type="color" value={this.activeBackgroundColor || "#000000"} onInput={ev => this.toggleColor("textBackgroundColor", (ev.target as HTMLInputElement).value)}/>
+                {this.activeBackgroundColor && <ion-button slot="end" fill="clear" size="small" onClick={() => this.toggleColor("textBackgroundColor")}>
+                    <ion-icon name="backspace" slot="icon-only" size="small"/>
                 </ion-button>}
             </ion-item>}
 

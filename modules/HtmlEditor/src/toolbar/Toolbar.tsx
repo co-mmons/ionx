@@ -1,14 +1,18 @@
 import {intl, MessageRef, translate} from "@co.mmons/js-intl";
-import {isPlatform, popoverController} from "@ionic/core";
+import {createAnimation, isPlatform, popoverController} from "@ionic/core";
 import {Component, ComponentInterface, Element, forceUpdate, h, Host, Prop} from "@stencil/core";
 import {deepEqual} from "fast-equals";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {redo, redoDepth, undo, undoDepth} from "prosemirror-history";
+import {Schema} from "prosemirror-model";
+import {EditorView} from "prosemirror-view";
 import {ToolbarItem} from "./ToolbarItem";
 
 interface Button {
     label: string;
     active: boolean;
+    menuComponent: string;
+    menuComponentProps: any | ((view: EditorView<Schema>) => any | Promise<any>);
 }
 
 @Component({
@@ -63,19 +67,32 @@ export class Toolbar implements ComponentInterface {
         this.editor.setFocus();
     }
 
-    async showMenu(event: Event, menu: string) {
+    async showMenu(event: Event, item: ToolbarItem) {
+
+        const view = await this.editor.getView();
 
         const popover = await popoverController.create({
-            component: `ionx-html-editor-${menu}-menu`,
+            component: item.menuComponent,
             componentProps: {
-                editor: this.editor
+                ...(typeof item.menuComponentProps === "function" ? await item.menuComponentProps(view) : (item.menuComponentProps ?? {})),
+                editor: this.editor,
             },
             event,
-            showBackdrop: isPlatform("ios")
+            showBackdrop: isPlatform("ios"),
+            leaveAnimation: () => createAnimation()
         });
 
+        popover.style.setProperty("--width", "auto");
+        popover.style.setProperty("--height", "auto");
+        popover.style.setProperty("--max-width", "80vw");
+        popover.style.setProperty("--max-height", "80vh");
+
         await popover.present();
-        popover.animated = false;
+
+        const dismiss = await popover.onDidDismiss();
+        if (dismiss.role === "backdrop") {
+            view.focus();
+        }
     }
 
     async forceUpdate(onlyIfChange = false) {
@@ -94,7 +111,9 @@ export class Toolbar implements ComponentInterface {
 
         this.buttons = this.items?.filter(item => !item.isVisible || item.isVisible(view)).map(item => ({
             label: item.label instanceof MessageRef ? translate(intl, item.label) : item.label,
-            active: item.isActive?.(view) || false
+            active: item.isActive?.(view) || false,
+            menuComponent: item.menuComponent,
+            menuComponentProps: typeof item.menuComponentProps === "function" ? item.menuComponentProps.bind(item) : item.menuComponentProps
         }));
 
         if (!onlyIfChange || wasCanUndo !== this.canUndo || wasCanRedo !== this.canRedo || !deepEqual(this.buttons, prevButtons)) {
@@ -124,7 +143,7 @@ export class Toolbar implements ComponentInterface {
             {this.buttons?.map(item => <ion-button
                     size="small"
                     fill={item.active ? "outline" : "clear"}
-                    onClick={ev => this.showMenu(ev, "text")}>
+                    onClick={ev => this.showMenu(ev, item)}>
                     <ion-icon name="caret-down" slot="end"/>
                     <span>{item.label}</span>
                 </ion-button>

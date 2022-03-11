@@ -5,6 +5,7 @@ import {MarkSpecExtended} from "./MarkSpecExtended";
 export class UnderlineMark extends MarkSpecExtended {
 
     readonly name = "underline";
+    group = "textFormat";
 
     parseDOM: ParseRule[] = [
         {tag: "u"},

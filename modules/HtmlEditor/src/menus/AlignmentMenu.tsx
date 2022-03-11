@@ -1,9 +1,9 @@
 import {intl} from "@co.mmons/js-intl";
 import {popoverController} from "@ionic/core";
-import {Component, h, Listen, Prop} from "@stencil/core";
-import {Alignment} from "./Alignment";
+import {Component, h, Prop} from "@stencil/core";
 import {changeAlignment} from "../prosemirror/alignment/commands";
 import {findBlockMarks} from "../prosemirror/utils/selection/findBlockMarks";
+import {Alignment} from "./Alignment";
 
 @Component({
     tag: "ionx-html-editor-alignment-menu",
@@ -26,7 +26,8 @@ export class AlignmentMenu {
             command(view.state, (tr) => view.dispatch(tr));
         }
 
-        popoverController.dismiss();
+        await popoverController.dismiss();
+        view.focus();
     }
 
     connectedCallback() {
@@ -35,7 +36,10 @@ export class AlignmentMenu {
 
         this.editor.getView().then(view => {
 
-            for (const mark of findBlockMarks(view.state, view.state.schema.marks.AlignmentMark)) {
+            const {state} = view;
+            const {marks} = state.schema;
+
+            for (const mark of findBlockMarks(state, marks.alignment)) {
 
                 // zaznaczonych wiele blocków z różnym wyrównaniem
                 if (this.active && this.active !== mark.attrs.align) {
@@ -46,11 +50,6 @@ export class AlignmentMenu {
                 this.active = mark.attrs.align;
             }
         });
-    }
-
-    @Listen("ionViewDidLeave")
-    didDismiss() {
-        this.editor.setFocus();
     }
 
     render() {

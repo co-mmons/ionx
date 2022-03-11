@@ -2,21 +2,58 @@ import {Component, h, Host} from "@stencil/core";
 import {baseKeymap} from "../keymaps";
 import {InsertLinkMenuItem} from "../menus";
 
-import {buildSchema, FontSizeMark, ParagraphNode, StrongMark} from "../schema";
-import {TextToolbarItem} from "../toolbar";
+import {
+    AlignmentMark,
+    BlockquoteNode,
+    buildSchema,
+    BulletListNode,
+    EmphasisMark,
+    FontSizeMark,
+    HardBreakNode,
+    HeadingNode,
+    HorizontalRuleNode,
+    LinkMark,
+    ListItemNode,
+    OrderedListNode,
+    ParagraphNode,
+    StrongMark,
+    TextBackgroundColorMark,
+    TextForegroundColorMark,
+    UnderlineMark
+} from "../schema";
+import {ParagraphToolbarItem, TextToolbarItem} from "../toolbar";
+import {AlignmentToolbarItem} from "../toolbar/AlignmentToolbarItem";
 import {InsertToolbarItem} from "../toolbar/InsertToolbarItem";
+import {LinkToolbarItem} from "../toolbar/LinkToolbarItem";
 
 @Component({
     tag: "ionx-html-editor-test"
 })
 export class HtmlEditorTest {
 
+    schema = buildSchema(
+        new ParagraphNode(), new StrongMark(),
+        new FontSizeMark(), new LinkMark(),
+        new EmphasisMark(), new AlignmentMark(),
+        new BlockquoteNode(), new BulletListNode(),
+        new HardBreakNode(), new HeadingNode(),
+        new HorizontalRuleNode(), new ListItemNode(),
+        new OrderedListNode(), new TextForegroundColorMark(),
+        new UnderlineMark(), new TextBackgroundColorMark());
+
+    toolbar = [
+        new TextToolbarItem(),
+        new AlignmentToolbarItem(),
+        new ParagraphToolbarItem(),
+        new InsertToolbarItem(InsertLinkMenuItem),
+        new LinkToolbarItem()];
+
     private value = `
 <p>
 Lorem <app-template-string props="{}"></app-template-string> ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ipsum risus, pharetra id odio dictum, eleifend interdum erat. Curabitur vitae vulputate ex, scelerisque dapibus sem. Morbi facilisis dolor mi, quis volutpat erat aliquet et. Curabitur in neque neque. Quisque sollicitudin lacus metus, non convallis risus tristique ut. Praesent rhoncus gravida elementum. Proin faucibus in nisl ut suscipit. Morbi neque augue, imperdiet a eleifend eu, laoreet fringilla augue. Praesent vestibulum condimentum eros, ac consequat purus.
 </p>
 <p>
-Vivamus non aliquet sem. Duis quis dolor ut lectus sollicitudin fringilla id sed dui. Suspendisse sit amet consequat justo. In hac habitasse platea dictumst. Pellentesque augue nisl, consectetur sagittis nunc eu, luctus lobortis nisl. Donec quam eros, auctor et consectetur ac, venenatis ut odio. Donec malesuada ullamcorper ipsum quis pretium. Duis lacinia efficitur leo ut ultrices. Vivamus tincidunt elit vitae facilisis lobortis. Nunc ac sapien eget leo consectetur mattis. Mauris in rutrum justo, ut dictum augue.
+Vivamus non aliquet sem. <a href="https://onet.pl" target="_blank">Duis</a> quis dolor ut lectus sollicitudin fringilla id sed dui. Suspendisse sit amet consequat justo. In hac habitasse platea dictumst. Pellentesque augue nisl, consectetur sagittis nunc eu, luctus lobortis nisl. Donec quam eros, auctor et consectetur ac, venenatis ut odio. Donec malesuada ullamcorper ipsum quis pretium. Duis lacinia efficitur leo ut ultrices. Vivamus tincidunt elit vitae facilisis lobortis. Nunc ac sapien eget leo consectetur mattis. Mauris in rutrum justo, ut dictum augue.
 </p>
 <p>
 Integer et lorem eget eros posuere tristique sit amet eget tellus. Pellentesque odio neque, venenatis quis lacus ut, scelerisque pharetra massa. Nulla vestibulum accumsan mattis. Ut ut viverra mauris. Cras viverra vestibulum quam eget pretium. Cras id dui in ipsum tempus porttitor vitae et quam. Praesent hendrerit vestibulum laoreet.
@@ -31,9 +68,9 @@ Aliquam faucibus dignissim dolor, at laoreet orci auctor sed. Morbi quis diam en
     render() {
         return <Host>
             <ionx-html-editor
-                schema={buildSchema(new ParagraphNode(), new StrongMark(), new FontSizeMark())}
+                schema={this.schema}
                 keymap={baseKeymap}
-                toolbarItems={[new TextToolbarItem(), new InsertToolbarItem(InsertLinkMenuItem)]}
+                toolbarItems={this.toolbar}
                 value={this.value}/>
         </Host>
     }

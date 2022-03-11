@@ -8,6 +8,7 @@ const emDOM = [em, 0] as DOMOutputSpecArray;
 export class EmphasisMark extends MarkSpecExtended {
 
     readonly name = "emphasis";
+    group = "textFormat";
 
     parseDOM = [
         {tag: "i"},

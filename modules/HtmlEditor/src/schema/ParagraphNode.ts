@@ -11,8 +11,6 @@ export class ParagraphNode extends NodeSpecExtended {
 
     content = "inline*";
 
-    // marks: "AlignmentMark StrongMark UnderlineMark EmphasisMark FontSizeMark LinkMark TextColorMark",
-
     group = "block";
 
     parseDOM = [{
@@ -48,6 +46,5 @@ export class ParagraphNode extends NodeSpecExtended {
                 this.allowMark(mark);
             }
         }
-
     }
 }

@@ -18,6 +18,7 @@ export const InsertLinkMenuItem: InsertMenuItemFactory = (view) => {
 
     return {
         iconName: "link-outline",
+        disabled: selection.empty,
         label: new MessageRef("ionx/LinkEditor", "Link"),
         sublabel: selection.empty ? new MessageRef("ionx/HtmlEditor", "selectTextToInsertLink") : undefined,
 
@@ -44,7 +45,6 @@ export const InsertLinkMenuItem: InsertMenuItemFactory = (view) => {
             if (link) {
                 toggleMark(linkMark, link)(view.state, view.dispatch);
             }
-
         }
     } as const
 

@@ -1,9 +1,8 @@
 import {intl} from "@co.mmons/js-intl";
 import {popoverController} from "@ionic/core";
-import {Component, h, Listen, Prop} from "@stencil/core";
+import {Component, h, Prop} from "@stencil/core";
 import {defineIonxLinkEditor, showLinkEditor} from "ionx/LinkEditor";
 import {toggleMark} from "prosemirror-commands";
-import {Schema} from "prosemirror-model";
 import {findMarksInSelection} from "../prosemirror/utils/findMarksInSelection";
 import {findNodeStartEnd} from "../prosemirror/utils/findNodeStartEnd";
 import {LinkMark} from "../schema";
@@ -23,11 +22,13 @@ export class LinkMenu {
     async edit() {
 
         const view = await this.editor.getView();
-        const schema = view.state.schema as Schema;
-        const linkMark = schema.marks.link;
+        const {state} = view;
+        const {schema} = state;
+        const {marks} = schema;
+        const linkMark = marks.link;
         const linkSpec = linkMark.spec;
 
-        MARKS: for (const mark of findMarksInSelection(view.state, linkMark)) {
+        MARKS: for (const mark of findMarksInSelection(state, linkMark)) {
             const href = mark.attrs.href;
             const target = mark.attrs.target;
             if (href) {
@@ -35,22 +36,25 @@ export class LinkMenu {
 
                 const linkSchemes = linkSpec instanceof LinkMark ? linkSpec.schemes : undefined;
 
-                const link = await showLinkEditor({value: {href, target}, schemes: linkSchemes});
+                const link = await showLinkEditor({value: {href, target}, schemes: linkSchemes}, {animated: "onlyEnter"});
                 if (link) {
 
-                    const selection = view.state.selection;
-                    const tr = view.state.tr;
+                    const selection = state.selection;
+                    const tr = state.tr;
 
                     tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
                         if (node.isText) {
                             const {start, end} = findNodeStartEnd(tr.doc, pos);
-                            tr.addMark(start, end, view.state.schema.mark(linkMark, link));
+                            tr.addMark(start, end, schema.mark(linkMark, link));
                         }
                     });
 
                     view.dispatch(tr);
 
                 }
+
+                view.focus();
+
                 break MARKS;
             }
         }
@@ -59,11 +63,13 @@ export class LinkMenu {
 
     async unlink() {
         const view = await this.editor.getView();
-        const selection = view.state.selection;
+        const {state} = view;
+        const {selection} = state;
+        const {marks} = state.schema;
 
         if (selection.empty) {
 
-            const tr = view.state.tr;
+            const tr = state.tr;
 
             tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
 
@@ -72,22 +78,18 @@ export class LinkMenu {
                     const start = pos - $pos.textOffset;
                     const end = start + $pos.parent.child($pos.index()).nodeSize;
 
-                    tr.removeMark(start, end, view.state.schema.marks.LinkMark);
+                    tr.removeMark(start, end, marks.link);
                 }
             });
 
             view.dispatch(tr);
 
         } else {
-            toggleMark(view.state.schema.marks.LinkMark)(view.state, tr => view.dispatch(tr));
+            toggleMark(marks.link)(state, tr => view.dispatch(tr));
         }
 
-        popoverController.dismiss();
-    }
-
-    @Listen("ionViewDidLeave")
-    didDismiss() {
-        this.editor.setFocus();
+        await popoverController.dismiss();
+        view.focus();
     }
 
     render() {

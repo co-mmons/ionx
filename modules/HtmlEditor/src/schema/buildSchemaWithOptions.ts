@@ -37,13 +37,13 @@ export function buildSchemaWithOptions(options: {topNode?: string}, ...specs: Ma
 
     const spec: OrderedSchemaSpec = {marks, nodes, topNode: options.topNode};
 
-    for (const node of Object.values(nodes) as NodeSpecExtended[]) {
+    nodes.forEach((_name, node) => {
         node.configure?.(spec);
-    }
+    })
 
-    for (const mark of Object.values(marks) as MarkSpecExtended[]) {
+    marks.forEach((_name, mark) => {
         mark.configure?.(spec);
-    }
+    });
 
     return new Schema(spec);
 }

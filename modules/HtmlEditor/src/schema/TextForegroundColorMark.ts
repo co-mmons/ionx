@@ -1,9 +1,9 @@
 import {DOMOutputSpecArray, ParseRule} from "prosemirror-model";
 import {MarkSpecExtended} from "./MarkSpecExtended";
 
-export class TextColorMark extends MarkSpecExtended {
+export class TextForegroundColorMark extends MarkSpecExtended {
 
-    readonly name: string = "textColor";
+    readonly name: string = "textForegroundColor";
 
     group = "textFormat";
 

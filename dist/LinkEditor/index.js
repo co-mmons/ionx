@@ -3,6 +3,7 @@ export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client'
 import { MessageRef, intl, setGlobalValues } from '@co.mmons/js-intl';
 import { Enum } from '@co.mmons/js-utils/core';
 import { FormValidationError, validEmail, defineIonxForms, FormController, required } from 'ionx/forms';
+import { createAnimation } from '@ionic/core';
 import { defineIonxDialog, showDialog } from 'ionx/Dialog';
 import { defineIonxFormsTooltipErrorPresenter } from 'ionx/forms/TooltipErrorPresenter';
 import { defineIonxSelect } from 'ionx/Select';
@@ -174,11 +175,13 @@ async function loadIntlMessages() {
   loaded.push(intl.locale);
 }
 
-async function showLinkEditor(props) {
+async function showLinkEditor(props, dialogOptions) {
   defineIonxDialog();
   const dialog = await showDialog({
     component: "ionx-link-editor-dialog",
     componentProps: { editorProps: props },
+    animated: dialogOptions?.animated !== false,
+    leaveAnimation: dialogOptions?.animated === "onlyEnter" ? (_baseEl) => createAnimation() : undefined
   });
   const result = await dialog.onDidDismiss();
   if (result.role === "ok") {

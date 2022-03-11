@@ -5,8 +5,10 @@ import {ToolbarItem} from "./ToolbarItem";
 
 export class LinkToolbarItem extends ToolbarItem {
     label = new MessageRef("ionx/LinkEditor", "Link");
+    menuComponent = "ionx-html-editor-link-menu";
 
     isVisible(view: EditorView): boolean {
-        return isMarkActive(view.state, view.state.schema.marks.link)
+        const {marks} = view.state.schema;
+        return marks.link && isMarkActive(view.state, marks.link);
     }
 }

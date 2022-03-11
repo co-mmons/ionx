@@ -15,7 +15,8 @@ export {OrderedListNode} from "./OrderedListNode";
 export {OrderedSchemaSpec} from "./OrderedSchemaSpec";
 export {ParagraphNode} from "./ParagraphNode";
 export {StrongMark} from "./StrongMark";
-export {TextColorMark} from "./TextColorMark";
+export {TextBackgroundColorMark} from "./TextBackgroundColorMark"
+export {TextForegroundColorMark} from "./TextForegroundColorMark";
 export {TextNode} from "./TextNode";
 export {UnderlineMark} from "./UnderlineMark";
 export {buildSchemaWithOptions} from "./buildSchemaWithOptions";

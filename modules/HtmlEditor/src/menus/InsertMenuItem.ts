@@ -8,5 +8,5 @@ export interface InsertMenuItem {
     label: string | MessageRef;
     sublabel: string | MessageRef,
     disabled?: boolean;
-    handler: (view?: EditorView<Schema>) => void;
+    handler: (view?: EditorView<Schema>) => any | Promise<any>;
 }
