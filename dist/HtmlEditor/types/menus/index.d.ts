@@ -1,3 +1,4 @@
 export { InsertLinkMenuItem } from "./InsertLinkMenuItem";
-export { InsertMenuItem } from "./InsertMenuItem";
+export { InsertListMenuItems } from "./InsertListMenuItems";
 export { InsertMenuItemFactory } from "./InsertMenuItemFactory";
+export { InsertMenuItem } from "./InsertMenuItem";
