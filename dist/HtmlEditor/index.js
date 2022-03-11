@@ -1,12 +1,112 @@
-import { HTMLElement as HTMLElement$1, createEvent, h, Host, Fragment as Fragment$1, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement as HTMLElement$1, createEvent, h, Host, Fragment as Fragment$1, forceUpdate, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
+import { MessageRef, intl, setGlobalValues, translate } from '@co.mmons/js-intl';
 import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { loadIonxLinkEditorIntl, defineIonxLinkEditor, showLinkEditor } from 'ionx/LinkEditor';
-import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
-import { unserialize } from '@co.mmons/js-utils/json';
-import { popoverController, isPlatform } from '@ionic/core';
+import { popoverController, isPlatform, createAnimation } from '@ionic/core';
 import { deepEqual, shallowEqual } from 'fast-equals';
 import { addEventListener } from 'ionx/utils';
+
+class MarkSpecExtended {
+}
+
+class AlignmentMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "alignment";
+    this.excludes = this.name;
+    this.group = "alignment";
+    this.attrs = { align: {} };
+    this.parseDOM = [
+      {
+        tag: "div[data-align]",
+        getAttrs: dom => {
+          const align = dom.getAttribute("data-align");
+          return align ? { align } : false;
+        }
+      }
+    ];
+  }
+  toDOM(mark) {
+    return [
+      "div",
+      {
+        style: `text-align: ${mark.attrs.align}`,
+        "data-align": mark.attrs.align,
+      },
+      0
+    ];
+  }
+}
+
+class NodeSpecExtended {
+  allowMark(mark) {
+    const marks = new Set(this.marks ? this.marks.split(" ") : []);
+    if (mark instanceof MarkSpecExtended) {
+      mark = mark.name;
+    }
+    marks.add(mark);
+    this.marks = [...marks.values()].join(" ");
+  }
+  allowContent(node) {
+    const content = new Set(this.content ? this.content.split(" ") : []);
+    if (node instanceof NodeSpecExtended) {
+      node = node.name;
+    }
+    content.add(node);
+    this.content = [...content.values()].join(" ");
+  }
+}
+
+const blockquote = "blockquote";
+const blockquoteDOM = [blockquote, 0];
+class BlockquoteNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = blockquote;
+    this.content = "block+";
+    this.group = "block";
+    this.defining = true;
+    this.parseDOM = [{ tag: blockquote }];
+  }
+  toDOM() {
+    return blockquoteDOM;
+  }
+}
+
+const ul = "ul";
+const domSpec$1 = [ul, 0];
+class BulletListNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "bulletList";
+    this.content = "listItem+";
+    this.group = "block";
+    this.parseDOM = [{ tag: ul }];
+  }
+  toDOM() {
+    return domSpec$1;
+  }
+}
+
+class DocNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "doc";
+    this.content = "block+";
+  }
+  setContent(content) {
+    this.content = typeof content === "string" ? content : content.join(" ");
+    return this;
+  }
+  configure(schema) {
+    for (const mark of ["alignment"]) {
+      if (schema.marks.get(mark)) {
+        this.allowMark(mark);
+      }
+    }
+  }
+}
 
 // ::- Persistent data structure representing an ordered mapping from
 // strings to values, with some convenient update methods.
@@ -1511,7 +1611,7 @@ Node$1.fromJSON = function fromJSON (schema, json) {
 
 Object.defineProperties( Node$1.prototype, prototypeAccessors$3$1 );
 
-var TextNode = /*@__PURE__*/(function (Node) {
+var TextNode$1 = /*@__PURE__*/(function (Node) {
   function TextNode(type, attrs, content, marks) {
     Node.call(this, type, attrs, null, marks);
 
@@ -2510,7 +2610,7 @@ Schema.prototype.node = function node (type, attrs, content, marks) {
 // allowed.
 Schema.prototype.text = function text (text$1, marks) {
   var type = this.nodes.text;
-  return new TextNode(type, type.defaultAttrs, text$1, Mark.setFrom(marks))
+  return new TextNode$1(type, type.defaultAttrs, text$1, Mark.setFrom(marks))
 };
 
 // :: (union<string, MarkType>, ?Object) → Mark
@@ -7045,8 +7145,8 @@ function chainCommands() {
   }
 }
 
-var backspace = chainCommands(deleteSelection, joinBackward, selectNodeBackward);
-var del = chainCommands(deleteSelection, joinForward, selectNodeForward);
+var backspace$1 = chainCommands(deleteSelection, joinBackward, selectNodeBackward);
+var del$1 = chainCommands(deleteSelection, joinForward, selectNodeForward);
 
 // :: Object
 // A basic keymap containing bindings not specific to any schema.
@@ -7059,41 +7159,788 @@ var del = chainCommands(deleteSelection, joinForward, selectNodeForward);
 // * **Delete** and **Mod-Delete** to `deleteSelection`, `joinForward`, `selectNodeForward`
 // * **Mod-Delete** to `deleteSelection`, `joinForward`, `selectNodeForward`
 // * **Mod-a** to `selectAll`
-var pcBaseKeymap = {
+({
   "Enter": chainCommands(newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock),
   "Mod-Enter": exitCode,
-  "Backspace": backspace,
-  "Mod-Backspace": backspace,
-  "Shift-Backspace": backspace,
-  "Delete": del,
-  "Mod-Delete": del,
+  "Backspace": backspace$1,
+  "Mod-Backspace": backspace$1,
+  "Shift-Backspace": backspace$1,
+  "Delete": del$1,
+  "Mod-Delete": del$1,
   "Mod-a": selectAll
-};
-
-// :: Object
-// A copy of `pcBaseKeymap` that also binds **Ctrl-h** like Backspace,
-// **Ctrl-d** like Delete, **Alt-Backspace** like Ctrl-Backspace, and
-// **Ctrl-Alt-Backspace**, **Alt-Delete**, and **Alt-d** like
-// Ctrl-Delete.
-var macBaseKeymap = {
-  "Ctrl-h": pcBaseKeymap["Backspace"],
-  "Alt-Backspace": pcBaseKeymap["Mod-Backspace"],
-  "Ctrl-d": pcBaseKeymap["Delete"],
-  "Ctrl-Alt-Backspace": pcBaseKeymap["Mod-Delete"],
-  "Alt-Delete": pcBaseKeymap["Mod-Delete"],
-  "Alt-d": pcBaseKeymap["Mod-Delete"]
-};
-for (var key$2 in pcBaseKeymap) { macBaseKeymap[key$2] = pcBaseKeymap[key$2]; }
+});
 
 // declare global: os, navigator
-var mac$3 = typeof navigator != "undefined" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform)
+typeof navigator != "undefined" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform)
           : typeof os != "undefined" ? os.platform() == "darwin" : false;
 
-// :: Object
-// Depending on the detected platform, this will hold
-// [`pcBasekeymap`](#commands.pcBaseKeymap) or
-// [`macBaseKeymap`](#commands.macBaseKeymap).
-var baseKeymap = mac$3 ? macBaseKeymap : pcBaseKeymap;
+const em = "em";
+const emDOM = [em, 0];
+class EmphasisMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "emphasis";
+    this.group = "textFormat";
+    this.parseDOM = [
+      { tag: "i" },
+      { tag: em },
+      { style: "font-style=italic" }
+    ];
+  }
+  toDOM() {
+    return emDOM;
+  }
+  keymap(schema) {
+    const cmd = toggleMark(schema.marks[this.name]);
+    return {
+      "Mod-i": cmd,
+      "Mod-I": cmd
+    };
+  }
+}
+
+class FontSizeMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "fontSize";
+    this.group = "textFormat";
+    this.attrs = { fontSize: {} };
+    this.parseDOM = [
+      {
+        style: "font-size",
+        getAttrs: fontSize => {
+          return { fontSize };
+        }
+      }
+    ];
+  }
+  toDOM(mark) {
+    return ["span", { style: `font-size: ${mark.attrs.fontSize}` }, 0];
+  }
+}
+
+const isApple = typeof navigator !== "undefined" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) :
+  (typeof window["os"] !== "undefined" ? window["os"].platform() === "darwin" : false);
+
+const br = "br";
+const brDOM = [br];
+class HardBreakNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "hardBreak";
+    this.inline = true;
+    this.group = "inline";
+    this.selectable = false;
+    this.parseDOM = [{ tag: br }];
+  }
+  toDOM() {
+    return brDOM;
+  }
+  keymap(schema) {
+    const node = schema.nodes[this.name];
+    const cmd = (state, dispatch) => {
+      dispatch(state.tr.replaceSelectionWith(node.create()).scrollIntoView());
+      return true;
+    };
+    return {
+      "Mod-Enter": cmd,
+      "Shift-Enter": cmd,
+      ...(isApple ? { "Ctrl-Enter": cmd } : {})
+    };
+  }
+}
+
+class HeadingNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "heading";
+    this.attrs = {
+      level: { default: 1 },
+      indent: { default: null }
+    };
+    this.content = "inline*";
+    this.group = "block";
+    this.defining = true;
+    this.parseDOM = [
+      { tag: "h1", getAttrs: this.getAttrs },
+      { tag: "h2", getAttrs: this.getAttrs },
+      { tag: "h3", getAttrs: this.getAttrs },
+      { tag: "h4", getAttrs: this.getAttrs },
+      { tag: "h5", getAttrs: this.getAttrs },
+      { tag: "h6", getAttrs: this.getAttrs }
+    ];
+  }
+  getAttrs(node) {
+    const level = parseInt(node.tagName.substring(1));
+    const indent = node.style.textIndent || null;
+    return { level, indent: indent && !indent.startsWith("0") ? indent : null };
+  }
+  toDOM(node) {
+    const { indent } = node.attrs;
+    const attrs = {};
+    const style = [];
+    if (indent) {
+      style.push(`text-indent: ${indent}`);
+    }
+    if (style.length) {
+      attrs["style"] = style.join(";");
+    }
+    return [`h${node.attrs.level}`, attrs, 0];
+  }
+}
+
+const hr = "hr";
+const hrDOM = [hr];
+class HorizontalRuleNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "horizontalRule";
+    this.group = "block";
+    this.parseDOM = [{ tag: hr }];
+  }
+  toDOM() {
+    return hrDOM;
+  }
+}
+
+class LinkMark extends MarkSpecExtended {
+  constructor(options) {
+    super();
+    this.name = "link";
+    this.attrs = {
+      href: {},
+      target: { default: null },
+      title: { default: null }
+    };
+    this.inclusive = false;
+    this.parseDOM = [
+      {
+        tag: "a[href]",
+        getAttrs(dom) {
+          if (dom instanceof HTMLElement) {
+            return {
+              href: dom.getAttribute("href"),
+              target: dom.getAttribute("target"),
+              title: dom.getAttribute("title")
+            };
+          }
+        }
+      }
+    ];
+    this.schemes = options?.schemes;
+  }
+  toDOM(node) {
+    const { href, title, target } = node.attrs;
+    return ["a", { href, title, target }, 0];
+  }
+}
+
+// :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
+// Returns a command function that wraps the selection in a list with
+// the given type an attributes. If `dispatch` is null, only return a
+// value to indicate whether this is possible, but don't actually
+// perform the change.
+function wrapInList$1(listType, attrs) {
+  return function(state, dispatch) {
+    var ref = state.selection;
+    var $from = ref.$from;
+    var $to = ref.$to;
+    var range = $from.blockRange($to), doJoin = false, outerRange = range;
+    if (!range) { return false }
+    // This is at the top of an existing list item
+    if (range.depth >= 2 && $from.node(range.depth - 1).type.compatibleContent(listType) && range.startIndex == 0) {
+      // Don't do anything if this is the top of the list
+      if ($from.index(range.depth - 1) == 0) { return false }
+      var $insert = state.doc.resolve(range.start - 2);
+      outerRange = new NodeRange($insert, $insert, range.depth);
+      if (range.endIndex < range.parent.childCount)
+        { range = new NodeRange($from, state.doc.resolve($to.end(range.depth)), range.depth); }
+      doJoin = true;
+    }
+    var wrap = findWrapping(outerRange, listType, attrs, range);
+    if (!wrap) { return false }
+    if (dispatch) { dispatch(doWrapInList(state.tr, range, wrap, doJoin, listType).scrollIntoView()); }
+    return true
+  }
+}
+
+function doWrapInList(tr, range, wrappers, joinBefore, listType) {
+  var content = Fragment.empty;
+  for (var i = wrappers.length - 1; i >= 0; i--)
+    { content = Fragment.from(wrappers[i].type.create(wrappers[i].attrs, content)); }
+
+  tr.step(new ReplaceAroundStep(range.start - (joinBefore ? 2 : 0), range.end, range.start, range.end,
+                                new Slice(content, 0, 0), wrappers.length, true));
+
+  var found = 0;
+  for (var i$1 = 0; i$1 < wrappers.length; i$1++) { if (wrappers[i$1].type == listType) { found = i$1 + 1; } }
+  var splitDepth = wrappers.length - found;
+
+  var splitPos = range.start + wrappers.length - (joinBefore ? 2 : 0), parent = range.parent;
+  for (var i$2 = range.startIndex, e = range.endIndex, first = true; i$2 < e; i$2++, first = false) {
+    if (!first && canSplit(tr.doc, splitPos, splitDepth)) {
+      tr.split(splitPos, splitDepth);
+      splitPos += 2 * splitDepth;
+    }
+    splitPos += parent.child(i$2).nodeSize;
+  }
+  return tr
+}
+
+// :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
+// Build a command that splits a non-empty textblock at the top level
+// of a list item by also splitting that list item.
+function splitListItem(itemType) {
+  return function(state, dispatch) {
+    var ref = state.selection;
+    var $from = ref.$from;
+    var $to = ref.$to;
+    var node = ref.node;
+    if ((node && node.isBlock) || $from.depth < 2 || !$from.sameParent($to)) { return false }
+    var grandParent = $from.node(-1);
+    if (grandParent.type != itemType) { return false }
+    if ($from.parent.content.size == 0 && $from.node(-1).childCount == $from.indexAfter(-1)) {
+      // In an empty block. If this is a nested list, the wrapping
+      // list item should be split. Otherwise, bail out and let next
+      // command handle lifting.
+      if ($from.depth == 2 || $from.node(-3).type != itemType ||
+          $from.index(-2) != $from.node(-2).childCount - 1) { return false }
+      if (dispatch) {
+        var wrap = Fragment.empty;
+        var depthBefore = $from.index(-1) ? 1 : $from.index(-2) ? 2 : 3;
+        // Build a fragment containing empty versions of the structure
+        // from the outer list item to the parent node of the cursor
+        for (var d = $from.depth - depthBefore; d >= $from.depth - 3; d--)
+          { wrap = Fragment.from($from.node(d).copy(wrap)); }
+        var depthAfter = $from.indexAfter(-1) < $from.node(-2).childCount ? 1
+            : $from.indexAfter(-2) < $from.node(-3).childCount ? 2 : 3;
+        // Add a second list item with an empty default start node
+        wrap = wrap.append(Fragment.from(itemType.createAndFill()));
+        var start = $from.before($from.depth - (depthBefore - 1));
+        var tr$1 = state.tr.replace(start, $from.after(-depthAfter), new Slice(wrap, 4 - depthBefore, 0));
+        var sel = -1;
+        tr$1.doc.nodesBetween(start, tr$1.doc.content.size, function (node, pos) {
+          if (sel > -1) { return false }
+          if (node.isTextblock && node.content.size == 0) { sel = pos + 1; }
+        });
+        if (sel > -1) { tr$1.setSelection(state.selection.constructor.near(tr$1.doc.resolve(sel))); }
+        dispatch(tr$1.scrollIntoView());
+      }
+      return true
+    }
+    var nextType = $to.pos == $from.end() ? grandParent.contentMatchAt(0).defaultType : null;
+    var tr = state.tr.delete($from.pos, $to.pos);
+    var types = nextType && [null, {type: nextType}];
+    if (!canSplit(tr.doc, $from.pos, 2, types)) { return false }
+    if (dispatch) { dispatch(tr.split($from.pos, 2, types).scrollIntoView()); }
+    return true
+  }
+}
+
+// :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
+// Create a command to lift the list item around the selection up into
+// a wrapping list.
+function liftListItem$1(itemType) {
+  return function(state, dispatch) {
+    var ref = state.selection;
+    var $from = ref.$from;
+    var $to = ref.$to;
+    var range = $from.blockRange($to, function (node) { return node.childCount && node.firstChild.type == itemType; });
+    if (!range) { return false }
+    if (!dispatch) { return true }
+    if ($from.node(range.depth - 1).type == itemType) // Inside a parent list
+      { return liftToOuterList(state, dispatch, itemType, range) }
+    else // Outer list node
+      { return liftOutOfList(state, dispatch, range) }
+  }
+}
+
+function liftToOuterList(state, dispatch, itemType, range) {
+  var tr = state.tr, end = range.end, endOfList = range.$to.end(range.depth);
+  if (end < endOfList) {
+    // There are siblings after the lifted items, which must become
+    // children of the last item
+    tr.step(new ReplaceAroundStep(end - 1, endOfList, end, endOfList,
+                                  new Slice(Fragment.from(itemType.create(null, range.parent.copy())), 1, 0), 1, true));
+    range = new NodeRange(tr.doc.resolve(range.$from.pos), tr.doc.resolve(endOfList), range.depth);
+  }
+  dispatch(tr.lift(range, liftTarget(range)).scrollIntoView());
+  return true
+}
+
+function liftOutOfList(state, dispatch, range) {
+  var tr = state.tr, list = range.parent;
+  // Merge the list items into a single big item
+  for (var pos = range.end, i = range.endIndex - 1, e = range.startIndex; i > e; i--) {
+    pos -= list.child(i).nodeSize;
+    tr.delete(pos - 1, pos + 1);
+  }
+  var $start = tr.doc.resolve(range.start), item = $start.nodeAfter;
+  if (tr.mapping.map(range.end) != range.start + $start.nodeAfter.nodeSize) { return false }
+  var atStart = range.startIndex == 0, atEnd = range.endIndex == list.childCount;
+  var parent = $start.node(-1), indexBefore = $start.index(-1);
+  if (!parent.canReplace(indexBefore + (atStart ? 0 : 1), indexBefore + 1,
+                         item.content.append(atEnd ? Fragment.empty : Fragment.from(list))))
+    { return false }
+  var start = $start.pos, end = start + item.nodeSize;
+  // Strip off the surrounding list. At the sides where we're not at
+  // the end of the list, the existing list is closed. At sides where
+  // this is the end, it is overwritten to its end.
+  tr.step(new ReplaceAroundStep(start - (atStart ? 1 : 0), end + (atEnd ? 1 : 0), start + 1, end - 1,
+                                new Slice((atStart ? Fragment.empty : Fragment.from(list.copy(Fragment.empty)))
+                                          .append(atEnd ? Fragment.empty : Fragment.from(list.copy(Fragment.empty))),
+                                          atStart ? 0 : 1, atEnd ? 0 : 1), atStart ? 0 : 1));
+  dispatch(tr.scrollIntoView());
+  return true
+}
+
+// :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
+// Create a command to sink the list item around the selection down
+// into an inner list.
+function sinkListItem(itemType) {
+  return function(state, dispatch) {
+    var ref = state.selection;
+    var $from = ref.$from;
+    var $to = ref.$to;
+    var range = $from.blockRange($to, function (node) { return node.childCount && node.firstChild.type == itemType; });
+    if (!range) { return false }
+    var startIndex = range.startIndex;
+    if (startIndex == 0) { return false }
+    var parent = range.parent, nodeBefore = parent.child(startIndex - 1);
+    if (nodeBefore.type != itemType) { return false }
+
+    if (dispatch) {
+      var nestedBefore = nodeBefore.lastChild && nodeBefore.lastChild.type == parent.type;
+      var inner = Fragment.from(nestedBefore ? itemType.create() : null);
+      var slice = new Slice(Fragment.from(itemType.create(null, Fragment.from(parent.type.create(null, inner)))),
+                            nestedBefore ? 3 : 1, 0);
+      var before = range.start, after = range.end;
+      dispatch(state.tr.step(new ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after,
+                                                   before, after, slice, 1, true))
+               .scrollIntoView());
+    }
+    return true
+  }
+}
+
+const liDOM = ["li", 0];
+class ListItemNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "listItem";
+    this.content = "block*";
+    this.parseDOM = [{ tag: "li" }];
+  }
+  toDOM() {
+    return liDOM;
+  }
+  keymap(schema) {
+    return { "Enter": splitListItem(schema.nodes[this.name]) };
+  }
+  configure(schema) {
+    for (const mark of ["alignment"]) {
+      if (schema.marks.get(mark)) {
+        this.allowMark(mark);
+      }
+    }
+    for (const node of ["paragraph"]) {
+      if (schema.nodes[node]) {
+        this.allowContent(node);
+      }
+    }
+  }
+}
+
+const olDOM = ["ol", 0];
+class OrderedListNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "orderedList";
+    this.content = "listItem+";
+    this.group = "block";
+    this.attrs = { order: { default: 1 } };
+    this.parseDOM = [
+      {
+        tag: "ol",
+        getAttrs(dom) {
+          return { order: dom.hasAttribute("start") ? +dom.getAttribute("start") : 1 };
+        }
+      }
+    ];
+  }
+  toDOM(node) {
+    return node.attrs.order == 1 ? olDOM : ["ol", { start: node.attrs.order }, 0];
+  }
+}
+
+function isMarkFromGroup(mark, groupName) {
+  if (mark instanceof MarkType) {
+    mark = mark.spec;
+  }
+  return mark.group && mark.group.split(" ").includes(groupName);
+}
+
+class ParagraphNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "paragraph";
+    this.attrs = {
+      indent: { default: null }
+    };
+    this.content = "inline*";
+    this.group = "block";
+    this.parseDOM = [{
+        tag: "p",
+        getAttrs(node) {
+          const indent = node.style.textIndent || null;
+          return { indent: indent && !indent.startsWith("0") ? indent : null };
+        }
+      }];
+  }
+  toDOM(node) {
+    const { indent } = node.attrs;
+    const attrs = {};
+    const style = [];
+    if (indent) {
+      style.push(`text-indent: ${indent}`);
+    }
+    if (style.length) {
+      attrs["style"] = style.join(";");
+    }
+    return ["p", attrs, 0];
+  }
+  configure(schema) {
+    schema.marks.forEach((_markName, mark) => {
+      if (isMarkFromGroup(mark, "textFormat")) {
+        this.allowMark(mark);
+      }
+    });
+  }
+}
+
+class StrikethroughMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "strikethrough";
+    this.group = "textFormat";
+    this.parseDOM = [
+      { tag: "s" },
+      { style: "text-decoration=line-through" },
+      { style: "text-decoration-line=line-through" }
+    ];
+  }
+  toDOM() {
+    return ["s", 0];
+  }
+}
+
+const strong = "strong";
+const domSpec = [strong, 0];
+class StrongMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = strong;
+    this.group = "textFormat";
+    this.parseDOM = [
+      { tag: strong },
+      // This works around a Google Docs misbehavior where
+      // pasted content will be inexplicably wrapped in `<b>`
+      // tags with a font-weight normal.
+      { tag: "b", getAttrs: node => node.style.fontWeight != "normal" && null },
+      { style: "font-weight", getAttrs: value => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null }
+    ];
+  }
+  toDOM() {
+    return domSpec;
+  }
+  keymap(schema) {
+    const cmd = toggleMark(schema.marks[this.name]);
+    return {
+      "Mod-b": cmd,
+      "Mod-B": cmd
+    };
+  }
+}
+
+class SubscriptMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "subscript";
+    this.group = "textFormat";
+    this.excludes = "superscript";
+    this.parseDOM = [
+      { tag: "sub" }
+    ];
+  }
+  toDOM() {
+    return ["sub", 0];
+  }
+}
+
+class SuperscriptMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "superscript";
+    this.group = "textFormat";
+    this.excludes = "subscript";
+    this.parseDOM = [
+      { tag: "sup" }
+    ];
+  }
+  toDOM() {
+    return ["sup", 0];
+  }
+}
+
+class TextBackgroundColorMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "textBackgroundColor";
+    this.group = "textFormat";
+    this.attrs = {
+      color: {},
+    };
+    this.parseDOM = [
+      {
+        style: "background-color",
+        getAttrs: color => {
+          return { color };
+        }
+      }
+    ];
+  }
+  toDOM(mark) {
+    return [
+      "span",
+      { style: `background-color: ${mark.attrs.color}` },
+      0
+    ];
+  }
+}
+
+class TextForegroundColorMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "textForegroundColor";
+    this.group = "textFormat";
+    this.attrs = {
+      color: {},
+    };
+    this.parseDOM = [
+      {
+        style: "color",
+        getAttrs: color => {
+          return { color };
+        }
+      }
+    ];
+  }
+  toDOM(mark) {
+    return [
+      "span",
+      { style: `color: ${mark.attrs.color}` },
+      0
+    ];
+  }
+}
+
+class TextNode extends NodeSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "text";
+    this.group = "inline";
+  }
+}
+
+class UnderlineMark extends MarkSpecExtended {
+  constructor() {
+    super(...arguments);
+    this.name = "underline";
+    this.group = "textFormat";
+    this.parseDOM = [
+      { tag: "u" },
+      { style: "text-decoration=underline" }
+    ];
+  }
+  toDOM() {
+    return ["u", 0];
+  }
+  keymap(schema) {
+    const cmd = toggleMark(schema.marks[this.name]);
+    return {
+      "Mod-u": cmd,
+      "Mod-U": cmd
+    };
+  }
+}
+
+function buildSchemaWithOptions(options, ...specs) {
+  let marks = orderedmap.from({});
+  let nodes = orderedmap.from({});
+  for (let spec of specs) {
+    if (!(spec instanceof NodeSpecExtended || spec instanceof MarkSpecExtended)) {
+      spec = new spec();
+    }
+    if (spec instanceof NodeSpecExtended) {
+      nodes = nodes.addToEnd(spec.name, spec);
+    }
+    else if (spec instanceof MarkSpecExtended) {
+      marks = marks.addToEnd(spec.name, spec);
+    }
+  }
+  if ((!options.topNode || options.topNode === "doc") && !nodes.get("doc")) {
+    nodes = nodes.addToStart("doc", new DocNode());
+  }
+  if (!nodes.get("text")) {
+    nodes = nodes.addToStart("text", new TextNode());
+  }
+  const spec = { marks, nodes, topNode: options.topNode };
+  nodes.forEach((_name, node) => {
+    node.configure?.(spec);
+  });
+  marks.forEach((_name, mark) => {
+    mark.configure?.(spec);
+  });
+  return new Schema(spec);
+}
+
+function buildSchema(...specs) {
+  return buildSchemaWithOptions({}, ...specs);
+}
+
+function isBlockMarkActive(state, type) {
+  const { from, $from, to, empty } = state.selection;
+  if (empty) {
+    for (const mark of $from.parent.marks) {
+      if (mark.type === type) {
+        return true;
+      }
+    }
+  }
+  else {
+    return state.doc.rangeHasMark(from, to, type);
+  }
+}
+
+class ToolbarItem {
+}
+
+class AlignmentToolbarItem extends ToolbarItem {
+  constructor() {
+    super(...arguments);
+    this.label = new MessageRef("ionx/HtmlEditor", "Alignment");
+    this.menuComponent = "ionx-html-editor-alignment-menu";
+  }
+  isVisible(view) {
+    return !!view.state.schema.marks.alignment;
+  }
+  isActive(view) {
+    return isBlockMarkActive(view.state, view.state.schema.marks.alignment);
+  }
+}
+
+class InsertMenuToolbarItem extends ToolbarItem {
+  constructor(...items) {
+    super();
+    this.label = new MessageRef("ionx/HtmlEditor", "Insert");
+    this.menuComponent = "ionx-html-editor-insert-menu";
+    this.items = items;
+  }
+  menuComponentProps(view) {
+    const items = [];
+    for (let item of this.items) {
+      if (typeof item === "function") {
+        const itms = item(view);
+        if (Array.isArray(itms)) {
+          for (const i of itms) {
+            if (i) {
+              items.push(i);
+            }
+          }
+        }
+        else if (itms) {
+          items.push(itms);
+        }
+      }
+      else if (item) {
+        items.push(item);
+      }
+    }
+    return { items };
+  }
+}
+
+function isMarkActive(state, type) {
+  const { from, $from, to, empty } = state.selection;
+  if (empty) {
+    return !!(type.isInSet(state.storedMarks || $from.marks()));
+  }
+  else {
+    return state.doc.rangeHasMark(from, to, type);
+  }
+}
+function anyMarkActive(state, types) {
+  const { from, $from, to, empty } = state.selection;
+  if (empty) {
+    for (const type of types) {
+      if (type.isInSet(state.storedMarks || $from.marks())) {
+        return true;
+      }
+    }
+  }
+  else {
+    for (const type of types) {
+      if (state.doc.rangeHasMark(from, to, type)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+class LinkMenuToolbarItem extends ToolbarItem {
+  constructor() {
+    super(...arguments);
+    this.label = new MessageRef("ionx/LinkEditor", "Link");
+    this.menuComponent = "ionx-html-editor-link-menu";
+  }
+  isActive() {
+    return true;
+  }
+  isVisible(view) {
+    const { marks } = view.state.schema;
+    return marks.link && isMarkActive(view.state, marks.link);
+  }
+}
+
+function createCommonjsModule(fn, basedir, module) {
+	return module = {
+		path: basedir,
+		exports: {},
+		require: function (path, base) {
+			return commonjsRequire();
+		}
+	}, fn(module, module.exports), module.exports;
+}
+
+function getAugmentedNamespace(n) {
+	if (n.__esModule) return n;
+	var a = Object.defineProperty({}, '__esModule', {value: true});
+	Object.keys(n).forEach(function (k) {
+		var d = Object.getOwnPropertyDescriptor(n, k);
+		Object.defineProperty(a, k, d.get ? d : {
+			enumerable: true,
+			get: function () {
+				return n[k];
+			}
+		});
+	});
+	return a;
+}
+
+function commonjsRequire () {
+	throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
+}
 
 var base = {
   8: "Backspace",
@@ -7182,9 +8029,9 @@ var shift = {
 var chrome$1 = typeof navigator != "undefined" && /Chrome\/(\d+)/.exec(navigator.userAgent);
 var safari = typeof navigator != "undefined" && /Apple Computer/.test(navigator.vendor);
 var gecko = typeof navigator != "undefined" && /Gecko\/\d+/.test(navigator.userAgent);
-var mac$2 = typeof navigator != "undefined" && /Mac/.test(navigator.platform);
+var mac$1 = typeof navigator != "undefined" && /Mac/.test(navigator.platform);
 var ie$1 = typeof navigator != "undefined" && /MSIE \d|Trident\/(?:[7-9]|\d{2,})\..*rv:(\d+)/.exec(navigator.userAgent);
-var brokenModifierNames = chrome$1 && (mac$2 || +chrome$1[1] < 57) || gecko && mac$2;
+var brokenModifierNames = chrome$1 && (mac$1 || +chrome$1[1] < 57) || gecko && mac$1;
 
 // Fill in the digit keys
 for (var i = 0; i < 10; i++) base[48 + i] = base[96 + i] = String(i);
@@ -7222,7 +8069,7 @@ function keyName(event) {
 
 // declare global: navigator
 
-var mac$1 = typeof navigator != "undefined" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : false;
+var mac = typeof navigator != "undefined" ? /Mac|iP(hone|[oa]d)/.test(navigator.platform) : false;
 
 function normalizeKeyName(name) {
   var parts = name.split(/-(?!$)/), result = parts[parts.length - 1];
@@ -7234,7 +8081,7 @@ function normalizeKeyName(name) {
     else if (/^a(lt)?$/i.test(mod)) { alt = true; }
     else if (/^(c|ctrl|control)$/i.test(mod)) { ctrl = true; }
     else if (/^s(hift)?$/i.test(mod)) { shift = true; }
-    else if (/^mod$/i.test(mod)) { if (mac$1) { meta = true; } else { ctrl = true; } }
+    else if (/^mod$/i.test(mod)) { if (mac) { meta = true; } else { ctrl = true; } }
     else { throw new Error("Unrecognized modifier name: " + mod) }
   }
   if (alt) { result = "Alt-" + result; }
@@ -12611,2069 +13458,6 @@ function checkStateComponent(plugin) {
     { throw new RangeError("Plugins passed directly to the view must not have a state component") }
 }
 
-// ::- Gap cursor selections are represented using this class. Its
-// `$anchor` and `$head` properties both point at the cursor position.
-var GapCursor = /*@__PURE__*/(function (Selection) {
-  function GapCursor($pos) {
-    Selection.call(this, $pos, $pos);
-  }
-
-  if ( Selection ) GapCursor.__proto__ = Selection;
-  GapCursor.prototype = Object.create( Selection && Selection.prototype );
-  GapCursor.prototype.constructor = GapCursor;
-
-  GapCursor.prototype.map = function map (doc, mapping) {
-    var $pos = doc.resolve(mapping.map(this.head));
-    return GapCursor.valid($pos) ? new GapCursor($pos) : Selection.near($pos)
-  };
-
-  GapCursor.prototype.content = function content () { return Slice.empty };
-
-  GapCursor.prototype.eq = function eq (other) {
-    return other instanceof GapCursor && other.head == this.head
-  };
-
-  GapCursor.prototype.toJSON = function toJSON () {
-    return {type: "gapcursor", pos: this.head}
-  };
-
-  GapCursor.fromJSON = function fromJSON (doc, json) {
-    if (typeof json.pos != "number") { throw new RangeError("Invalid input for GapCursor.fromJSON") }
-    return new GapCursor(doc.resolve(json.pos))
-  };
-
-  GapCursor.prototype.getBookmark = function getBookmark () { return new GapBookmark(this.anchor) };
-
-  GapCursor.valid = function valid ($pos) {
-    var parent = $pos.parent;
-    if (parent.isTextblock || !closedBefore($pos) || !closedAfter($pos)) { return false }
-    var override = parent.type.spec.allowGapCursor;
-    if (override != null) { return override }
-    var deflt = parent.contentMatchAt($pos.index()).defaultType;
-    return deflt && deflt.isTextblock
-  };
-
-  GapCursor.findFrom = function findFrom ($pos, dir, mustMove) {
-    search: for (;;) {
-      if (!mustMove && GapCursor.valid($pos)) { return $pos }
-      var pos = $pos.pos, next = null;
-      // Scan up from this position
-      for (var d = $pos.depth;; d--) {
-        var parent = $pos.node(d);
-        if (dir > 0 ? $pos.indexAfter(d) < parent.childCount : $pos.index(d) > 0) {
-          next = parent.child(dir > 0 ? $pos.indexAfter(d) : $pos.index(d) - 1);
-          break
-        } else if (d == 0) {
-          return null
-        }
-        pos += dir;
-        var $cur = $pos.doc.resolve(pos);
-        if (GapCursor.valid($cur)) { return $cur }
-      }
-
-      // And then down into the next node
-      for (;;) {
-        var inside = dir > 0 ? next.firstChild : next.lastChild;
-        if (!inside) {
-          if (next.isAtom && !next.isText && !NodeSelection.isSelectable(next)) {
-            $pos = $pos.doc.resolve(pos + next.nodeSize * dir);
-            mustMove = false;
-            continue search
-          }
-          break
-        }
-        next = inside;
-        pos += dir;
-        var $cur$1 = $pos.doc.resolve(pos);
-        if (GapCursor.valid($cur$1)) { return $cur$1 }
-      }
-
-      return null
-    }
-  };
-
-  return GapCursor;
-}(Selection));
-
-GapCursor.prototype.visible = false;
-
-Selection.jsonID("gapcursor", GapCursor);
-
-var GapBookmark = function GapBookmark(pos) {
-  this.pos = pos;
-};
-GapBookmark.prototype.map = function map (mapping) {
-  return new GapBookmark(mapping.map(this.pos))
-};
-GapBookmark.prototype.resolve = function resolve (doc) {
-  var $pos = doc.resolve(this.pos);
-  return GapCursor.valid($pos) ? new GapCursor($pos) : Selection.near($pos)
-};
-
-function closedBefore($pos) {
-  for (var d = $pos.depth; d >= 0; d--) {
-    var index = $pos.index(d);
-    // At the start of this parent, look at next one
-    if (index == 0) { continue }
-    // See if the node before (or its first ancestor) is closed
-    for (var before = $pos.node(d).child(index - 1);; before = before.lastChild) {
-      if ((before.childCount == 0 && !before.inlineContent) || before.isAtom || before.type.spec.isolating) { return true }
-      if (before.inlineContent) { return false }
-    }
-  }
-  // Hit start of document
-  return true
-}
-
-function closedAfter($pos) {
-  for (var d = $pos.depth; d >= 0; d--) {
-    var index = $pos.indexAfter(d), parent = $pos.node(d);
-    if (index == parent.childCount) { continue }
-    for (var after = parent.child(index);; after = after.firstChild) {
-      if ((after.childCount == 0 && !after.inlineContent) || after.isAtom || after.type.spec.isolating) { return true }
-      if (after.inlineContent) { return false }
-    }
-  }
-  return true
-}
-
-// :: () → Plugin
-// Create a gap cursor plugin. When enabled, this will capture clicks
-// near and arrow-key-motion past places that don't have a normally
-// selectable position nearby, and create a gap cursor selection for
-// them. The cursor is drawn as an element with class
-// `ProseMirror-gapcursor`. You can either include
-// `style/gapcursor.css` from the package's directory or add your own
-// styles to make it visible.
-var gapCursor = function() {
-  return new Plugin({
-    props: {
-      decorations: drawGapCursor,
-
-      createSelectionBetween: function createSelectionBetween(_view, $anchor, $head) {
-        if ($anchor.pos == $head.pos && GapCursor.valid($head)) { return new GapCursor($head) }
-      },
-
-      handleClick: handleClick,
-      handleKeyDown: handleKeyDown$1
-    }
-  })
-};
-
-var handleKeyDown$1 = keydownHandler({
-  "ArrowLeft": arrow$1("horiz", -1),
-  "ArrowRight": arrow$1("horiz", 1),
-  "ArrowUp": arrow$1("vert", -1),
-  "ArrowDown": arrow$1("vert", 1)
-});
-
-function arrow$1(axis, dir) {
-  var dirStr = axis == "vert" ? (dir > 0 ? "down" : "up") : (dir > 0 ? "right" : "left");
-  return function(state, dispatch, view) {
-    var sel = state.selection;
-    var $start = dir > 0 ? sel.$to : sel.$from, mustMove = sel.empty;
-    if (sel instanceof TextSelection) {
-      if (!view.endOfTextblock(dirStr) || $start.depth == 0) { return false }
-      mustMove = false;
-      $start = state.doc.resolve(dir > 0 ? $start.after() : $start.before());
-    }
-    var $found = GapCursor.findFrom($start, dir, mustMove);
-    if (!$found) { return false }
-    if (dispatch) { dispatch(state.tr.setSelection(new GapCursor($found))); }
-    return true
-  }
-}
-
-function handleClick(view, pos, event) {
-  if (!view.editable) { return false }
-  var $pos = view.state.doc.resolve(pos);
-  if (!GapCursor.valid($pos)) { return false }
-  var ref = view.posAtCoords({left: event.clientX, top: event.clientY});
-  var inside = ref.inside;
-  if (inside > -1 && NodeSelection.isSelectable(view.state.doc.nodeAt(inside))) { return false }
-  view.dispatch(view.state.tr.setSelection(new GapCursor($pos)));
-  return true
-}
-
-function drawGapCursor(state) {
-  if (!(state.selection instanceof GapCursor)) { return null }
-  var node = document.createElement("div");
-  node.className = "ProseMirror-gapcursor";
-  return DecorationSet.create(state.doc, [Decoration.widget(state.selection.head, node, {key: "gapcursor"})])
-}
-
-var GOOD_LEAF_SIZE = 200;
-
-// :: class<T> A rope sequence is a persistent sequence data structure
-// that supports appending, prepending, and slicing without doing a
-// full copy. It is represented as a mostly-balanced tree.
-var RopeSequence = function RopeSequence () {};
-
-RopeSequence.prototype.append = function append (other) {
-  if (!other.length) { return this }
-  other = RopeSequence.from(other);
-
-  return (!this.length && other) ||
-    (other.length < GOOD_LEAF_SIZE && this.leafAppend(other)) ||
-    (this.length < GOOD_LEAF_SIZE && other.leafPrepend(this)) ||
-    this.appendInner(other)
-};
-
-// :: (union<[T], RopeSequence<T>>) → RopeSequence<T>
-// Prepend an array or other rope to this one, returning a new rope.
-RopeSequence.prototype.prepend = function prepend (other) {
-  if (!other.length) { return this }
-  return RopeSequence.from(other).append(this)
-};
-
-RopeSequence.prototype.appendInner = function appendInner (other) {
-  return new Append(this, other)
-};
-
-// :: (?number, ?number) → RopeSequence<T>
-// Create a rope repesenting a sub-sequence of this rope.
-RopeSequence.prototype.slice = function slice (from, to) {
-    if ( from === void 0 ) from = 0;
-    if ( to === void 0 ) to = this.length;
-
-  if (from >= to) { return RopeSequence.empty }
-  return this.sliceInner(Math.max(0, from), Math.min(this.length, to))
-};
-
-// :: (number) → T
-// Retrieve the element at the given position from this rope.
-RopeSequence.prototype.get = function get (i) {
-  if (i < 0 || i >= this.length) { return undefined }
-  return this.getInner(i)
-};
-
-// :: ((element: T, index: number) → ?bool, ?number, ?number)
-// Call the given function for each element between the given
-// indices. This tends to be more efficient than looping over the
-// indices and calling `get`, because it doesn't have to descend the
-// tree for every element.
-RopeSequence.prototype.forEach = function forEach (f, from, to) {
-    if ( from === void 0 ) from = 0;
-    if ( to === void 0 ) to = this.length;
-
-  if (from <= to)
-    { this.forEachInner(f, from, to, 0); }
-  else
-    { this.forEachInvertedInner(f, from, to, 0); }
-};
-
-// :: ((element: T, index: number) → U, ?number, ?number) → [U]
-// Map the given functions over the elements of the rope, producing
-// a flat array.
-RopeSequence.prototype.map = function map (f, from, to) {
-    if ( from === void 0 ) from = 0;
-    if ( to === void 0 ) to = this.length;
-
-  var result = [];
-  this.forEach(function (elt, i) { return result.push(f(elt, i)); }, from, to);
-  return result
-};
-
-// :: (?union<[T], RopeSequence<T>>) → RopeSequence<T>
-// Create a rope representing the given array, or return the rope
-// itself if a rope was given.
-RopeSequence.from = function from (values) {
-  if (values instanceof RopeSequence) { return values }
-  return values && values.length ? new Leaf(values) : RopeSequence.empty
-};
-
-var Leaf = /*@__PURE__*/(function (RopeSequence) {
-  function Leaf(values) {
-    RopeSequence.call(this);
-    this.values = values;
-  }
-
-  if ( RopeSequence ) Leaf.__proto__ = RopeSequence;
-  Leaf.prototype = Object.create( RopeSequence && RopeSequence.prototype );
-  Leaf.prototype.constructor = Leaf;
-
-  var prototypeAccessors = { length: { configurable: true },depth: { configurable: true } };
-
-  Leaf.prototype.flatten = function flatten () {
-    return this.values
-  };
-
-  Leaf.prototype.sliceInner = function sliceInner (from, to) {
-    if (from == 0 && to == this.length) { return this }
-    return new Leaf(this.values.slice(from, to))
-  };
-
-  Leaf.prototype.getInner = function getInner (i) {
-    return this.values[i]
-  };
-
-  Leaf.prototype.forEachInner = function forEachInner (f, from, to, start) {
-    for (var i = from; i < to; i++)
-      { if (f(this.values[i], start + i) === false) { return false } }
-  };
-
-  Leaf.prototype.forEachInvertedInner = function forEachInvertedInner (f, from, to, start) {
-    for (var i = from - 1; i >= to; i--)
-      { if (f(this.values[i], start + i) === false) { return false } }
-  };
-
-  Leaf.prototype.leafAppend = function leafAppend (other) {
-    if (this.length + other.length <= GOOD_LEAF_SIZE)
-      { return new Leaf(this.values.concat(other.flatten())) }
-  };
-
-  Leaf.prototype.leafPrepend = function leafPrepend (other) {
-    if (this.length + other.length <= GOOD_LEAF_SIZE)
-      { return new Leaf(other.flatten().concat(this.values)) }
-  };
-
-  prototypeAccessors.length.get = function () { return this.values.length };
-
-  prototypeAccessors.depth.get = function () { return 0 };
-
-  Object.defineProperties( Leaf.prototype, prototypeAccessors );
-
-  return Leaf;
-}(RopeSequence));
-
-// :: RopeSequence
-// The empty rope sequence.
-RopeSequence.empty = new Leaf([]);
-
-var Append = /*@__PURE__*/(function (RopeSequence) {
-  function Append(left, right) {
-    RopeSequence.call(this);
-    this.left = left;
-    this.right = right;
-    this.length = left.length + right.length;
-    this.depth = Math.max(left.depth, right.depth) + 1;
-  }
-
-  if ( RopeSequence ) Append.__proto__ = RopeSequence;
-  Append.prototype = Object.create( RopeSequence && RopeSequence.prototype );
-  Append.prototype.constructor = Append;
-
-  Append.prototype.flatten = function flatten () {
-    return this.left.flatten().concat(this.right.flatten())
-  };
-
-  Append.prototype.getInner = function getInner (i) {
-    return i < this.left.length ? this.left.get(i) : this.right.get(i - this.left.length)
-  };
-
-  Append.prototype.forEachInner = function forEachInner (f, from, to, start) {
-    var leftLen = this.left.length;
-    if (from < leftLen &&
-        this.left.forEachInner(f, from, Math.min(to, leftLen), start) === false)
-      { return false }
-    if (to > leftLen &&
-        this.right.forEachInner(f, Math.max(from - leftLen, 0), Math.min(this.length, to) - leftLen, start + leftLen) === false)
-      { return false }
-  };
-
-  Append.prototype.forEachInvertedInner = function forEachInvertedInner (f, from, to, start) {
-    var leftLen = this.left.length;
-    if (from > leftLen &&
-        this.right.forEachInvertedInner(f, from - leftLen, Math.max(to, leftLen) - leftLen, start + leftLen) === false)
-      { return false }
-    if (to < leftLen &&
-        this.left.forEachInvertedInner(f, Math.min(from, leftLen), to, start) === false)
-      { return false }
-  };
-
-  Append.prototype.sliceInner = function sliceInner (from, to) {
-    if (from == 0 && to == this.length) { return this }
-    var leftLen = this.left.length;
-    if (to <= leftLen) { return this.left.slice(from, to) }
-    if (from >= leftLen) { return this.right.slice(from - leftLen, to - leftLen) }
-    return this.left.slice(from, leftLen).append(this.right.slice(0, to - leftLen))
-  };
-
-  Append.prototype.leafAppend = function leafAppend (other) {
-    var inner = this.right.leafAppend(other);
-    if (inner) { return new Append(this.left, inner) }
-  };
-
-  Append.prototype.leafPrepend = function leafPrepend (other) {
-    var inner = this.left.leafPrepend(other);
-    if (inner) { return new Append(inner, this.right) }
-  };
-
-  Append.prototype.appendInner = function appendInner (other) {
-    if (this.left.depth >= Math.max(this.right.depth, other.depth) + 1)
-      { return new Append(this.left, new Append(this.right, other)) }
-    return new Append(this, other)
-  };
-
-  return Append;
-}(RopeSequence));
-
-var ropeSequence = RopeSequence;
-
-// ProseMirror's history isn't simply a way to roll back to a previous
-// state, because ProseMirror supports applying changes without adding
-// them to the history (for example during collaboration).
-//
-// To this end, each 'Branch' (one for the undo history and one for
-// the redo history) keeps an array of 'Items', which can optionally
-// hold a step (an actual undoable change), and always hold a position
-// map (which is needed to move changes below them to apply to the
-// current document).
-//
-// An item that has both a step and a selection bookmark is the start
-// of an 'event' — a group of changes that will be undone or redone at
-// once. (It stores only the bookmark, since that way we don't have to
-// provide a document until the selection is actually applied, which
-// is useful when compressing.)
-
-// Used to schedule history compression
-var max_empty_items = 500;
-
-var Branch = function Branch(items, eventCount) {
-  this.items = items;
-  this.eventCount = eventCount;
-};
-
-// : (EditorState, bool) → ?{transform: Transform, selection: ?SelectionBookmark, remaining: Branch}
-// Pop the latest event off the branch's history and apply it
-// to a document transform.
-Branch.prototype.popEvent = function popEvent (state, preserveItems) {
-    var this$1 = this;
-
-  if (this.eventCount == 0) { return null }
-
-  var end = this.items.length;
-  for (;; end--) {
-    var next = this.items.get(end - 1);
-    if (next.selection) { --end; break }
-  }
-
-  var remap, mapFrom;
-  if (preserveItems) {
-    remap = this.remapping(end, this.items.length);
-    mapFrom = remap.maps.length;
-  }
-  var transform = state.tr;
-  var selection, remaining;
-  var addAfter = [], addBefore = [];
-
-  this.items.forEach(function (item, i) {
-    if (!item.step) {
-      if (!remap) {
-        remap = this$1.remapping(end, i + 1);
-        mapFrom = remap.maps.length;
-      }
-      mapFrom--;
-      addBefore.push(item);
-      return
-    }
-
-    if (remap) {
-      addBefore.push(new Item(item.map));
-      var step = item.step.map(remap.slice(mapFrom)), map;
-
-      if (step && transform.maybeStep(step).doc) {
-        map = transform.mapping.maps[transform.mapping.maps.length - 1];
-        addAfter.push(new Item(map, null, null, addAfter.length + addBefore.length));
-      }
-      mapFrom--;
-      if (map) { remap.appendMap(map, mapFrom); }
-    } else {
-      transform.maybeStep(item.step);
-    }
-
-    if (item.selection) {
-      selection = remap ? item.selection.map(remap.slice(mapFrom)) : item.selection;
-      remaining = new Branch(this$1.items.slice(0, end).append(addBefore.reverse().concat(addAfter)), this$1.eventCount - 1);
-      return false
-    }
-  }, this.items.length, 0);
-
-  return {remaining: remaining, transform: transform, selection: selection}
-};
-
-// : (Transform, ?SelectionBookmark, Object) → Branch
-// Create a new branch with the given transform added.
-Branch.prototype.addTransform = function addTransform (transform, selection, histOptions, preserveItems) {
-  var newItems = [], eventCount = this.eventCount;
-  var oldItems = this.items, lastItem = !preserveItems && oldItems.length ? oldItems.get(oldItems.length - 1) : null;
-
-  for (var i = 0; i < transform.steps.length; i++) {
-    var step = transform.steps[i].invert(transform.docs[i]);
-    var item = new Item(transform.mapping.maps[i], step, selection), merged = (void 0);
-    if (merged = lastItem && lastItem.merge(item)) {
-      item = merged;
-      if (i) { newItems.pop(); }
-      else { oldItems = oldItems.slice(0, oldItems.length - 1); }
-    }
-    newItems.push(item);
-    if (selection) {
-      eventCount++;
-      selection = null;
-    }
-    if (!preserveItems) { lastItem = item; }
-  }
-  var overflow = eventCount - histOptions.depth;
-  if (overflow > DEPTH_OVERFLOW) {
-    oldItems = cutOffEvents(oldItems, overflow);
-    eventCount -= overflow;
-  }
-  return new Branch(oldItems.append(newItems), eventCount)
-};
-
-Branch.prototype.remapping = function remapping (from, to) {
-  var maps = new Mapping;
-  this.items.forEach(function (item, i) {
-    var mirrorPos = item.mirrorOffset != null && i - item.mirrorOffset >= from
-        ? maps.maps.length - item.mirrorOffset : null;
-    maps.appendMap(item.map, mirrorPos);
-  }, from, to);
-  return maps
-};
-
-Branch.prototype.addMaps = function addMaps (array) {
-  if (this.eventCount == 0) { return this }
-  return new Branch(this.items.append(array.map(function (map) { return new Item(map); })), this.eventCount)
-};
-
-// : (Transform, number)
-// When the collab module receives remote changes, the history has
-// to know about those, so that it can adjust the steps that were
-// rebased on top of the remote changes, and include the position
-// maps for the remote changes in its array of items.
-Branch.prototype.rebased = function rebased (rebasedTransform, rebasedCount) {
-  if (!this.eventCount) { return this }
-
-  var rebasedItems = [], start = Math.max(0, this.items.length - rebasedCount);
-
-  var mapping = rebasedTransform.mapping;
-  var newUntil = rebasedTransform.steps.length;
-  var eventCount = this.eventCount;
-  this.items.forEach(function (item) { if (item.selection) { eventCount--; } }, start);
-
-  var iRebased = rebasedCount;
-  this.items.forEach(function (item) {
-    var pos = mapping.getMirror(--iRebased);
-    if (pos == null) { return }
-    newUntil = Math.min(newUntil, pos);
-    var map = mapping.maps[pos];
-    if (item.step) {
-      var step = rebasedTransform.steps[pos].invert(rebasedTransform.docs[pos]);
-      var selection = item.selection && item.selection.map(mapping.slice(iRebased + 1, pos));
-      if (selection) { eventCount++; }
-      rebasedItems.push(new Item(map, step, selection));
-    } else {
-      rebasedItems.push(new Item(map));
-    }
-  }, start);
-
-  var newMaps = [];
-  for (var i = rebasedCount; i < newUntil; i++)
-    { newMaps.push(new Item(mapping.maps[i])); }
-  var items = this.items.slice(0, start).append(newMaps).append(rebasedItems);
-  var branch = new Branch(items, eventCount);
-
-  if (branch.emptyItemCount() > max_empty_items)
-    { branch = branch.compress(this.items.length - rebasedItems.length); }
-  return branch
-};
-
-Branch.prototype.emptyItemCount = function emptyItemCount () {
-  var count = 0;
-  this.items.forEach(function (item) { if (!item.step) { count++; } });
-  return count
-};
-
-// Compressing a branch means rewriting it to push the air (map-only
-// items) out. During collaboration, these naturally accumulate
-// because each remote change adds one. The `upto` argument is used
-// to ensure that only the items below a given level are compressed,
-// because `rebased` relies on a clean, untouched set of items in
-// order to associate old items with rebased steps.
-Branch.prototype.compress = function compress (upto) {
-    if ( upto === void 0 ) upto = this.items.length;
-
-  var remap = this.remapping(0, upto), mapFrom = remap.maps.length;
-  var items = [], events = 0;
-  this.items.forEach(function (item, i) {
-    if (i >= upto) {
-      items.push(item);
-      if (item.selection) { events++; }
-    } else if (item.step) {
-      var step = item.step.map(remap.slice(mapFrom)), map = step && step.getMap();
-      mapFrom--;
-      if (map) { remap.appendMap(map, mapFrom); }
-      if (step) {
-        var selection = item.selection && item.selection.map(remap.slice(mapFrom));
-        if (selection) { events++; }
-        var newItem = new Item(map.invert(), step, selection), merged, last = items.length - 1;
-        if (merged = items.length && items[last].merge(newItem))
-          { items[last] = merged; }
-        else
-          { items.push(newItem); }
-      }
-    } else if (item.map) {
-      mapFrom--;
-    }
-  }, this.items.length, 0);
-  return new Branch(ropeSequence.from(items.reverse()), events)
-};
-
-Branch.empty = new Branch(ropeSequence.empty, 0);
-
-function cutOffEvents(items, n) {
-  var cutPoint;
-  items.forEach(function (item, i) {
-    if (item.selection && (n-- == 0)) {
-      cutPoint = i;
-      return false
-    }
-  });
-  return items.slice(cutPoint)
-}
-
-var Item = function Item(map, step, selection, mirrorOffset) {
-  // The (forward) step map for this item.
-  this.map = map;
-  // The inverted step
-  this.step = step;
-  // If this is non-null, this item is the start of a group, and
-  // this selection is the starting selection for the group (the one
-  // that was active before the first step was applied)
-  this.selection = selection;
-  // If this item is the inverse of a previous mapping on the stack,
-  // this points at the inverse's offset
-  this.mirrorOffset = mirrorOffset;
-};
-
-Item.prototype.merge = function merge (other) {
-  if (this.step && other.step && !other.selection) {
-    var step = other.step.merge(this.step);
-    if (step) { return new Item(step.getMap().invert(), step, this.selection) }
-  }
-};
-
-// The value of the state field that tracks undo/redo history for that
-// state. Will be stored in the plugin state when the history plugin
-// is active.
-var HistoryState = function HistoryState(done, undone, prevRanges, prevTime) {
-  this.done = done;
-  this.undone = undone;
-  this.prevRanges = prevRanges;
-  this.prevTime = prevTime;
-};
-
-var DEPTH_OVERFLOW = 20;
-
-// : (HistoryState, EditorState, Transaction, Object)
-// Record a transformation in undo history.
-function applyTransaction(history, state, tr, options) {
-  var historyTr = tr.getMeta(historyKey), rebased;
-  if (historyTr) { return historyTr.historyState }
-
-  if (tr.getMeta(closeHistoryKey)) { history = new HistoryState(history.done, history.undone, null, 0); }
-
-  var appended = tr.getMeta("appendedTransaction");
-
-  if (tr.steps.length == 0) {
-    return history
-  } else if (appended && appended.getMeta(historyKey)) {
-    if (appended.getMeta(historyKey).redo)
-      { return new HistoryState(history.done.addTransform(tr, null, options, mustPreserveItems(state)),
-                              history.undone, rangesFor(tr.mapping.maps[tr.steps.length - 1]), history.prevTime) }
-    else
-      { return new HistoryState(history.done, history.undone.addTransform(tr, null, options, mustPreserveItems(state)),
-                              null, history.prevTime) }
-  } else if (tr.getMeta("addToHistory") !== false && !(appended && appended.getMeta("addToHistory") === false)) {
-    // Group transforms that occur in quick succession into one event.
-    var newGroup = history.prevTime == 0 || !appended && (history.prevTime < (tr.time || 0) - options.newGroupDelay ||
-                                                          !isAdjacentTo(tr, history.prevRanges));
-    var prevRanges = appended ? mapRanges(history.prevRanges, tr.mapping) : rangesFor(tr.mapping.maps[tr.steps.length - 1]);
-    return new HistoryState(history.done.addTransform(tr, newGroup ? state.selection.getBookmark() : null,
-                                                      options, mustPreserveItems(state)),
-                            Branch.empty, prevRanges, tr.time)
-  } else if (rebased = tr.getMeta("rebased")) {
-    // Used by the collab module to tell the history that some of its
-    // content has been rebased.
-    return new HistoryState(history.done.rebased(tr, rebased),
-                            history.undone.rebased(tr, rebased),
-                            mapRanges(history.prevRanges, tr.mapping), history.prevTime)
-  } else {
-    return new HistoryState(history.done.addMaps(tr.mapping.maps),
-                            history.undone.addMaps(tr.mapping.maps),
-                            mapRanges(history.prevRanges, tr.mapping), history.prevTime)
-  }
-}
-
-function isAdjacentTo(transform, prevRanges) {
-  if (!prevRanges) { return false }
-  if (!transform.docChanged) { return true }
-  var adjacent = false;
-  transform.mapping.maps[0].forEach(function (start, end) {
-    for (var i = 0; i < prevRanges.length; i += 2)
-      { if (start <= prevRanges[i + 1] && end >= prevRanges[i])
-        { adjacent = true; } }
-  });
-  return adjacent
-}
-
-function rangesFor(map) {
-  var result = [];
-  map.forEach(function (_from, _to, from, to) { return result.push(from, to); });
-  return result
-}
-
-function mapRanges(ranges, mapping) {
-  if (!ranges) { return null }
-  var result = [];
-  for (var i = 0; i < ranges.length; i += 2) {
-    var from = mapping.map(ranges[i], 1), to = mapping.map(ranges[i + 1], -1);
-    if (from <= to) { result.push(from, to); }
-  }
-  return result
-}
-
-// : (HistoryState, EditorState, (tr: Transaction), bool)
-// Apply the latest event from one branch to the document and shift the event
-// onto the other branch.
-function histTransaction(history, state, dispatch, redo) {
-  var preserveItems = mustPreserveItems(state), histOptions = historyKey.get(state).spec.config;
-  var pop = (redo ? history.undone : history.done).popEvent(state, preserveItems);
-  if (!pop) { return }
-
-  var selection = pop.selection.resolve(pop.transform.doc);
-  var added = (redo ? history.done : history.undone).addTransform(pop.transform, state.selection.getBookmark(),
-                                                                  histOptions, preserveItems);
-
-  var newHist = new HistoryState(redo ? added : pop.remaining, redo ? pop.remaining : added, null, 0);
-  dispatch(pop.transform.setSelection(selection).setMeta(historyKey, {redo: redo, historyState: newHist}).scrollIntoView());
-}
-
-var cachedPreserveItems = false, cachedPreserveItemsPlugins = null;
-// Check whether any plugin in the given state has a
-// `historyPreserveItems` property in its spec, in which case we must
-// preserve steps exactly as they came in, so that they can be
-// rebased.
-function mustPreserveItems(state) {
-  var plugins = state.plugins;
-  if (cachedPreserveItemsPlugins != plugins) {
-    cachedPreserveItems = false;
-    cachedPreserveItemsPlugins = plugins;
-    for (var i = 0; i < plugins.length; i++) { if (plugins[i].spec.historyPreserveItems) {
-      cachedPreserveItems = true;
-      break
-    } }
-  }
-  return cachedPreserveItems
-}
-
-var historyKey = new PluginKey("history");
-var closeHistoryKey = new PluginKey("closeHistory");
-
-// :: (?Object) → Plugin
-// Returns a plugin that enables the undo history for an editor. The
-// plugin will track undo and redo stacks, which can be used with the
-// [`undo`](#history.undo) and [`redo`](#history.redo) commands.
-//
-// You can set an `"addToHistory"` [metadata
-// property](#state.Transaction.setMeta) of `false` on a transaction
-// to prevent it from being rolled back by undo.
-//
-//   config::-
-//   Supports the following configuration options:
-//
-//     depth:: ?number
-//     The amount of history events that are collected before the
-//     oldest events are discarded. Defaults to 100.
-//
-//     newGroupDelay:: ?number
-//     The delay between changes after which a new group should be
-//     started. Defaults to 500 (milliseconds). Note that when changes
-//     aren't adjacent, a new group is always started.
-function history(config) {
-  config = {depth: config && config.depth || 100,
-            newGroupDelay: config && config.newGroupDelay || 500};
-  return new Plugin({
-    key: historyKey,
-
-    state: {
-      init: function init() {
-        return new HistoryState(Branch.empty, Branch.empty, null, 0)
-      },
-      apply: function apply(tr, hist, state) {
-        return applyTransaction(hist, state, tr, config)
-      }
-    },
-
-    config: config,
-
-    props: {
-      handleDOMEvents: {
-        beforeinput: function beforeinput(view, e) {
-          var handled = e.inputType == "historyUndo" ? undo(view.state, view.dispatch) :
-              e.inputType == "historyRedo" ? redo(view.state, view.dispatch) : false;
-          if (handled) { e.preventDefault(); }
-          return handled
-        }
-      }
-    }
-  })
-}
-
-// :: (EditorState, ?(tr: Transaction)) → bool
-// A command function that undoes the last change, if any.
-function undo(state, dispatch) {
-  var hist = historyKey.getState(state);
-  if (!hist || hist.done.eventCount == 0) { return false }
-  if (dispatch) { histTransaction(hist, state, dispatch, false); }
-  return true
-}
-
-// :: (EditorState, ?(tr: Transaction)) → bool
-// A command function that redoes the last undone change, if any.
-function redo(state, dispatch) {
-  var hist = historyKey.getState(state);
-  if (!hist || hist.undone.eventCount == 0) { return false }
-  if (dispatch) { histTransaction(hist, state, dispatch, true); }
-  return true
-}
-
-// :: (EditorState) → number
-// The amount of undoable events available in a given state.
-function undoDepth(state) {
-  var hist = historyKey.getState(state);
-  return hist ? hist.done.eventCount : 0
-}
-
-// :: (EditorState) → number
-// The amount of redoable events available in a given editor state.
-function redoDepth(state) {
-  var hist = historyKey.getState(state);
-  return hist ? hist.undone.eventCount : 0
-}
-
-let loaded = [];
-async function importJson() {
-  const locale = intl.locale;
-  switch (locale) {case "cs": return (await import('./cs.js')).default;
-case "da": return (await import('./da.js')).default;
-case "de": return (await import('./de.js')).default;
-case "en": return (await import('./en.js')).default;
-case "fr": return (await import('./fr.js')).default;
-case "hu": return (await import('./hu.js')).default;
-case "nl": return (await import('./nl.js')).default;
-case "pl": return (await import('./pl.js')).default;
-case "ru": return (await import('./ru.js')).default;
-
-  }
-  return Promise.resolve({});
-}
-async function loadIntlMessages() {
-  if (loaded.includes(intl.locale)) {
-    return;
-  }
-  setGlobalValues("ionx/HtmlEditor", intl.locale, await importJson());
-  loaded.push(intl.locale);
-}
-
-// :: (EditorState, ?(Transaction)) → bool
-// This is a command that will undo an input rule, if applying such a
-// rule was the last thing that the user did.
-function undoInputRule(state, dispatch) {
-  var plugins = state.plugins;
-  for (var i = 0; i < plugins.length; i++) {
-    var plugin = plugins[i], undoable = (void 0);
-    if (plugin.spec.isInputRules && (undoable = plugin.getState(state))) {
-      if (dispatch) {
-        var tr = state.tr, toUndo = undoable.transform;
-        for (var j = toUndo.steps.length - 1; j >= 0; j--)
-          { tr.step(toUndo.steps[j].invert(toUndo.docs[j])); }
-        if (undoable.text) {
-          var marks = tr.doc.resolve(undoable.from).marks();
-          tr.replaceWith(undoable.from, undoable.to, state.schema.text(undoable.text, marks));
-        } else {
-          tr.delete(undoable.from, undoable.to);
-        }
-        dispatch(tr);
-      }
-      return true
-    }
-  }
-  return false
-}
-
-var olDOM = ["ol", 0], ulDOM = ["ul", 0], liDOM = ["li", 0];
-
-// :: NodeSpec
-// An ordered list [node spec](#model.NodeSpec). Has a single
-// attribute, `order`, which determines the number at which the list
-// starts counting, and defaults to 1. Represented as an `<ol>`
-// element.
-var orderedList = {
-  attrs: {order: {default: 1}},
-  parseDOM: [{tag: "ol", getAttrs: function getAttrs(dom) {
-    return {order: dom.hasAttribute("start") ? +dom.getAttribute("start") : 1}
-  }}],
-  toDOM: function toDOM(node) {
-    return node.attrs.order == 1 ? olDOM : ["ol", {start: node.attrs.order}, 0]
-  }
-};
-
-// :: NodeSpec
-// A bullet list node spec, represented in the DOM as `<ul>`.
-var bulletList = {
-  parseDOM: [{tag: "ul"}],
-  toDOM: function toDOM() { return ulDOM }
-};
-
-// :: NodeSpec
-// A list item (`<li>`) spec.
-var listItem = {
-  parseDOM: [{tag: "li"}],
-  toDOM: function toDOM() { return liDOM },
-  defining: true
-};
-
-// :: (NodeType, ?Object) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
-// Returns a command function that wraps the selection in a list with
-// the given type an attributes. If `dispatch` is null, only return a
-// value to indicate whether this is possible, but don't actually
-// perform the change.
-function wrapInList$1(listType, attrs) {
-  return function(state, dispatch) {
-    var ref = state.selection;
-    var $from = ref.$from;
-    var $to = ref.$to;
-    var range = $from.blockRange($to), doJoin = false, outerRange = range;
-    if (!range) { return false }
-    // This is at the top of an existing list item
-    if (range.depth >= 2 && $from.node(range.depth - 1).type.compatibleContent(listType) && range.startIndex == 0) {
-      // Don't do anything if this is the top of the list
-      if ($from.index(range.depth - 1) == 0) { return false }
-      var $insert = state.doc.resolve(range.start - 2);
-      outerRange = new NodeRange($insert, $insert, range.depth);
-      if (range.endIndex < range.parent.childCount)
-        { range = new NodeRange($from, state.doc.resolve($to.end(range.depth)), range.depth); }
-      doJoin = true;
-    }
-    var wrap = findWrapping(outerRange, listType, attrs, range);
-    if (!wrap) { return false }
-    if (dispatch) { dispatch(doWrapInList(state.tr, range, wrap, doJoin, listType).scrollIntoView()); }
-    return true
-  }
-}
-
-function doWrapInList(tr, range, wrappers, joinBefore, listType) {
-  var content = Fragment.empty;
-  for (var i = wrappers.length - 1; i >= 0; i--)
-    { content = Fragment.from(wrappers[i].type.create(wrappers[i].attrs, content)); }
-
-  tr.step(new ReplaceAroundStep(range.start - (joinBefore ? 2 : 0), range.end, range.start, range.end,
-                                new Slice(content, 0, 0), wrappers.length, true));
-
-  var found = 0;
-  for (var i$1 = 0; i$1 < wrappers.length; i$1++) { if (wrappers[i$1].type == listType) { found = i$1 + 1; } }
-  var splitDepth = wrappers.length - found;
-
-  var splitPos = range.start + wrappers.length - (joinBefore ? 2 : 0), parent = range.parent;
-  for (var i$2 = range.startIndex, e = range.endIndex, first = true; i$2 < e; i$2++, first = false) {
-    if (!first && canSplit(tr.doc, splitPos, splitDepth)) {
-      tr.split(splitPos, splitDepth);
-      splitPos += 2 * splitDepth;
-    }
-    splitPos += parent.child(i$2).nodeSize;
-  }
-  return tr
-}
-
-// :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
-// Build a command that splits a non-empty textblock at the top level
-// of a list item by also splitting that list item.
-function splitListItem(itemType) {
-  return function(state, dispatch) {
-    var ref = state.selection;
-    var $from = ref.$from;
-    var $to = ref.$to;
-    var node = ref.node;
-    if ((node && node.isBlock) || $from.depth < 2 || !$from.sameParent($to)) { return false }
-    var grandParent = $from.node(-1);
-    if (grandParent.type != itemType) { return false }
-    if ($from.parent.content.size == 0 && $from.node(-1).childCount == $from.indexAfter(-1)) {
-      // In an empty block. If this is a nested list, the wrapping
-      // list item should be split. Otherwise, bail out and let next
-      // command handle lifting.
-      if ($from.depth == 2 || $from.node(-3).type != itemType ||
-          $from.index(-2) != $from.node(-2).childCount - 1) { return false }
-      if (dispatch) {
-        var wrap = Fragment.empty;
-        var depthBefore = $from.index(-1) ? 1 : $from.index(-2) ? 2 : 3;
-        // Build a fragment containing empty versions of the structure
-        // from the outer list item to the parent node of the cursor
-        for (var d = $from.depth - depthBefore; d >= $from.depth - 3; d--)
-          { wrap = Fragment.from($from.node(d).copy(wrap)); }
-        var depthAfter = $from.indexAfter(-1) < $from.node(-2).childCount ? 1
-            : $from.indexAfter(-2) < $from.node(-3).childCount ? 2 : 3;
-        // Add a second list item with an empty default start node
-        wrap = wrap.append(Fragment.from(itemType.createAndFill()));
-        var start = $from.before($from.depth - (depthBefore - 1));
-        var tr$1 = state.tr.replace(start, $from.after(-depthAfter), new Slice(wrap, 4 - depthBefore, 0));
-        var sel = -1;
-        tr$1.doc.nodesBetween(start, tr$1.doc.content.size, function (node, pos) {
-          if (sel > -1) { return false }
-          if (node.isTextblock && node.content.size == 0) { sel = pos + 1; }
-        });
-        if (sel > -1) { tr$1.setSelection(state.selection.constructor.near(tr$1.doc.resolve(sel))); }
-        dispatch(tr$1.scrollIntoView());
-      }
-      return true
-    }
-    var nextType = $to.pos == $from.end() ? grandParent.contentMatchAt(0).defaultType : null;
-    var tr = state.tr.delete($from.pos, $to.pos);
-    var types = nextType && [null, {type: nextType}];
-    if (!canSplit(tr.doc, $from.pos, 2, types)) { return false }
-    if (dispatch) { dispatch(tr.split($from.pos, 2, types).scrollIntoView()); }
-    return true
-  }
-}
-
-// :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
-// Create a command to lift the list item around the selection up into
-// a wrapping list.
-function liftListItem$1(itemType) {
-  return function(state, dispatch) {
-    var ref = state.selection;
-    var $from = ref.$from;
-    var $to = ref.$to;
-    var range = $from.blockRange($to, function (node) { return node.childCount && node.firstChild.type == itemType; });
-    if (!range) { return false }
-    if (!dispatch) { return true }
-    if ($from.node(range.depth - 1).type == itemType) // Inside a parent list
-      { return liftToOuterList(state, dispatch, itemType, range) }
-    else // Outer list node
-      { return liftOutOfList(state, dispatch, range) }
-  }
-}
-
-function liftToOuterList(state, dispatch, itemType, range) {
-  var tr = state.tr, end = range.end, endOfList = range.$to.end(range.depth);
-  if (end < endOfList) {
-    // There are siblings after the lifted items, which must become
-    // children of the last item
-    tr.step(new ReplaceAroundStep(end - 1, endOfList, end, endOfList,
-                                  new Slice(Fragment.from(itemType.create(null, range.parent.copy())), 1, 0), 1, true));
-    range = new NodeRange(tr.doc.resolve(range.$from.pos), tr.doc.resolve(endOfList), range.depth);
-  }
-  dispatch(tr.lift(range, liftTarget(range)).scrollIntoView());
-  return true
-}
-
-function liftOutOfList(state, dispatch, range) {
-  var tr = state.tr, list = range.parent;
-  // Merge the list items into a single big item
-  for (var pos = range.end, i = range.endIndex - 1, e = range.startIndex; i > e; i--) {
-    pos -= list.child(i).nodeSize;
-    tr.delete(pos - 1, pos + 1);
-  }
-  var $start = tr.doc.resolve(range.start), item = $start.nodeAfter;
-  if (tr.mapping.map(range.end) != range.start + $start.nodeAfter.nodeSize) { return false }
-  var atStart = range.startIndex == 0, atEnd = range.endIndex == list.childCount;
-  var parent = $start.node(-1), indexBefore = $start.index(-1);
-  if (!parent.canReplace(indexBefore + (atStart ? 0 : 1), indexBefore + 1,
-                         item.content.append(atEnd ? Fragment.empty : Fragment.from(list))))
-    { return false }
-  var start = $start.pos, end = start + item.nodeSize;
-  // Strip off the surrounding list. At the sides where we're not at
-  // the end of the list, the existing list is closed. At sides where
-  // this is the end, it is overwritten to its end.
-  tr.step(new ReplaceAroundStep(start - (atStart ? 1 : 0), end + (atEnd ? 1 : 0), start + 1, end - 1,
-                                new Slice((atStart ? Fragment.empty : Fragment.from(list.copy(Fragment.empty)))
-                                          .append(atEnd ? Fragment.empty : Fragment.from(list.copy(Fragment.empty))),
-                                          atStart ? 0 : 1, atEnd ? 0 : 1), atStart ? 0 : 1));
-  dispatch(tr.scrollIntoView());
-  return true
-}
-
-// :: (NodeType) → (state: EditorState, dispatch: ?(tr: Transaction)) → bool
-// Create a command to sink the list item around the selection down
-// into an inner list.
-function sinkListItem(itemType) {
-  return function(state, dispatch) {
-    var ref = state.selection;
-    var $from = ref.$from;
-    var $to = ref.$to;
-    var range = $from.blockRange($to, function (node) { return node.childCount && node.firstChild.type == itemType; });
-    if (!range) { return false }
-    var startIndex = range.startIndex;
-    if (startIndex == 0) { return false }
-    var parent = range.parent, nodeBefore = parent.child(startIndex - 1);
-    if (nodeBefore.type != itemType) { return false }
-
-    if (dispatch) {
-      var nestedBefore = nodeBefore.lastChild && nodeBefore.lastChild.type == parent.type;
-      var inner = Fragment.from(nestedBefore ? itemType.create() : null);
-      var slice = new Slice(Fragment.from(itemType.create(null, Fragment.from(parent.type.create(null, inner)))),
-                            nestedBefore ? 3 : 1, 0);
-      var before = range.start, after = range.end;
-      dispatch(state.tr.step(new ReplaceAroundStep(before - (nestedBefore ? 3 : 1), after,
-                                                   before, after, slice, 1, true))
-               .scrollIntoView());
-    }
-    return true
-  }
-}
-
-const mac = typeof navigator !== "undefined" ? /Mac/.test(navigator.platform) : false;
-function buildKeymap(schema, mapKeys) {
-  const keys = {};
-  let type;
-  function bind(key, cmd) {
-    if (mapKeys) {
-      const mapped = mapKeys[key];
-      if (mapped === false) {
-        return;
-      }
-      if (mapped) {
-        key = mapped;
-      }
-    }
-    keys[key] = cmd;
-  }
-  bind("Mod-z", undo);
-  bind("Shift-Mod-z", redo);
-  bind("Backspace", undoInputRule);
-  if (!mac) {
-    bind("Mod-y", redo);
-  }
-  bind("Alt-ArrowUp", joinUp);
-  bind("Alt-ArrowDown", joinDown);
-  bind("Mod-BracketLeft", lift);
-  bind("Escape", selectParentNode);
-  if (type = schema.marks.strong) {
-    bind("Mod-b", toggleMark(type));
-    bind("Mod-B", toggleMark(type));
-  }
-  if (type = schema.marks.em) {
-    bind("Mod-i", toggleMark(type));
-    bind("Mod-I", toggleMark(type));
-  }
-  if (type = schema.marks.underline) {
-    bind("Mod-u", toggleMark(type));
-    bind("Mod-U", toggleMark(type));
-  }
-  if (type = schema.nodes.listItem) {
-    bind("Enter", splitListItem(type));
-  }
-  if (type = schema.nodes.hardBreak) {
-    const br = type;
-    const cmd = (state, dispatch) => {
-      dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView());
-      return true;
-    };
-    bind("Mod-Enter", cmd);
-    bind("Shift-Enter", cmd);
-    if (mac) {
-      bind("Ctrl-Enter", cmd);
-    }
-  }
-  return keys;
-}
-
-var pDOM = ["p", 0], blockquoteDOM = ["blockquote", 0], hrDOM = ["hr"],
-      preDOM = ["pre", ["code", 0]], brDOM = ["br"];
-
-// :: Object
-// [Specs](#model.NodeSpec) for the nodes defined in this schema.
-var nodes$1 = {
-  // :: NodeSpec The top level document node.
-  doc: {
-    content: "block+"
-  },
-
-  // :: NodeSpec A plain paragraph textblock. Represented in the DOM
-  // as a `<p>` element.
-  paragraph: {
-    content: "inline*",
-    group: "block",
-    parseDOM: [{tag: "p"}],
-    toDOM: function toDOM() { return pDOM }
-  },
-
-  // :: NodeSpec A blockquote (`<blockquote>`) wrapping one or more blocks.
-  blockquote: {
-    content: "block+",
-    group: "block",
-    defining: true,
-    parseDOM: [{tag: "blockquote"}],
-    toDOM: function toDOM() { return blockquoteDOM }
-  },
-
-  // :: NodeSpec A horizontal rule (`<hr>`).
-  horizontal_rule: {
-    group: "block",
-    parseDOM: [{tag: "hr"}],
-    toDOM: function toDOM() { return hrDOM }
-  },
-
-  // :: NodeSpec A heading textblock, with a `level` attribute that
-  // should hold the number 1 to 6. Parsed and serialized as `<h1>` to
-  // `<h6>` elements.
-  heading: {
-    attrs: {level: {default: 1}},
-    content: "inline*",
-    group: "block",
-    defining: true,
-    parseDOM: [{tag: "h1", attrs: {level: 1}},
-               {tag: "h2", attrs: {level: 2}},
-               {tag: "h3", attrs: {level: 3}},
-               {tag: "h4", attrs: {level: 4}},
-               {tag: "h5", attrs: {level: 5}},
-               {tag: "h6", attrs: {level: 6}}],
-    toDOM: function toDOM(node) { return ["h" + node.attrs.level, 0] }
-  },
-
-  // :: NodeSpec A code listing. Disallows marks or non-text inline
-  // nodes by default. Represented as a `<pre>` element with a
-  // `<code>` element inside of it.
-  code_block: {
-    content: "text*",
-    marks: "",
-    group: "block",
-    code: true,
-    defining: true,
-    parseDOM: [{tag: "pre", preserveWhitespace: "full"}],
-    toDOM: function toDOM() { return preDOM }
-  },
-
-  // :: NodeSpec The text node.
-  text: {
-    group: "inline"
-  },
-
-  // :: NodeSpec An inline image (`<img>`) node. Supports `src`,
-  // `alt`, and `href` attributes. The latter two default to the empty
-  // string.
-  image: {
-    inline: true,
-    attrs: {
-      src: {},
-      alt: {default: null},
-      title: {default: null}
-    },
-    group: "inline",
-    draggable: true,
-    parseDOM: [{tag: "img[src]", getAttrs: function getAttrs(dom) {
-      return {
-        src: dom.getAttribute("src"),
-        title: dom.getAttribute("title"),
-        alt: dom.getAttribute("alt")
-      }
-    }}],
-    toDOM: function toDOM(node) { var ref = node.attrs;
-    var src = ref.src;
-    var alt = ref.alt;
-    var title = ref.title; return ["img", {src: src, alt: alt, title: title}] }
-  },
-
-  // :: NodeSpec A hard line break, represented in the DOM as `<br>`.
-  hard_break: {
-    inline: true,
-    group: "inline",
-    selectable: false,
-    parseDOM: [{tag: "br"}],
-    toDOM: function toDOM() { return brDOM }
-  }
-};
-
-var emDOM = ["em", 0], strongDOM = ["strong", 0], codeDOM = ["code", 0];
-
-// :: Object [Specs](#model.MarkSpec) for the marks in the schema.
-var marks$1 = {
-  // :: MarkSpec A link. Has `href` and `title` attributes. `title`
-  // defaults to the empty string. Rendered and parsed as an `<a>`
-  // element.
-  link: {
-    attrs: {
-      href: {},
-      title: {default: null}
-    },
-    inclusive: false,
-    parseDOM: [{tag: "a[href]", getAttrs: function getAttrs(dom) {
-      return {href: dom.getAttribute("href"), title: dom.getAttribute("title")}
-    }}],
-    toDOM: function toDOM(node) { var ref = node.attrs;
-    var href = ref.href;
-    var title = ref.title; return ["a", {href: href, title: title}, 0] }
-  },
-
-  // :: MarkSpec An emphasis mark. Rendered as an `<em>` element.
-  // Has parse rules that also match `<i>` and `font-style: italic`.
-  em: {
-    parseDOM: [{tag: "i"}, {tag: "em"}, {style: "font-style=italic"}],
-    toDOM: function toDOM() { return emDOM }
-  },
-
-  // :: MarkSpec A strong mark. Rendered as `<strong>`, parse rules
-  // also match `<b>` and `font-weight: bold`.
-  strong: {
-    parseDOM: [{tag: "strong"},
-               // This works around a Google Docs misbehavior where
-               // pasted content will be inexplicably wrapped in `<b>`
-               // tags with a font-weight normal.
-               {tag: "b", getAttrs: function (node) { return node.style.fontWeight != "normal" && null; }},
-               {style: "font-weight", getAttrs: function (value) { return /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null; }}],
-    toDOM: function toDOM() { return strongDOM }
-  },
-
-  // :: MarkSpec Code font mark. Represented as a `<code>` element.
-  code: {
-    parseDOM: [{tag: "code"}],
-    toDOM: function toDOM() { return codeDOM }
-  }
-};
-
-// :: Schema
-// This schema roughly corresponds to the document schema used by
-// [CommonMark](http://commonmark.org/), minus the list elements,
-// which are defined in the [`prosemirror-schema-list`](#schema-list)
-// module.
-//
-// To reuse elements from this schema, extend or read from its
-// `spec.nodes` and `spec.marks` [properties](#model.Schema.spec).
-new Schema({nodes: nodes$1, marks: marks$1});
-
-const alignment = {
-  excludes: "alignment",
-  group: "alignment",
-  attrs: {
-    align: {},
-  },
-  parseDOM: [
-    {
-      tag: "div[data-align]",
-      getAttrs: dom => {
-        const align = dom.getAttribute("data-align");
-        return align ? { align } : false;
-      },
-    },
-  ],
-  toDOM(mark) {
-    return [
-      "div",
-      {
-        style: `text-align: ${mark.attrs.align}`,
-        "data-align": mark.attrs.align,
-      },
-      0
-    ];
-  },
-};
-
-const fontSize = {
-  attrs: {
-    fontSize: {},
-  },
-  parseDOM: [
-    {
-      style: "font-size",
-      getAttrs: fontSize => {
-        return { fontSize };
-      },
-    },
-  ],
-  toDOM(mark) {
-    return [
-      "span",
-      { style: `font-size: ${mark.attrs.fontSize}` },
-      0
-    ];
-  },
-};
-
-const textColor = {
-  attrs: {
-    color: {},
-  },
-  parseDOM: [
-    {
-      style: "color",
-      getAttrs: color => {
-        return { color };
-      },
-    },
-  ],
-  toDOM(mark) {
-    return [
-      "span",
-      { style: `color: ${mark.attrs.color}` },
-      0
-    ];
-  },
-};
-
-const youtube = {
-  attrs: { id: { default: "" }, start: { default: 0 } },
-  inline: false,
-  group: "block",
-  draggable: false,
-  toDOM: (node) => {
-    return [
-      "div",
-      { "data-youtube": node.attrs.id + (node.attrs.start ? "," + node.attrs.start : "") }
-    ];
-  },
-  parseDOM: [
-    {
-      tag: "div[data-youtube]",
-      getAttrs: (dom) => {
-        // @ts-ignore
-        const info = dom.getAttribute("data-youtube").split(",");
-        return {
-          id: info[0],
-          start: info.length > 1 ? info[1] : 0
-        };
-      },
-    }
-  ]
-};
-
-const paragraph = {
-  attrs: {
-    indent: { default: null }
-  },
-  content: "inline*",
-  marks: "alignment strong underline em fontSize link textColor",
-  group: "block",
-  parseDOM: [{
-      tag: "p",
-      getAttrs(node) {
-        const indent = node.style.textIndent || null;
-        return { indent: indent && !indent.startsWith("0") ? indent : null };
-      }
-    }],
-  toDOM(node) {
-    const { indent } = node.attrs;
-    const attrs = {};
-    const style = [];
-    if (indent) {
-      style.push(`text-indent: ${indent}`);
-    }
-    if (style.length) {
-      attrs["style"] = style.join(";");
-    }
-    return ["p", attrs, 0];
-  }
-};
-
-const TemplateString = {
-  attrs: {},
-  group: "inline",
-  inline: true,
-  draggable: true,
-  toDOM: (node) => {
-    return [
-      "app-template-string",
-      { "props": JSON.stringify(node.attrs.props) }
-    ];
-  },
-  parseDOM: [
-    {
-      tag: "app-template-string",
-      getAttrs: (dom) => {
-        // @ts-ignore
-        const info = unserialize(JSON.parse(dom.getAttribute("props")));
-        return {
-          "props": info
-        };
-      },
-    }
-  ]
-};
-
-const nodes = {
-  doc: {
-    content: "block+",
-    marks: "alignment",
-  },
-  paragraph,
-  blockquote: nodes$1.blockquote,
-  horizontalRule: nodes$1.horizontal_rule,
-  heading: nodes$1.heading,
-  text: nodes$1.text,
-  hardBreak: nodes$1.hard_break,
-  bulletList: Object.assign({}, bulletList, {
-    content: "listItem+",
-    group: "block"
-  }),
-  orderedList: Object.assign({}, orderedList, {
-    content: "listItem+",
-    group: "block"
-  }),
-  listItem: Object.assign({}, listItem, {
-    content: "paragraph block*",
-    marks: "alignment"
-  }),
-  youtube,
-  TemplateString
-};
-const marks = {
-  link: {
-    attrs: {
-      href: {},
-      target: { default: null },
-      title: { default: null }
-    },
-    inclusive: false,
-    parseDOM: [{
-        tag: "a[href]",
-        getAttrs(dom) {
-          if (dom instanceof HTMLElement) {
-            return { href: dom.getAttribute("href"), target: dom.getAttribute("target"), title: dom.getAttribute("title") };
-          }
-        }
-      }],
-    toDOM(node) {
-      const { href, title, target } = node.attrs;
-      return ["a", { href, title, target }, 0];
-    }
-  },
-  em: marks$1.em,
-  strong: marks$1.strong,
-  alignment,
-  fontSize,
-  textColor,
-  underline: {
-    parseDOM: [{ tag: "u" }, { style: "text-decoration=underline" }],
-    toDOM() {
-      return ["u", 0];
-    }
-  }
-};
-const schema = new Schema({ nodes, marks });
-
-function findScrollParent(element) {
-  if (!element) {
-    return;
-  }
-  if (element.scrollHeight >= element.clientHeight) {
-    const overflowY = window.getComputedStyle(element).overflowY;
-    if (overflowY !== "visible" && overflowY !== "hidden") {
-      return element;
-    }
-  }
-  if (element.assignedSlot) {
-    const p = findScrollParent(element.assignedSlot.parentElement);
-    if (p) {
-      return p;
-    }
-  }
-  return findScrollParent(element.parentElement);
-}
-
-async function fixIonItemOverflow(editor) {
-  const item = editor.closest("ion-item");
-  if (item) {
-    await waitTill(() => !!item.shadowRoot && !!item.shadowRoot.querySelector(".item-inner"));
-    item.style.overflow = "initial";
-    const style = document.createElement("style");
-    style.innerHTML = `.item-native, .item-inner, .input-wrapper { overflow: initial !important; }`;
-    item.shadowRoot.appendChild(style);
-  }
-}
-
-function scrollIntoView(element, parent) {
-  if (parent) {
-    const parentRect = parent.getBoundingClientRect();
-    const rect = element.getBoundingClientRect();
-    if (!(rect.top > parentRect.top && rect.top <= parentRect.bottom && rect.bottom < parentRect.height)) {
-      let top = element.offsetTop - 100;
-      if (element.offsetParent) {
-        let offsetParent = element.offsetParent;
-        while (offsetParent !== parent && !!offsetParent) {
-          top += offsetParent.offsetTop;
-          offsetParent = offsetParent.offsetParent;
-        }
-      }
-      parent.scrollTo({ top: top });
-    }
-    return;
-  }
-  element.scrollIntoView();
-}
-
-function caretTopPoint() {
-  const selection = document.getSelection();
-  const range0 = selection.getRangeAt(0);
-  let rect;
-  let range;
-  // supposed to be textNode in most cases
-  // but div[contenteditable] when empty
-  const node = range0.startContainer;
-  const offset = range0.startOffset;
-  if (offset > 0) {
-    // new range, don't influence DOM state
-    range = document.createRange();
-    range.setStart(node, (offset - 1));
-    range.setEnd(node, offset);
-    // https://developer.mozilla.org/en-US/docs/Web/API/range.getBoundingClientRect
-    // IE9, Safari?(but look good in Safari 8)
-    rect = range.getBoundingClientRect();
-    return { left: rect["right"], top: rect.top };
-  }
-  else if (offset < node["length"]) {
-    range = document.createRange();
-    // similar but select next on letter
-    range.setStart(node, offset);
-    range.setEnd(node, (offset + 1));
-    rect = range.getBoundingClientRect();
-    return { left: rect.left, top: rect.top };
-  }
-  else {
-    // textNode has length
-    // https://developer.mozilla.org/en-US/docs/Web/API/Element.getBoundingClientRect
-    rect = node.getBoundingClientRect();
-    const styles = getComputedStyle(node);
-    const lineHeight = parseInt(styles.lineHeight);
-    const fontSize = parseInt(styles.fontSize);
-    // roughly half the whitespace... but not exactly
-    const delta = (lineHeight - fontSize) / 2;
-    return { left: rect.left, top: (rect.top + delta) };
-  }
-}
-
-function scrollToCaret(parent) {
-  if (parent) {
-    const parentRect = parent.getBoundingClientRect();
-    const rect = caretTopPoint();
-    rect.top -= 100;
-    if (!(rect.top > parentRect.top && rect.top <= parentRect.bottom)) {
-      let top = rect.top - parentRect.top;
-      parent.scrollTo({ top: top, behavior: "auto" });
-    }
-    return;
-  }
-}
-
-const htmlEditorCss = ".ProseMirror-gapcursor{display:none;pointer-events:none;position:absolute}.ProseMirror-gapcursor:after{content:\"\";display:block;position:absolute;top:-2px;width:20px;border-top:1px solid black;animation:ProseMirror-cursor-blink 1.1s steps(2, start) infinite}@keyframes ProseMirror-cursor-blink{to{visibility:hidden}}.ProseMirror-focused .ProseMirror-gapcursor{display:block}.ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}img.ProseMirror-separator{display:inline !important;border:none !important;margin:0 !important}ionx-html-editor{display:block}ionx-html-editor app-template-string{display:inline-block;width:1em;height:0.8em;background:red}ionx-html-editor>.ionx--prosemirror>.ProseMirror{outline:none;user-select:text}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>.ionx--prosemirror>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>.ionx--prosemirror>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>.ionx--prosemirror>.ProseMirror p:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1{font-size:130%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h2{font-size:125%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h3{font-size:120%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h4{font-size:115%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h5{font-size:110%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{font-size:105%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6:first-child{margin-top:0}ionx-html-editor>.ionx--prosemirror>.ProseMirror ul:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
-
-let HtmlEditor = class extends HTMLElement$1 {
-  constructor() {
-    super();
-    this.__registerHost();
-    this.editorSelectionChange = createEvent(this, "editorSelectionChange", 7);
-    this.ionChange = createEvent(this, "ionChange", 7);
-  }
-  async getView() {
-    return this.view;
-  }
-  async setFocus() {
-    if (!this.scrollParent) {
-      this.scrollParent = findScrollParent(this.element);
-    }
-    this.view.dom.focus({ preventScroll: true });
-    const pos = this.view.domAtPos(this.view.state.selection.to);
-    if (pos.node) {
-      if (pos.node.nodeType === Node.TEXT_NODE) {
-        scrollToCaret(this.scrollParent);
-      }
-      else {
-        scrollIntoView(this.view.dom.querySelector(".ionx--selected") || pos.node, this.scrollParent);
-      }
-    }
-  }
-  valueChanged(value, old) {
-    if (value !== old) {
-      console.debug("[ionx-html-editor]", "value changed");
-      if (this.view && !this.valueChangedByProseMirror) {
-        const state = EditorState.create({
-          schema: this.view.state.schema,
-          plugins: this.view.state.plugins,
-          doc: this.editorDocument(value || "<div></div>")
-        });
-        this.view.updateState(state);
-      }
-    }
-    this.valueChangedByProseMirror = false;
-  }
-  applyProseMirrorStatus() {
-    if (this.view) {
-      this.view.dom["contentEditable"] = !this.readonly && !this.disabled ? "true" : "false";
-    }
-  }
-  async initEditor() {
-    const container = this.element.getElementsByClassName("ionx--prosemirror");
-    await waitTill(() => container.length > 0, 1);
-    this.schema = schema;
-    this.plugins = [
-      keymap(buildKeymap(schema)),
-      keymap(baseKeymap),
-      gapCursor(),
-      history()
-    ];
-    const state = EditorState.create({
-      schema: this.schema,
-      plugins: this.plugins,
-      doc: this.editorDocument(this.value ? this.value : "<div></div>")
-    });
-    this.view = new EditorView(container[0], {
-      state,
-      dispatchTransaction: transaction => this.onEditorTransaction(transaction),
-      handleScrollToSelection: view => this.handleEditorScroll(view)
-    });
-    this.applyProseMirrorStatus();
-  }
-  handleEditorScroll(view) {
-    if (!this.scrollParent) {
-      this.scrollParent = findScrollParent(this.element);
-    }
-    const pos = view.domAtPos(view.state.selection.to);
-    if (pos.node) {
-      if (pos.node.nodeType === Node.TEXT_NODE) {
-        scrollToCaret(this.scrollParent);
-      }
-      else {
-        scrollIntoView(view.dom.querySelector(".ionx--selected") || pos.node, this.scrollParent);
-      }
-    }
-    return false;
-  }
-  editorDocument(html) {
-    const node = document.createElement("div");
-    node.innerHTML = html;
-    // this.prepareInputValue(node);
-    return DOMParser.fromSchema(this.schema).parse(node);
-  }
-  editorValue() {
-    if (this.view) {
-      const value = DOMSerializer.fromSchema(this.schema).serializeFragment(this.view.state.doc.content);
-      const tmp = document.createElement("div");
-      tmp.appendChild(value);
-      if (!tmp.innerText) {
-        return null;
-      }
-      else {
-        return tmp.innerHTML; // this.prepareOutputValue(tmp);
-      }
-    }
-    else {
-      return this.value;
-    }
-  }
-  onEditorTransaction(transaction) {
-    this.view.dom.focus({ preventScroll: true });
-    this.view.updateState(this.view.state.apply(transaction));
-    // this.setFocus();
-    this.editorSelectionChange.emit();
-    if (transaction.docChanged) {
-      const value = this.editorValue();
-      if (this.value !== value) {
-        this.valueChangedByProseMirror = true;
-        this.value = value;
-        this.ionChange.emit({ value });
-      }
-    }
-  }
-  async componentWillLoad() {
-    await loadIntlMessages();
-    await loadIonxLinkEditorIntl();
-  }
-  connectedCallback() {
-    this.initEditor();
-    fixIonItemOverflow(this.element);
-  }
-  disconnectedCallback() {
-    this.view?.destroy();
-    this.view = undefined;
-  }
-  render() {
-    return h(Host, null, !this.readonly && h("ionx-html-editor-toolbar", null), h("div", { class: "ionx--prosemirror" }));
-  }
-  static get assetsDirs() { return ["assets"]; }
-  get element() { return this; }
-  static get watchers() { return {
-    "value": ["valueChanged"],
-    "disabled": ["applyProseMirrorStatus"],
-    "readonly": ["applyProseMirrorStatus"]
-  }; }
-  static get style() { return htmlEditorCss; }
-};
-
-class Alignment extends Enum {
-  constructor(name) {
-    super(name);
-    this.name = name;
-    this.label = new MessageRef("ionx/HtmlEditor", "alignmentMenu/" + name);
-  }
-  static values() {
-    return super.values();
-  }
-  static valueOf(value) {
-    return super.valueOf(value);
-  }
-  static fromJSON(value) {
-    return super.fromJSON(value);
-  }
-}
-Alignment.left = new Alignment("left");
-Alignment.right = new Alignment("right");
-Alignment.center = new Alignment("center");
-Alignment.justify = new Alignment("justify");
-
-/**
- * Toggles block mark based on the return type of `getAttrs`.
- * This is similar to ProseMirror"s `getAttrs` from `AttributeSpec`
- * return `false` to remove the mark.
- * return `undefined for no-op.
- * return an `object` to update the mark.
- */
-const toggleBlockMark = (markType, getAttrs, allowedBlocks) => (state, dispatch) => {
-  let markApplied = false;
-  const tr = state.tr;
-  const toggleBlockMarkOnRange = (from, to, tr) => {
-    state.doc.nodesBetween(from, to, (node, pos, parent) => {
-      if (!node.type.isBlock) {
-        return false;
-      }
-      if ((!allowedBlocks || (Array.isArray(allowedBlocks) ? allowedBlocks.indexOf(node.type) > -1 : allowedBlocks(state.schema, node, parent))) &&
-        parent.type.allowsMarkType(markType)) {
-        const oldMarks = node.marks.filter(mark => mark.type === markType);
-        const prevAttrs = oldMarks.length ? oldMarks[0].attrs : undefined;
-        const newAttrs = getAttrs(prevAttrs, node);
-        if (newAttrs !== undefined) {
-          tr.setNodeMarkup(pos, node.type, node.attrs, node.marks
-            .filter(mark => !markType.excludes(mark.type))
-            .concat(newAttrs === false ? [] : markType.create(newAttrs)));
-          markApplied = true;
-        }
-      }
-      return;
-    });
-  };
-  const { from, to } = state.selection;
-  toggleBlockMarkOnRange(from, to, tr);
-  if (markApplied && tr.docChanged) {
-    if (dispatch) {
-      dispatch(tr.scrollIntoView());
-    }
-    return true;
-  }
-  return false;
-};
-
-const changeAlignment = (align) => (state, dispatch) => {
-  const { nodes: { paragraph, heading }, marks: { alignment } } = state.schema;
-  return toggleBlockMark(alignment, () => (!align ? undefined : align === "left" ? false : { align }), [paragraph, heading])(state, dispatch);
-};
-
-function findBlockMarks(state, markType) {
-  const marks = [];
-  const { from, to } = state.selection;
-  state.doc.nodesBetween(from, to, (node, _pos, _parent) => {
-    if (!node.type.isBlock) {
-      return false;
-    }
-    for (const mark of node.marks) {
-      if (mark.type === markType) {
-        marks.push(mark);
-      }
-    }
-  });
-  return marks;
-}
-
-const alignmentMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}";
-
-let AlignmentMenu = class extends HTMLElement$1 {
-  constructor() {
-    super();
-    this.__registerHost();
-    this.__attachShadow();
-  }
-  async toggleAlignment(alignment) {
-    const view = await this.editor.getView();
-    const command = changeAlignment(alignment.name);
-    if (command(view.state)) {
-      command(view.state, (tr) => view.dispatch(tr));
-    }
-    popoverController.dismiss();
-  }
-  connectedCallback() {
-    this.active = undefined;
-    this.editor.getView().then(view => {
-      for (const mark of findBlockMarks(view.state, schema.marks.alignment)) {
-        // zaznaczonych wiele blocków z różnym wyrównaniem
-        if (this.active && this.active !== mark.attrs.align) {
-          this.active = undefined;
-          break;
-        }
-        this.active = mark.attrs.align;
-      }
-    });
-  }
-  didDismiss() {
-    this.editor.setFocus();
-  }
-  render() {
-    return h("ion-list", { lines: "full" }, Alignment.values().map(alignment => h("ion-item", { button: true, detail: false, onClick: () => this.toggleAlignment(alignment) }, h("ion-label", null, intl.message(alignment.label)), this.active === alignment.name && h("ion-icon", { name: "checkmark", slot: "end" }), h("ion-icon", { src: `/assets/ionx.HtmlEditor/icons/align-${alignment.name}.svg`, slot: "start" }))));
-  }
-  static get style() { return alignmentMenuCss; }
-};
-
-function findMarks(doc, from, to, markType, attrs) {
-  const marks = [];
-  doc.nodesBetween(from, to, node => {
-    for (let i = 0; i < node.marks.length; i++) {
-      if (node.marks[i].type === markType && (!attrs || deepEqual(node.marks[i].attrs, attrs))) {
-        marks.push(node.marks[i]);
-      }
-    }
-  });
-  return marks;
-}
-
-function findMarksInSelection(state, markType, attrs) {
-  const doc = state.doc;
-  const { from, to } = state.selection;
-  return findMarks(doc, from, to, markType, attrs);
-}
-
-const insertMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
-
-let InsertMenu = class extends HTMLElement$1 {
-  constructor() {
-    super();
-    this.__registerHost();
-    this.__attachShadow();
-  }
-  async link() {
-    await popoverController.dismiss();
-    defineIonxLinkEditor();
-    const view = await this.editor.getView();
-    let href;
-    let target;
-    for (const mark of findMarksInSelection(view.state, schema.marks.link)) {
-      const h = mark.attrs.href;
-      const t = mark.attrs.target;
-      if (h) {
-        href = h;
-        target = t;
-        break;
-      }
-    }
-    const link = await showLinkEditor({ value: href ? { href, target } : undefined, schemes: this.editor.linkSchemes });
-    if (link) {
-      toggleMark(schema.marks.link, link)(view.state, view.dispatch);
-    }
-  }
-  didDismiss() {
-    this.editor.setFocus();
-  }
-  async componentWillLoad() {
-    const view = await this.editor.getView();
-    this.selectionEmpty = view.state.selection.empty;
-  }
-  render() {
-    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, disabled: this.selectionEmpty, detail: false, onClick: () => this.link() }, h("ion-icon", { name: "link-outline", slot: "start" }), h("ion-label", null, h("div", null, intl.message `ionx/LinkEditor#Link`), this.selectionEmpty && h("small", null, h("ion-text", { color: "danger" }, intl.message `ionx/HtmlEditor#selectTextToInsertLink`)))));
-  }
-  static get style() { return insertMenuCss; }
-};
-
-function findNodeStartEnd(doc, pos) {
-  const $pos = doc.resolve(pos);
-  const start = pos - $pos.textOffset;
-  const end = start + $pos.parent.child($pos.index()).nodeSize;
-  return { start, end };
-}
-
-const linkMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
-
-defineIonxLinkEditor();
-let LinkMenu = class extends HTMLElement$1 {
-  constructor() {
-    super();
-    this.__registerHost();
-    this.__attachShadow();
-  }
-  async edit() {
-    const view = await this.editor.getView();
-    MARKS: for (const mark of findMarksInSelection(view.state, schema.marks.link)) {
-      const href = mark.attrs.href;
-      const target = mark.attrs.target;
-      if (href) {
-        await popoverController.dismiss();
-        const link = await showLinkEditor({ value: { href, target }, schemes: this.editor.linkSchemes });
-        if (link) {
-          const selection = view.state.selection;
-          const tr = view.state.tr;
-          tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-            if (node.isText) {
-              const { start, end } = findNodeStartEnd(tr.doc, pos);
-              tr.addMark(start, end, schema.mark(schema.marks.link, link));
-            }
-          });
-          view.dispatch(tr);
-        }
-        break MARKS;
-      }
-    }
-  }
-  async unlink() {
-    const view = await this.editor.getView();
-    const selection = view.state.selection;
-    if (selection.empty) {
-      const tr = view.state.tr;
-      tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
-        if (node.isText) {
-          const $pos = tr.doc.resolve(pos);
-          const start = pos - $pos.textOffset;
-          const end = start + $pos.parent.child($pos.index()).nodeSize;
-          tr.removeMark(start, end, schema.marks.link);
-        }
-      });
-      view.dispatch(tr);
-    }
-    else {
-      toggleMark(schema.marks.link)(view.state, tr => view.dispatch(tr));
-    }
-    popoverController.dismiss();
-  }
-  didDismiss() {
-    this.editor.setFocus();
-  }
-  render() {
-    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.edit() }, h("ion-icon", { name: "link-outline", slot: "start" }), h("ion-label", null, intl.message `@co.mmons/js-intl#Edit|command`)), h("ion-item", { button: true, detail: false, onClick: () => this.unlink() }, h("ion-icon", { name: "unlink-outline", slot: "start" }), h("ion-label", null, intl.message `@co.mmons/js-intl#Delete|command`)));
-  }
-  static get style() { return linkMenuCss; }
-};
-
-function createCommonjsModule(fn, basedir, module) {
-	return module = {
-		path: basedir,
-		exports: {},
-		require: function (path, base) {
-			return commonjsRequire();
-		}
-	}, fn(module, module.exports), module.exports;
-}
-
-function getAugmentedNamespace(n) {
-	if (n.__esModule) return n;
-	var a = Object.defineProperty({}, '__esModule', {value: true});
-	Object.keys(n).forEach(function (k) {
-		var d = Object.getOwnPropertyDescriptor(n, k);
-		Object.defineProperty(a, k, d.get ? d : {
-			enumerable: true,
-			get: function () {
-				return n[k];
-			}
-		});
-	});
-	return a;
-}
-
-function commonjsRequire () {
-	throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
-}
-
 // Because working with row and column-spanning cells is not quite
 // trivial, this code builds up a descriptive structure for a given
 // table node. The structures are cached with the (persistent) table
@@ -15697,10 +14481,10 @@ function insertCells(state, dispatch, tableStart, rect, cells) {
 // This file defines a number of helpers for wiring up user input to
 
 var handleKeyDown = keydownHandler({
-  "ArrowLeft": arrow("horiz", -1),
-  "ArrowRight": arrow("horiz", 1),
-  "ArrowUp": arrow("vert", -1),
-  "ArrowDown": arrow("vert", 1),
+  "ArrowLeft": arrow$1("horiz", -1),
+  "ArrowRight": arrow$1("horiz", 1),
+  "ArrowUp": arrow$1("vert", -1),
+  "ArrowDown": arrow$1("vert", 1),
 
   "Shift-ArrowLeft": shiftArrow("horiz", -1),
   "Shift-ArrowRight": shiftArrow("horiz", 1),
@@ -15719,7 +14503,7 @@ function maybeSetSelection(state, dispatch, selection) {
   return true
 }
 
-function arrow(axis, dir) {
+function arrow$1(axis, dir) {
   return function (state, dispatch, view) {
     var sel = state.selection;
     if (sel instanceof CellSelection) {
@@ -19166,6 +17950,1513 @@ exports.removeNodeBefore = removeNodeBefore;
 //# sourceMappingURL=index.js.map
 });
 
+class ListMenuToolbarItem extends ToolbarItem {
+  constructor() {
+    super(...arguments);
+    this.label = new MessageRef("ionx/HtmlEditor", "listMenu/List");
+    this.menuComponent = "ionx-html-editor-list-menu";
+  }
+  isVisible(view) {
+    const { schema, selection } = view.state;
+    const { nodes } = schema;
+    return (nodes.orderedList || nodes.bulletList) && !!dist.findParentNode(predicate => predicate.hasMarkup(nodes.orderedList) || predicate.hasMarkup(nodes.bulletList))(selection);
+  }
+  isActive() {
+    return true;
+  }
+}
+
+class ParagraphMenuToolbarItem extends ToolbarItem {
+  constructor() {
+    super(...arguments);
+    this.label = new MessageRef("ionx/HtmlEditor", "Paragraph");
+    this.menuComponent = "ionx-html-editor-paragraph-menu";
+  }
+  isVisible(view) {
+    const { nodes } = view.state.schema;
+    return !!nodes.heading || !!nodes.paragraph;
+  }
+  isActive(view) {
+    const { selection, schema } = view.state;
+    return !!dist.findParentNodeOfType(schema.nodes.heading)(selection);
+  }
+}
+
+const iconsPath = "/assets/ionx.HtmlEditor/icons";
+
+class TextToolbarItem extends ToolbarItem {
+  constructor(markName) {
+    super();
+    this.markName = markName;
+    this.labelVisible = false;
+  }
+  isVisible(view) {
+    return !!view.state.schema.marks[this.markName];
+  }
+  isActive(view) {
+    return isMarkActive(view.state, view.state.schema.marks[this.markName]);
+  }
+  handler(view) {
+    const { marks } = view.state.schema;
+    const command = toggleMark(marks[this.markName]);
+    if (command(view.state)) {
+      command(view.state, t => view.dispatch(t));
+    }
+  }
+}
+
+class TextEmphasisToolbarItem extends TextToolbarItem {
+  constructor() {
+    super("emphasis");
+    this.label = new MessageRef("ionx/HtmlEditor", "Italic|text");
+    this.iconSrc = `${iconsPath}/italic.svg`;
+  }
+}
+
+class TextStrikethroughToolbarItem extends TextToolbarItem {
+  constructor() {
+    super("strikethrough");
+    this.label = new MessageRef("ionx/HtmlEditor", "Strikethrough|text");
+    this.iconSrc = `${iconsPath}/strikethrough.svg`;
+  }
+}
+
+class TextStrongToolbarItem extends TextToolbarItem {
+  constructor() {
+    super("strong");
+    this.label = new MessageRef("ionx/HtmlEditor", "Bold|text");
+    this.iconSrc = `${iconsPath}/bold.svg`;
+  }
+}
+
+class TextSubscriptToolbarItem extends TextToolbarItem {
+  constructor() {
+    super("subscript");
+    this.label = new MessageRef("ionx/HtmlEditor", "Subscript|text");
+    this.iconSrc = `${iconsPath}/subscript.svg`;
+  }
+}
+
+class TextSuperscriptToolbarItem extends TextToolbarItem {
+  constructor() {
+    super("superscript");
+    this.label = new MessageRef("ionx/HtmlEditor", "Superscript|text");
+    this.iconSrc = `${iconsPath}/superscript.svg`;
+  }
+}
+
+class TextMenuToolbarItem extends ToolbarItem {
+  constructor() {
+    super(...arguments);
+    this.label = new MessageRef("ionx/HtmlEditor", "Text");
+    this.menuComponent = "ionx-html-editor-text-menu";
+  }
+  isActive(view) {
+    return anyMarkActive(view.state, Object.values(view.state.schema.marks).filter(mark => isMarkFromGroup(mark, "textFormat")));
+  }
+}
+
+class TextUnderlineToolbarItem extends TextToolbarItem {
+  constructor() {
+    super("underline");
+    this.label = new MessageRef("ionx/HtmlEditor", "Underline|text");
+    this.iconSrc = `${iconsPath}/underline.svg`;
+  }
+}
+
+// :: Object
+let backspace = chainCommands(deleteSelection, joinBackward, selectNodeBackward);
+let del = chainCommands(deleteSelection, joinForward, selectNodeForward);
+let pcBaseKeymap = {
+  "Backspace": backspace,
+  "Mod-Backspace": backspace,
+  "Shift-Backspace": backspace,
+  "Delete": del,
+  "Mod-Delete": del,
+  "Mod-a": selectAll,
+  "Alt-ArrowUp": joinUp,
+  "Alt-ArrowDown": joinDown,
+  "Mod-BracketLeft": lift,
+  "Escape": selectParentNode
+};
+// :: Object
+// A copy of `pcBaseKeymap` that also binds **Ctrl-h** like Backspace,
+// **Ctrl-d** like Delete, **Alt-Backspace** like Ctrl-Backspace, and
+// **Ctrl-Alt-Backspace**, **Alt-Delete**, and **Alt-d** like
+// Ctrl-Delete.
+let macBaseKeymap = {
+  "Ctrl-h": pcBaseKeymap["Backspace"],
+  "Alt-Backspace": pcBaseKeymap["Mod-Backspace"],
+  "Ctrl-d": pcBaseKeymap["Delete"],
+  "Ctrl-Alt-Backspace": pcBaseKeymap["Mod-Delete"],
+  "Alt-Delete": pcBaseKeymap["Mod-Delete"],
+  "Alt-d": pcBaseKeymap["Mod-Delete"]
+};
+for (let key in pcBaseKeymap)
+  macBaseKeymap[key] = pcBaseKeymap[key];
+// :: Object
+// Depending on the detected platform, this will hold
+// [`pcBasekeymap`](#commands.pcBaseKeymap) or
+// [`macBaseKeymap`](#commands.macBaseKeymap).
+let baseKeymap = isApple ? macBaseKeymap : pcBaseKeymap;
+
+const enterKeymap = {
+  "Enter": chainCommands(newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock),
+  "Mod-Enter": exitCode
+};
+
+var GOOD_LEAF_SIZE = 200;
+
+// :: class<T> A rope sequence is a persistent sequence data structure
+// that supports appending, prepending, and slicing without doing a
+// full copy. It is represented as a mostly-balanced tree.
+var RopeSequence = function RopeSequence () {};
+
+RopeSequence.prototype.append = function append (other) {
+  if (!other.length) { return this }
+  other = RopeSequence.from(other);
+
+  return (!this.length && other) ||
+    (other.length < GOOD_LEAF_SIZE && this.leafAppend(other)) ||
+    (this.length < GOOD_LEAF_SIZE && other.leafPrepend(this)) ||
+    this.appendInner(other)
+};
+
+// :: (union<[T], RopeSequence<T>>) → RopeSequence<T>
+// Prepend an array or other rope to this one, returning a new rope.
+RopeSequence.prototype.prepend = function prepend (other) {
+  if (!other.length) { return this }
+  return RopeSequence.from(other).append(this)
+};
+
+RopeSequence.prototype.appendInner = function appendInner (other) {
+  return new Append(this, other)
+};
+
+// :: (?number, ?number) → RopeSequence<T>
+// Create a rope repesenting a sub-sequence of this rope.
+RopeSequence.prototype.slice = function slice (from, to) {
+    if ( from === void 0 ) from = 0;
+    if ( to === void 0 ) to = this.length;
+
+  if (from >= to) { return RopeSequence.empty }
+  return this.sliceInner(Math.max(0, from), Math.min(this.length, to))
+};
+
+// :: (number) → T
+// Retrieve the element at the given position from this rope.
+RopeSequence.prototype.get = function get (i) {
+  if (i < 0 || i >= this.length) { return undefined }
+  return this.getInner(i)
+};
+
+// :: ((element: T, index: number) → ?bool, ?number, ?number)
+// Call the given function for each element between the given
+// indices. This tends to be more efficient than looping over the
+// indices and calling `get`, because it doesn't have to descend the
+// tree for every element.
+RopeSequence.prototype.forEach = function forEach (f, from, to) {
+    if ( from === void 0 ) from = 0;
+    if ( to === void 0 ) to = this.length;
+
+  if (from <= to)
+    { this.forEachInner(f, from, to, 0); }
+  else
+    { this.forEachInvertedInner(f, from, to, 0); }
+};
+
+// :: ((element: T, index: number) → U, ?number, ?number) → [U]
+// Map the given functions over the elements of the rope, producing
+// a flat array.
+RopeSequence.prototype.map = function map (f, from, to) {
+    if ( from === void 0 ) from = 0;
+    if ( to === void 0 ) to = this.length;
+
+  var result = [];
+  this.forEach(function (elt, i) { return result.push(f(elt, i)); }, from, to);
+  return result
+};
+
+// :: (?union<[T], RopeSequence<T>>) → RopeSequence<T>
+// Create a rope representing the given array, or return the rope
+// itself if a rope was given.
+RopeSequence.from = function from (values) {
+  if (values instanceof RopeSequence) { return values }
+  return values && values.length ? new Leaf(values) : RopeSequence.empty
+};
+
+var Leaf = /*@__PURE__*/(function (RopeSequence) {
+  function Leaf(values) {
+    RopeSequence.call(this);
+    this.values = values;
+  }
+
+  if ( RopeSequence ) Leaf.__proto__ = RopeSequence;
+  Leaf.prototype = Object.create( RopeSequence && RopeSequence.prototype );
+  Leaf.prototype.constructor = Leaf;
+
+  var prototypeAccessors = { length: { configurable: true },depth: { configurable: true } };
+
+  Leaf.prototype.flatten = function flatten () {
+    return this.values
+  };
+
+  Leaf.prototype.sliceInner = function sliceInner (from, to) {
+    if (from == 0 && to == this.length) { return this }
+    return new Leaf(this.values.slice(from, to))
+  };
+
+  Leaf.prototype.getInner = function getInner (i) {
+    return this.values[i]
+  };
+
+  Leaf.prototype.forEachInner = function forEachInner (f, from, to, start) {
+    for (var i = from; i < to; i++)
+      { if (f(this.values[i], start + i) === false) { return false } }
+  };
+
+  Leaf.prototype.forEachInvertedInner = function forEachInvertedInner (f, from, to, start) {
+    for (var i = from - 1; i >= to; i--)
+      { if (f(this.values[i], start + i) === false) { return false } }
+  };
+
+  Leaf.prototype.leafAppend = function leafAppend (other) {
+    if (this.length + other.length <= GOOD_LEAF_SIZE)
+      { return new Leaf(this.values.concat(other.flatten())) }
+  };
+
+  Leaf.prototype.leafPrepend = function leafPrepend (other) {
+    if (this.length + other.length <= GOOD_LEAF_SIZE)
+      { return new Leaf(other.flatten().concat(this.values)) }
+  };
+
+  prototypeAccessors.length.get = function () { return this.values.length };
+
+  prototypeAccessors.depth.get = function () { return 0 };
+
+  Object.defineProperties( Leaf.prototype, prototypeAccessors );
+
+  return Leaf;
+}(RopeSequence));
+
+// :: RopeSequence
+// The empty rope sequence.
+RopeSequence.empty = new Leaf([]);
+
+var Append = /*@__PURE__*/(function (RopeSequence) {
+  function Append(left, right) {
+    RopeSequence.call(this);
+    this.left = left;
+    this.right = right;
+    this.length = left.length + right.length;
+    this.depth = Math.max(left.depth, right.depth) + 1;
+  }
+
+  if ( RopeSequence ) Append.__proto__ = RopeSequence;
+  Append.prototype = Object.create( RopeSequence && RopeSequence.prototype );
+  Append.prototype.constructor = Append;
+
+  Append.prototype.flatten = function flatten () {
+    return this.left.flatten().concat(this.right.flatten())
+  };
+
+  Append.prototype.getInner = function getInner (i) {
+    return i < this.left.length ? this.left.get(i) : this.right.get(i - this.left.length)
+  };
+
+  Append.prototype.forEachInner = function forEachInner (f, from, to, start) {
+    var leftLen = this.left.length;
+    if (from < leftLen &&
+        this.left.forEachInner(f, from, Math.min(to, leftLen), start) === false)
+      { return false }
+    if (to > leftLen &&
+        this.right.forEachInner(f, Math.max(from - leftLen, 0), Math.min(this.length, to) - leftLen, start + leftLen) === false)
+      { return false }
+  };
+
+  Append.prototype.forEachInvertedInner = function forEachInvertedInner (f, from, to, start) {
+    var leftLen = this.left.length;
+    if (from > leftLen &&
+        this.right.forEachInvertedInner(f, from - leftLen, Math.max(to, leftLen) - leftLen, start + leftLen) === false)
+      { return false }
+    if (to < leftLen &&
+        this.left.forEachInvertedInner(f, Math.min(from, leftLen), to, start) === false)
+      { return false }
+  };
+
+  Append.prototype.sliceInner = function sliceInner (from, to) {
+    if (from == 0 && to == this.length) { return this }
+    var leftLen = this.left.length;
+    if (to <= leftLen) { return this.left.slice(from, to) }
+    if (from >= leftLen) { return this.right.slice(from - leftLen, to - leftLen) }
+    return this.left.slice(from, leftLen).append(this.right.slice(0, to - leftLen))
+  };
+
+  Append.prototype.leafAppend = function leafAppend (other) {
+    var inner = this.right.leafAppend(other);
+    if (inner) { return new Append(this.left, inner) }
+  };
+
+  Append.prototype.leafPrepend = function leafPrepend (other) {
+    var inner = this.left.leafPrepend(other);
+    if (inner) { return new Append(inner, this.right) }
+  };
+
+  Append.prototype.appendInner = function appendInner (other) {
+    if (this.left.depth >= Math.max(this.right.depth, other.depth) + 1)
+      { return new Append(this.left, new Append(this.right, other)) }
+    return new Append(this, other)
+  };
+
+  return Append;
+}(RopeSequence));
+
+var ropeSequence = RopeSequence;
+
+// ProseMirror's history isn't simply a way to roll back to a previous
+// state, because ProseMirror supports applying changes without adding
+// them to the history (for example during collaboration).
+//
+// To this end, each 'Branch' (one for the undo history and one for
+// the redo history) keeps an array of 'Items', which can optionally
+// hold a step (an actual undoable change), and always hold a position
+// map (which is needed to move changes below them to apply to the
+// current document).
+//
+// An item that has both a step and a selection bookmark is the start
+// of an 'event' — a group of changes that will be undone or redone at
+// once. (It stores only the bookmark, since that way we don't have to
+// provide a document until the selection is actually applied, which
+// is useful when compressing.)
+
+// Used to schedule history compression
+var max_empty_items = 500;
+
+var Branch = function Branch(items, eventCount) {
+  this.items = items;
+  this.eventCount = eventCount;
+};
+
+// : (EditorState, bool) → ?{transform: Transform, selection: ?SelectionBookmark, remaining: Branch}
+// Pop the latest event off the branch's history and apply it
+// to a document transform.
+Branch.prototype.popEvent = function popEvent (state, preserveItems) {
+    var this$1 = this;
+
+  if (this.eventCount == 0) { return null }
+
+  var end = this.items.length;
+  for (;; end--) {
+    var next = this.items.get(end - 1);
+    if (next.selection) { --end; break }
+  }
+
+  var remap, mapFrom;
+  if (preserveItems) {
+    remap = this.remapping(end, this.items.length);
+    mapFrom = remap.maps.length;
+  }
+  var transform = state.tr;
+  var selection, remaining;
+  var addAfter = [], addBefore = [];
+
+  this.items.forEach(function (item, i) {
+    if (!item.step) {
+      if (!remap) {
+        remap = this$1.remapping(end, i + 1);
+        mapFrom = remap.maps.length;
+      }
+      mapFrom--;
+      addBefore.push(item);
+      return
+    }
+
+    if (remap) {
+      addBefore.push(new Item(item.map));
+      var step = item.step.map(remap.slice(mapFrom)), map;
+
+      if (step && transform.maybeStep(step).doc) {
+        map = transform.mapping.maps[transform.mapping.maps.length - 1];
+        addAfter.push(new Item(map, null, null, addAfter.length + addBefore.length));
+      }
+      mapFrom--;
+      if (map) { remap.appendMap(map, mapFrom); }
+    } else {
+      transform.maybeStep(item.step);
+    }
+
+    if (item.selection) {
+      selection = remap ? item.selection.map(remap.slice(mapFrom)) : item.selection;
+      remaining = new Branch(this$1.items.slice(0, end).append(addBefore.reverse().concat(addAfter)), this$1.eventCount - 1);
+      return false
+    }
+  }, this.items.length, 0);
+
+  return {remaining: remaining, transform: transform, selection: selection}
+};
+
+// : (Transform, ?SelectionBookmark, Object) → Branch
+// Create a new branch with the given transform added.
+Branch.prototype.addTransform = function addTransform (transform, selection, histOptions, preserveItems) {
+  var newItems = [], eventCount = this.eventCount;
+  var oldItems = this.items, lastItem = !preserveItems && oldItems.length ? oldItems.get(oldItems.length - 1) : null;
+
+  for (var i = 0; i < transform.steps.length; i++) {
+    var step = transform.steps[i].invert(transform.docs[i]);
+    var item = new Item(transform.mapping.maps[i], step, selection), merged = (void 0);
+    if (merged = lastItem && lastItem.merge(item)) {
+      item = merged;
+      if (i) { newItems.pop(); }
+      else { oldItems = oldItems.slice(0, oldItems.length - 1); }
+    }
+    newItems.push(item);
+    if (selection) {
+      eventCount++;
+      selection = null;
+    }
+    if (!preserveItems) { lastItem = item; }
+  }
+  var overflow = eventCount - histOptions.depth;
+  if (overflow > DEPTH_OVERFLOW) {
+    oldItems = cutOffEvents(oldItems, overflow);
+    eventCount -= overflow;
+  }
+  return new Branch(oldItems.append(newItems), eventCount)
+};
+
+Branch.prototype.remapping = function remapping (from, to) {
+  var maps = new Mapping;
+  this.items.forEach(function (item, i) {
+    var mirrorPos = item.mirrorOffset != null && i - item.mirrorOffset >= from
+        ? maps.maps.length - item.mirrorOffset : null;
+    maps.appendMap(item.map, mirrorPos);
+  }, from, to);
+  return maps
+};
+
+Branch.prototype.addMaps = function addMaps (array) {
+  if (this.eventCount == 0) { return this }
+  return new Branch(this.items.append(array.map(function (map) { return new Item(map); })), this.eventCount)
+};
+
+// : (Transform, number)
+// When the collab module receives remote changes, the history has
+// to know about those, so that it can adjust the steps that were
+// rebased on top of the remote changes, and include the position
+// maps for the remote changes in its array of items.
+Branch.prototype.rebased = function rebased (rebasedTransform, rebasedCount) {
+  if (!this.eventCount) { return this }
+
+  var rebasedItems = [], start = Math.max(0, this.items.length - rebasedCount);
+
+  var mapping = rebasedTransform.mapping;
+  var newUntil = rebasedTransform.steps.length;
+  var eventCount = this.eventCount;
+  this.items.forEach(function (item) { if (item.selection) { eventCount--; } }, start);
+
+  var iRebased = rebasedCount;
+  this.items.forEach(function (item) {
+    var pos = mapping.getMirror(--iRebased);
+    if (pos == null) { return }
+    newUntil = Math.min(newUntil, pos);
+    var map = mapping.maps[pos];
+    if (item.step) {
+      var step = rebasedTransform.steps[pos].invert(rebasedTransform.docs[pos]);
+      var selection = item.selection && item.selection.map(mapping.slice(iRebased + 1, pos));
+      if (selection) { eventCount++; }
+      rebasedItems.push(new Item(map, step, selection));
+    } else {
+      rebasedItems.push(new Item(map));
+    }
+  }, start);
+
+  var newMaps = [];
+  for (var i = rebasedCount; i < newUntil; i++)
+    { newMaps.push(new Item(mapping.maps[i])); }
+  var items = this.items.slice(0, start).append(newMaps).append(rebasedItems);
+  var branch = new Branch(items, eventCount);
+
+  if (branch.emptyItemCount() > max_empty_items)
+    { branch = branch.compress(this.items.length - rebasedItems.length); }
+  return branch
+};
+
+Branch.prototype.emptyItemCount = function emptyItemCount () {
+  var count = 0;
+  this.items.forEach(function (item) { if (!item.step) { count++; } });
+  return count
+};
+
+// Compressing a branch means rewriting it to push the air (map-only
+// items) out. During collaboration, these naturally accumulate
+// because each remote change adds one. The `upto` argument is used
+// to ensure that only the items below a given level are compressed,
+// because `rebased` relies on a clean, untouched set of items in
+// order to associate old items with rebased steps.
+Branch.prototype.compress = function compress (upto) {
+    if ( upto === void 0 ) upto = this.items.length;
+
+  var remap = this.remapping(0, upto), mapFrom = remap.maps.length;
+  var items = [], events = 0;
+  this.items.forEach(function (item, i) {
+    if (i >= upto) {
+      items.push(item);
+      if (item.selection) { events++; }
+    } else if (item.step) {
+      var step = item.step.map(remap.slice(mapFrom)), map = step && step.getMap();
+      mapFrom--;
+      if (map) { remap.appendMap(map, mapFrom); }
+      if (step) {
+        var selection = item.selection && item.selection.map(remap.slice(mapFrom));
+        if (selection) { events++; }
+        var newItem = new Item(map.invert(), step, selection), merged, last = items.length - 1;
+        if (merged = items.length && items[last].merge(newItem))
+          { items[last] = merged; }
+        else
+          { items.push(newItem); }
+      }
+    } else if (item.map) {
+      mapFrom--;
+    }
+  }, this.items.length, 0);
+  return new Branch(ropeSequence.from(items.reverse()), events)
+};
+
+Branch.empty = new Branch(ropeSequence.empty, 0);
+
+function cutOffEvents(items, n) {
+  var cutPoint;
+  items.forEach(function (item, i) {
+    if (item.selection && (n-- == 0)) {
+      cutPoint = i;
+      return false
+    }
+  });
+  return items.slice(cutPoint)
+}
+
+var Item = function Item(map, step, selection, mirrorOffset) {
+  // The (forward) step map for this item.
+  this.map = map;
+  // The inverted step
+  this.step = step;
+  // If this is non-null, this item is the start of a group, and
+  // this selection is the starting selection for the group (the one
+  // that was active before the first step was applied)
+  this.selection = selection;
+  // If this item is the inverse of a previous mapping on the stack,
+  // this points at the inverse's offset
+  this.mirrorOffset = mirrorOffset;
+};
+
+Item.prototype.merge = function merge (other) {
+  if (this.step && other.step && !other.selection) {
+    var step = other.step.merge(this.step);
+    if (step) { return new Item(step.getMap().invert(), step, this.selection) }
+  }
+};
+
+// The value of the state field that tracks undo/redo history for that
+// state. Will be stored in the plugin state when the history plugin
+// is active.
+var HistoryState = function HistoryState(done, undone, prevRanges, prevTime) {
+  this.done = done;
+  this.undone = undone;
+  this.prevRanges = prevRanges;
+  this.prevTime = prevTime;
+};
+
+var DEPTH_OVERFLOW = 20;
+
+// : (HistoryState, EditorState, Transaction, Object)
+// Record a transformation in undo history.
+function applyTransaction(history, state, tr, options) {
+  var historyTr = tr.getMeta(historyKey), rebased;
+  if (historyTr) { return historyTr.historyState }
+
+  if (tr.getMeta(closeHistoryKey)) { history = new HistoryState(history.done, history.undone, null, 0); }
+
+  var appended = tr.getMeta("appendedTransaction");
+
+  if (tr.steps.length == 0) {
+    return history
+  } else if (appended && appended.getMeta(historyKey)) {
+    if (appended.getMeta(historyKey).redo)
+      { return new HistoryState(history.done.addTransform(tr, null, options, mustPreserveItems(state)),
+                              history.undone, rangesFor(tr.mapping.maps[tr.steps.length - 1]), history.prevTime) }
+    else
+      { return new HistoryState(history.done, history.undone.addTransform(tr, null, options, mustPreserveItems(state)),
+                              null, history.prevTime) }
+  } else if (tr.getMeta("addToHistory") !== false && !(appended && appended.getMeta("addToHistory") === false)) {
+    // Group transforms that occur in quick succession into one event.
+    var newGroup = history.prevTime == 0 || !appended && (history.prevTime < (tr.time || 0) - options.newGroupDelay ||
+                                                          !isAdjacentTo(tr, history.prevRanges));
+    var prevRanges = appended ? mapRanges(history.prevRanges, tr.mapping) : rangesFor(tr.mapping.maps[tr.steps.length - 1]);
+    return new HistoryState(history.done.addTransform(tr, newGroup ? state.selection.getBookmark() : null,
+                                                      options, mustPreserveItems(state)),
+                            Branch.empty, prevRanges, tr.time)
+  } else if (rebased = tr.getMeta("rebased")) {
+    // Used by the collab module to tell the history that some of its
+    // content has been rebased.
+    return new HistoryState(history.done.rebased(tr, rebased),
+                            history.undone.rebased(tr, rebased),
+                            mapRanges(history.prevRanges, tr.mapping), history.prevTime)
+  } else {
+    return new HistoryState(history.done.addMaps(tr.mapping.maps),
+                            history.undone.addMaps(tr.mapping.maps),
+                            mapRanges(history.prevRanges, tr.mapping), history.prevTime)
+  }
+}
+
+function isAdjacentTo(transform, prevRanges) {
+  if (!prevRanges) { return false }
+  if (!transform.docChanged) { return true }
+  var adjacent = false;
+  transform.mapping.maps[0].forEach(function (start, end) {
+    for (var i = 0; i < prevRanges.length; i += 2)
+      { if (start <= prevRanges[i + 1] && end >= prevRanges[i])
+        { adjacent = true; } }
+  });
+  return adjacent
+}
+
+function rangesFor(map) {
+  var result = [];
+  map.forEach(function (_from, _to, from, to) { return result.push(from, to); });
+  return result
+}
+
+function mapRanges(ranges, mapping) {
+  if (!ranges) { return null }
+  var result = [];
+  for (var i = 0; i < ranges.length; i += 2) {
+    var from = mapping.map(ranges[i], 1), to = mapping.map(ranges[i + 1], -1);
+    if (from <= to) { result.push(from, to); }
+  }
+  return result
+}
+
+// : (HistoryState, EditorState, (tr: Transaction), bool)
+// Apply the latest event from one branch to the document and shift the event
+// onto the other branch.
+function histTransaction(history, state, dispatch, redo) {
+  var preserveItems = mustPreserveItems(state), histOptions = historyKey.get(state).spec.config;
+  var pop = (redo ? history.undone : history.done).popEvent(state, preserveItems);
+  if (!pop) { return }
+
+  var selection = pop.selection.resolve(pop.transform.doc);
+  var added = (redo ? history.done : history.undone).addTransform(pop.transform, state.selection.getBookmark(),
+                                                                  histOptions, preserveItems);
+
+  var newHist = new HistoryState(redo ? added : pop.remaining, redo ? pop.remaining : added, null, 0);
+  dispatch(pop.transform.setSelection(selection).setMeta(historyKey, {redo: redo, historyState: newHist}).scrollIntoView());
+}
+
+var cachedPreserveItems = false, cachedPreserveItemsPlugins = null;
+// Check whether any plugin in the given state has a
+// `historyPreserveItems` property in its spec, in which case we must
+// preserve steps exactly as they came in, so that they can be
+// rebased.
+function mustPreserveItems(state) {
+  var plugins = state.plugins;
+  if (cachedPreserveItemsPlugins != plugins) {
+    cachedPreserveItems = false;
+    cachedPreserveItemsPlugins = plugins;
+    for (var i = 0; i < plugins.length; i++) { if (plugins[i].spec.historyPreserveItems) {
+      cachedPreserveItems = true;
+      break
+    } }
+  }
+  return cachedPreserveItems
+}
+
+var historyKey = new PluginKey("history");
+var closeHistoryKey = new PluginKey("closeHistory");
+
+// :: (?Object) → Plugin
+// Returns a plugin that enables the undo history for an editor. The
+// plugin will track undo and redo stacks, which can be used with the
+// [`undo`](#history.undo) and [`redo`](#history.redo) commands.
+//
+// You can set an `"addToHistory"` [metadata
+// property](#state.Transaction.setMeta) of `false` on a transaction
+// to prevent it from being rolled back by undo.
+//
+//   config::-
+//   Supports the following configuration options:
+//
+//     depth:: ?number
+//     The amount of history events that are collected before the
+//     oldest events are discarded. Defaults to 100.
+//
+//     newGroupDelay:: ?number
+//     The delay between changes after which a new group should be
+//     started. Defaults to 500 (milliseconds). Note that when changes
+//     aren't adjacent, a new group is always started.
+function history(config) {
+  config = {depth: config && config.depth || 100,
+            newGroupDelay: config && config.newGroupDelay || 500};
+  return new Plugin({
+    key: historyKey,
+
+    state: {
+      init: function init() {
+        return new HistoryState(Branch.empty, Branch.empty, null, 0)
+      },
+      apply: function apply(tr, hist, state) {
+        return applyTransaction(hist, state, tr, config)
+      }
+    },
+
+    config: config,
+
+    props: {
+      handleDOMEvents: {
+        beforeinput: function beforeinput(view, e) {
+          var handled = e.inputType == "historyUndo" ? undo(view.state, view.dispatch) :
+              e.inputType == "historyRedo" ? redo(view.state, view.dispatch) : false;
+          if (handled) { e.preventDefault(); }
+          return handled
+        }
+      }
+    }
+  })
+}
+
+// :: (EditorState, ?(tr: Transaction)) → bool
+// A command function that undoes the last change, if any.
+function undo(state, dispatch) {
+  var hist = historyKey.getState(state);
+  if (!hist || hist.done.eventCount == 0) { return false }
+  if (dispatch) { histTransaction(hist, state, dispatch, false); }
+  return true
+}
+
+// :: (EditorState, ?(tr: Transaction)) → bool
+// A command function that redoes the last undone change, if any.
+function redo(state, dispatch) {
+  var hist = historyKey.getState(state);
+  if (!hist || hist.undone.eventCount == 0) { return false }
+  if (dispatch) { histTransaction(hist, state, dispatch, true); }
+  return true
+}
+
+// :: (EditorState) → number
+// The amount of undoable events available in a given state.
+function undoDepth(state) {
+  var hist = historyKey.getState(state);
+  return hist ? hist.done.eventCount : 0
+}
+
+// :: (EditorState) → number
+// The amount of redoable events available in a given editor state.
+function redoDepth(state) {
+  var hist = historyKey.getState(state);
+  return hist ? hist.undone.eventCount : 0
+}
+
+// :: (EditorState, ?(Transaction)) → bool
+// This is a command that will undo an input rule, if applying such a
+// rule was the last thing that the user did.
+function undoInputRule(state, dispatch) {
+  var plugins = state.plugins;
+  for (var i = 0; i < plugins.length; i++) {
+    var plugin = plugins[i], undoable = (void 0);
+    if (plugin.spec.isInputRules && (undoable = plugin.getState(state))) {
+      if (dispatch) {
+        var tr = state.tr, toUndo = undoable.transform;
+        for (var j = toUndo.steps.length - 1; j >= 0; j--)
+          { tr.step(toUndo.steps[j].invert(toUndo.docs[j])); }
+        if (undoable.text) {
+          var marks = tr.doc.resolve(undoable.from).marks();
+          tr.replaceWith(undoable.from, undoable.to, state.schema.text(undoable.text, marks));
+        } else {
+          tr.delete(undoable.from, undoable.to);
+        }
+        dispatch(tr);
+      }
+      return true
+    }
+  }
+  return false
+}
+
+const undoRedoKeymap = {
+  "Mod-z": undo,
+  "Shift-Mod-z": redo,
+  "Backspace": undoInputRule,
+  ...(isApple ? { "Mod-y": redo } : {})
+};
+
+let loaded = [];
+async function importJson() {
+  const locale = intl.locale;
+  switch (locale) {case "cs": return (await import('./cs.js')).default;
+case "da": return (await import('./da.js')).default;
+case "de": return (await import('./de.js')).default;
+case "en": return (await import('./en.js')).default;
+case "fr": return (await import('./fr.js')).default;
+case "hu": return (await import('./hu.js')).default;
+case "nl": return (await import('./nl.js')).default;
+case "pl": return (await import('./pl.js')).default;
+case "ru": return (await import('./ru.js')).default;
+
+  }
+  return Promise.resolve({});
+}
+async function loadIntlMessages() {
+  if (loaded.includes(intl.locale)) {
+    return;
+  }
+  setGlobalValues("ionx/HtmlEditor", intl.locale, await importJson());
+  loaded.push(intl.locale);
+}
+
+function findScrollParent(element) {
+  if (!element) {
+    return;
+  }
+  if (element.scrollHeight >= element.clientHeight) {
+    const overflowY = window.getComputedStyle(element).overflowY;
+    if (overflowY !== "visible" && overflowY !== "hidden") {
+      return element;
+    }
+  }
+  if (element.assignedSlot) {
+    const p = findScrollParent(element.assignedSlot.parentElement);
+    if (p) {
+      return p;
+    }
+  }
+  return findScrollParent(element.parentElement);
+}
+
+async function fixIonItemOverflow(editor) {
+  const item = editor.closest("ion-item");
+  if (item) {
+    await waitTill(() => !!item.shadowRoot && !!item.shadowRoot.querySelector(".item-inner"));
+    item.style.overflow = "initial";
+    const style = document.createElement("style");
+    style.innerHTML = `.item-native, .item-inner, .input-wrapper { overflow: initial !important; }`;
+    item.shadowRoot.appendChild(style);
+  }
+}
+
+function scrollIntoView(element, parent) {
+  if (parent) {
+    const parentRect = parent.getBoundingClientRect();
+    const rect = element.getBoundingClientRect();
+    if (!(rect.top > parentRect.top && rect.top <= parentRect.bottom && rect.bottom < parentRect.height)) {
+      let top = element.offsetTop - 100;
+      if (element.offsetParent) {
+        let offsetParent = element.offsetParent;
+        while (offsetParent !== parent && !!offsetParent) {
+          top += offsetParent.offsetTop;
+          offsetParent = offsetParent.offsetParent;
+        }
+      }
+      parent.scrollTo({ top: top });
+    }
+    return;
+  }
+  element.scrollIntoView();
+}
+
+function caretTopPoint() {
+  const selection = document.getSelection();
+  const range0 = selection.getRangeAt(0);
+  let rect;
+  let range;
+  // supposed to be textNode in most cases
+  // but div[contenteditable] when empty
+  const node = range0.startContainer;
+  const offset = range0.startOffset;
+  if (offset > 0) {
+    // new range, don't influence DOM state
+    range = document.createRange();
+    range.setStart(node, (offset - 1));
+    range.setEnd(node, offset);
+    // https://developer.mozilla.org/en-US/docs/Web/API/range.getBoundingClientRect
+    // IE9, Safari?(but look good in Safari 8)
+    rect = range.getBoundingClientRect();
+    return { left: rect["right"], top: rect.top };
+  }
+  else if (offset < node["length"]) {
+    range = document.createRange();
+    // similar but select next on letter
+    range.setStart(node, offset);
+    range.setEnd(node, (offset + 1));
+    rect = range.getBoundingClientRect();
+    return { left: rect.left, top: rect.top };
+  }
+  else {
+    // textNode has length
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element.getBoundingClientRect
+    rect = node.getBoundingClientRect();
+    const styles = getComputedStyle(node);
+    const lineHeight = parseInt(styles.lineHeight);
+    const fontSize = parseInt(styles.fontSize);
+    // roughly half the whitespace... but not exactly
+    const delta = (lineHeight - fontSize) / 2;
+    return { left: rect.left, top: (rect.top + delta) };
+  }
+}
+
+function scrollToCaret(parent) {
+  if (parent) {
+    const parentRect = parent.getBoundingClientRect();
+    const rect = caretTopPoint();
+    rect.top -= 100;
+    if (!(rect.top > parentRect.top && rect.top <= parentRect.bottom)) {
+      let top = rect.top - parentRect.top;
+      parent.scrollTo({ top: top, behavior: "auto" });
+    }
+    return;
+  }
+}
+
+const htmlEditorCss = ".ProseMirror-gapcursor{display:none;pointer-events:none;position:absolute}.ProseMirror-gapcursor:after{content:\"\";display:block;position:absolute;top:-2px;width:20px;border-top:1px solid black;animation:ProseMirror-cursor-blink 1.1s steps(2, start) infinite}@keyframes ProseMirror-cursor-blink{to{visibility:hidden}}.ProseMirror-focused .ProseMirror-gapcursor{display:block}.ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}img.ProseMirror-separator{display:inline !important;border:none !important;margin:0 !important}ionx-html-editor{display:block}ionx-html-editor app-template-string{display:inline-block;width:1em;height:0.8em;background:red}ionx-html-editor>.ionx--prosemirror>.ProseMirror{outline:none;user-select:text}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>.ionx--prosemirror>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>.ionx--prosemirror>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1{font-size:130%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h2{font-size:125%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h3{font-size:120%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h4{font-size:115%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h5{font-size:110%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{font-size:105%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>.ionx--prosemirror>.ProseMirror p:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror ul:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror ol:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h1:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
+
+let HtmlEditor = class extends HTMLElement$1 {
+  constructor() {
+    super();
+    this.__registerHost();
+    this.editorSelectionChange = createEvent(this, "editorSelectionChange", 7);
+    this.ionChange = createEvent(this, "ionChange", 7);
+  }
+  async getView() {
+    return this.view;
+  }
+  async getState() {
+    return this.view.state;
+  }
+  async getScheme() {
+    return this.view.state.schema;
+  }
+  async setFocus() {
+    if (!this.scrollParent) {
+      this.scrollParent = findScrollParent(this.element);
+    }
+    this.view.dom.focus({ preventScroll: true });
+    const pos = this.view.domAtPos(this.view.state.selection.to);
+    if (pos.node) {
+      if (pos.node.nodeType === Node.TEXT_NODE) {
+        scrollToCaret(this.scrollParent);
+      }
+      else {
+        scrollIntoView(this.view.dom.querySelector(".ionx--selected") || pos.node, this.scrollParent);
+      }
+    }
+  }
+  valueChanged(value, old) {
+    if (value !== old) {
+      console.debug("[ionx-html-editor]", "value changed");
+      if (this.view && !this.valueChangedByProseMirror) {
+        const state = EditorState.create({
+          schema: this.view.state.schema,
+          plugins: this.view.state.plugins,
+          doc: this.editorDocument(value || "<div></div>")
+        });
+        this.view.updateState(state);
+      }
+    }
+    this.valueChangedByProseMirror = false;
+  }
+  applyProseMirrorStatus() {
+    if (this.view) {
+      this.view.dom["contentEditable"] = !this.readonly && !this.disabled ? "true" : "false";
+    }
+  }
+  async initEditor() {
+    const container = this.element.getElementsByClassName("ionx--prosemirror");
+    await waitTill(() => container.length > 0, 1);
+    const plugins = [
+      ...Object.values(this.schema.nodes)
+        .filter(node => node.spec instanceof NodeSpecExtended && node.spec.keymap)
+        .map(node => keymap(node.spec.keymap(this.schema))),
+      ...Object.values(this.schema.marks)
+        .filter(mark => mark.spec instanceof MarkSpecExtended && mark.spec.keymap)
+        .map(mark => keymap(mark.spec.keymap(this.schema))),
+      ...(!this.historyDisabled ? [keymap(undoRedoKeymap)] : []),
+      ...(Array.isArray(this.keymap) ? this.keymap.map(km => keymap(km)) : (this.keymap ? [keymap(this.keymap)] : [])),
+      ...(this.plugins ?? []),
+      ...(!this.historyDisabled ? [history()] : [])
+    ];
+    const state = EditorState.create({
+      schema: this.schema,
+      plugins: plugins,
+      doc: this.editorDocument(this.value ? this.value : "<div></div>")
+    });
+    this.view = new EditorView(container[0], {
+      state,
+      dispatchTransaction: transaction => this.onEditorTransaction(transaction),
+      handleScrollToSelection: view => this.handleEditorScroll(view)
+    });
+    this.applyProseMirrorStatus();
+  }
+  handleEditorScroll(view) {
+    if (!this.scrollParent) {
+      this.scrollParent = findScrollParent(this.element);
+    }
+    const pos = view.domAtPos(view.state.selection.to);
+    if (pos.node) {
+      if (pos.node.nodeType === Node.TEXT_NODE) {
+        scrollToCaret(this.scrollParent);
+      }
+      else {
+        scrollIntoView(view.dom.querySelector(".ionx--selected") || pos.node, this.scrollParent);
+      }
+    }
+    return false;
+  }
+  editorDocument(html) {
+    const node = document.createElement("div");
+    node.innerHTML = html;
+    // this.prepareInputValue(node);
+    return DOMParser.fromSchema(this.schema).parse(node);
+  }
+  editorValue() {
+    if (this.view) {
+      const value = DOMSerializer.fromSchema(this.schema).serializeFragment(this.view.state.doc.content);
+      const tmp = document.createElement("div");
+      tmp.appendChild(value);
+      if (!tmp.innerText) {
+        return null;
+      }
+      else {
+        return tmp.innerHTML; // this.prepareOutputValue(tmp);
+      }
+    }
+    else {
+      return this.value;
+    }
+  }
+  onEditorTransaction(transaction) {
+    this.view.dom.focus({ preventScroll: true });
+    this.view.updateState(this.view.state.apply(transaction));
+    // this.setFocus();
+    this.editorSelectionChange.emit();
+    if (transaction.docChanged) {
+      const value = this.editorValue();
+      if (this.value !== value) {
+        this.valueChangedByProseMirror = true;
+        this.value = value;
+        this.ionChange.emit({ value });
+      }
+    }
+  }
+  async componentWillLoad() {
+    await loadIntlMessages();
+    await loadIonxLinkEditorIntl();
+  }
+  connectedCallback() {
+    this.initEditor();
+    fixIonItemOverflow(this.element);
+  }
+  disconnectedCallback() {
+    this.view?.destroy();
+    this.view = undefined;
+  }
+  render() {
+    return h(Host, null, !this.readonly && h("ionx-html-editor-toolbar", { items: this.toolbarItems, historyDisabled: this.historyDisabled }), h("div", { class: "ionx--prosemirror" }));
+  }
+  static get assetsDirs() { return ["assets"]; }
+  get element() { return this; }
+  static get watchers() { return {
+    "value": ["valueChanged"],
+    "disabled": ["applyProseMirrorStatus"],
+    "readonly": ["applyProseMirrorStatus"]
+  }; }
+  static get style() { return htmlEditorCss; }
+};
+
+/**
+ * Toggles block mark based on the return type of `getAttrs`.
+ * This is similar to ProseMirror"s `getAttrs` from `AttributeSpec`
+ * return `false` to remove the mark.
+ * return `undefined for no-op.
+ * return an `object` to update the mark.
+ */
+const toggleBlockMark = (markType, getAttrs, allowedBlocks) => (state, dispatch) => {
+  let markApplied = false;
+  const tr = state.tr;
+  const toggleBlockMarkOnRange = (from, to, tr) => {
+    state.doc.nodesBetween(from, to, (node, pos, parent) => {
+      if (!node.type.isBlock) {
+        return false;
+      }
+      if ((!allowedBlocks || (Array.isArray(allowedBlocks) ? allowedBlocks.indexOf(node.type) > -1 : allowedBlocks(state.schema, node, parent))) &&
+        parent.type.allowsMarkType(markType)) {
+        const oldMarks = node.marks.filter(mark => mark.type === markType);
+        const prevAttrs = oldMarks.length ? oldMarks[0].attrs : undefined;
+        const newAttrs = getAttrs(prevAttrs, node);
+        if (newAttrs !== undefined) {
+          tr.setNodeMarkup(pos, node.type, node.attrs, node.marks
+            .filter(mark => !markType.excludes(mark.type))
+            .concat(newAttrs === false ? [] : markType.create(newAttrs)));
+          markApplied = true;
+        }
+      }
+      return;
+    });
+  };
+  const { from, to } = state.selection;
+  toggleBlockMarkOnRange(from, to, tr);
+  if (markApplied && tr.docChanged) {
+    if (dispatch) {
+      dispatch(tr.scrollIntoView());
+    }
+    return true;
+  }
+  return false;
+};
+
+const changeAlignment = (align) => (state, dispatch) => {
+  const { nodes: { paragraph, heading }, marks: { alignment } } = state.schema;
+  return toggleBlockMark(alignment, () => (!align ? undefined : align === "left" ? false : { align }), [paragraph, heading])(state, dispatch);
+};
+
+function findBlockMarks(state, markType) {
+  const marks = [];
+  const { from, to } = state.selection;
+  state.doc.nodesBetween(from, to, (node, _pos, _parent) => {
+    if (!node.type.isBlock) {
+      return false;
+    }
+    for (const mark of node.marks) {
+      if (mark.type === markType) {
+        marks.push(mark);
+      }
+    }
+  });
+  return marks;
+}
+
+class Alignment extends Enum {
+  constructor(name) {
+    super(name);
+    this.name = name;
+    this.label = new MessageRef("ionx/HtmlEditor", "alignmentMenu/" + name);
+  }
+  static values() {
+    return super.values();
+  }
+  static valueOf(value) {
+    return super.valueOf(value);
+  }
+  static fromJSON(value) {
+    return super.fromJSON(value);
+  }
+}
+Alignment.left = new Alignment("left");
+Alignment.right = new Alignment("right");
+Alignment.center = new Alignment("center");
+Alignment.justify = new Alignment("justify");
+
+const alignmentMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider.item{--background:transparent;--color:rgb(var(--ion-text-color-rgb), .5);--padding-start:16px;--padding-end:16px;--padding-top:20px;--inner-border-width:0;--border-width:0;font-size:calc(var(--ionx-default-font-size, 16px) * 0.75);font-weight:500;border-bottom:var(--ionx-border-width) solid var(--ion-border-color);text-transform:uppercase;letter-spacing:1px}:host ion-list ion-icon[slot=start],:host ion-list ion-icon[slot=end]{font-size:1.2em}:host ion-list ion-icon[slot=start]{margin-right:8px}:host ion-list ion-icon[slot=end]{margin-right:0}";
+
+let AlignmentMenu = class extends HTMLElement$1 {
+  constructor() {
+    super();
+    this.__registerHost();
+    this.__attachShadow();
+  }
+  async toggleAlignment(alignment) {
+    const view = await this.editor.getView();
+    const command = changeAlignment(alignment.name);
+    if (command(view.state)) {
+      command(view.state, (tr) => view.dispatch(tr));
+    }
+    await popoverController.dismiss();
+    view.focus();
+  }
+  connectedCallback() {
+    this.active = undefined;
+    this.editor.getView().then(view => {
+      const { state } = view;
+      const { marks } = state.schema;
+      for (const mark of findBlockMarks(state, marks.alignment)) {
+        // zaznaczonych wiele blocków z różnym wyrównaniem
+        if (this.active && this.active !== mark.attrs.align) {
+          this.active = undefined;
+          break;
+        }
+        this.active = mark.attrs.align;
+      }
+    });
+  }
+  render() {
+    return h("ion-list", { lines: "full" }, Alignment.values().map(alignment => h("ion-item", { button: true, detail: false, onClick: () => this.toggleAlignment(alignment) }, h("ion-label", null, intl.message(alignment.label)), this.active === alignment.name && h("ion-icon", { name: "checkmark", slot: "end" }), h("ion-icon", { src: `/assets/ionx.HtmlEditor/icons/align-${alignment.name}.svg`, slot: "start" }))));
+  }
+  static get style() { return alignmentMenuCss; }
+};
+
+const insertMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider.item{--background:transparent;--color:rgb(var(--ion-text-color-rgb), .5);--padding-start:16px;--padding-end:16px;--padding-top:20px;--inner-border-width:0;--border-width:0;font-size:calc(var(--ionx-default-font-size, 16px) * 0.75);font-weight:500;border-bottom:var(--ionx-border-width) solid var(--ion-border-color);text-transform:uppercase;letter-spacing:1px}:host ion-list ion-icon[slot=start],:host ion-list ion-icon[slot=end]{font-size:1.2em}:host ion-list ion-icon[slot=start]{margin-right:8px}:host ion-list ion-icon[slot=end]{margin-right:0}";
+
+let InsertMenu = class extends HTMLElement$1 {
+  constructor() {
+    super();
+    this.__registerHost();
+    this.__attachShadow();
+  }
+  async handleItem(item) {
+    popoverController.dismiss();
+    const view = await this.editor.getView();
+    const result = item.handler(view);
+    if (result instanceof Promise) {
+      await result;
+    }
+    view.focus();
+  }
+  render() {
+    return h("ion-list", { lines: "full" }, this.items.map(item => h("ion-item", { button: true, disabled: item.disabled, detail: false, onClick: () => this.handleItem(item) }, (item.iconName || item.iconSrc) && h("ion-icon", { name: item.iconName, src: item.iconSrc, slot: "start" }), h("ion-label", null, h("div", null, item.label instanceof MessageRef ? translate(intl, item.label) : item.label), item.sublabel && h("small", null, item.sublabel instanceof MessageRef ? translate(intl, item.sublabel) : item.sublabel)))));
+  }
+  static get style() { return insertMenuCss; }
+};
+
+function findMarks(doc, from, to, markType, attrs) {
+  const marks = [];
+  doc.nodesBetween(from, to, node => {
+    for (let i = 0; i < node.marks.length; i++) {
+      if (node.marks[i].type === markType && (!attrs || deepEqual(node.marks[i].attrs, attrs))) {
+        marks.push(node.marks[i]);
+      }
+    }
+  });
+  return marks;
+}
+
+function findMarksInSelection(state, markType, attrs) {
+  const doc = state.doc;
+  const { from, to } = state.selection;
+  return findMarks(doc, from, to, markType, attrs);
+}
+
+function findNodeStartEnd(doc, pos) {
+  const $pos = doc.resolve(pos);
+  const start = pos - $pos.textOffset;
+  const end = start + $pos.parent.child($pos.index()).nodeSize;
+  return { start, end };
+}
+
+const linkMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider.item{--background:transparent;--color:rgb(var(--ion-text-color-rgb), .5);--padding-start:16px;--padding-end:16px;--padding-top:20px;--inner-border-width:0;--border-width:0;font-size:calc(var(--ionx-default-font-size, 16px) * 0.75);font-weight:500;border-bottom:var(--ionx-border-width) solid var(--ion-border-color);text-transform:uppercase;letter-spacing:1px}:host ion-list ion-icon[slot=start],:host ion-list ion-icon[slot=end]{font-size:1.2em}:host ion-list ion-icon[slot=start]{margin-right:8px}:host ion-list ion-icon[slot=end]{margin-right:0}";
+
+defineIonxLinkEditor();
+let LinkMenu = class extends HTMLElement$1 {
+  constructor() {
+    super();
+    this.__registerHost();
+    this.__attachShadow();
+  }
+  async edit() {
+    const view = await this.editor.getView();
+    const { state } = view;
+    const { schema } = state;
+    const { marks } = schema;
+    const linkMark = marks.link;
+    const linkSpec = linkMark.spec;
+    MARKS: for (const mark of findMarksInSelection(state, linkMark)) {
+      const href = mark.attrs.href;
+      const target = mark.attrs.target;
+      if (href) {
+        await popoverController.dismiss();
+        const linkSchemes = linkSpec instanceof LinkMark ? linkSpec.schemes : undefined;
+        const link = await showLinkEditor({ value: { href, target }, schemes: linkSchemes }, { animated: "onlyEnter" });
+        if (link) {
+          const selection = state.selection;
+          const tr = state.tr;
+          tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+            if (node.isText) {
+              const { start, end } = findNodeStartEnd(tr.doc, pos);
+              tr.addMark(start, end, schema.mark(linkMark, link));
+            }
+          });
+          view.dispatch(tr);
+        }
+        view.focus();
+        break MARKS;
+      }
+    }
+  }
+  async unlink() {
+    const view = await this.editor.getView();
+    const { state } = view;
+    const { selection } = state;
+    const { marks } = state.schema;
+    if (selection.empty) {
+      const tr = state.tr;
+      tr.doc.nodesBetween(selection.from, selection.to, (node, pos) => {
+        if (node.isText) {
+          const $pos = tr.doc.resolve(pos);
+          const start = pos - $pos.textOffset;
+          const end = start + $pos.parent.child($pos.index()).nodeSize;
+          tr.removeMark(start, end, marks.link);
+        }
+      });
+      view.dispatch(tr);
+    }
+    else {
+      toggleMark(marks.link)(state, tr => view.dispatch(tr));
+    }
+    await popoverController.dismiss();
+    view.focus();
+  }
+  render() {
+    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.edit() }, h("ion-icon", { name: "link-outline", slot: "start" }), h("ion-label", null, intl.message `@co.mmons/js-intl#Edit|command`)), h("ion-item", { button: true, detail: false, onClick: () => this.unlink() }, h("ion-icon", { name: "unlink-outline", slot: "start" }), h("ion-label", null, intl.message `@co.mmons/js-intl#Delete|command`)));
+  }
+  static get style() { return linkMenuCss; }
+};
+
+// ::- Gap cursor selections are represented using this class. Its
+// `$anchor` and `$head` properties both point at the cursor position.
+var GapCursor = /*@__PURE__*/(function (Selection) {
+  function GapCursor($pos) {
+    Selection.call(this, $pos, $pos);
+  }
+
+  if ( Selection ) GapCursor.__proto__ = Selection;
+  GapCursor.prototype = Object.create( Selection && Selection.prototype );
+  GapCursor.prototype.constructor = GapCursor;
+
+  GapCursor.prototype.map = function map (doc, mapping) {
+    var $pos = doc.resolve(mapping.map(this.head));
+    return GapCursor.valid($pos) ? new GapCursor($pos) : Selection.near($pos)
+  };
+
+  GapCursor.prototype.content = function content () { return Slice.empty };
+
+  GapCursor.prototype.eq = function eq (other) {
+    return other instanceof GapCursor && other.head == this.head
+  };
+
+  GapCursor.prototype.toJSON = function toJSON () {
+    return {type: "gapcursor", pos: this.head}
+  };
+
+  GapCursor.fromJSON = function fromJSON (doc, json) {
+    if (typeof json.pos != "number") { throw new RangeError("Invalid input for GapCursor.fromJSON") }
+    return new GapCursor(doc.resolve(json.pos))
+  };
+
+  GapCursor.prototype.getBookmark = function getBookmark () { return new GapBookmark(this.anchor) };
+
+  GapCursor.valid = function valid ($pos) {
+    var parent = $pos.parent;
+    if (parent.isTextblock || !closedBefore($pos) || !closedAfter($pos)) { return false }
+    var override = parent.type.spec.allowGapCursor;
+    if (override != null) { return override }
+    var deflt = parent.contentMatchAt($pos.index()).defaultType;
+    return deflt && deflt.isTextblock
+  };
+
+  GapCursor.findFrom = function findFrom ($pos, dir, mustMove) {
+    search: for (;;) {
+      if (!mustMove && GapCursor.valid($pos)) { return $pos }
+      var pos = $pos.pos, next = null;
+      // Scan up from this position
+      for (var d = $pos.depth;; d--) {
+        var parent = $pos.node(d);
+        if (dir > 0 ? $pos.indexAfter(d) < parent.childCount : $pos.index(d) > 0) {
+          next = parent.child(dir > 0 ? $pos.indexAfter(d) : $pos.index(d) - 1);
+          break
+        } else if (d == 0) {
+          return null
+        }
+        pos += dir;
+        var $cur = $pos.doc.resolve(pos);
+        if (GapCursor.valid($cur)) { return $cur }
+      }
+
+      // And then down into the next node
+      for (;;) {
+        var inside = dir > 0 ? next.firstChild : next.lastChild;
+        if (!inside) {
+          if (next.isAtom && !next.isText && !NodeSelection.isSelectable(next)) {
+            $pos = $pos.doc.resolve(pos + next.nodeSize * dir);
+            mustMove = false;
+            continue search
+          }
+          break
+        }
+        next = inside;
+        pos += dir;
+        var $cur$1 = $pos.doc.resolve(pos);
+        if (GapCursor.valid($cur$1)) { return $cur$1 }
+      }
+
+      return null
+    }
+  };
+
+  return GapCursor;
+}(Selection));
+
+GapCursor.prototype.visible = false;
+
+Selection.jsonID("gapcursor", GapCursor);
+
+var GapBookmark = function GapBookmark(pos) {
+  this.pos = pos;
+};
+GapBookmark.prototype.map = function map (mapping) {
+  return new GapBookmark(mapping.map(this.pos))
+};
+GapBookmark.prototype.resolve = function resolve (doc) {
+  var $pos = doc.resolve(this.pos);
+  return GapCursor.valid($pos) ? new GapCursor($pos) : Selection.near($pos)
+};
+
+function closedBefore($pos) {
+  for (var d = $pos.depth; d >= 0; d--) {
+    var index = $pos.index(d);
+    // At the start of this parent, look at next one
+    if (index == 0) { continue }
+    // See if the node before (or its first ancestor) is closed
+    for (var before = $pos.node(d).child(index - 1);; before = before.lastChild) {
+      if ((before.childCount == 0 && !before.inlineContent) || before.isAtom || before.type.spec.isolating) { return true }
+      if (before.inlineContent) { return false }
+    }
+  }
+  // Hit start of document
+  return true
+}
+
+function closedAfter($pos) {
+  for (var d = $pos.depth; d >= 0; d--) {
+    var index = $pos.indexAfter(d), parent = $pos.node(d);
+    if (index == parent.childCount) { continue }
+    for (var after = parent.child(index);; after = after.firstChild) {
+      if ((after.childCount == 0 && !after.inlineContent) || after.isAtom || after.type.spec.isolating) { return true }
+      if (after.inlineContent) { return false }
+    }
+  }
+  return true
+}
+
+keydownHandler({
+  "ArrowLeft": arrow("horiz", -1),
+  "ArrowRight": arrow("horiz", 1),
+  "ArrowUp": arrow("vert", -1),
+  "ArrowDown": arrow("vert", 1)
+});
+
+function arrow(axis, dir) {
+  var dirStr = axis == "vert" ? (dir > 0 ? "down" : "up") : (dir > 0 ? "right" : "left");
+  return function(state, dispatch, view) {
+    var sel = state.selection;
+    var $start = dir > 0 ? sel.$to : sel.$from, mustMove = sel.empty;
+    if (sel instanceof TextSelection) {
+      if (!view.endOfTextblock(dirStr) || $start.depth == 0) { return false }
+      mustMove = false;
+      $start = state.doc.resolve(dir > 0 ? $start.after() : $start.before());
+    }
+    var $found = GapCursor.findFrom($start, dir, mustMove);
+    if (!$found) { return false }
+    if (dispatch) { dispatch(state.tr.setSelection(new GapCursor($found))); }
+    return true
+  }
+}
+
 const filter = (predicates, cmd) => {
   return function (state, dispatch, view) {
     if (!Array.isArray(predicates)) {
@@ -19491,7 +19782,7 @@ filter([
   // list items might have multiple paragraphs; only do this at the first one
   isFirstChildOfParent,
   canOutdent,
-], chainCommands(deletePreviousEmptyListItem, outdentList())),
+], chainCommands(deletePreviousEmptyListItem, outdentList())), 
 // if we"re just inside a paragraph node (or gapcursor is shown) and backspace, then try to join
 // the text to the previous list item, if one exists
 filter([isEmptySelectionAtStart, canToJoinToPreviousListItem], joinToPreviousListItem));
@@ -19756,7 +20047,7 @@ function wrapInList(nodeType) {
   return autoJoin(wrapInList$1(nodeType), (before, after) => before.type === after.type && before.type === nodeType);
 }
 
-const listMenuCss = ":host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
+const listMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider.item{--background:transparent;--color:rgb(var(--ion-text-color-rgb), .5);--padding-start:16px;--padding-end:16px;--padding-top:20px;--inner-border-width:0;--border-width:0;font-size:calc(var(--ionx-default-font-size, 16px) * 0.75);font-weight:500;border-bottom:var(--ionx-border-width) solid var(--ion-border-color);text-transform:uppercase;letter-spacing:1px}:host ion-list ion-icon[slot=start],:host ion-list ion-icon[slot=end]{font-size:1.2em}:host ion-list ion-icon[slot=start]{margin-right:8px}:host ion-list ion-icon[slot=end]{margin-right:0}";
 
 let ListMenu = class extends HTMLElement$1 {
   constructor() {
@@ -19766,24 +20057,25 @@ let ListMenu = class extends HTMLElement$1 {
   }
   async level(level) {
     const view = await this.editor.getView();
+    const { state } = view;
     const command = level < 0 ? outdentList() : indentList();
-    if (command(view.state)) {
-      command(view.state, t => view.dispatch(t));
+    if (command(state)) {
+      command(state, t => view.dispatch(t));
     }
-    popoverController.dismiss();
+    await popoverController.dismiss();
+    view.focus();
   }
   async toggleList(type) {
     const view = await this.editor.getView();
     toggleList(view.state, t => view.dispatch(t), view, type);
-    popoverController.dismiss();
-  }
-  didDismiss() {
-    this.editor.setFocus();
+    await popoverController.dismiss();
+    view.focus();
   }
   connectedCallback() {
     this.editor.getView().then(view => {
-      this.activeBulletList = !!dist.findParentNode(predicate => predicate.hasMarkup(schema.nodes.bulletList))(view.state.selection);
-      this.activeNumberedList = !!dist.findParentNode(predicate => predicate.hasMarkup(schema.nodes.orderedList))(view.state.selection);
+      const { selection, schema } = view.state;
+      this.activeBulletList = !!dist.findParentNode(predicate => predicate.hasMarkup(schema.nodes.bulletList))(selection);
+      this.activeNumberedList = !!dist.findParentNode(predicate => predicate.hasMarkup(schema.nodes.orderedList))(selection);
     });
   }
   render() {
@@ -19792,7 +20084,7 @@ let ListMenu = class extends HTMLElement$1 {
   static get style() { return listMenuCss; }
 };
 
-const paragraphMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}";
+const paragraphMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider.item{--background:transparent;--color:rgb(var(--ion-text-color-rgb), .5);--padding-start:16px;--padding-end:16px;--padding-top:20px;--inner-border-width:0;--border-width:0;font-size:calc(var(--ionx-default-font-size, 16px) * 0.75);font-weight:500;border-bottom:var(--ionx-border-width) solid var(--ion-border-color);text-transform:uppercase;letter-spacing:1px}:host ion-list ion-icon[slot=start],:host ion-list ion-icon[slot=end]{font-size:1.2em}:host ion-list ion-icon[slot=start]{margin-right:8px}:host ion-list ion-icon[slot=end]{margin-right:0}";
 
 let ParagraphMenu = class extends HTMLElement$1 {
   constructor() {
@@ -19802,96 +20094,46 @@ let ParagraphMenu = class extends HTMLElement$1 {
   }
   async indentLevel(move) {
     const view = await this.editor.getView();
-    const selection = view.state.selection;
-    const paragraph = dist.findParentNodeOfType(schema.nodes.paragraph)(selection);
-    if (paragraph) {
-      const currentLevel = parseInt((paragraph.node.attrs["indent"] || "0").replace("px", ""), 10) / 32;
+    const { selection, schema } = view.state;
+    const node = dist.findParentNodeOfType(schema.nodes.heading)(selection) ?? dist.findParentNodeOfType(schema.nodes.paragraph)(selection);
+    if (node) {
+      const currentLevel = parseInt((node.node.attrs["indent"] || "0").replace("px", ""), 10) / 32;
       const newLevel = currentLevel === 1 && move === -1 ? 0 : currentLevel + move;
-      view.dispatch(view.state.tr.setNodeMarkup(paragraph.pos, null, { indent: newLevel > 0 ? `${newLevel * 32}px` : null }));
+      view.dispatch(view.state.tr.setNodeMarkup(node.pos, null, { indent: newLevel > 0 ? `${newLevel * 32}px` : null }));
     }
-    popoverController.dismiss();
+    await popoverController.dismiss();
+    view.focus();
   }
   async toggleHeading(heading) {
     const view = await this.editor.getView();
+    const { state } = view;
+    const { nodes } = state.schema;
     if (heading > 0 && this.activeHeading !== heading) {
-      const command = setBlockType(schema.nodes.heading, { level: heading });
-      if (command(view.state)) {
-        command(view.state, t => view.dispatch(t));
+      const command = setBlockType(nodes.heading, { level: heading });
+      if (command(state)) {
+        command(state, t => view.dispatch(t));
       }
     }
     else {
-      setBlockType(schema.nodes.paragraph)(view.state, t => view.dispatch(t));
+      setBlockType(nodes.paragraph)(state, t => view.dispatch(t));
     }
-    popoverController.dismiss();
-  }
-  didDismiss() {
-    this.editor.setFocus();
+    await popoverController.dismiss();
+    view.focus();
   }
   connectedCallback() {
     this.editor.getView().then(view => {
-      const activeHeading = dist.findParentNodeOfType(schema.nodes.heading)(view.state.selection);
+      const { schema, selection } = view.state;
+      const activeHeading = dist.findParentNodeOfType(schema.nodes.heading)(selection);
       if (activeHeading) {
         this.activeHeading = activeHeading.node.attrs.level;
       }
     });
   }
   render() {
-    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.indentLevel(-1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Decrease indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-decrease.svg", slot: "start" })), h("ion-item", { button: true, detail: false, onClick: () => this.indentLevel(1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Increase indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-increase.svg", slot: "start" })), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Heading`)), this.activeHeading > 0 && h("ion-item", { button: true, detail: false, onClick: () => this.toggleHeading(0) }, h("ion-label", null, intl.message `ionx/HtmlEditor#Plain text`)), [1, 2, 3, 4, 5, 6].map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleHeading(size) }, h("ion-label", { style: { fontWeight: "500", fontSize: `${130 - ((size - 1) * 5)}%` } }, intl.message `ionx/HtmlEditor#Heading`, " ", size), this.activeHeading === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
+    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.indentLevel(1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Increase indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-increase.svg", slot: "start" })), h("ion-item", { button: true, detail: false, onClick: () => this.indentLevel(-1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Decrease indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-decrease.svg", slot: "start" })), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Heading`)), this.activeHeading > 0 && h("ion-item", { button: true, detail: false, onClick: () => this.toggleHeading(0) }, h("ion-label", null, intl.message `ionx/HtmlEditor#Plain text`)), [1, 2, 3, 4, 5, 6].map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleHeading(size) }, h("ion-label", { style: { fontWeight: "500", fontSize: `${130 - ((size - 1) * 5)}%` } }, intl.message `ionx/HtmlEditor#Heading`, " ", size), this.activeHeading === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
   }
   static get style() { return paragraphMenuCss; }
 };
-
-class FontSize extends Enum {
-  constructor(name, css) {
-    super(name);
-    this.name = name;
-    this.css = css;
-    this.label = new MessageRef("ionx/HtmlEditor", `${name}FontSizeLabel`);
-  }
-  static values() {
-    return super.values();
-  }
-  static valueOf(value) {
-    return super.valueOf(value);
-  }
-  static fromJSON(value) {
-    return super.fromJSON(value);
-  }
-}
-FontSize.xxSmall = new FontSize("xxSmall", "xx-small");
-FontSize.xSmall = new FontSize("xSmall", "x-small");
-FontSize.small = new FontSize("small", "small");
-FontSize.large = new FontSize("large", "large");
-FontSize.xLarge = new FontSize("xLarge", "x-large");
-FontSize.xxLarge = new FontSize("xxLarge", "xx-large");
-
-function isMarkActive(state, type) {
-  const { from, $from, to, empty } = state.selection;
-  if (empty) {
-    return !!(type.isInSet(state.storedMarks || $from.marks()));
-  }
-  else {
-    return state.doc.rangeHasMark(from, to, type);
-  }
-}
-function anyMarkActive(state, types) {
-  const { from, $from, to, empty } = state.selection;
-  if (empty) {
-    for (const type of types) {
-      if (type.isInSet(state.storedMarks || $from.marks())) {
-        return true;
-      }
-    }
-  }
-  else {
-    for (const type of types) {
-      if (state.doc.rangeHasMark(from, to, type)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
 
 function markApplies(doc, from, to, type) {
   let applies = false;
@@ -19945,105 +20187,141 @@ function toggleInlineMark(markType, attrs) {
   };
 }
 
-const textMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider{--background:transparent;border-bottom:0;font-size:13px;font-weight:400;--color:var(--ion-text-color);opacity:0.5}:host input[type=color]{width:20px;height:20px;border:1px solid var(--ion-border-color);background-color:transparent;margin:0 0 0 8px;outline:none}:host ion-button[slot=end]{margin:0}";
+class FontSize extends Enum {
+  constructor(name, css) {
+    super(name);
+    this.name = name;
+    this.css = css;
+    this.label = new MessageRef("ionx/HtmlEditor", `${name}FontSizeLabel`);
+  }
+  static values() {
+    return super.values();
+  }
+  static valueOf(value) {
+    return super.valueOf(value);
+  }
+  static fromJSON(value) {
+    return super.fromJSON(value);
+  }
+}
+FontSize.xxSmall = new FontSize("xxSmall", "xx-small");
+FontSize.xSmall = new FontSize("xSmall", "x-small");
+FontSize.small = new FontSize("small", "small");
+FontSize.large = new FontSize("large", "large");
+FontSize.xLarge = new FontSize("xLarge", "x-large");
+FontSize.xxLarge = new FontSize("xxLarge", "xx-large");
 
+const textMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider.item{--background:transparent;--color:rgb(var(--ion-text-color-rgb), .5);--padding-start:16px;--padding-end:16px;--padding-top:20px;--inner-border-width:0;--border-width:0;font-size:calc(var(--ionx-default-font-size, 16px) * 0.75);font-weight:500;border-bottom:var(--ionx-border-width) solid var(--ion-border-color);text-transform:uppercase;letter-spacing:1px}:host ion-list ion-icon[slot=start],:host ion-list ion-icon[slot=end]{font-size:1.2em}:host ion-list ion-icon[slot=start]{margin-right:8px}:host ion-list ion-icon[slot=end]{margin-right:0}:host input[type=color]{width:24px;height:24px;border:1px solid var(--ion-border-color);background-color:transparent;margin:0 0 0 8px;outline:none}:host ion-button[slot=end],:host ion-icon[slot=end]{margin:0}";
+
+const simpleMarks = [
+  { name: "strong", style: { fontWeight: "bold" }, label: new MessageRef("ionx/HtmlEditor", "Bold|text") },
+  { name: "emphasis", style: { fontStyle: "italic" }, label: new MessageRef("ionx/HtmlEditor", "Italic|text") },
+  { name: "underline", style: { textDecoration: "underline" }, label: new MessageRef("ionx/HtmlEditor", "Underline|text") },
+  { name: "strikethrough", style: { textDecoration: "line-through" }, label: new MessageRef("ionx/HtmlEditor", "Strikethrough|text") },
+  { name: "superscript", label: new MessageRef("ionx/HtmlEditor", "Superscript|text"), sublabel: `<sup>xyz</sup>` },
+  { name: "subscript", label: new MessageRef("ionx/HtmlEditor", "Subscript|text"), sublabel: `<sub>xyz</sub>` }
+];
 let TextMenu = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
     this.__attachShadow();
   }
-  async toggle(name) {
-    let command;
-    if (name === "bold") {
-      command = toggleMark(schema.marks.strong);
-    }
-    else if (name === "italic") {
-      command = toggleMark(schema.marks.em);
-    }
-    else if (name === "underline") {
-      command = toggleMark(schema.marks.underline);
-    }
+  async toggle(markName) {
     const view = await this.editor.getView();
+    const { state } = view;
+    const { marks } = state.schema;
+    const command = toggleMark(marks[markName]);
     if (command(view.state)) {
       command(view.state, t => view.dispatch(t));
     }
-    popoverController.dismiss();
+    await popoverController.dismiss();
+    view.focus();
   }
   async toggleFontSize(size) {
     this.activeFontSize = size;
     const view = await this.editor.getView();
+    const { state } = view;
     if (size) {
-      toggleInlineMark(schema.marks.fontSize, { fontSize: size.css })(view.state, view.dispatch);
+      toggleInlineMark(state.schema.marks.fontSize, { fontSize: size.css })(state, view.dispatch);
     }
     else {
-      toggleMark(schema.marks.fontSize)(view.state, view.dispatch);
-      popoverController.dismiss();
+      toggleMark(state.schema.marks.fontSize)(state, view.dispatch);
     }
+    await popoverController.dismiss();
+    view.focus();
   }
-  async toggleColor(color) {
-    this.activeForegroundColor = color;
+  async toggleColor(mark, color) {
+    if (mark === "textForegroundColor") {
+      this.activeForegroundColor = color;
+    }
+    else {
+      this.activeBackgroundColor = color;
+    }
     const view = await this.editor.getView();
+    const { state } = view;
+    const { marks } = state.schema;
     if (color) {
-      toggleInlineMark(schema.marks.textColor, { color })(view.state, view.dispatch);
+      toggleInlineMark(marks[mark], { color })(state, view.dispatch);
     }
     else {
-      toggleMark(schema.marks.textColor)(view.state, view.dispatch);
-      popoverController.dismiss();
+      toggleMark(marks[mark])(state, view.dispatch);
+      await popoverController.dismiss();
+      view.focus();
     }
-  }
-  didDismiss() {
-    this.editor.setFocus();
   }
   connectedCallback() {
     this.editor.getView().then(view => {
-      this.strongActivated = isMarkActive(view.state, schema.marks.strong);
-      this.emphasisActivated = isMarkActive(view.state, schema.marks.em);
-      this.underlineActivated = isMarkActive(view.state, schema.marks.underline);
-      this.activeForegroundColor = findMarksInSelection(view.state, schema.marks.textColor).map(mark => mark.attrs.color)
+      const { state } = view;
+      const { marks } = state.schema;
+      this.activeMarks = [];
+      this.marks = [];
+      for (const [markName, mark] of Object.entries(marks)) {
+        if (isMarkFromGroup(mark, "textFormat")) {
+          this.marks.push(markName);
+          if (isMarkActive(state, mark)) {
+            this.activeMarks.push(markName);
+          }
+        }
+      }
+      this.activeForegroundColor = marks.textForegroundColor && findMarksInSelection(state, marks.textForegroundColor).map(mark => mark.attrs.color)
+        .find(color => !!color);
+      this.activeBackgroundColor = marks.textBackgroundColor && findMarksInSelection(state, marks.textBackgroundColor).map(mark => mark.attrs.color)
         .find(color => !!color);
       this.activeFontSize = undefined;
-      MARKS: for (const mark of findMarksInSelection(view.state, schema.marks.fontSize)) {
-        for (const size of FontSize.values()) {
-          if (size.css === mark.attrs.fontSize) {
-            // ups, mamy różne rozmiary w zaznaczeniu
-            if (this.activeFontSize && size !== this.activeFontSize) {
-              this.activeFontSize = undefined;
-              break MARKS;
+      if (marks.fontSize) {
+        MARKS: for (const mark of findMarksInSelection(state, marks.fontSize)) {
+          for (const size of FontSize.values()) {
+            if (size.css === mark.attrs.fontSize) {
+              // ups, mamy różne rozmiary w zaznaczeniu
+              if (this.activeFontSize && size !== this.activeFontSize) {
+                this.activeFontSize = undefined;
+                break MARKS;
+              }
+              this.activeFontSize = size;
             }
-            this.activeFontSize = size;
           }
         }
       }
     });
   }
   render() {
-    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggle("bold") }, h("ion-label", { style: { fontWeight: "bold" } }, intl.message `ionx/HtmlEditor#Bold|text`), this.strongActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("italic") }, h("ion-label", { style: { fontStyle: "italic" } }, intl.message `ionx/HtmlEditor#Italic|text`), this.emphasisActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggle("underline") }, h("ion-label", { style: { textDecoration: "underline" } }, intl.message `ionx/HtmlEditor#Underline|text`), this.underlineActivated && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeForegroundColor || "#000000", onInput: ev => this.toggleColor(ev.target.value) }), this.activeForegroundColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor() }, h("ion-icon", { name: "close", slot: "icon-only" }))), h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" }))));
+    if (!this.marks) {
+      return;
+    }
+    return h("ion-list", { lines: "full" }, simpleMarks.map(mark => this.marks.includes(mark.name) && h("ion-item", { button: true, detail: false, onClick: () => this.toggle(mark.name) }, h("ion-label", { style: mark.style }, translate(intl, mark.label), mark.sublabel && h("span", { innerHTML: mark.sublabel })), this.activeMarks.includes(mark.name) && h("ion-icon", { name: "checkmark", slot: "end" }))), this.marks.includes("textForegroundColor") && h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeForegroundColor || "#000000", onInput: ev => this.toggleColor("textForegroundColor", ev.target.value) }), this.activeForegroundColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor("textForegroundColor") }, h("ion-icon", { name: "backspace", slot: "icon-only", size: "small" }))), this.marks.includes("textBackgroundColor") && h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Background color`), h("input", { slot: "end", type: "color", value: this.activeBackgroundColor || "#000000", onInput: ev => this.toggleColor("textBackgroundColor", ev.target.value) }), this.activeBackgroundColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor("textBackgroundColor") }, h("ion-icon", { name: "backspace", slot: "icon-only", size: "small" }))), this.marks.includes("fontSize") && h(Fragment$1, null, h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" })))));
   }
   static get style() { return textMenuCss; }
 };
 
-function isBlockMarkActive(state, type) {
-  const { from, $from, to, empty } = state.selection;
-  if (empty) {
-    for (const mark of $from.parent.marks) {
-      if (mark.type === type) {
-        return true;
-      }
-    }
-  }
-  else {
-    return state.doc.rangeHasMark(from, to, type);
-  }
-}
-
-const toolbarCss = ".sc-ionx-html-editor-toolbar-h{outline:none;display:flex;justify-content:center;flex-wrap:wrap;position:sticky;position:-webkit-sticky;top:0;background-color:var(--background);z-index:1;padding:8px 0}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar{margin:0 4px;--padding-end:2px;--padding-start:4px}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar:not(.button-outline){border:1px solid transparent}.sc-ionx-html-editor-toolbar-h ion-button.button-outline.sc-ionx-html-editor-toolbar{--border-width:1px}.sc-ionx-html-editor-toolbar-h ion-icon[slot=end].sc-ionx-html-editor-toolbar{margin:0;font-size:1em}.sc-ionx-html-editor-toolbar-h ion-button[disabled].sc-ionx-html-editor-toolbar{opacity:0.5}.sc-ionx-html-editor-toolbar-h [ionx--buttons-group].sc-ionx-html-editor-toolbar{display:flex}.sc-ionx-html-editor-toolbar-h .buttons-group.sc-ionx-html-editor-toolbar ion-button.sc-ionx-html-editor-toolbar:not(:last-child){margin-right:0}.ion-focused.sc-ionx-html-editor-toolbar-h,.ion-focused .sc-ionx-html-editor-toolbar-h{background-color:var(--background-focused)}";
+const toolbarCss = ".sc-ionx-html-editor-toolbar-h{outline:none;display:flex;justify-content:center;flex-wrap:wrap;position:sticky;position:-webkit-sticky;top:0;background-color:var(--background);z-index:1;padding:8px 0}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar{margin:0 4px;--padding-end:4px;--padding-start:4px}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar:not(.button-outline){border:1px solid transparent}.sc-ionx-html-editor-toolbar-h ion-button.button-outline.sc-ionx-html-editor-toolbar{--border-width:1px}.sc-ionx-html-editor-toolbar-h ion-icon[slot=end].sc-ionx-html-editor-toolbar{margin:0;font-size:1em}.sc-ionx-html-editor-toolbar-h ion-button[disabled].sc-ionx-html-editor-toolbar{opacity:0.5}.sc-ionx-html-editor-toolbar-h [ionx--buttons-group].sc-ionx-html-editor-toolbar{display:flex}.sc-ionx-html-editor-toolbar-h .buttons-group.sc-ionx-html-editor-toolbar ion-button.sc-ionx-html-editor-toolbar:not(:last-child){margin-right:0}.ion-focused.sc-ionx-html-editor-toolbar-h,.ion-focused .sc-ionx-html-editor-toolbar-h{background-color:var(--background-focused)}";
 
 let Toolbar = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
-    this.activeFeatures = {};
+    this.canUndo = false;
+    this.canRedo = false;
   }
   get editor() {
     return this.element.parentElement;
@@ -20062,56 +20340,99 @@ let Toolbar = class extends HTMLElement$1 {
     this.canRedo = redoDepth(view.state) > 0;
     this.editor.setFocus();
   }
-  editLink() {
-  }
-  async showMenu(event, menu) {
+  async showMenu(view, item) {
     const popover = await popoverController.create({
-      component: `ionx-html-editor-${menu}-menu`,
+      component: item.menuComponent,
       componentProps: {
-        editor: this.editor
+        ...(typeof item.menuComponentProps === "function" ? await item.menuComponentProps(view) : (item.menuComponentProps ?? {})),
+        editor: this.editor,
       },
       event,
-      showBackdrop: isPlatform("ios")
+      showBackdrop: isPlatform("ios"),
+      leaveAnimation: () => createAnimation()
     });
+    popover.style.setProperty("--width", "auto");
+    popover.style.setProperty("--height", "auto");
+    popover.style.setProperty("--max-width", "80vw");
+    popover.style.setProperty("--max-height", "80vh");
     await popover.present();
-    popover.animated = false;
+    const dismiss = await popover.onDidDismiss();
+    if (dismiss.role === "backdrop") {
+      view.focus();
+    }
   }
-  async editorSelectionChanged() {
+  async handleItemClick(_event, item) {
+    const view = await this.editor.getView();
+    if (item.menuComponent) {
+      this.showMenu(view, item);
+    }
+    else if (item.handler) {
+      try {
+        let result = item.handler(view);
+        if (result instanceof Promise) {
+          result = await result;
+        }
+        if (result !== false) {
+          view.focus();
+        }
+      }
+      catch (e) {
+        console.error(e);
+      }
+    }
+  }
+  async forceUpdate(onlyIfChange = false) {
     const view = await this.editor.getView();
     if (!view) {
       return;
     }
+    const wasCanUndo = this.canUndo;
+    const wasCanRedo = this.canRedo;
+    const prevButtons = this.buttons;
     this.canUndo = undoDepth(view.state) > 0;
     this.canRedo = redoDepth(view.state) > 0;
-    this.activeFeatures = {};
-    this.activeFeatures.text = anyMarkActive(view.state, [schema.marks.strong, schema.marks.em, schema.marks.underline, schema.marks.fontSize, schema.marks.textColor]);
-    this.activeFeatures.list = !!dist.findParentNode(predicate => predicate.hasMarkup(schema.nodes.orderedList) || predicate.hasMarkup(schema.nodes.bulletList))(view.state.selection);
-    this.activeFeatures.alignment = isBlockMarkActive(view.state, schema.marks.alignment);
-    this.activeFeatures.ParagraphNode = !!dist.findParentNodeOfType(schema.nodes.heading)(view.state.selection);
-    this.activeFeatures.link = isMarkActive(view.state, schema.marks.link);
+    this.buttons = this.items?.filter(item => !item.isVisible || item.isVisible(view)).map(item => ({
+      labelVisible: item.labelVisible,
+      iconVisible: item.iconVisible,
+      label: item.label instanceof MessageRef ? translate(intl, item.label) : item.label,
+      active: item.isActive?.(view) || false,
+      iconName: item.iconName,
+      iconSrc: item.iconSrc,
+      menuComponent: item.menuComponent,
+      menuComponentProps: typeof item.menuComponentProps === "function" ? item.menuComponentProps.bind(item) : item.menuComponentProps,
+      handler: item.handler ? item.handler.bind(item) : undefined
+    }));
+    if (!onlyIfChange || wasCanUndo !== this.canUndo || wasCanRedo !== this.canRedo || !deepEqual(this.buttons, prevButtons)) {
+      forceUpdate(this);
+    }
+  }
+  async editorSelectionChanged() {
+    await this.forceUpdate(true);
+  }
+  async componentDidLoad() {
+    await this.forceUpdate(true);
   }
   connectedCallback() {
     this.selectionUnlisten = addEventListener(this.editor, "editorSelectionChange", () => this.editorSelectionChanged());
-    this.editorSelectionChanged();
   }
   disconnectedCallback() {
     this.selectionUnlisten?.();
   }
   render() {
-    return h(Host, null, h("ion-button", { size: "small", fill: this.activeFeatures.text ? "outline" : "clear", onClick: ev => this.showMenu(ev, "text") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Text`)), this.features?.alignment !== false && h("ion-button", { size: "small", fill: this.activeFeatures.alignment ? "outline" : "clear", onClick: ev => this.showMenu(ev, "alignment") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Alignment`)), this.features?.heading !== false && h("ion-button", { size: "small", fill: this.activeFeatures.paragraph ? "outline" : "clear", onClick: ev => this.showMenu(ev, "paragraph") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Paragraph`)), this.features?.list !== false && h("ion-button", { size: "small", fill: this.activeFeatures.list ? "outline" : "clear", onClick: ev => this.showMenu(ev, "list") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#listMenu/List`)), this.features?.link !== false && h("ion-button", { size: "small", fill: "clear", onClick: ev => this.showMenu(ev, "insert") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/HtmlEditor#Insert`)), this.activeFeatures.link && h("ion-button", { size: "small", fill: "outline", onClick: ev => this.showMenu(ev, "link") }, h("ion-icon", { name: "caret-down", slot: "end" }), h("span", null, intl.message `ionx/LinkEditor#Link`)), h("div", { class: "buttons-group" }, h("ion-button", { size: "small", fill: "clear", tabindex: "-1", disabled: !this.canUndo, title: intl.message `ionx/HtmlEditor#Undo`, onClick: () => this.undo() }, h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/undo.svg", slot: "icon-only" })), h("ion-button", { size: "small", fill: "clear", tabindex: "-1", disabled: !this.canRedo, title: intl.message `ionx/HtmlEditor#Redo`, onClick: () => this.redo() }, h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/redo.svg", slot: "icon-only" }))));
+    return h(Host, null, this.buttons?.map(item => h("ion-button", { size: "small", fill: item.active ? "outline" : "clear", onClick: ev => this.handleItemClick(ev, item) }, (item.iconSrc || item.iconName) && item.iconVisible !== false && h("ion-icon", { name: item.iconName, src: item.iconSrc, slot: item.labelVisible !== false ? "start" : "icon-only", size: item.labelVisible !== false ? "small" : undefined }), item.menuComponent && h("ion-icon", { name: "caret-down", slot: "end" }), item.labelVisible !== false && h("span", null, item.label))), !this.historyDisabled && h("div", { class: "buttons-group" }, h("ion-button", { size: "small", fill: "clear", tabindex: "-1", disabled: !this.canUndo, title: intl.message `ionx/HtmlEditor#Undo`, onClick: () => this.undo() }, h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/undo.svg", slot: "icon-only" })), h("ion-button", { size: "small", fill: "clear", tabindex: "-1", disabled: !this.canRedo, title: intl.message `ionx/HtmlEditor#Redo`, onClick: () => this.redo() }, h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/redo.svg", slot: "icon-only" }))));
   }
   get element() { return this; }
   static get style() { return toolbarCss; }
 };
 
-const IonxHtmlEditor = /*@__PURE__*/proxyCustomElement(HtmlEditor, [0,"ionx-html-editor",{"readonly":[4],"disabled":[4],"value":[1025],"linkSchemes":[16]}]);
-const IonxHtmlEditorAlignmentMenu = /*@__PURE__*/proxyCustomElement(AlignmentMenu, [1,"ionx-html-editor-alignment-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
-const IonxHtmlEditorInsertMenu = /*@__PURE__*/proxyCustomElement(InsertMenu, [1,"ionx-html-editor-insert-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
-const IonxHtmlEditorLinkMenu = /*@__PURE__*/proxyCustomElement(LinkMenu, [1,"ionx-html-editor-link-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
-const IonxHtmlEditorListMenu = /*@__PURE__*/proxyCustomElement(ListMenu, [1,"ionx-html-editor-list-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
-const IonxHtmlEditorParagraphMenu = /*@__PURE__*/proxyCustomElement(ParagraphMenu, [1,"ionx-html-editor-paragraph-menu",{"editor":[16]},[[0,"ionViewDidLeave","didDismiss"]]]);
-const IonxHtmlEditorTextMenu = /*@__PURE__*/proxyCustomElement(TextMenu, [1,"ionx-html-editor-text-menu",{"editor":[16],"activeColor":[32]},[[0,"ionViewDidLeave","didDismiss"]]]);
-const IonxHtmlEditorToolbar = /*@__PURE__*/proxyCustomElement(Toolbar, [2,"ionx-html-editor-toolbar",{"features":[16],"activeFeatures":[32],"canUndo":[32],"canRedo":[32]}]);
+const IonxHtmlEditor = /*@__PURE__*/proxyCustomElement(HtmlEditor, [0,"ionx-html-editor",{"readonly":[4],"disabled":[4],"value":[1025],"schema":[16],"plugins":[16],"keymap":[16],"historyDisabled":[4,"history-disabled"],"toolbarItems":[16]}]);
+const IonxHtmlEditorAlignmentMenu = /*@__PURE__*/proxyCustomElement(AlignmentMenu, [1,"ionx-html-editor-alignment-menu",{"editor":[16]}]);
+const IonxHtmlEditorInsertMenu = /*@__PURE__*/proxyCustomElement(InsertMenu, [1,"ionx-html-editor-insert-menu",{"editor":[16],"items":[16]}]);
+const IonxHtmlEditorLinkMenu = /*@__PURE__*/proxyCustomElement(LinkMenu, [1,"ionx-html-editor-link-menu",{"editor":[16]}]);
+const IonxHtmlEditorListMenu = /*@__PURE__*/proxyCustomElement(ListMenu, [1,"ionx-html-editor-list-menu",{"editor":[16]}]);
+const IonxHtmlEditorParagraphMenu = /*@__PURE__*/proxyCustomElement(ParagraphMenu, [1,"ionx-html-editor-paragraph-menu",{"editor":[16]}]);
+const IonxHtmlEditorTextMenu = /*@__PURE__*/proxyCustomElement(TextMenu, [1,"ionx-html-editor-text-menu",{"editor":[16],"activeForegroundColor":[32],"activeBackgroundColor":[32]}]);
+const IonxHtmlEditorToolbar = /*@__PURE__*/proxyCustomElement(Toolbar, [2,"ionx-html-editor-toolbar",{"historyDisabled":[4,"history-disabled"],"items":[16]}]);
 const defineIonxHtmlEditor = (opts) => {
   if (typeof customElements !== 'undefined') {
     [
@@ -20131,4 +20452,4 @@ const defineIonxHtmlEditor = (opts) => {
   }
 };
 
-export { IonxHtmlEditor, IonxHtmlEditorAlignmentMenu, IonxHtmlEditorInsertMenu, IonxHtmlEditorLinkMenu, IonxHtmlEditorListMenu, IonxHtmlEditorParagraphMenu, IonxHtmlEditorTextMenu, IonxHtmlEditorToolbar, defineIonxHtmlEditor };
+export { AlignmentMark, AlignmentToolbarItem, BlockquoteNode, BulletListNode, DocNode, EmphasisMark, FontSizeMark, HardBreakNode, HeadingNode, HorizontalRuleNode, InsertMenuToolbarItem, IonxHtmlEditor, IonxHtmlEditorAlignmentMenu, IonxHtmlEditorInsertMenu, IonxHtmlEditorLinkMenu, IonxHtmlEditorListMenu, IonxHtmlEditorParagraphMenu, IonxHtmlEditorTextMenu, IonxHtmlEditorToolbar, LinkMark, LinkMenuToolbarItem, ListItemNode, ListMenuToolbarItem, MarkSpecExtended, NodeSpecExtended, OrderedListNode, ParagraphMenuToolbarItem, ParagraphNode, StrikethroughMark, StrongMark, SubscriptMark, SuperscriptMark, TextBackgroundColorMark, TextEmphasisToolbarItem, TextForegroundColorMark, TextMenuToolbarItem, TextNode, TextStrikethroughToolbarItem, TextStrongToolbarItem, TextSubscriptToolbarItem, TextSuperscriptToolbarItem, TextUnderlineToolbarItem, ToolbarItem, UnderlineMark, baseKeymap, buildSchema, buildSchemaWithOptions, defineIonxHtmlEditor, enterKeymap };

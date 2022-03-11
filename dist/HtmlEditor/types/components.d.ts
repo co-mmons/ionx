@@ -5,16 +5,25 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { LinkScheme } from "ionx/LinkEditor";
+import { Schema } from "prosemirror-model";
+import { EditorState, Plugin } from "prosemirror-state";
+import { Keymap } from "prosemirror-commands";
+import { ToolbarItem } from "./toolbar/ToolbarItem";
 import { EditorView } from "prosemirror-view";
-import { HtmlEditorFeatures } from "./HtmlEditorFeatures";
+import { InsertMenuItem } from "./menus/InsertMenuItem";
 export namespace Components {
     interface IonxHtmlEditor {
         "disabled": boolean;
-        "getView": () => Promise<EditorView<any>>;
-        "linkSchemes": LinkScheme[];
+        "getScheme": () => Promise<Schema>;
+        "getState": () => Promise<EditorState<Schema>>;
+        "getView": () => Promise<EditorView<Schema<any, any>>>;
+        "historyDisabled": boolean;
+        "keymap": Keymap | Keymap[];
+        "plugins": Plugin[];
         "readonly": boolean;
+        "schema": Schema;
         "setFocus": () => Promise<void>;
+        "toolbarItems": ToolbarItem[];
         "value": string;
     }
     interface IonxHtmlEditorAlignmentMenu {
@@ -22,6 +31,7 @@ export namespace Components {
     }
     interface IonxHtmlEditorInsertMenu {
         "editor": HTMLIonxHtmlEditorElement;
+        "items": InsertMenuItem[];
     }
     interface IonxHtmlEditorLinkMenu {
         "editor": HTMLIonxHtmlEditorElement;
@@ -36,7 +46,8 @@ export namespace Components {
         "editor": HTMLIonxHtmlEditorElement;
     }
     interface IonxHtmlEditorToolbar {
-        "features": HtmlEditorFeatures;
+        "historyDisabled": boolean;
+        "items": ToolbarItem[];
     }
 }
 declare global {
@@ -102,10 +113,14 @@ declare global {
 declare namespace LocalJSX {
     interface IonxHtmlEditor {
         "disabled"?: boolean;
-        "linkSchemes"?: LinkScheme[];
+        "historyDisabled"?: boolean;
+        "keymap"?: Keymap | Keymap[];
         "onEditorSelectionChange"?: (event: CustomEvent<any>) => void;
         "onIonChange"?: (event: CustomEvent<{value: string}>) => void;
+        "plugins"?: Plugin[];
         "readonly"?: boolean;
+        "schema"?: Schema;
+        "toolbarItems"?: ToolbarItem[];
         "value"?: string;
     }
     interface IonxHtmlEditorAlignmentMenu {
@@ -113,6 +128,7 @@ declare namespace LocalJSX {
     }
     interface IonxHtmlEditorInsertMenu {
         "editor": HTMLIonxHtmlEditorElement;
+        "items": InsertMenuItem[];
     }
     interface IonxHtmlEditorLinkMenu {
         "editor": HTMLIonxHtmlEditorElement;
@@ -127,7 +143,8 @@ declare namespace LocalJSX {
         "editor": HTMLIonxHtmlEditorElement;
     }
     interface IonxHtmlEditorToolbar {
-        "features"?: HtmlEditorFeatures;
+        "historyDisabled"?: boolean;
+        "items"?: ToolbarItem[];
     }
     interface IntrinsicElements {
         "ionx-html-editor": IonxHtmlEditor;
