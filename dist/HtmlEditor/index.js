@@ -1681,7 +1681,8 @@ let HtmlEditor = class extends HTMLElement$1 {
   }
   applyProseMirrorStatus() {
     if (this.view) {
-      this.view.dom["contentEditable"] = !this.readonly && !this.disabled ? "true" : "false";
+      const thiz = this;
+      this.view.setProps({ editable: () => !thiz.readonly && !thiz.disabled });
     }
   }
   async initEditor() {

@@ -129,7 +129,8 @@ export class HtmlEditor implements ComponentInterface {
     @Watch("readonly")
     protected applyProseMirrorStatus() {
         if (this.view) {
-            this.view.dom["contentEditable"] = !this.readonly && !this.disabled ? "true" : "false";
+            const thiz = this;
+            this.view.setProps({editable: () => !thiz.readonly && !thiz.disabled});
         }
     }
 
