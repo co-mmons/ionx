@@ -14,7 +14,7 @@ export const config: Config = {
             defineFunctionName: "defineIonxHtmlEditor",
             includeGlobalScripts: false,
             dir: "../../dist/HtmlEditor",
-            external: [...defaultExternals, /prosemirror-*/, /ionx\/(?!modules\/HtmlEditor)/],
+            external: [...defaultExternals, "orderedmap", /prosemirror-+/, /ionx\/(?!modules\/HtmlEditor)/],
             empty: true
         }
     ]

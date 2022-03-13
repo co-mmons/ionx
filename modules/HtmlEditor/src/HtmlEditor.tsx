@@ -163,7 +163,15 @@ export class HtmlEditor implements ComponentInterface {
         this.view = new EditorView(container[0], {
             state,
             dispatchTransaction: transaction => this.onEditorTransaction(transaction),
-            handleScrollToSelection: view => this.handleEditorScroll(view)
+            handleScrollToSelection: view => this.handleEditorScroll(view),
+            nodeViews: Object.assign({},
+                ...Object.values(this.schema.nodes).filter(node => node.spec instanceof NodeSpecExtended && node.spec.render)
+                    .map(node => ({[node.name]: node.spec.render.bind(node.spec)})),
+                ...Object.values(this.schema.marks)
+                    .filter(mark => mark.spec instanceof MarkSpecExtended && mark.spec.render)
+                    .map(mark => mark.spec as MarkSpecExtended)
+                    .map(mark => ({[mark.name]: mark.render.bind(mark)}))
+                )
         });
 
         this.applyProseMirrorStatus();

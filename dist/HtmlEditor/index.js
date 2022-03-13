@@ -1,29 +1,25 @@
-import { HTMLElement as HTMLElement$1, createEvent, h, Host, Fragment, forceUpdate, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement as HTMLElement$1, createEvent, h, Host, Fragment as Fragment$1, forceUpdate, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
+import * as baseCommand from 'prosemirror-commands';
 import { toggleMark, chainCommands, deleteSelection, joinBackward, selectNodeBackward, joinForward, selectNodeForward, selectAll, joinUp, joinDown, lift, selectParentNode, newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock, exitCode, setBlockType } from 'prosemirror-commands';
+import * as baseListCommand from 'prosemirror-schema-list';
 import { splitListItem } from 'prosemirror-schema-list';
-import { isMarkFromGroup } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/utils/isMarkFromGroup';
-import { Schema, DOMParser, DOMSerializer } from 'prosemirror-model';
+import { MarkType, Schema, Slice, Fragment, NodeRange, DOMParser, DOMSerializer } from 'prosemirror-model';
 export { Schema } from 'prosemirror-model';
+import OrderedMap from 'orderedmap';
 import { MessageRef, intl, setGlobalValues, translate } from '@co.mmons/js-intl';
-import { isBlockMarkActive } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/utils/selection/isBlockMarkActive';
-import { isMarkActive, anyMarkActive } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/active';
-import { findParentNode, findParentNodeOfType } from 'prosemirror-utils';
+import { TextSelection, NodeSelection, EditorState } from 'prosemirror-state';
+import { findParentNode, findParentNodeOfType, findPositionOfNodeBefore, hasParentNodeOfType } from 'prosemirror-utils';
 import { defineIonxLinkEditor, showLinkEditor, loadIonxLinkEditorIntl } from 'ionx/LinkEditor';
-import { findMarksInSelection } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/utils/findMarksInSelection';
-import { toggleList, outdentList, indentList } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/list-commands';
+import { deepEqual, shallowEqual } from 'fast-equals';
+import { GapCursor } from 'prosemirror-gapcursor';
+import { ReplaceAroundStep, liftTarget } from 'prosemirror-transform';
 import { undo, redo, history, undoDepth, redoDepth } from 'prosemirror-history';
 import { undoInputRule } from 'prosemirror-inputrules';
 import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { keymap } from 'prosemirror-keymap';
-import { EditorState } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { popoverController, isPlatform, createAnimation } from '@ionic/core';
-import { changeAlignment } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/alignment/commands';
-import { findBlockMarks } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/utils/selection/findBlockMarks';
-import { findNodeStartEnd } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/utils/findNodeStartEnd';
-import { toggleInlineMark } from './Volumes/Projekty/co.mmons/ionx/modules/HtmlEditor/src/prosemirror/commands/toogleInlineMark';
-import { deepEqual } from 'fast-equals';
 import { addEventListener } from 'ionx/utils';
 
 class MarkSpecExtended {
@@ -338,6 +334,13 @@ class OrderedListNode extends NodeSpecExtended {
   }
 }
 
+function isMarkFromGroup(mark, groupName) {
+  if (mark instanceof MarkType) {
+    mark = mark.spec;
+  }
+  return mark.group && mark.group.split(" ").includes(groupName);
+}
+
 class ParagraphNode extends NodeSpecExtended {
   constructor() {
     super(...arguments);
@@ -532,139 +535,9 @@ class UnderlineMark extends MarkSpecExtended {
   }
 }
 
-// ::- Persistent data structure representing an ordered mapping from
-// strings to values, with some convenient update methods.
-function OrderedMap(content) {
-  this.content = content;
-}
-
-OrderedMap.prototype = {
-  constructor: OrderedMap,
-
-  find: function(key) {
-    for (var i = 0; i < this.content.length; i += 2)
-      if (this.content[i] === key) return i
-    return -1
-  },
-
-  // :: (string) → ?any
-  // Retrieve the value stored under `key`, or return undefined when
-  // no such key exists.
-  get: function(key) {
-    var found = this.find(key);
-    return found == -1 ? undefined : this.content[found + 1]
-  },
-
-  // :: (string, any, ?string) → OrderedMap
-  // Create a new map by replacing the value of `key` with a new
-  // value, or adding a binding to the end of the map. If `newKey` is
-  // given, the key of the binding will be replaced with that key.
-  update: function(key, value, newKey) {
-    var self = newKey && newKey != key ? this.remove(newKey) : this;
-    var found = self.find(key), content = self.content.slice();
-    if (found == -1) {
-      content.push(newKey || key, value);
-    } else {
-      content[found + 1] = value;
-      if (newKey) content[found] = newKey;
-    }
-    return new OrderedMap(content)
-  },
-
-  // :: (string) → OrderedMap
-  // Return a map with the given key removed, if it existed.
-  remove: function(key) {
-    var found = this.find(key);
-    if (found == -1) return this
-    var content = this.content.slice();
-    content.splice(found, 2);
-    return new OrderedMap(content)
-  },
-
-  // :: (string, any) → OrderedMap
-  // Add a new key to the start of the map.
-  addToStart: function(key, value) {
-    return new OrderedMap([key, value].concat(this.remove(key).content))
-  },
-
-  // :: (string, any) → OrderedMap
-  // Add a new key to the end of the map.
-  addToEnd: function(key, value) {
-    var content = this.remove(key).content.slice();
-    content.push(key, value);
-    return new OrderedMap(content)
-  },
-
-  // :: (string, string, any) → OrderedMap
-  // Add a key after the given key. If `place` is not found, the new
-  // key is added to the end.
-  addBefore: function(place, key, value) {
-    var without = this.remove(key), content = without.content.slice();
-    var found = without.find(place);
-    content.splice(found == -1 ? content.length : found, 0, key, value);
-    return new OrderedMap(content)
-  },
-
-  // :: ((key: string, value: any))
-  // Call the given function for each key/value pair in the map, in
-  // order.
-  forEach: function(f) {
-    for (var i = 0; i < this.content.length; i += 2)
-      f(this.content[i], this.content[i + 1]);
-  },
-
-  // :: (union<Object, OrderedMap>) → OrderedMap
-  // Create a new map by prepending the keys in this map that don't
-  // appear in `map` before the keys in `map`.
-  prepend: function(map) {
-    map = OrderedMap.from(map);
-    if (!map.size) return this
-    return new OrderedMap(map.content.concat(this.subtract(map).content))
-  },
-
-  // :: (union<Object, OrderedMap>) → OrderedMap
-  // Create a new map by appending the keys in this map that don't
-  // appear in `map` after the keys in `map`.
-  append: function(map) {
-    map = OrderedMap.from(map);
-    if (!map.size) return this
-    return new OrderedMap(this.subtract(map).content.concat(map.content))
-  },
-
-  // :: (union<Object, OrderedMap>) → OrderedMap
-  // Create a map containing all the keys in this map that don't
-  // appear in `map`.
-  subtract: function(map) {
-    var result = this;
-    map = OrderedMap.from(map);
-    for (var i = 0; i < map.content.length; i += 2)
-      result = result.remove(map.content[i]);
-    return result
-  },
-
-  // :: number
-  // The amount of keys in this map.
-  get size() {
-    return this.content.length >> 1
-  }
-};
-
-// :: (?union<Object, OrderedMap>) → OrderedMap
-// Return a map with the given content. If null, create an empty
-// map. If given an ordered map, return that map itself. If given an
-// object, create a map from the object's properties.
-OrderedMap.from = function(value) {
-  if (value instanceof OrderedMap) return value
-  var content = [];
-  if (value) for (var prop in value) content.push(prop, value[prop]);
-  return new OrderedMap(content)
-};
-
-var orderedmap = OrderedMap;
-
 function buildSchemaWithOptions(options, ...specs) {
-  let marks = orderedmap.from({});
-  let nodes = orderedmap.from({});
+  let marks = OrderedMap.from({});
+  let nodes = OrderedMap.from({});
   for (let spec of specs) {
     if (!(spec instanceof NodeSpecExtended || spec instanceof MarkSpecExtended)) {
       spec = new spec();
@@ -694,6 +567,20 @@ function buildSchemaWithOptions(options, ...specs) {
 
 function buildSchema(...specs) {
   return buildSchemaWithOptions({}, ...specs);
+}
+
+function isBlockMarkActive(state, type) {
+  const { from, $from, to, empty } = state.selection;
+  if (empty) {
+    for (const mark of $from.parent.marks) {
+      if (mark.type === type) {
+        return true;
+      }
+    }
+  }
+  else {
+    return state.doc.rangeHasMark(from, to, type);
+  }
 }
 
 class ToolbarItem {
@@ -742,6 +629,34 @@ class InsertMenuToolbarItem extends ToolbarItem {
     }
     return { items };
   }
+}
+
+function isMarkActive(state, type) {
+  const { from, $from, to, empty } = state.selection;
+  if (empty) {
+    return !!(type.isInSet(state.storedMarks || $from.marks()));
+  }
+  else {
+    return state.doc.rangeHasMark(from, to, type);
+  }
+}
+function anyMarkActive(state, types) {
+  const { from, $from, to, empty } = state.selection;
+  if (empty) {
+    for (const type of types) {
+      if (type.isInSet(state.storedMarks || $from.marks())) {
+        return true;
+      }
+    }
+  }
+  else {
+    for (const type of types) {
+      if (state.doc.rangeHasMark(from, to, type)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 class LinkMenuToolbarItem extends ToolbarItem {
@@ -873,6 +788,24 @@ class TextUnderlineToolbarItem extends TextToolbarItem {
   }
 }
 
+function findMarks(doc, from, to, markType, attrs) {
+  const marks = [];
+  doc.nodesBetween(from, to, node => {
+    for (let i = 0; i < node.marks.length; i++) {
+      if (node.marks[i].type === markType && (!attrs || deepEqual(node.marks[i].attrs, attrs))) {
+        marks.push(node.marks[i]);
+      }
+    }
+  });
+  return marks;
+}
+
+function findMarksInSelection(state, markType, attrs) {
+  const doc = state.doc;
+  const { from, to } = state.selection;
+  return findMarks(doc, from, to, markType, attrs);
+}
+
 defineIonxLinkEditor();
 const InsertLinkMenuItem = (view) => {
   const { schema, selection } = view.state;
@@ -906,6 +839,596 @@ const InsertLinkMenuItem = (view) => {
     }
   };
 };
+
+const filter = (predicates, cmd) => {
+  return function (state, dispatch, view) {
+    if (!Array.isArray(predicates)) {
+      predicates = [predicates];
+    }
+    if (predicates.some(pred => !pred(state, view))) {
+      return false;
+    }
+    return cmd(state, dispatch, view) || false;
+  };
+};
+
+const isEmptySelectionAtStart = (state) => {
+  const { empty, $from } = state.selection;
+  return (empty &&
+    ($from.parentOffset === 0 || state.selection instanceof GapCursor));
+};
+
+const isFirstChildOfParent = (state) => {
+  const { $from } = state.selection;
+  return $from.depth > 1
+    ? (state.selection instanceof GapCursor &&
+      $from.parentOffset === 0) ||
+      $from.index($from.depth - 1) === 0
+    : true;
+};
+
+function liftListItem(state, selection, tr) {
+  const { $from, $to } = selection;
+  const nodeType = state.schema.nodes.listItem;
+  let range = $from.blockRange($to, node => !!node.childCount &&
+    !!node.firstChild &&
+    node.firstChild.type === nodeType);
+  if (!range ||
+    range.depth < 2 ||
+    $from.node(range.depth - 1).type !== nodeType) {
+    return tr;
+  }
+  const end = range.end;
+  const endOfList = $to.end(range.depth);
+  if (end < endOfList) {
+    tr.step(new ReplaceAroundStep(end - 1, endOfList, end, endOfList, new Slice(Fragment.from(nodeType.create(undefined, range.parent.copy())), 1, 0), 1, true));
+    range = new NodeRange(tr.doc.resolve($from.pos), tr.doc.resolve(endOfList), range.depth);
+  }
+  return tr.lift(range, liftTarget(range)).scrollIntoView();
+}
+function liftFollowingList(state, from, to, rootListDepth, tr) {
+  const { listItem } = state.schema.nodes;
+  let lifted = false;
+  tr.doc.nodesBetween(from, to, (node, pos) => {
+    if (!lifted && node.type === listItem && pos > from) {
+      lifted = true;
+      let listDepth = rootListDepth + 3;
+      while (listDepth > rootListDepth + 2) {
+        const start = tr.doc.resolve(tr.mapping.map(pos));
+        listDepth = start.depth;
+        const end = tr.doc.resolve(tr.mapping.map(pos + node.textContent.length));
+        const sel = new TextSelection(start, end);
+        tr = liftListItem(state, sel, tr);
+      }
+    }
+  });
+  return tr;
+}
+
+// This will return (depth - 1) for root list parent of a list.
+const getListLiftTarget = (schema, resPos) => {
+  let target = resPos.depth;
+  const { bulletList, orderedList, listItem } = schema.nodes;
+  for (let i = resPos.depth; i > 0; i--) {
+    const node = resPos.node(i);
+    if (node.type === bulletList || node.type === orderedList) {
+      target = i;
+    }
+    if (node.type !== bulletList &&
+      node.type !== orderedList &&
+      node.type !== listItem) {
+      break;
+    }
+  }
+  return target - 1;
+};
+
+// The function will list paragraphs in selection out to level 1 below root list.
+function liftSelectionList(state, tr) {
+  const { from, to } = state.selection;
+  const { paragraph } = state.schema.nodes;
+  const listCol = [];
+  tr.doc.nodesBetween(from, to, (node, pos) => {
+    if (node.type === paragraph) {
+      listCol.push({ node, pos });
+    }
+  });
+  for (let i = listCol.length - 1; i >= 0; i--) {
+    const paragraph = listCol[i];
+    const start = tr.doc.resolve(tr.mapping.map(paragraph.pos));
+    if (start.depth > 0) {
+      let end;
+      if (paragraph.node.textContent && paragraph.node.textContent.length > 0) {
+        end = tr.doc.resolve(tr.mapping.map(paragraph.pos + paragraph.node.textContent.length));
+      }
+      else {
+        end = tr.doc.resolve(tr.mapping.map(paragraph.pos + 1));
+      }
+      const range = start.blockRange(end);
+      if (range) {
+        tr.lift(range, getListLiftTarget(state.schema, start));
+      }
+    }
+  }
+  return tr;
+}
+
+/**
+ * Removes marks from nodes in the current selection that are not supported
+ */
+const sanitizeSelectionMarks = (state) => {
+  let tr;
+  const { $from, $to } = state.tr.selection;
+  state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+    node.marks.forEach(mark => {
+      if (!node.type.allowsMarkType(mark.type)) {
+        const filteredMarks = node.marks.filter(m => m.type !== mark.type);
+        const position = pos > 0 ? pos - 1 : 0;
+        tr = (tr || state.tr).setNodeMarkup(position, undefined, node.attrs, filteredMarks);
+      }
+    });
+  });
+  return tr;
+};
+
+/**
+ * Step through block-nodes between $from and $to and returns false if a node is
+ * found that isn"t of the specified type
+ */
+function isRangeOfType(doc, $from, $to, nodeType) {
+  return (getAncestorNodesBetween(doc, $from, $to).filter(node => node.type !== nodeType).length === 0);
+}
+/**
+ * Returns all top-level ancestor-nodes between $from and $to
+ */
+function getAncestorNodesBetween(doc, $from, $to) {
+  const nodes = Array();
+  const maxDepth = findAncestorPosition(doc, $from).depth;
+  let current = doc.resolve($from.start(maxDepth));
+  while (current.pos <= $to.start($to.depth)) {
+    const depth = Math.min(current.depth, maxDepth);
+    const node = current.node(depth);
+    if (node) {
+      nodes.push(node);
+    }
+    if (depth === 0) {
+      break;
+    }
+    let next = doc.resolve(current.after(depth));
+    if (next.start(depth) >= doc.nodeSize - 2) {
+      break;
+    }
+    if (next.depth !== current.depth) {
+      next = doc.resolve(next.pos + 2);
+    }
+    if (next.depth) {
+      current = doc.resolve(next.start(next.depth));
+    }
+    else {
+      current = doc.resolve(next.end(next.depth));
+    }
+  }
+  return nodes;
+}
+/**
+ * Traverse the document until an "ancestor" is found. Any nestable block can be an ancestor.
+ */
+function findAncestorPosition(doc, pos) {
+  const nestableBlocks = ["blockquote", "bulletList", "orderedList"];
+  if (pos.depth === 1) {
+    return pos;
+  }
+  let node = pos.node(pos.depth);
+  let newPos = pos;
+  while (pos.depth >= 1) {
+    pos = doc.resolve(pos.before(pos.depth));
+    node = pos.node(pos.depth);
+    if (node && nestableBlocks.indexOf(node.type.name) !== -1) {
+      newPos = pos;
+    }
+  }
+  return newPos;
+}
+/**
+ * Compose 1 to n functions.
+ * @param func first function
+ * @param funcs additional functions
+ */
+function compose(func, ...funcs) {
+  const allFuncs = [func, ...funcs];
+  return function composed(raw) {
+    return allFuncs.reduceRight((memo, func) => func(memo), raw);
+  };
+}
+
+function findCutBefore($pos) {
+  // parent is non-isolating, so we can look across this boundary
+  if (!$pos.parent.type.spec.isolating) {
+    // search up the tree from the pos"s *parent*
+    for (let i = $pos.depth - 1; i >= 0; i--) {
+      // starting from the inner most node"s parent, find out
+      // if we"re not its first child
+      if ($pos.index(i) > 0) {
+        return $pos.doc.resolve($pos.before(i + 1));
+      }
+      if ($pos.node(i).type.spec.isolating) {
+        break;
+      }
+    }
+  }
+  return null;
+}
+
+const maxIndentation = 5;
+const deletePreviousEmptyListItem = (state, dispatch) => {
+  const { $from } = state.selection;
+  const { listItem } = state.schema.nodes;
+  const $cut = findCutBefore($from);
+  if (!$cut || !$cut.nodeBefore || !($cut.nodeBefore.type === listItem)) {
+    return false;
+  }
+  const previousListItemEmpty = $cut.nodeBefore.childCount === 1 && $cut.nodeBefore.firstChild && $cut.nodeBefore.firstChild.nodeSize <= 2;
+  if (previousListItemEmpty) {
+    const { tr } = state;
+    if (dispatch) {
+      dispatch(tr
+        .delete($cut.pos - $cut.nodeBefore.nodeSize, $from.pos)
+        .scrollIntoView());
+    }
+    return true;
+  }
+  return false;
+};
+const joinToPreviousListItem = (state, dispatch) => {
+  const { $from } = state.selection;
+  const { paragraph, listItem, codeBlock, bulletList, orderedList, } = state.schema.nodes;
+  const isGapCursorShown = state.selection instanceof GapCursor;
+  const $cutPos = isGapCursorShown ? state.doc.resolve($from.pos + 1) : $from;
+  const $cut = findCutBefore($cutPos);
+  if (!$cut) {
+    return false;
+  }
+  // see if the containing node is a list
+  if ($cut.nodeBefore &&
+    [bulletList, orderedList].indexOf($cut.nodeBefore.type) > -1) {
+    // and the node after this is a paragraph or a codeBlock
+    if ($cut.nodeAfter &&
+      ($cut.nodeAfter.type === paragraph || $cut.nodeAfter.type === codeBlock)) {
+      // find the nearest paragraph that precedes this node
+      let $lastNode = $cut.doc.resolve($cut.pos - 1);
+      while ($lastNode.parent.type !== paragraph) {
+        $lastNode = state.doc.resolve($lastNode.pos - 1);
+      }
+      let { tr } = state;
+      if (isGapCursorShown) {
+        const nodeBeforePos = findPositionOfNodeBefore(tr.selection);
+        if (typeof nodeBeforePos !== "number") {
+          return false;
+        }
+        // append the codeblock to the list node
+        const list = $cut.nodeBefore.copy($cut.nodeBefore.content.append(Fragment.from(listItem.createChecked({}, $cut.nodeAfter))));
+        tr.replaceWith(nodeBeforePos, $from.pos + $cut.nodeAfter.nodeSize, list);
+      }
+      else {
+        // take the text content of the paragraph and insert after the paragraph up until before the the cut
+        tr = state.tr.step(new ReplaceAroundStep($lastNode.pos, $cut.pos + $cut.nodeAfter.nodeSize, $cut.pos + 1, $cut.pos + $cut.nodeAfter.nodeSize - 1, state.tr.doc.slice($lastNode.pos, $cut.pos), 0, true));
+      }
+      // find out if there"s now another list following and join them
+      // as in, [list, p, list] => [list with p, list], and we want [joined list]
+      const $postCut = tr.doc.resolve(tr.mapping.map($cut.pos + $cut.nodeAfter.nodeSize));
+      if ($postCut.nodeBefore &&
+        $postCut.nodeAfter &&
+        $postCut.nodeBefore.type === $postCut.nodeAfter.type &&
+        [bulletList, orderedList].indexOf($postCut.nodeBefore.type) > -1) {
+        tr = tr.join($postCut.pos);
+      }
+      if (dispatch) {
+        dispatch(tr.scrollIntoView());
+      }
+      return true;
+    }
+  }
+  return false;
+};
+const isInsideListItem = (state) => {
+  const { $from } = state.selection;
+  const { listItem, paragraph } = state.schema.nodes;
+  if (state.selection instanceof GapCursor) {
+    return $from.parent.type === listItem;
+  }
+  return (hasParentNodeOfType(listItem)(state.selection) &&
+    $from.parent.type === paragraph);
+};
+const canToJoinToPreviousListItem = (state) => {
+  const { $from } = state.selection;
+  const { bulletList, orderedList } = state.schema.nodes;
+  const $before = state.doc.resolve($from.pos - 1);
+  let nodeBefore = $before ? $before.nodeBefore : null;
+  if (state.selection instanceof GapCursor) {
+    nodeBefore = $from.nodeBefore;
+  }
+  return (!!nodeBefore && [bulletList, orderedList].indexOf(nodeBefore.type) > -1);
+};
+const canOutdent = (state) => {
+  const { parent } = state.selection.$from;
+  const { listItem, paragraph } = state.schema.nodes;
+  if (state.selection instanceof GapCursor) {
+    return parent.type === listItem;
+  }
+  return (parent.type === paragraph && hasParentNodeOfType(listItem)(state.selection));
+};
+baseCommand.chainCommands(
+// if we"re at the start of a list item, we need to either backspace
+// directly to an empty list item above, or outdent this node
+filter([
+  isEmptySelectionAtStart,
+  // list items might have multiple paragraphs; only do this at the first one
+  isFirstChildOfParent,
+  canOutdent,
+], baseCommand.chainCommands(deletePreviousEmptyListItem, outdentList())), 
+// if we"re just inside a paragraph node (or gapcursor is shown) and backspace, then try to join
+// the text to the previous list item, if one exists
+filter([isEmptySelectionAtStart, canToJoinToPreviousListItem], joinToPreviousListItem));
+/**
+ * Merge closest bullet list blocks into one
+ */
+function mergeLists(listItem, range) {
+  return (command) => {
+    return (state, dispatch) => command(state, tr => {
+      /* we now need to handle the case that we lifted a sublist out,
+       * and any listItems at the current level get shifted out to
+       * their own new list; e.g.:
+       *
+       * unorderedList
+       *  listItem(A)
+       *  listItem
+       *    unorderedList
+       *      listItem(B)
+       *  listItem(C)
+       *
+       * becomes, after unindenting the first, top level listItem, A:
+       *
+       * content of A
+       * unorderedList
+       *  listItem(B)
+       * unorderedList
+       *  listItem(C)
+       *
+       * so, we try to merge these two lists if they"re of the same type, to give:
+       *
+       * content of A
+       * unorderedList
+       *  listItem(B)
+       *  listItem(C)
+       */
+      const $start = state.doc.resolve(range.start);
+      const $end = state.doc.resolve(range.end);
+      const $join = tr.doc.resolve(tr.mapping.map(range.end - 1));
+      if ($join.nodeBefore &&
+        $join.nodeAfter &&
+        $join.nodeBefore.type === $join.nodeAfter.type) {
+        if ($end.nodeAfter &&
+          $end.nodeAfter.type === listItem &&
+          $end.parent.type === $start.parent.type) {
+          tr.join($join.pos);
+        }
+      }
+      if (dispatch) {
+        dispatch(tr.scrollIntoView());
+      }
+    });
+  };
+}
+function outdentList() {
+  return function (state, dispatch) {
+    const { listItem } = state.schema.nodes;
+    const { $from, $to } = state.selection;
+    if (isInsideListItem(state)) {
+      // if we"re backspacing at the start of a list item, unindent it
+      // take the the range of nodes we might be lifting
+      // the predicate is for when you"re backspacing a top level list item:
+      // we don"t want to go up past the doc node, otherwise the range
+      // to clear will include everything
+      const range = $from.blockRange($to, node => node.childCount > 0 && node.firstChild && node.firstChild.type === listItem);
+      if (!range) {
+        return false;
+      }
+      return compose(mergeLists(listItem, range), // 2. Check if I need to merge nearest list
+      baseListCommand.liftListItem)(listItem)(state, dispatch);
+    }
+    return false;
+  };
+}
+/**
+ * Check if we can sink the list.
+ *
+ * @returns true if we can sink the list, false if we reach the max indentation level
+ */
+function canSink(initialIndentationLevel, state) {
+  /*
+      - Keep going forward in document until indentation of the node is < than the initial
+      - If indentation is EVER > max indentation, return true and don"t sink the list
+      */
+  let currentIndentationLevel;
+  let currentPos = state.tr.selection.$to.pos;
+  do {
+    const resolvedPos = state.doc.resolve(currentPos);
+    currentIndentationLevel = numberNestedLists(resolvedPos, state.schema.nodes);
+    if (currentIndentationLevel > maxIndentation) {
+      // Cancel sink list.
+      // If current indentation less than the initial, it won"t be
+      // larger than the max, and the loop will terminate at end of this iteration
+      return false;
+    }
+    currentPos++;
+  } while (currentIndentationLevel >= initialIndentationLevel);
+  return true;
+}
+function indentList() {
+  return function (state, dispatch) {
+    const { listItem } = state.schema.nodes;
+    if (isInsideListItem(state)) {
+      // Record initial list indentation
+      const initialIndentationLevel = numberNestedLists(state.selection.$from, state.schema.nodes);
+      if (canSink(initialIndentationLevel, state)) {
+        compose(baseListCommand.sinkListItem)(listItem)(state, dispatch);
+      }
+      return true;
+    }
+    return false;
+  };
+}
+function liftListItems() {
+  return function (state, dispatch) {
+    const { tr } = state;
+    const { $from, $to } = state.selection;
+    tr.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+      // Following condition will ensure that block types paragraph, heading, codeBlock, blockquote, panel are lifted.
+      // isTextblock is true for paragraph, heading, codeBlock.
+      if (node.isTextblock ||
+        node.type.name === "blockquote" ||
+        node.type.name === "panel") {
+        const sel = new NodeSelection(tr.doc.resolve(tr.mapping.map(pos)));
+        const range = sel.$from.blockRange(sel.$to);
+        if (!range || sel.$from.parent.type !== state.schema.nodes.listItem) {
+          return false;
+        }
+        const target = range && liftTarget(range);
+        if (target === undefined || target === null) {
+          return false;
+        }
+        tr.lift(range, target);
+      }
+      return;
+    });
+    if (dispatch) {
+      dispatch(tr);
+    }
+    return true;
+  };
+}
+/**
+ * Sometimes a selection in the editor can be slightly offset, for example:
+ * it"s possible for a selection to start or end at an empty node at the very end of
+ * a line. This isn"t obvious by looking at the editor and it"s likely not what the
+ * user intended - so we need to adjust the selection a bit in scenarios like that.
+ */
+function adjustSelectionInList(doc, selection) {
+  const { $from, $to } = selection;
+  const isSameLine = $from.pos === $to.pos;
+  let startPos = $from.pos;
+  const endPos = $to.pos;
+  if (isSameLine && startPos === doc.nodeSize - 3) {
+    // Line is empty, don"t do anything
+    return selection;
+  }
+  // Selection started at the very beginning of a line and therefor points to the previous line.
+  if ($from.nodeBefore && !isSameLine) {
+    startPos++;
+    let node = doc.nodeAt(startPos);
+    while (!node || (node && !node.isText)) {
+      startPos++;
+      node = doc.nodeAt(startPos);
+    }
+  }
+  if (endPos === startPos) {
+    return new TextSelection(doc.resolve(startPos));
+  }
+  return new TextSelection(doc.resolve(startPos), doc.resolve(endPos));
+}
+// Get the depth of the nearest ancestor list
+const rootListDepth = (pos, nodes) => {
+  const { bulletList, orderedList, listItem } = nodes;
+  let depth;
+  for (let i = pos.depth - 1; i > 0; i--) {
+    const node = pos.node(i);
+    if (node.type === bulletList || node.type === orderedList) {
+      depth = i;
+    }
+    if (node.type !== bulletList &&
+      node.type !== orderedList &&
+      node.type !== listItem) {
+      break;
+    }
+  }
+  return depth;
+};
+// Returns the number of nested lists that are ancestors of the given selection
+const numberNestedLists = (resolvedPos, nodes) => {
+  const { bulletList, orderedList } = nodes;
+  let count = 0;
+  for (let i = resolvedPos.depth - 1; i > 0; i--) {
+    const node = resolvedPos.node(i);
+    if (node.type === bulletList || node.type === orderedList) {
+      count += 1;
+    }
+  }
+  return count;
+};
+const toggleList = (state, dispatch, view, listType) => {
+  const { selection } = state;
+  const fromNode = selection.$from.node(selection.$from.depth - 2);
+  const endNode = selection.$to.node(selection.$to.depth - 2);
+  if (!fromNode ||
+    fromNode.type.name !== listType ||
+    (!endNode || endNode.type.name !== listType)) {
+    return toggleListCommand(listType)(state, dispatch, view);
+  }
+  else {
+    const depth = rootListDepth(selection.$to, state.schema.nodes);
+    let tr = liftFollowingList(state, selection.$to.pos, selection.$to.end(depth), depth || 0, state.tr);
+    tr = liftSelectionList(state, tr);
+    dispatch(tr);
+    return true;
+  }
+};
+/**
+ * Check of is selection is inside a list of the specified type
+ */
+function isInsideList(state, listType) {
+  const { $from } = state.selection;
+  const parent = $from.node(-2);
+  const grandgrandParent = $from.node(-3);
+  return ((parent && parent.type === state.schema.nodes[listType]) ||
+    (grandgrandParent && grandgrandParent.type === state.schema.nodes[listType]));
+}
+function toggleListCommand(listType) {
+  return function (state, dispatch, view) {
+    if (dispatch) {
+      dispatch(state.tr.setSelection(adjustSelectionInList(state.doc, state.selection)));
+    }
+    if (!view) {
+      return false;
+    }
+    state = view.state;
+    const { $from, $to } = state.selection;
+    const isRangeOfSingleType = isRangeOfType(state.doc, $from, $to, state.schema.nodes[listType]);
+    if (isInsideList(state, listType) && isRangeOfSingleType) {
+      // Untoggles list
+      return liftListItems()(state, dispatch);
+    }
+    else {
+      // Converts list type e.g. bullet_list -> ordered_list if needed
+      if (!isRangeOfSingleType) {
+        liftListItems()(state, dispatch);
+        state = view.state;
+      }
+      // Remove any invalid marks that are not supported
+      const tr = sanitizeSelectionMarks(state);
+      if (tr) {
+        if (dispatch) {
+          dispatch(tr);
+        }
+        state = view.state;
+      }
+      // Wraps selection in list
+      return wrapInList(state.schema.nodes[listType])(state, dispatch);
+    }
+  };
+}
+function wrapInList(nodeType) {
+  return baseCommand.autoJoin(baseListCommand.wrapInList(nodeType), (before, after) => before.type === after.type && before.type === nodeType);
+}
 
 const InsertListMenuItems = () => {
   return [
@@ -1184,7 +1707,12 @@ let HtmlEditor = class extends HTMLElement$1 {
     this.view = new EditorView(container[0], {
       state,
       dispatchTransaction: transaction => this.onEditorTransaction(transaction),
-      handleScrollToSelection: view => this.handleEditorScroll(view)
+      handleScrollToSelection: view => this.handleEditorScroll(view),
+      nodeViews: Object.assign({}, ...Object.values(this.schema.nodes).filter(node => node.spec instanceof NodeSpecExtended && node.spec.render)
+        .map(node => ({ [node.name]: node.spec.render.bind(node.spec) })), ...Object.values(this.schema.marks)
+        .filter(mark => mark.spec instanceof MarkSpecExtended && mark.spec.render)
+        .map(mark => mark.spec)
+        .map(mark => ({ [mark.name]: mark.render.bind(mark) })))
     });
     this.applyProseMirrorStatus();
   }
@@ -1263,6 +1791,68 @@ let HtmlEditor = class extends HTMLElement$1 {
   }; }
   static get style() { return htmlEditorCss; }
 };
+
+/**
+ * Toggles block mark based on the return type of `getAttrs`.
+ * This is similar to ProseMirror"s `getAttrs` from `AttributeSpec`
+ * return `false` to remove the mark.
+ * return `undefined for no-op.
+ * return an `object` to update the mark.
+ */
+const toggleBlockMark = (markType, getAttrs, allowedBlocks) => (state, dispatch) => {
+  let markApplied = false;
+  const tr = state.tr;
+  const toggleBlockMarkOnRange = (from, to, tr) => {
+    state.doc.nodesBetween(from, to, (node, pos, parent) => {
+      if (!node.type.isBlock) {
+        return false;
+      }
+      if ((!allowedBlocks || (Array.isArray(allowedBlocks) ? allowedBlocks.indexOf(node.type) > -1 : allowedBlocks(state.schema, node, parent))) &&
+        parent.type.allowsMarkType(markType)) {
+        const oldMarks = node.marks.filter(mark => mark.type === markType);
+        const prevAttrs = oldMarks.length ? oldMarks[0].attrs : undefined;
+        const newAttrs = getAttrs(prevAttrs, node);
+        if (newAttrs !== undefined) {
+          tr.setNodeMarkup(pos, node.type, node.attrs, node.marks
+            .filter(mark => !markType.excludes(mark.type))
+            .concat(newAttrs === false ? [] : markType.create(newAttrs)));
+          markApplied = true;
+        }
+      }
+      return;
+    });
+  };
+  const { from, to } = state.selection;
+  toggleBlockMarkOnRange(from, to, tr);
+  if (markApplied && tr.docChanged) {
+    if (dispatch) {
+      dispatch(tr.scrollIntoView());
+    }
+    return true;
+  }
+  return false;
+};
+
+const changeAlignment = (align) => (state, dispatch) => {
+  const { nodes: { paragraph, heading }, marks: { alignment } } = state.schema;
+  return toggleBlockMark(alignment, () => (!align ? undefined : align === "left" ? false : { align }), [paragraph, heading])(state, dispatch);
+};
+
+function findBlockMarks(state, markType) {
+  const marks = [];
+  const { from, to } = state.selection;
+  state.doc.nodesBetween(from, to, (node, _pos, _parent) => {
+    if (!node.type.isBlock) {
+      return false;
+    }
+    for (const mark of node.marks) {
+      if (mark.type === markType) {
+        marks.push(mark);
+      }
+    }
+  });
+  return marks;
+}
 
 class Alignment extends Enum {
   constructor(name) {
@@ -1345,6 +1935,13 @@ let InsertMenu = class extends HTMLElement$1 {
   }
   static get style() { return insertMenuCss; }
 };
+
+function findNodeStartEnd(doc, pos) {
+  const $pos = doc.resolve(pos);
+  const start = pos - $pos.textOffset;
+  const end = start + $pos.parent.child($pos.index()).nodeSize;
+  return { start, end };
+}
 
 const linkMenuCss = ":host{overflow:initial !important}:host ion-list{margin:0;padding:0}:host ion-list ion-item{--border-width:0 0 var(--ionx-border-width) 0;--inner-border-width:0;--inner-padding-start:0;--inner-padding-end:0;--padding-start:16px;--padding-end:16px}:host ion-list>ion-item.item:last-child,:host ion-list>*:last-child>ion-item.item:last-child{--border-width:0}:host ion-list ion-item>[slot=start]{margin-right:16px;margin-left:0px}:host ion-list ion-item.item ion-label{white-space:normal}:host ion-list ion-item.item ion-label small{display:block;line-height:1}:host ion-list ion-item-divider.item{--background:transparent;--color:rgb(var(--ion-text-color-rgb), .5);--padding-start:16px;--padding-end:16px;--padding-top:20px;--inner-border-width:0;--border-width:0;font-size:calc(var(--ionx-default-font-size, 16px) * 0.75);font-weight:500;border-bottom:var(--ionx-border-width) solid var(--ion-border-color);text-transform:uppercase;letter-spacing:1px}:host ion-list ion-icon[slot=start],:host ion-list ion-icon[slot=end]{font-size:1.2em}:host ion-list ion-icon[slot=start]{margin-right:8px}:host ion-list ion-icon[slot=end]{margin-right:0}";
 
@@ -1446,7 +2043,7 @@ let ListMenu = class extends HTMLElement$1 {
     });
   }
   render() {
-    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggleList("bulletList") }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Bulleted list`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/list-bulleted.svg", slot: "start" }), this.activeBulletList && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggleList("orderedList") }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Numbered list`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/list-numbered.svg", slot: "start" }), this.activeNumberedList && h("ion-icon", { name: "checkmark", slot: "end" })), (this.activeNumberedList || this.activeBulletList) && h(Fragment, null, h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Indent`)), h("ion-item", { button: true, detail: false, onClick: () => this.level(-1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Decrease indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-decrease.svg", slot: "start" })), h("ion-item", { button: true, detail: false, onClick: () => this.level(1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Increase indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-increase.svg", slot: "start" }))));
+    return h("ion-list", { lines: "full" }, h("ion-item", { button: true, detail: false, onClick: () => this.toggleList("bulletList") }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Bulleted list`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/list-bulleted.svg", slot: "start" }), this.activeBulletList && h("ion-icon", { name: "checkmark", slot: "end" })), h("ion-item", { button: true, detail: false, onClick: () => this.toggleList("orderedList") }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Numbered list`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/list-numbered.svg", slot: "start" }), this.activeNumberedList && h("ion-icon", { name: "checkmark", slot: "end" })), (this.activeNumberedList || this.activeBulletList) && h(Fragment$1, null, h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Indent`)), h("ion-item", { button: true, detail: false, onClick: () => this.level(-1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Decrease indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-decrease.svg", slot: "start" })), h("ion-item", { button: true, detail: false, onClick: () => this.level(1) }, h("ion-label", null, intl.message `ionx/HtmlEditor#listMenu/Increase indent`), h("ion-icon", { src: "/assets/ionx.HtmlEditor/icons/indent-increase.svg", slot: "start" }))));
   }
   static get style() { return listMenuCss; }
 };
@@ -1501,6 +2098,58 @@ let ParagraphMenu = class extends HTMLElement$1 {
   }
   static get style() { return paragraphMenuCss; }
 };
+
+function markApplies(doc, from, to, type) {
+  let applies = false;
+  doc.nodesBetween(from, to, (node, _pos, parent) => {
+    if (applies) {
+      return false;
+    }
+    applies = node.isInline && parent.type.allowsMarkType(type);
+  });
+  return applies;
+}
+// return true iff all nodes in range have the mark with the same attrs
+function rangeHasMark(doc, from, to, type, attrs) {
+  let hasMark = null;
+  doc.nodesBetween(from, to, node => {
+    for (let i = 0; i < node.marks.length; i++) {
+      const markMatch = node.marks[i].type === type && (!attrs || shallowEqual(node.marks[i].attrs, attrs));
+      hasMark = (markMatch && (hasMark === null || hasMark === true));
+    }
+    return hasMark;
+  });
+  return !!hasMark;
+}
+function toggleInlineMark(markType, attrs) {
+  return function (state, dispatch) {
+    const { empty, from, to, $from } = state.selection;
+    if (!markApplies(state.doc, from, to, markType)) {
+      console.log("not applies");
+      return false;
+    }
+    if (dispatch) {
+      if (empty) {
+        const markInSet = markType.isInSet(state.storedMarks || $from.marks());
+        if (markInSet && (!attrs || shallowEqual(markInSet.attrs, attrs))) {
+          dispatch(state.tr.removeStoredMark(markType));
+        }
+        else {
+          dispatch(state.tr.addStoredMark(markType.create(attrs)));
+        }
+      }
+      else {
+        if (rangeHasMark(state.doc, from, to, markType, attrs)) {
+          dispatch(state.tr.removeMark(from, to, markType).scrollIntoView());
+        }
+        else {
+          dispatch(state.tr.addMark(from, to, markType.create(attrs)).scrollIntoView());
+        }
+      }
+    }
+    return true;
+  };
+}
 
 class FontSize extends Enum {
   constructor(name, css) {
@@ -1624,7 +2273,7 @@ let TextMenu = class extends HTMLElement$1 {
     if (!this.marks) {
       return;
     }
-    return h("ion-list", { lines: "full" }, simpleMarks.map(mark => this.marks.includes(mark.name) && h("ion-item", { button: true, detail: false, onClick: () => this.toggle(mark.name) }, h("ion-label", { style: mark.style }, translate(intl, mark.label), mark.sublabel && h("span", { innerHTML: mark.sublabel })), this.activeMarks.includes(mark.name) && h("ion-icon", { name: "checkmark", slot: "end" }))), this.marks.includes("textForegroundColor") && h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeForegroundColor || "#000000", onInput: ev => this.toggleColor("textForegroundColor", ev.target.value) }), this.activeForegroundColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor("textForegroundColor") }, h("ion-icon", { name: "backspace", slot: "icon-only", size: "small" }))), this.marks.includes("textBackgroundColor") && h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Background color`), h("input", { slot: "end", type: "color", value: this.activeBackgroundColor || "#000000", onInput: ev => this.toggleColor("textBackgroundColor", ev.target.value) }), this.activeBackgroundColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor("textBackgroundColor") }, h("ion-icon", { name: "backspace", slot: "icon-only", size: "small" }))), this.marks.includes("fontSize") && h(Fragment, null, h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" })))));
+    return h("ion-list", { lines: "full" }, simpleMarks.map(mark => this.marks.includes(mark.name) && h("ion-item", { button: true, detail: false, onClick: () => this.toggle(mark.name) }, h("ion-label", { style: mark.style }, translate(intl, mark.label), mark.sublabel && h("span", { innerHTML: mark.sublabel })), this.activeMarks.includes(mark.name) && h("ion-icon", { name: "checkmark", slot: "end" }))), this.marks.includes("textForegroundColor") && h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Text color`), h("input", { slot: "end", type: "color", value: this.activeForegroundColor || "#000000", onInput: ev => this.toggleColor("textForegroundColor", ev.target.value) }), this.activeForegroundColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor("textForegroundColor") }, h("ion-icon", { name: "backspace", slot: "icon-only", size: "small" }))), this.marks.includes("textBackgroundColor") && h("ion-item", { detail: false }, h("ion-label", null, intl.message `ionx/HtmlEditor#Background color`), h("input", { slot: "end", type: "color", value: this.activeBackgroundColor || "#000000", onInput: ev => this.toggleColor("textBackgroundColor", ev.target.value) }), this.activeBackgroundColor && h("ion-button", { slot: "end", fill: "clear", size: "small", onClick: () => this.toggleColor("textBackgroundColor") }, h("ion-icon", { name: "backspace", slot: "icon-only", size: "small" }))), this.marks.includes("fontSize") && h(Fragment$1, null, h("ion-item-divider", null, h("ion-label", null, intl.message `ionx/HtmlEditor#Text size`)), h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize() }, h("ion-label", null, intl.message `ionx/HtmlEditor#Default|text size`)), FontSize.values().map(size => h("ion-item", { button: true, detail: false, onClick: () => this.toggleFontSize(size) }, h("ion-label", { style: { fontSize: size.css } }, intl.message(size.label)), this.activeFontSize === size && h("ion-icon", { name: "checkmark", slot: "end" })))));
   }
   static get style() { return textMenuCss; }
 };

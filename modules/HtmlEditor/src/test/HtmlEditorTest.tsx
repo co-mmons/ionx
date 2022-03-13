@@ -35,6 +35,7 @@ import {
     TextMenuToolbarItem,
     TextUnderlineToolbarItem
 } from "../toolbar";
+import {TestCustomRenderNode} from "./TestCustomRenderNode";
 
 @Component({
     tag: "ionx-html-editor-test"
@@ -42,6 +43,7 @@ import {
 export class HtmlEditorTest {
 
     schema1 = buildSchema(
+        new TestCustomRenderNode(),
         new ParagraphNode(), new StrongMark(),
         new FontSizeMark(), new LinkMark(),
         new EmphasisMark(), new AlignmentMark(),
@@ -62,7 +64,7 @@ export class HtmlEditorTest {
 
     private value1 = `
 <p>
-Lorem <app-template-string props="{}"></app-template-string> ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ipsum risus, pharetra id odio dictum, eleifend interdum erat. Curabitur vitae vulputate ex, scelerisque dapibus sem. Morbi facilisis dolor mi, quis volutpat erat aliquet et. Curabitur in neque neque. Quisque sollicitudin lacus metus, non convallis risus tristique ut. Praesent rhoncus gravida elementum. Proin faucibus in nisl ut suscipit. Morbi neque augue, imperdiet a eleifend eu, laoreet fringilla augue. Praesent vestibulum condimentum eros, ac consequat purus.
+Lorem <ionx-html-editor-custom-render props="test"></ionx-html-editor-custom-render> ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ipsum risus, pharetra id odio dictum, eleifend interdum erat. Curabitur vitae vulputate ex, scelerisque dapibus sem. Morbi facilisis dolor mi, quis volutpat erat aliquet et. Curabitur in neque neque. Quisque sollicitudin lacus metus, non convallis risus tristique ut. Praesent rhoncus gravida elementum. Proin faucibus in nisl ut suscipit. Morbi neque augue, imperdiet a eleifend eu, laoreet fringilla augue. Praesent vestibulum condimentum eros, ac consequat purus.
 </p>
 <p>
 Vivamus non aliquet sem. <a href="https://onet.pl" target="_blank">Duis</a> quis dolor ut lectus sollicitudin fringilla id sed dui. Suspendisse sit amet consequat justo. In hac habitasse platea dictumst. Pellentesque augue nisl, consectetur sagittis nunc eu, luctus lobortis nisl. Donec quam eros, auctor et consectetur ac, venenatis ut odio. Donec malesuada ullamcorper ipsum quis pretium. Duis lacinia efficitur leo ut ultrices. Vivamus tincidunt elit vitae facilisis lobortis. Nunc ac sapien eget leo consectetur mattis. Mauris in rutrum justo, ut dictum augue.
