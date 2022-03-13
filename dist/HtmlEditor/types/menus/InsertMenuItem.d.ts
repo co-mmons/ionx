@@ -5,7 +5,7 @@ export interface InsertMenuItem {
   iconName?: string;
   iconSrc?: string;
   label: string | MessageRef;
-  sublabel: string | MessageRef;
+  sublabel?: string | MessageRef;
   disabled?: boolean;
   handler: (view?: EditorView<Schema>) => any | Promise<any>;
 }
