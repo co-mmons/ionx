@@ -149,7 +149,7 @@ export class Toolbar {
 
     render() {
 
-        const closeButton = this.button === "close" && (!this.element.closest("ionx-dialog") && matchesMediaBreakpoint(this, "md")) ? "close" : undefined;
+        const closeButton = this.button === "close" && (this.element.closest("ionx-dialog") || matchesMediaBreakpoint(this, "md")) ? "close" : undefined;
 
         return <Host class={{"ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse"}}>
             <ion-toolbar ref={el => this.toolbarElement = el}>
