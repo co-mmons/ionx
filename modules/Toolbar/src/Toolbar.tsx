@@ -46,6 +46,8 @@ export class Toolbar {
 
     toolbarElement: HTMLElement;
 
+    viewportType: "window" | "modal" | "dialog" | "popover";
+
     get contentElement() {
         return this.element.closest("ion-header")?.parentElement?.querySelector<HTMLElement & ionic.IonContent>("ion-content");
     }
@@ -137,6 +139,15 @@ export class Toolbar {
             this.enableCollapsibleTitle();
         }
 
+        if (this.element.closest("ionx-dialog")) {
+            this.viewportType = "dialog";
+        } else if (this.element.closest("ion-modal")) {
+            this.viewportType = "modal";
+        } else if (this.element.closest("ion-popover")) {
+            this.viewportType = "popover";
+        } else {
+            this.viewportType = "window";
+        }
     }
 
     disconnectedCallback() {
@@ -149,7 +160,7 @@ export class Toolbar {
 
     render() {
 
-        const closeButton = this.button === "close" && (this.element.closest("ionx-dialog") || matchesMediaBreakpoint(this, "md")) ? "close" : undefined;
+        const closeIcon = this.button === "close" && (this.viewportType === "dialog" || matchesMediaBreakpoint(this, "md")) ? "close" : undefined;
 
         return <Host class={{"ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse"}}>
             <ion-toolbar ref={el => this.toolbarElement = el}>
@@ -158,9 +169,9 @@ export class Toolbar {
 
                 {(this.button === "back" || this.button === "close") && <ion-back-button
                     slot="start"
-                    style={{display: closeButton ? "inline-block" : null}}
-                    icon={closeButton ? "close" : undefined}
-                    onClick={ev => closeButton && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
+                    style={{display: closeIcon ? "inline-block" : null}}
+                    icon={closeIcon ? "close" : undefined}
+                    onClick={ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
                     defaultHref={(this.button === "back" && this.defaultBackHref) || null}/>}
 
                 <div ionx--inner>
