@@ -149,6 +149,8 @@ export class Toolbar {
 
     render() {
 
+        const closeButton = this.button === "close" && (!this.element.closest("ionx-dialog") && matchesMediaBreakpoint(this, "md")) ? "close" : undefined;
+
         return <Host class={{"ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse"}}>
             <ion-toolbar ref={el => this.toolbarElement = el}>
 
@@ -156,9 +158,9 @@ export class Toolbar {
 
                 {(this.button === "back" || this.button === "close") && <ion-back-button
                     slot="start"
-                    style={{display: this.button === "close" ? "inline-block" : null}}
-                    icon={this.button === "close" && matchesMediaBreakpoint(this, "md") ? "close" : undefined}
-                    onClick={ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
+                    style={{display: closeButton ? "inline-block" : null}}
+                    icon={closeButton ? "close" : undefined}
+                    onClick={ev => closeButton && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
                     defaultHref={(this.button === "back" && this.defaultBackHref) || null}/>}
 
                 <div ionx--inner>
