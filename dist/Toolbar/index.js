@@ -93,18 +93,6 @@ let Toolbar = class extends HTMLElement {
     if (this.titleWrap === "collapse") {
       this.enableCollapsibleTitle();
     }
-    if (this.element.closest("ionx-dialog")) {
-      this.viewportType = "dialog";
-    }
-    else if (this.element.closest("ion-modal")) {
-      this.viewportType = "modal";
-    }
-    else if (this.element.closest("ion-popover")) {
-      this.viewportType = "popover";
-    }
-    else {
-      this.viewportType = "window";
-    }
   }
   disconnectedCallback() {
     this.disableCollapsibleTitle();
@@ -113,7 +101,7 @@ let Toolbar = class extends HTMLElement {
     this.breakpoints = undefined;
   }
   render() {
-    const closeIcon = this.button === "close" && (this.viewportType === "dialog" || matchesMediaBreakpoint(this, "md")) ? "close" : undefined;
+    const closeIcon = this.button === "close" && matchesMediaBreakpoint(this, "md") ? "close" : undefined;
     return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-back-button", { slot: "start", style: { display: closeIcon ? "inline-block" : null }, icon: closeIcon ? "close" : undefined, onClick: ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()], defaultHref: (this.button === "back" && this.defaultBackHref) || null }), h("div", { "ionx--inner": true }, h("ion-buttons", null, h("slot", { name: "action" })), h("h1", null, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
   }
   get element() { return this; }

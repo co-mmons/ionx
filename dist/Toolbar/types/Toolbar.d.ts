@@ -13,7 +13,6 @@ export declare class Toolbar {
   titleWrapChanged(niu: ToolbarTitleWrap, old: ToolbarTitleWrap): void;
   breakpoints: WidthBreakpointsContainer;
   toolbarElement: HTMLElement;
-  viewportType: "window" | "modal" | "dialog" | "popover";
   get contentElement(): HTMLElement & ionic.IonContent;
   unlistenScroll: EventUnlisten;
   contentScrolled(scrollElement: HTMLElement): Promise<void>;

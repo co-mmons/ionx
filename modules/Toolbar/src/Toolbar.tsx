@@ -1,5 +1,5 @@
-import type {Components as ionic} from "@ionic/core";
 import {waitTill} from "@co.mmons/js-utils/core";
+import type {Components as ionic} from "@ionic/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten, matchesMediaBreakpoint} from "ionx/utils";
 import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
@@ -45,8 +45,6 @@ export class Toolbar {
     breakpoints: WidthBreakpointsContainer;
 
     toolbarElement: HTMLElement;
-
-    viewportType: "window" | "modal" | "dialog" | "popover";
 
     get contentElement() {
         return this.element.closest("ion-header")?.parentElement?.querySelector<HTMLElement & ionic.IonContent>("ion-content");
@@ -138,16 +136,6 @@ export class Toolbar {
         if (this.titleWrap === "collapse") {
             this.enableCollapsibleTitle();
         }
-
-        if (this.element.closest("ionx-dialog")) {
-            this.viewportType = "dialog";
-        } else if (this.element.closest("ion-modal")) {
-            this.viewportType = "modal";
-        } else if (this.element.closest("ion-popover")) {
-            this.viewportType = "popover";
-        } else {
-            this.viewportType = "window";
-        }
     }
 
     disconnectedCallback() {
@@ -160,7 +148,7 @@ export class Toolbar {
 
     render() {
 
-        const closeIcon = this.button === "close" && (this.viewportType === "dialog" || matchesMediaBreakpoint(this, "md")) ? "close" : undefined;
+        const closeIcon = this.button === "close" && matchesMediaBreakpoint(this, "md") ? "close" : undefined;
 
         return <Host class={{"ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse"}}>
             <ion-toolbar ref={el => this.toolbarElement = el}>
