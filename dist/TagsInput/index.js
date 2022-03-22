@@ -1,6 +1,8 @@
 import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
+const TagsInputTag = "ionx-tags-input";
+
 const tagsInputCss = ".sc-ionx-tags-input-h{display:block}.sc-ionx-tags-input-h ion-chip.sc-ionx-tags-input{margin:4px 4px 4px 0;height:30px}.sc-ionx-tags-input-h ion-chip.chip-disabled.sc-ionx-tags-input{opacity:1}.sc-ionx-tags-input-h ion-input.sc-ionx-tags-input{--padding-start:0;--padding-end:0}.item-label-stacked.sc-ionx-tags-input-h,.item-label-stacked .sc-ionx-tags-input-h{width:100%}ionx-form-field [slot-container=default]>.sc-ionx-tags-input-h{margin-left:16px;margin-right:16px;min-height:38px}";
 
 let TagsInput = class extends HTMLElement {
@@ -162,5 +164,6 @@ const defineIonxTagsInput = (opts) => {
     });
   }
 };
+defineIonxTagsInput();
 
-export { IonxTagsInput, defineIonxTagsInput };
+export { IonxTagsInput, TagsInputTag, defineIonxTagsInput };

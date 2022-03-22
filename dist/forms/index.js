@@ -908,6 +908,9 @@ function matchPattern(pattern, message) {
   };
 }
 
+const FormField$1 = "ionx-form-field";
+const FormItem$1 = "ionx-form-item";
+
 let FormControllerComponent = class extends HTMLElement {
   constructor() {
     super();
@@ -1049,5 +1052,6 @@ const defineIonxForms = (opts) => {
     });
   }
 };
+defineIonxForms();
 
-export { FormController, FormFieldLabelButton, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };
+export { FormController, FormField$1 as FormField, FormFieldLabelButton, FormItem$1 as FormItem, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };

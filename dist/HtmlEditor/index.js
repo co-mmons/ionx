@@ -1505,6 +1505,8 @@ const undoRedoKeymap = {
   ...(isApple ? { "Mod-y": redo } : {})
 };
 
+const HtmlEditor$1 = "ionx-html-editor";
+
 let loaded = [];
 async function importJson() {
   const locale = intl.locale;
@@ -2416,5 +2418,6 @@ const defineIonxHtmlEditor = (opts) => {
     });
   }
 };
+defineIonxHtmlEditor();
 
-export { AlignmentMark, AlignmentToolbarItem, BlockquoteNode, BulletListNode, DocNode, EmphasisMark, FontSizeMark, HardBreakNode, HeadingNode, HorizontalRuleNode, InsertLinkMenuItem, InsertListMenuItems, InsertMenuToolbarItem, IonxHtmlEditor, IonxHtmlEditorAlignmentMenu, IonxHtmlEditorInsertMenu, IonxHtmlEditorLinkMenu, IonxHtmlEditorListMenu, IonxHtmlEditorParagraphMenu, IonxHtmlEditorTextMenu, IonxHtmlEditorToolbar, LinkMark, LinkMenuToolbarItem, ListItemNode, ListMenuToolbarItem, MarkSpecExtended, NodeSpecExtended, OrderedListNode, ParagraphMenuToolbarItem, ParagraphNode, StrikethroughMark, StrongMark, SubscriptMark, SuperscriptMark, TextBackgroundColorMark, TextEmphasisToolbarItem, TextForegroundColorMark, TextMenuToolbarItem, TextNode, TextStrikethroughToolbarItem, TextStrongToolbarItem, TextSubscriptToolbarItem, TextSuperscriptToolbarItem, TextUnderlineToolbarItem, ToolbarItem, UnderlineMark, baseKeymap, buildSchema, buildSchemaWithOptions, defineIonxHtmlEditor, enterKeymap };
+export { AlignmentMark, AlignmentToolbarItem, BlockquoteNode, BulletListNode, DocNode, EmphasisMark, FontSizeMark, HardBreakNode, HeadingNode, HorizontalRuleNode, HtmlEditor$1 as HtmlEditor, InsertLinkMenuItem, InsertListMenuItems, InsertMenuToolbarItem, IonxHtmlEditor, IonxHtmlEditorAlignmentMenu, IonxHtmlEditorInsertMenu, IonxHtmlEditorLinkMenu, IonxHtmlEditorListMenu, IonxHtmlEditorParagraphMenu, IonxHtmlEditorTextMenu, IonxHtmlEditorToolbar, LinkMark, LinkMenuToolbarItem, ListItemNode, ListMenuToolbarItem, MarkSpecExtended, NodeSpecExtended, OrderedListNode, ParagraphMenuToolbarItem, ParagraphNode, StrikethroughMark, StrongMark, SubscriptMark, SuperscriptMark, TextBackgroundColorMark, TextEmphasisToolbarItem, TextForegroundColorMark, TextMenuToolbarItem, TextNode, TextStrikethroughToolbarItem, TextStrongToolbarItem, TextSubscriptToolbarItem, TextSuperscriptToolbarItem, TextUnderlineToolbarItem, ToolbarItem, UnderlineMark, baseKeymap, buildSchema, buildSchemaWithOptions, defineIonxHtmlEditor, enterKeymap };

@@ -14,6 +14,7 @@ export const config: Config = {
             dir: "../../dist/forms",
             defineFunctionName: "defineIonxForms",
             includeGlobalScripts: false,
+            autoDefineCustomElements: true,
             external: [
                 "scroll-into-view",
                 ...defaultExternals,

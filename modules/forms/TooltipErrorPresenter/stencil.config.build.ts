@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../../dist/forms/TooltipErrorPresenter",
             defineFunctionName: "defineIonxFormsTooltipErrorPresenter",
             includeGlobalScripts: false,
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /tippy\.js/,

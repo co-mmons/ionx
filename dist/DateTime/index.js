@@ -6,6 +6,8 @@ import { popoverController, isPlatform } from '@ionic/core';
 import { addEventListener } from 'ionx/utils';
 import { defineIonxSelect } from 'ionx/Select';
 
+const DateTimeInput$1 = "ionx-date-time";
+
 const defaultDateTimeFormat = {
   year: "numeric", month: "numeric", day: "numeric",
   hour: "2-digit", minute: "2-digit", second: undefined
@@ -505,5 +507,6 @@ const defineIonxDateTime = (opts) => {
     });
   }
 };
+defineIonxDateTime();
 
-export { IonxDateTime, IonxDateTimeOverlay, defineIonxDateTime };
+export { DateTimeInput$1 as DateTimeInput, IonxDateTime, IonxDateTimeOverlay, defineIonxDateTime };

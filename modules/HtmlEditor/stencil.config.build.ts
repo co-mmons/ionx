@@ -13,6 +13,7 @@ export const config: Config = {
             type: "dist-custom-elements-bundle",
             defineFunctionName: "defineIonxHtmlEditor",
             includeGlobalScripts: false,
+            autoDefineCustomElements: true,
             dir: "../../dist/HtmlEditor",
             external: [...defaultExternals, "orderedmap", /prosemirror-+/, /ionx\/(?!modules\/HtmlEditor)/],
             empty: true

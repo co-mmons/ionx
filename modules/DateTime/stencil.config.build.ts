@@ -13,6 +13,7 @@ export const config: Config = {
             type: "dist-custom-elements-bundle",
             dir: "../../dist/DateTime",
             defineFunctionName: "defineIonxDateTime",
+            autoDefineCustomElements: true,
             includeGlobalScripts: false,
             external: [...defaultExternals, /ionx\/(?!modules\/DateTime)/],
             empty: true

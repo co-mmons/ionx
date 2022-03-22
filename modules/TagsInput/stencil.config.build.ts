@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../dist/TagsInput",
             includeGlobalScripts: false,
             defineFunctionName: "defineIonxTagsInput",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/TagsInput)/
