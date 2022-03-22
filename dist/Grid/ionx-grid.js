@@ -1,9 +1,9 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
-const gridCss = "ionx-grid{display:block;margin:var(--grid-margin-top, 8px) var(--grid-margin-end, 8px) var(--grid-margin-bottom, 8px) var(--grid-margin-start, 8px)}";
+const gridComponentCss = "ionx-grid{display:block;margin:var(--grid-margin-top, 8px) var(--grid-margin-end, 8px) var(--grid-margin-bottom, 8px) var(--grid-margin-start, 8px)}";
 
-let Grid = class extends HTMLElement {
+let GridComponent = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -19,9 +19,9 @@ let Grid = class extends HTMLElement {
     return h(Host, null, h("slot", null));
   }
   get element() { return this; }
-  static get style() { return gridCss; }
+  static get style() { return gridComponentCss; }
 };
-Grid = /*@__PURE__*/ proxyCustomElement(Grid, [4, "ionx-grid"]);
+GridComponent = /*@__PURE__*/ proxyCustomElement(GridComponent, [4, "ionx-grid"]);
 function defineCustomElement$1() {
   if (typeof customElements === "undefined") {
     return;
@@ -30,14 +30,14 @@ function defineCustomElement$1() {
   components.forEach(tagName => { switch (tagName) {
     case "ionx-grid":
       if (!customElements.get(tagName)) {
-        customElements.define(tagName, Grid);
+        customElements.define(tagName, GridComponent);
       }
       break;
   } });
 }
 defineCustomElement$1();
 
-const IonxGrid = Grid;
+const IonxGrid = GridComponent;
 const defineCustomElement = defineCustomElement$1;
 
 export { IonxGrid, defineCustomElement };

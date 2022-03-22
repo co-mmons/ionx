@@ -5,3 +5,5 @@ export {SelectOverlayProps} from "./SelectOverlayProps";
 export {SelectProps} from "./SelectProps";
 export {SelectValueItem, SelectValueItem as SelectOption} from "./SelectValueItem";
 export {showSelectOverlay} from "./showSelectOverlay";
+
+export const Select = "ionx-select";

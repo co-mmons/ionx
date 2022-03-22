@@ -3,9 +3,9 @@ import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 
 @Component({
     tag: "ionx-grid",
-    styleUrl: "Grid.scss"
+    styleUrl: "GridComponent.scss"
 })
-export class Grid {
+export class GridComponent {
 
     @Element()
     element: HTMLElement;

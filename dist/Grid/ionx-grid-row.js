@@ -1,8 +1,8 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 
-const rowCss = "ionx-grid-row{display:flex;flex-wrap:wrap}";
+const rowComponentCss = "ionx-grid-row{display:flex;flex-wrap:wrap}";
 
-let Row = class extends HTMLElement {
+let RowComponent = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -10,9 +10,9 @@ let Row = class extends HTMLElement {
   render() {
     return h(Host, null, h("slot", null));
   }
-  static get style() { return rowCss; }
+  static get style() { return rowComponentCss; }
 };
-Row = /*@__PURE__*/ proxyCustomElement(Row, [4, "ionx-grid-row"]);
+RowComponent = /*@__PURE__*/ proxyCustomElement(RowComponent, [4, "ionx-grid-row"]);
 function defineCustomElement$1() {
   if (typeof customElements === "undefined") {
     return;
@@ -21,14 +21,14 @@ function defineCustomElement$1() {
   components.forEach(tagName => { switch (tagName) {
     case "ionx-grid-row":
       if (!customElements.get(tagName)) {
-        customElements.define(tagName, Row);
+        customElements.define(tagName, RowComponent);
       }
       break;
   } });
 }
 defineCustomElement$1();
 
-const IonxGridRow = Row;
+const IonxGridRow = RowComponent;
 const defineCustomElement = defineCustomElement$1;
 
 export { IonxGridRow, defineCustomElement };

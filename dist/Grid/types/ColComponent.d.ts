@@ -1,4 +1,4 @@
-export declare class Col {
+export declare class ColComponent {
   sizeXs: string | number;
   sizeSm: string | number;
   sizeMd: string | number;

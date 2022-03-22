@@ -12,6 +12,7 @@ export const config: Config = {
             type: "dist-custom-elements-bundle",
             dir: "../../dist/Select",
             defineFunctionName: "defineIonxSelect",
+            autoDefineCustomElements: true,
             includeGlobalScripts: false,
             external: ["sortablejs", ...defaultExternals, /ionx\/(?!modules\/Select)/],
             empty: true

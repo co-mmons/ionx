@@ -5,7 +5,7 @@ import { SelectItem } from "./SelectItem";
 import { SelectProps } from "./SelectProps";
 import { SelectValueItem } from "./SelectValueItem";
 import { ValueComparator } from "./ValueComparator";
-export declare class Select implements SelectProps {
+export declare class SelectComponent implements SelectProps {
   element: HTMLElement;
   /**
    * @inheritDoc

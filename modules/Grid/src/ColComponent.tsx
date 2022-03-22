@@ -3,9 +3,9 @@ import {WidthBreakpoint} from "ionx/WidthBreakpoints";
 
 @Component({
     tag: "ionx-grid-col",
-    styleUrl: "Col.scss"
+    styleUrl: "ColComponent.scss"
 })
-export class Col {
+export class ColComponent {
 
     @Prop()
     sizeXs: string | number;

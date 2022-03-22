@@ -2,9 +2,9 @@ import {Component, h, Host} from "@stencil/core";
 
 @Component({
     tag: "ionx-grid-row",
-    styleUrl: "Row.scss"
+    styleUrl: "RowComponent.scss"
 })
-export class Row {
+export class RowComponent {
 
     render() {
         return <Host>

@@ -16,10 +16,10 @@ let instanceCounter = 0;
 
 @Component({
     tag: "ionx-select",
-    styleUrl: "Select.scss",
+    styleUrl: "SelectComponent.scss",
     scoped: true
 })
-export class Select implements SelectProps {
+export class SelectComponent implements SelectProps {
 
     @Element()
     element: HTMLElement;

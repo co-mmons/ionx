@@ -1,6 +1,7 @@
 import {sleep} from "@co.mmons/js-utils/core";
 import {Component, h, Host} from "@stencil/core";
 import {defineIonxForms, FormController} from "ionx/forms";
+import {Select} from "../index";
 import {SelectItem} from "../SelectItem";
 
 defineIonxForms()
@@ -94,7 +95,7 @@ export class Test {
 
             <fieldset>
                 <legend>groups</legend>
-                <ionx-select
+                <Select
                     placeholder="Choose..."
                     overlayTitle="Title here"
                     overlay="modal"
