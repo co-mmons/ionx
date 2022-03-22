@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../dist/ToggleLabels",
             includeGlobalScripts: false,
             defineFunctionName: "defineIonxToggleLabels",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/ToggleLabels)/
