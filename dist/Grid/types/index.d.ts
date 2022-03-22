@@ -1,3 +1,3 @@
-export declare const Col = "ionx-grid-col";
-export declare const Row = "ionx-grid-row";
+export declare const GridCol = "ionx-grid-col";
+export declare const GridRow = "ionx-grid-row";
 export declare const Grid = "ionx-grid";
