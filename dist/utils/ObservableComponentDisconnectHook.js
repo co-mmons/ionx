@@ -32,7 +32,7 @@ export class ObservableComponentDisconnectHook {
         return this.$valueChanged;
     }
     update() {
-        forceUpdate(this.component);
+        window.requestAnimationFrame(() => forceUpdate(this.component));
     }
     disconnect() {
         this.$error = undefined;

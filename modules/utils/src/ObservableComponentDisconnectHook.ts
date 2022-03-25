@@ -50,7 +50,7 @@ export class ObservableComponentDisconnectHook<Value = any> implements Component
     private subscription: Subscription;
 
     private update() {
-        forceUpdate(this.component);
+        window.requestAnimationFrame(() => forceUpdate(this.component));
     }
 
     disconnect(): void {
