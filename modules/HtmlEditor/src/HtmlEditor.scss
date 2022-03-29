@@ -1,6 +1,10 @@
 @import "~prosemirror-view/style/prosemirror";
 @import "~prosemirror-gapcursor/style/gapcursor.css";
 
+.ProseMirror-selectednode {
+    outline: 2px solid var(--ion-color-primary);
+}
+
 ionx-html-editor {
     display: block;
 
@@ -71,6 +75,6 @@ ionx-html-editor > .ionx--prosemirror > .ProseMirror {
     }
 }
 
-ionx-form-field [slot-container="default"] > ionx-html-editor{
+ionx-form-field [slot-container="default"] > ionx-html-editor {
     margin: 8px 16px;
 }
