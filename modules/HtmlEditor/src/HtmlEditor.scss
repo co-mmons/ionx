@@ -1,10 +1,6 @@
 @import "~prosemirror-view/style/prosemirror";
 @import "~prosemirror-gapcursor/style/gapcursor.css";
 
-.ProseMirror-selectednode {
-    outline: 2px solid var(--ion-color-primary);
-}
-
 ionx-html-editor {
     display: block;
 
@@ -13,6 +9,10 @@ ionx-html-editor {
         width: 1em;
         height: 0.8em;
         background: red;
+    }
+
+    .ProseMirror-selectednode {
+        outline: var(--html-editor-selected-node-outline, 1px solid var(--ion-color-primary))
     }
 }
 
