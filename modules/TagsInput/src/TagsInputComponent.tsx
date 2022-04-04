@@ -3,10 +3,10 @@ import {Component, Element, Event, EventEmitter, h, Host, Method, Prop, State} f
 
 @Component({
     tag: "ionx-tags-input",
-    styleUrl: "TagsInput.scss",
+    styleUrl: "TagsInputComponent.scss",
     scoped: true
 })
-export class TagsInput {
+export class TagsInputComponent {
 
     @Element()
     element: HTMLElement;

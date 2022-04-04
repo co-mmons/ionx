@@ -1,11 +1,11 @@
 import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
-const TagsInputTag = "ionx-tags-input";
+const TagsInput = "ionx-tags-input";
 
-const tagsInputCss = ".sc-ionx-tags-input-h{display:block}.sc-ionx-tags-input-h ion-chip.sc-ionx-tags-input{margin:4px 4px 4px 0;height:30px}.sc-ionx-tags-input-h ion-chip.chip-disabled.sc-ionx-tags-input{opacity:1}.sc-ionx-tags-input-h ion-input.sc-ionx-tags-input{--padding-start:0;--padding-end:0}.item-label-stacked.sc-ionx-tags-input-h,.item-label-stacked .sc-ionx-tags-input-h{width:100%}ionx-form-field [slot-container=default]>.sc-ionx-tags-input-h{margin-left:16px;margin-right:16px;min-height:38px}";
+const tagsInputComponentCss = ".sc-ionx-tags-input-h{display:block}.sc-ionx-tags-input-h ion-chip.sc-ionx-tags-input{margin:4px 4px 4px 0;height:30px}.sc-ionx-tags-input-h ion-chip.chip-disabled.sc-ionx-tags-input{opacity:1}.sc-ionx-tags-input-h ion-input.sc-ionx-tags-input{--padding-start:0;--padding-end:0}.item-label-stacked.sc-ionx-tags-input-h,.item-label-stacked .sc-ionx-tags-input-h{width:100%}ionx-form-field [slot-container=default]>.sc-ionx-tags-input-h{margin-left:16px;margin-right:16px;min-height:38px}";
 
-let TagsInput = class extends HTMLElement {
+let TagsInputComponent = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -149,10 +149,10 @@ let TagsInput = class extends HTMLElement {
     return h(Host, null, h("div", { class: "ionx-tags-input-wrapper" }, this.value?.map((tag, index) => h("ion-chip", { outline: true, disabled: this.readonly }, h("div", null, tag), !this.hideRemove && !this.readonly && h("ion-icon", { name: "close", onClick: () => this.removeTag(index) })))), !this.readonly && h("ion-input", { disabled: this.readonly, required: this.required, class: { "ionx-tags-input-input": true }, type: this.type, value: this.currentTag, placeholder: this.placeholder, onIonBlur: () => this.pushTag(this.currentTag?.trim()), onIonChange: ev => [ev.stopPropagation(), ev.stopImmediatePropagation()], onKeyUp: ev => this.onKeyUp(ev) }));
   }
   get element() { return this; }
-  static get style() { return tagsInputCss; }
+  static get style() { return tagsInputComponentCss; }
 };
 
-const IonxTagsInput = /*@__PURE__*/proxyCustomElement(TagsInput, [2,"ionx-tags-input",{"readonly":[516],"hideRemove":[4,"hide-remove"],"maxTags":[2,"max-tags"],"placeholder":[1],"type":[1],"separator":[1],"canEnterAdd":[4,"can-enter-add"],"canBackspaceRemove":[4,"can-backspace-remove"],"verifyFn":[16],"sortFn":[16],"sortable":[4],"unique":[4],"required":[4],"value":[16],"currentTag":[32]}]);
+const IonxTagsInput = /*@__PURE__*/proxyCustomElement(TagsInputComponent, [2,"ionx-tags-input",{"readonly":[516],"hideRemove":[4,"hide-remove"],"maxTags":[2,"max-tags"],"placeholder":[1],"type":[1],"separator":[1],"canEnterAdd":[4,"can-enter-add"],"canBackspaceRemove":[4,"can-backspace-remove"],"verifyFn":[16],"sortFn":[16],"sortable":[4],"unique":[4],"required":[4],"value":[16],"currentTag":[32]}]);
 const defineIonxTagsInput = (opts) => {
   if (typeof customElements !== 'undefined') {
     [
@@ -166,4 +166,4 @@ const defineIonxTagsInput = (opts) => {
 };
 defineIonxTagsInput();
 
-export { IonxTagsInput, TagsInputTag, defineIonxTagsInput };
+export { IonxTagsInput, TagsInput, defineIonxTagsInput };
