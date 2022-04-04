@@ -17,6 +17,7 @@ export {minLength} from "./validators/minLength";
 export {validEmail} from "./validators/validEmail";
 export {matchPattern} from "./validators/matchPattern";
 export {loadIntlMessages as loadIonxFormsIntl} from "./intl/loadIntlMessages";
+export {isOnlyDirty} from "./isOnlyDirty";
 
 export const FormField = "ionx-form-field";
 export const FormItem = "ionx-form-item";

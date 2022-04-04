@@ -70,5 +70,6 @@ const defineIonxFormsTooltipErrorPresenter = (opts) => {
     });
   }
 };
+defineIonxFormsTooltipErrorPresenter();
 
 export { IonxFormTooltipErrorPresenter, TooltipErrorPresenter, defineIonxFormsTooltipErrorPresenter };

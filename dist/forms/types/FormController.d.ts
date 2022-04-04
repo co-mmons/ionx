@@ -6,15 +6,16 @@ import { FormControlState } from "./FormControlState";
 import { FormState } from "./FormState";
 import { FormValidationErrorPresenter } from "./FormValidationErrorPresenter";
 import { FormValidator } from "./FormValidator";
-/**
- *
- */
-export declare class FormController<Controls extends {
+export declare type FormKnownControls = {
   [name: string]: {
     value?: any;
     validators?: FormValidator[];
   };
-} = any> implements FormControllerPublicApi {
+};
+/**
+ *
+ */
+export declare class FormController<Controls extends FormKnownControls = any> implements FormControllerPublicApi {
   constructor(controls?: Controls, options?: {
     errorHandler?: FormValidationErrorPresenter;
   });

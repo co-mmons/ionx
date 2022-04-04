@@ -908,6 +908,18 @@ function matchPattern(pattern, message) {
   };
 }
 
+/**
+ * Checks if form's dirty controls are only of given names.
+ */
+function isOnlyDirty(controller, ...controlNames) {
+  const { controls } = controller;
+  for (const controlName in controls) {
+    if (controls[controlName].dirty && !controlNames.includes(controlName)) {
+      return false;
+    }
+  }
+}
+
 const FormField$1 = "ionx-form-field";
 const FormItem$1 = "ionx-form-item";
 
@@ -1054,4 +1066,4 @@ const defineIonxForms = (opts) => {
 };
 defineIonxForms();
 
-export { FormController, FormField$1 as FormField, FormFieldLabelButton, FormItem$1 as FormItem, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };
+export { FormController, FormField$1 as FormField, FormFieldLabelButton, FormItem$1 as FormItem, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, isOnlyDirty, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };
