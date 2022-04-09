@@ -11,11 +11,11 @@ export const config: Config = {
         {type: "docs-readme"},
         {
             type: "dist-custom-elements-bundle",
-            dir: "../../dist/DateTime",
-            defineFunctionName: "defineIonxDateTime",
+            dir: "../../dist/DateTimeInput",
+            defineFunctionName: "defineIonxDateTimeInput",
             autoDefineCustomElements: true,
             includeGlobalScripts: false,
-            external: [...defaultExternals, /ionx\/(?!modules\/DateTime)/],
+            external: [...defaultExternals, /ionx\/(?!modules\/DateTimeInput)/],
             empty: true
         }
     ]

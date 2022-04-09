@@ -30,17 +30,17 @@
 ### Graph
 ```mermaid
 graph TD;
-  ionx-date-time-overlay --> ion-item
-  ionx-date-time-overlay --> ion-label
-  ionx-date-time-overlay --> ion-button
-  ionx-date-time-overlay --> ion-icon
-  ionx-date-time-overlay --> ion-input
-  ionx-date-time-overlay --> ion-footer
-  ionx-date-time-overlay --> ion-toolbar
+  ionx-date-time-input-overlay --> ion-item
+  ionx-date-time-input-overlay --> ion-label
+  ionx-date-time-input-overlay --> ion-button
+  ionx-date-time-input-overlay --> ion-icon
+  ionx-date-time-input-overlay --> ion-input
+  ionx-date-time-input-overlay --> ion-footer
+  ionx-date-time-input-overlay --> ion-toolbar
   ion-item --> ion-icon
   ion-item --> ion-ripple-effect
   ion-button --> ion-ripple-effect
-  style ionx-date-time-overlay fill:#f9f,stroke:#333,stroke-width:4px
+  style ionx-date-time-input-overlay fill:#f9f,stroke:#333,stroke-width:4px
 ```
 
 ----------------------------------------------

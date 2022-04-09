@@ -1,1 +1,1 @@
-export declare const ToggleLabels = "ionx-toggle-labels";
+export declare const $ToggleLabels = "ionx-toggle-labels";

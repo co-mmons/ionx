@@ -12,6 +12,7 @@ export const config: Config = {
             type: "dist-custom-elements-bundle",
             dir: "../../dist/DataTable",
             defineFunctionName: "defineIonxDataTable",
+            autoDefineCustomElements: true,
             includeGlobalScripts: false,
             external: [...defaultExternals, /ionx\/(?!modules\/DataTable)/],
             empty: true

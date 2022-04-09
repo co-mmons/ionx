@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../dist/ExpandingSearchbar",
             includeGlobalScripts: false,
             defineFunctionName: "defineIonxExpandingSearchbar",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/ExpandingSearchbar)/

@@ -203,6 +203,8 @@ const unknownScheme = new class {
   }
 };
 
+const $LinkEditor = "ionx-link-editor";
+
 const linkEditorCss = ".sc-ionx-link-editor-h{display:block}.sc-ionx-link-editor-h ionx-form-field.sc-ionx-link-editor:not(:first-child){margin-top:16px}ionx-form-field.sc-ionx-link-editor-h,ionx-form-field .sc-ionx-link-editor-h{margin:16px}";
 
 var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || function (receiver, state, kind, f) {
@@ -389,5 +391,6 @@ const defineIonxLinkEditor = (opts) => {
     });
   }
 };
+defineIonxLinkEditor();
 
-export { DefaultLinkScheme, DefaultLinkTarget, IonxLinkEditor, IonxLinkEditorDialog, defineIonxLinkEditor, loadIntlMessages as loadIonxLinkEditorIntl, showLinkEditor, unknownScheme, urlValidator };
+export { $LinkEditor, DefaultLinkScheme, DefaultLinkTarget, IonxLinkEditor, IonxLinkEditorDialog, defineIonxLinkEditor, loadIntlMessages as loadIonxLinkEditorIntl, showLinkEditor, unknownScheme, urlValidator };

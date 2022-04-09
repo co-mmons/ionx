@@ -1,6 +1,8 @@
 import { HTMLElement, h, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
+const $Svg = "ionx-svg";
+
 const svgCss = ":host{display:inline-block}:host svg{display:inline-block;width:100%;height:100%;fill:var(--svg-fill-color);stroke:var(--svg-stroke-color);position:absolute;left:0px;top:0px}";
 
 let Svg = class extends HTMLElement {
@@ -27,5 +29,6 @@ const defineIonxSvg = (opts) => {
     });
   }
 };
+defineIonxSvg();
 
-export { IonxSvg, defineIonxSvg };
+export { $Svg, IonxSvg, defineIonxSvg };

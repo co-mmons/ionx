@@ -27,7 +27,7 @@ async function showSelectOverlay(overlay, event) {
   return { willDismiss, didDismiss };
 }
 
-const Select = "ionx-select";
+const $Select = "ionx-select";
 
 function isEqualValue(a, b, comparator) {
   if (comparator === "toString") {
@@ -113,6 +113,9 @@ let SelectComponent = class extends HTMLElement {
   optionsChanged(niu) {
     this.items = niu;
   }
+  async itemsChanged() {
+    await this.buildVisibleItems(false);
+  }
   async valueChanged(niu, old) {
     if (this.valueChanging) {
       if (!deepEqual(niu, old)) {
@@ -149,7 +152,7 @@ let SelectComponent = class extends HTMLElement {
       "interactive-disabled": this.disabled,
     });
   }
-  async buildVisibleItems() {
+  async buildVisibleItems(forceRender = true) {
     let visible = [];
     // values, that do not match items
     const unmatched = [];
@@ -186,7 +189,9 @@ let SelectComponent = class extends HTMLElement {
     }
     this.visibleItems = visible;
     this.loading = false;
-    forceUpdate(this);
+    if (forceRender) {
+      forceUpdate(this);
+    }
   }
   async open() {
     const overlay = this.overlay || "popover";
@@ -299,6 +304,8 @@ let SelectComponent = class extends HTMLElement {
   static get watchers() { return {
     "disabled": ["disabledChanged"],
     "options": ["optionsChanged"],
+    "items": ["itemsChanged"],
+    "lazyItems": ["itemsChanged"],
     "value": ["valueChanged"]
   }; }
   static get style() { return selectComponentCss; }
@@ -576,4 +583,4 @@ const defineIonxSelect = (opts) => {
 };
 defineIonxSelect();
 
-export { IonxSelect, IonxSelectOverlay, Select, defineIonxSelect, showSelectOverlay };
+export { $Select, IonxSelect, IonxSelectOverlay, defineIonxSelect, showSelectOverlay };

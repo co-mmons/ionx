@@ -7,11 +7,11 @@ import {DateTimeInputProps} from "./DateTimeInputProps";
 import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
 
 @Component({
-    tag: "ionx-date-time",
-    styleUrl: "DateTimeInput.scss",
+    tag: "ionx-date-time-input",
+    styleUrl: "Input.scss",
     scoped: true
 })
-export class DateTimeInput implements DateTimeInputProps {
+export class Input implements DateTimeInputProps {
 
     @Element()
     element: HTMLElement;
@@ -279,7 +279,7 @@ export class DateTimeInput implements DateTimeInputProps {
             };
 
             const popover = await popoverController.create({
-                component: "ionx-date-time-overlay",
+                component: "ionx-date-time-input-overlay",
                 componentProps: overlayProps,
                 event: {target: this.element} as any,
                 showBackdrop: true

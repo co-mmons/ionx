@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../dist/Loading",
             includeGlobalScripts: false,
             defineFunctionName: "defineIonxLoading",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/Loading)/

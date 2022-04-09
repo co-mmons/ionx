@@ -18,7 +18,7 @@ const modules = [
     "Popover",
     "Block",
     "Card",
-    "DateTime",
+    ["DateTimeInput", ["Select"]],
     "Dragula",
     "ExpandingSearchbar",
     "Input",

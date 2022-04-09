@@ -1,6 +1,6 @@
 import { TimeZoneDate } from "@co.mmons/js-utils/core";
 declare type NumericDateTimePart = "Hour" | "Minute" | "Year" | "Month" | "Day";
-export declare class DateTimeOverlay {
+export declare class Overlay {
   element: HTMLElement;
   dateOnly: boolean;
   timeZoneDisabled: boolean;

@@ -920,8 +920,9 @@ function isOnlyDirty(controller, ...controlNames) {
   }
 }
 
-const FormField$1 = "ionx-form-field";
-const FormItem$1 = "ionx-form-item";
+const $FormField = "ionx-form-field";
+const $FormItem = "ionx-form-item";
+const $FormController = "ionx-form-controller";
 
 let FormControllerComponent = class extends HTMLElement {
   constructor() {
@@ -1066,4 +1067,4 @@ const defineIonxForms = (opts) => {
 };
 defineIonxForms();
 
-export { FormController, FormField$1 as FormField, FormFieldLabelButton, FormItem$1 as FormItem, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, isOnlyDirty, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };
+export { $FormController, $FormField, $FormItem, FormController, FormFieldLabelButton, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, isOnlyDirty, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };

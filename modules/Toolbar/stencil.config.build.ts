@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../dist/Toolbar",
             includeGlobalScripts: false,
             defineFunctionName: "defineIonxToolbar",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/Toolbar)/

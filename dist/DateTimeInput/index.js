@@ -4,9 +4,9 @@ import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import { TimeZoneDate, timeZoneOffset, sleep } from '@co.mmons/js-utils/core';
 import { popoverController, isPlatform } from '@ionic/core';
 import { addEventListener } from 'ionx/utils';
-import { defineIonxSelect } from 'ionx/Select';
+import { $Select } from 'ionx/Select';
 
-const DateTimeInput$1 = "ionx-date-time";
+const $DateTimeInput = "ionx-date-time";
 
 const defaultDateTimeFormat = {
   year: "numeric", month: "numeric", day: "numeric",
@@ -16,9 +16,9 @@ const defaultDateFormat = {
   year: "numeric", month: "numeric", day: "numeric"
 };
 
-const dateTimeInputCss = ".sc-ionx-date-time-h{position:relative;display:inline-flex;max-width:100%;user-select:none;min-height:38px;align-items:center;outline:none;cursor:pointer}.sc-ionx-date-time-h::-moz-focus-inner{border:0}.sc-ionx-date-time-h .ionx--text.sc-ionx-date-time{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-date-time-h .ionx--text.ionx--placeholder-visible.sc-ionx-date-time{opacity:var(--date-time-placeholder-opacity, 0.5)}.sc-ionx-date-time-h .ionx--icon.sc-ionx-date-time{position:relative;width:16px;height:20px}.sc-ionx-date-time-h .ionx--icon.sc-ionx-date-time .ionx--icon-inner.sc-ionx-date-time{top:50%;right:0;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--date-time-dropdown-icon-opacity, 0.5);pointer-events:none}[disabled].sc-ionx-date-time-h{opacity:var(--date-time-disabled-opacity, 0.5);pointer-events:none;cursor:default}[readonly].sc-ionx-date-time-h{opacity:1;pointer-events:none;cursor:default}.sc-ionx-date-time-h ion-button.sc-ionx-date-time{--padding-start:4px;--padding-end:4px;margin:0 0 0 4px;height:auto}ionx-form-field [slot-container=default]>.sc-ionx-date-time-h,.item-label-stacked.sc-ionx-date-time-h,.item-label-stacked .sc-ionx-date-time-h{align-self:flex-start;width:calc(100% - 32px);margin-left:16px;margin-right:16px;min-height:38px}ionx-form-field [slot-container=default]>.sc-ionx-date-time-h .ionx--text.sc-ionx-date-time,.item-label-stacked.sc-ionx-date-time-h .ionx--text.sc-ionx-date-time,.item-label-stacked .sc-ionx-date-time-h .ionx--text.sc-ionx-date-time{max-width:calc(100% - 16px);flex:initial}";
+const inputCss = ".sc-ionx-date-time-input-h{position:relative;display:inline-flex;max-width:100%;user-select:none;min-height:38px;align-items:center;outline:none;cursor:pointer}.sc-ionx-date-time-input-h::-moz-focus-inner{border:0}.sc-ionx-date-time-input-h .ionx--text.sc-ionx-date-time-input{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-date-time-input-h .ionx--text.ionx--placeholder-visible.sc-ionx-date-time-input{opacity:var(--date-time-placeholder-opacity, 0.5)}.sc-ionx-date-time-input-h .ionx--icon.sc-ionx-date-time-input{position:relative;width:16px;height:20px}.sc-ionx-date-time-input-h .ionx--icon.sc-ionx-date-time-input .ionx--icon-inner.sc-ionx-date-time-input{top:50%;right:0;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--date-time-dropdown-icon-opacity, 0.5);pointer-events:none}[disabled].sc-ionx-date-time-input-h{opacity:var(--date-time-disabled-opacity, 0.5);pointer-events:none;cursor:default}[readonly].sc-ionx-date-time-input-h{opacity:1;pointer-events:none;cursor:default}.sc-ionx-date-time-input-h ion-button.sc-ionx-date-time-input{--padding-start:4px;--padding-end:4px;margin:0 0 0 4px;height:auto}ionx-form-field [slot-container=default]>.sc-ionx-date-time-input-h,.item-label-stacked.sc-ionx-date-time-input-h,.item-label-stacked .sc-ionx-date-time-input-h{align-self:flex-start;width:calc(100% - 32px);margin-left:16px;margin-right:16px;min-height:38px}ionx-form-field [slot-container=default]>.sc-ionx-date-time-input-h .ionx--text.sc-ionx-date-time-input,.item-label-stacked.sc-ionx-date-time-input-h .ionx--text.sc-ionx-date-time-input,.item-label-stacked .sc-ionx-date-time-input-h .ionx--text.sc-ionx-date-time-input{max-width:calc(100% - 16px);flex:initial}";
 
-let DateTimeInput = class extends HTMLElement {
+let Input = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -171,7 +171,7 @@ let DateTimeInput = class extends HTMLElement {
         timeZoneRequired: !this.dateOnly && !!this.timeZoneRequired
       };
       const popover = await popoverController.create({
-        component: "ionx-date-time-overlay",
+        component: "ionx-date-time-input-overlay",
         componentProps: overlayProps,
         event: { target: this.element },
         showBackdrop: true
@@ -227,7 +227,7 @@ let DateTimeInput = class extends HTMLElement {
     "disabled": ["disabledChanged"],
     "value": ["valueChanged"]
   }; }
-  static get style() { return dateTimeInputCss; }
+  static get style() { return inputCss; }
 };
 
 let loaded = [];
@@ -249,13 +249,13 @@ async function loadIntlMessages() {
   if (loaded.includes(intl.locale)) {
     return;
   }
-  setGlobalValues("ionx/DateTime", intl.locale, await importJson());
+  setGlobalValues("ionx/DateTimeInput", intl.locale, await importJson());
   loaded.push(intl.locale);
 }
 
 const noTimeZoneSelectValue = {
   value: undefined,
-  label: new MessageRef("ionx/DateTime", "No time zone")
+  label: new MessageRef("ionx/DateTimeInput", "No time zone")
 };
 
 let currentLocale;
@@ -319,10 +319,9 @@ function timeZoneSelectItemsLoader(required, date) {
   };
 }
 
-const dateTimeOverlayCss = ":host{display:block}:host ion-input{flex:1;text-align:right;--padding-end:0px;font-weight:600}:host ion-input input::-webkit-outer-spin-button,:host ion-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}:host ion-input input[type=number]{-moz-appearance:textfield}:host ion-item{--inner-padding-start:16px;--inner-padding-end:16px;--padding-start:0px;--padding-end:0px}:host ion-item ion-button[slot=end]{margin:0}:host .numeric-buttons{text-align:center;margin-left:16px;margin-right:0}:host .numeric-buttons ion-button{margin:0;--padding-start:2px;--padding-end:2px}:host ion-footer{--border-width:0px}:host ion-footer::before{display:none}:host ion-footer ion-toolbar{--border-width:0px !important;--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px}:host ion-footer div{flex:1;display:flex}:host ion-footer ion-button{min-height:44px;margin:0px}:host ion-footer ion-button:not(:last-child){font-weight:400}:host ion-footer ion-button:last-child{font-weight:500}:host ion-footer.md div{justify-content:flex-end}:host ion-footer.md ion-button{flex:none !important}:host ion-footer.ios ion-button{width:50%}";
+const overlayCss = ":host{display:block}:host ion-input{flex:1;text-align:right;--padding-end:0px;font-weight:600}:host ion-input input::-webkit-outer-spin-button,:host ion-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}:host ion-input input[type=number]{-moz-appearance:textfield}:host ion-item{--inner-padding-start:16px;--inner-padding-end:16px;--padding-start:0px;--padding-end:0px}:host ion-item ion-button[slot=end]{margin:0}:host .numeric-buttons{text-align:center;margin-left:16px;margin-right:0}:host .numeric-buttons ion-button{margin:0;--padding-start:2px;--padding-end:2px}:host ion-footer{--border-width:0px}:host ion-footer::before{display:none}:host ion-footer ion-toolbar{--border-width:0px !important;--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px}:host ion-footer div{flex:1;display:flex}:host ion-footer ion-button{min-height:44px;margin:0px}:host ion-footer ion-button:not(:last-child){font-weight:400}:host ion-footer ion-button:last-child{font-weight:500}:host ion-footer.md div{justify-content:flex-end}:host ion-footer.md ion-button{flex:none !important}:host ion-footer.ios ion-button{width:50%}";
 
-defineIonxSelect();
-let DateTimeOverlay = class extends HTMLElement {
+let Overlay = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -479,27 +478,27 @@ let DateTimeOverlay = class extends HTMLElement {
       if (part in this.numericValues && typeof this.numericValues[part] !== "number") {
         val = undefined;
       }
-      return h("ion-item", null, h("ion-label", { class: "numeric-label" }, intl.message(`ionx/DateTime#${part}`)), h("div", { class: "numeric-buttons", slot: "end" }, h("ion-button", { fill: "clear", size: "small", tabindex: -1, onClick: () => this.move(part, -1) }, h("ion-icon", { slot: "icon-only", name: "remove-circle-outline" })), h("ion-button", { fill: "clear", size: "small", tabindex: -1, onClick: () => this.move(part, 1) }, h("ion-icon", { slot: "icon-only", name: "add-circle" }))), h("ion-input", { type: "number", name: part, placeholder: `${def}`, value: val, min: `${range[0]}`, max: `${range[1]}` }));
+      return h("ion-item", null, h("ion-label", { class: "numeric-label" }, intl.message(`ionx/DateTimeInput#${part}`)), h("div", { class: "numeric-buttons", slot: "end" }, h("ion-button", { fill: "clear", size: "small", tabindex: -1, onClick: () => this.move(part, -1) }, h("ion-icon", { slot: "icon-only", name: "remove-circle-outline" })), h("ion-button", { fill: "clear", size: "small", tabindex: -1, onClick: () => this.move(part, 1) }, h("ion-icon", { slot: "icon-only", name: "add-circle" }))), h("ion-input", { type: "number", name: part, placeholder: `${def}`, value: val, min: `${range[0]}`, max: `${range[1]}` }));
     }
     else {
-      return h("ion-item", null, h("ion-label", { position: "stacked" }, intl.message(`ionx/DateTime#${part}`)), h("ionx-select", { overlay: "modal", placeholder: this.timeZoneRequired ? "Choose..." : intl.message(noTimeZoneSelectValue.label), value: this.timeZoneValue, lazyItems: timeZoneSelectItemsLoader(this.timeZoneRequired, this.date) }));
+      return h("ion-item", null, h("ion-label", { position: "stacked" }, intl.message(`ionx/DateTimeInput#${part}`)), h($Select, { overlay: "modal", placeholder: this.timeZoneRequired ? "Choose..." : intl.message(noTimeZoneSelectValue.label), value: this.timeZoneValue, lazyItems: timeZoneSelectItemsLoader(this.timeZoneRequired, this.date) }));
     }
   }
   render() {
     const ranges = this.ranges();
-    return h(Host, null, h("div", null, this.renderPart("Year", ranges["Year"]), this.renderPart("Month", ranges["Month"]), this.renderPart("Day", ranges["Day"]), !this.dateOnly && this.renderPart("Hour", ranges["Hour"]), !this.dateOnly && this.renderPart("Minute", ranges["Minute"]), h("ion-item", null, h("ion-button", { size: "small", slot: "end", onClick: () => this.now() }, this.dateOnly ? intl.message `ionx/DateTime#Today` : intl.message `ionx/DateTime#Now`)), !this.timeZoneDisabled && this.renderPart("Time zone")), h("ion-footer", null, h("ion-toolbar", null, h("div", null, h("ion-button", { fill: "clear", onClick: () => this.cancel() }, intl.message `@co.mmons/js-intl#Cancel`), h("ion-button", { fill: "clear", onClick: () => this.ok() }, intl.message `@co.mmons/js-intl#Ok`)))));
+    return h(Host, null, h("div", null, this.renderPart("Year", ranges["Year"]), this.renderPart("Month", ranges["Month"]), this.renderPart("Day", ranges["Day"]), !this.dateOnly && this.renderPart("Hour", ranges["Hour"]), !this.dateOnly && this.renderPart("Minute", ranges["Minute"]), h("ion-item", null, h("ion-button", { size: "small", slot: "end", onClick: () => this.now() }, this.dateOnly ? intl.message `ionx/DateTimeInput#Today` : intl.message `ionx/DateTimeInput#Now`)), !this.timeZoneDisabled && this.renderPart("Time zone")), h("ion-footer", null, h("ion-toolbar", null, h("div", null, h("ion-button", { fill: "clear", onClick: () => this.cancel() }, intl.message `@co.mmons/js-intl#Cancel`), h("ion-button", { fill: "clear", onClick: () => this.ok() }, intl.message `@co.mmons/js-intl#Ok`)))));
   }
   get element() { return this; }
-  static get style() { return dateTimeOverlayCss; }
+  static get style() { return overlayCss; }
 };
 
-const IonxDateTime = /*@__PURE__*/proxyCustomElement(DateTimeInput, [2,"ionx-date-time",{"placeholder":[1],"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"defaultTimeZone":[1,"default-time-zone"],"timeZoneRequired":[4,"time-zone-required"],"clearButtonVisible":[4,"clear-button-visible"],"clearButtonIcon":[1,"clear-button-icon"],"readonly":[516],"disabled":[516],"formatOptions":[16],"value":[1040],"formattedValue":[32]},[[0,"keydown","onKeyDown"],[0,"focus","onFocus"],[0,"blur","onBlur"],[0,"click","onClick"]]]);
-const IonxDateTimeOverlay = /*@__PURE__*/proxyCustomElement(DateTimeOverlay, [1,"ionx-date-time-overlay",{"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"timeZoneRequired":[4,"time-zone-required"],"value":[16],"date":[32]},[[0,"ionFocus","onFocus"],[0,"keydown","onKeyDown"],[0,"ionChange","onChange"]]]);
-const defineIonxDateTime = (opts) => {
+const IonxDateTimeInput = /*@__PURE__*/proxyCustomElement(Input, [2,"ionx-date-time-input",{"placeholder":[1],"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"defaultTimeZone":[1,"default-time-zone"],"timeZoneRequired":[4,"time-zone-required"],"clearButtonVisible":[4,"clear-button-visible"],"clearButtonIcon":[1,"clear-button-icon"],"readonly":[516],"disabled":[516],"formatOptions":[16],"value":[1040],"formattedValue":[32]},[[0,"keydown","onKeyDown"],[0,"focus","onFocus"],[0,"blur","onBlur"],[0,"click","onClick"]]]);
+const IonxDateTimeInputOverlay = /*@__PURE__*/proxyCustomElement(Overlay, [1,"ionx-date-time-input-overlay",{"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"timeZoneRequired":[4,"time-zone-required"],"value":[16],"date":[32]},[[0,"ionFocus","onFocus"],[0,"keydown","onKeyDown"],[0,"ionChange","onChange"]]]);
+const defineIonxDateTimeInput = (opts) => {
   if (typeof customElements !== 'undefined') {
     [
-      IonxDateTime,
-  IonxDateTimeOverlay
+      IonxDateTimeInput,
+  IonxDateTimeInputOverlay
     ].forEach(cmp => {
       if (!customElements.get(cmp.is)) {
         customElements.define(cmp.is, cmp, opts);
@@ -507,6 +506,6 @@ const defineIonxDateTime = (opts) => {
     });
   }
 };
-defineIonxDateTime();
+defineIonxDateTimeInput();
 
-export { DateTimeInput$1 as DateTimeInput, IonxDateTime, IonxDateTimeOverlay, defineIonxDateTime };
+export { $DateTimeInput, IonxDateTimeInput, IonxDateTimeInputOverlay, defineIonxDateTimeInput };

@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../dist/LazyLoad",
             includeGlobalScripts: false,
             defineFunctionName: "defineIonxLazyLoad",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/LazyLoad)/

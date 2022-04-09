@@ -12,6 +12,7 @@ export const config: Config = {
         {
             type: "dist-custom-elements-bundle",
             defineFunctionName: "defineIonxMasonryGrid",
+            autoDefineCustomElements: true,
             dir: "../../dist/MasonryGrid",
             includeGlobalScripts: false,
             external: [...defaultExternals, /ionx\/(?!modules\/MasonryGrid)/],

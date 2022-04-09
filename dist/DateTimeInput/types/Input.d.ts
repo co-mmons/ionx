@@ -3,7 +3,7 @@ import { StyleEventDetail } from "@ionic/core";
 import { EventEmitter } from "@stencil/core";
 import { EventUnlisten } from "ionx/utils";
 import { DateTimeInputProps } from "./DateTimeInputProps";
-export declare class DateTimeInput implements DateTimeInputProps {
+export declare class Input implements DateTimeInputProps {
   element: HTMLElement;
   /**
    * @inheritDoc

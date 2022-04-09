@@ -190,6 +190,12 @@ export class SelectComponent implements SelectProps {
         this.items = niu;
     }
 
+    @Watch("items")
+    @Watch("lazyItems")
+    async itemsChanged() {
+        await this.buildVisibleItems(false);
+    }
+
     @Watch("value")
     async valueChanged(niu: any, old: any) {
 
@@ -239,7 +245,7 @@ export class SelectComponent implements SelectProps {
         });
     }
 
-    async buildVisibleItems() {
+    async buildVisibleItems(forceRender = true) {
 
         let visible: SelectValueItem[] = [];
 
@@ -285,7 +291,9 @@ export class SelectComponent implements SelectProps {
         this.visibleItems = visible;
         this.loading = false;
 
-        forceUpdate(this);
+        if (forceRender) {
+            forceUpdate(this);
+        }
     }
 
     async open() {

@@ -11,7 +11,13 @@ const PaginationModule = (context) => {
   context.extendParams({ pagination: { el: ".swiper-pagination" } });
 };
 
-export { NavigationModule, PaginationModule };
+const $Swiper = "ionx-swiper";
+const $SwiperSlides = "ionx-swiper-slides";
+const $SwiperSlide = "ionx-swiper-slide";
+const $SwiperNavigation = "ionx-swiper-navigation";
+const $SwiperPagination = "ionx-swiper-pagination";
+
+export { $Swiper, $SwiperNavigation, $SwiperPagination, $SwiperSlide, $SwiperSlides, NavigationModule, PaginationModule };
 
 import {IonxSwiper} from "./ionx-swiper";
 import {IonxSwiperNavigation} from "./ionx-swiper-navigation";

@@ -1,21 +1,19 @@
 import {intl} from "@co.mmons/js-intl";
 import {TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
-import {defineIonxSelect} from "ionx/Select";
+import {$Select} from "ionx/Select";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
 import {noTimeZoneSelectValue} from "./noTimeZoneSelectValue";
 import {timeZoneSelectItemsLoader} from "./timeZoneSelectItemsLoader";
 
 type NumericDateTimePart = "Hour" | "Minute" | "Year" | "Month" | "Day";
 
-defineIonxSelect();
-
 @Component({
-    tag: "ionx-date-time-overlay",
-    styleUrl: "DateTimeOverlay.scss",
+    tag: "ionx-date-time-input-overlay",
+    styleUrl: "Overlay.scss",
     shadow: true
 })
-export class DateTimeOverlay {
+export class Overlay {
 
     @Element()
     element: HTMLElement;
@@ -224,7 +222,7 @@ export class DateTimeOverlay {
 
             return <ion-item>
 
-                <ion-label class="numeric-label">{intl.message(`ionx/DateTime#${part}`)}</ion-label>
+                <ion-label class="numeric-label">{intl.message(`ionx/DateTimeInput#${part}`)}</ion-label>
 
                 <div class="numeric-buttons" slot="end">
                     <ion-button fill="clear" size="small" tabindex={-1} onClick={() => this.move(part, -1)}>
@@ -248,8 +246,8 @@ export class DateTimeOverlay {
         } else {
 
             return <ion-item>
-                <ion-label position="stacked">{intl.message(`ionx/DateTime#${part}`)}</ion-label>
-                <ionx-select
+                <ion-label position="stacked">{intl.message(`ionx/DateTimeInput#${part}`)}</ion-label>
+                <$Select
                     overlay="modal"
                     placeholder={this.timeZoneRequired ? "Choose..." : intl.message(noTimeZoneSelectValue.label)}
                     value={this.timeZoneValue}
@@ -273,7 +271,7 @@ export class DateTimeOverlay {
                 {!this.dateOnly && this.renderPart("Minute", ranges["Minute"])}
 
                 <ion-item>
-                    <ion-button size="small" slot="end" onClick={() => this.now()}>{this.dateOnly ? intl.message`ionx/DateTime#Today` : intl.message`ionx/DateTime#Now`}</ion-button>
+                    <ion-button size="small" slot="end" onClick={() => this.now()}>{this.dateOnly ? intl.message`ionx/DateTimeInput#Today` : intl.message`ionx/DateTimeInput#Now`}</ion-button>
                 </ion-item>
 
                 {!this.timeZoneDisabled && this.renderPart("Time zone")}

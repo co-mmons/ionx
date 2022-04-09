@@ -1,10 +1,10 @@
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
-const GridCol = "ionx-grid-col";
-const GridRow = "ionx-grid-row";
-const Grid = "ionx-grid";
+const $GridCol = "ionx-grid-col";
+const $GridRow = "ionx-grid-row";
+const $Grid = "ionx-grid";
 
-export { Grid, GridCol, GridRow };
+export { $Grid, $GridCol, $GridRow };
 
 import {IonxGrid} from "./ionx-grid";
 import {IonxGridCol} from "./ionx-grid-col";

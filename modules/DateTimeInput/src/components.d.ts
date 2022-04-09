@@ -8,7 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { TimeZoneDate } from "@co.mmons/js-utils/core";
 import { StyleEventDetail } from "@ionic/core";
 export namespace Components {
-    interface IonxDateTime {
+    interface IonxDateTimeInput {
         /**
           * @inheritDoc
          */
@@ -61,7 +61,7 @@ export namespace Components {
          */
         "value": TimeZoneDate;
     }
-    interface IonxDateTimeOverlay {
+    interface IonxDateTimeInputOverlay {
         "dateOnly": boolean;
         "timeZoneDisabled": boolean;
         "timeZoneRequired": boolean;
@@ -69,25 +69,25 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLIonxDateTimeElement extends Components.IonxDateTime, HTMLStencilElement {
+    interface HTMLIonxDateTimeInputElement extends Components.IonxDateTimeInput, HTMLStencilElement {
     }
-    var HTMLIonxDateTimeElement: {
-        prototype: HTMLIonxDateTimeElement;
-        new (): HTMLIonxDateTimeElement;
+    var HTMLIonxDateTimeInputElement: {
+        prototype: HTMLIonxDateTimeInputElement;
+        new (): HTMLIonxDateTimeInputElement;
     };
-    interface HTMLIonxDateTimeOverlayElement extends Components.IonxDateTimeOverlay, HTMLStencilElement {
+    interface HTMLIonxDateTimeInputOverlayElement extends Components.IonxDateTimeInputOverlay, HTMLStencilElement {
     }
-    var HTMLIonxDateTimeOverlayElement: {
-        prototype: HTMLIonxDateTimeOverlayElement;
-        new (): HTMLIonxDateTimeOverlayElement;
+    var HTMLIonxDateTimeInputOverlayElement: {
+        prototype: HTMLIonxDateTimeInputOverlayElement;
+        new (): HTMLIonxDateTimeInputOverlayElement;
     };
     interface HTMLElementTagNameMap {
-        "ionx-date-time": HTMLIonxDateTimeElement;
-        "ionx-date-time-overlay": HTMLIonxDateTimeOverlayElement;
+        "ionx-date-time-input": HTMLIonxDateTimeInputElement;
+        "ionx-date-time-input-overlay": HTMLIonxDateTimeInputOverlayElement;
     }
 }
 declare namespace LocalJSX {
-    interface IonxDateTime {
+    interface IonxDateTimeInput {
         /**
           * @inheritDoc
          */
@@ -142,23 +142,23 @@ declare namespace LocalJSX {
          */
         "value"?: TimeZoneDate;
     }
-    interface IonxDateTimeOverlay {
+    interface IonxDateTimeInputOverlay {
         "dateOnly"?: boolean;
         "timeZoneDisabled"?: boolean;
         "timeZoneRequired"?: boolean;
         "value"?: TimeZoneDate;
     }
     interface IntrinsicElements {
-        "ionx-date-time": IonxDateTime;
-        "ionx-date-time-overlay": IonxDateTimeOverlay;
+        "ionx-date-time-input": IonxDateTimeInput;
+        "ionx-date-time-input-overlay": IonxDateTimeInputOverlay;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "ionx-date-time": LocalJSX.IonxDateTime & JSXBase.HTMLAttributes<HTMLIonxDateTimeElement>;
-            "ionx-date-time-overlay": LocalJSX.IonxDateTimeOverlay & JSXBase.HTMLAttributes<HTMLIonxDateTimeOverlayElement>;
+            "ionx-date-time-input": LocalJSX.IonxDateTimeInput & JSXBase.HTMLAttributes<HTMLIonxDateTimeInputElement>;
+            "ionx-date-time-input-overlay": LocalJSX.IonxDateTimeInputOverlay & JSXBase.HTMLAttributes<HTMLIonxDateTimeInputOverlayElement>;
         }
     }
 }

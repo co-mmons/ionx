@@ -17,7 +17,7 @@ export async function loadIntlMessages() {
         return;
     }
 
-    setGlobalValues("ionx/DateTime", intl.locale, await importJson());
+    setGlobalValues("ionx/DateTimeInput", intl.locale, await importJson());
 
     loaded.push(intl.locale);
 }

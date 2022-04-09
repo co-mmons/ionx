@@ -225,6 +225,8 @@ function lazyLoadItem(elementOrOptions, options) {
   }
 }
 
+const $LazyLoad = "ionx-lazy-load";
+
 function closestElement(node, selector) {
   if (!node) {
     return;
@@ -311,5 +313,6 @@ const defineIonxLazyLoad = (opts) => {
     });
   }
 };
+defineIonxLazyLoad();
 
-export { IonxLazyLoad, LazyLoadController, defineIonxLazyLoad, ensureLazyLoad, lazyLoadItem };
+export { $LazyLoad, IonxLazyLoad, LazyLoadController, defineIonxLazyLoad, ensureLazyLoad, lazyLoadItem };

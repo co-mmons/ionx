@@ -2,16 +2,16 @@
 
 import type { Components, JSX } from "./types/components";
 
-interface IonxDateTime extends Components.IonxDateTime, HTMLElement {}
-export const IonxDateTime: {
-  prototype: IonxDateTime;
-  new (): IonxDateTime;
+interface IonxDateTimeInput extends Components.IonxDateTimeInput, HTMLElement {}
+export const IonxDateTimeInput: {
+  prototype: IonxDateTimeInput;
+  new (): IonxDateTimeInput;
 };
 
-interface IonxDateTimeOverlay extends Components.IonxDateTimeOverlay, HTMLElement {}
-export const IonxDateTimeOverlay: {
-  prototype: IonxDateTimeOverlay;
-  new (): IonxDateTimeOverlay;
+interface IonxDateTimeInputOverlay extends Components.IonxDateTimeInputOverlay, HTMLElement {}
+export const IonxDateTimeInputOverlay: {
+  prototype: IonxDateTimeInputOverlay;
+  new (): IonxDateTimeInputOverlay;
 };
 
 /**
@@ -24,7 +24,7 @@ export const IonxDateTimeOverlay: {
  * Use the standard [customElements.define()](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/define) 
  * method instead to define custom elements individually, or to provide a different tag name.
  */
-export declare const defineIonxDateTime: (opts?: any) => void;
+export declare const defineIonxDateTimeInput: (opts?: any) => void;
 
 /**
  * Used to manually set the base path where assets can be found.

@@ -12,6 +12,7 @@ export const config: Config = {
         {
             type: "dist-custom-elements-bundle",
             defineFunctionName: "defineIonxLinkEditor",
+            autoDefineCustomElements: true,
             dir: "../../dist/LinkEditor",
             includeGlobalScripts: false,
             external: [...defaultExternals, /ionx\/(?!modules\/LinkEditor)/],

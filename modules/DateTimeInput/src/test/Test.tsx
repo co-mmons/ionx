@@ -2,6 +2,8 @@ import {TimeZoneDate} from "@co.mmons/js-utils/core";
 import {Component, h, Host} from "@stencil/core";
 import {defineIonxForms, FormController} from "ionx/forms";
 
+import {$DateTimeInput} from "../index";
+
 defineIonxForms()
 
 @Component({
@@ -18,16 +20,16 @@ export class Test {
         return <Host>
 
             <ionx-form-field label="simple with time zone required">
-                <ionx-date-time ref={this.data.controls.date1.attach()}/>
+                <$DateTimeInput ref={this.data.controls.date1.attach()}/>
                 <div>value: {JSON.stringify(this.data.controls.date1.value.toJSON())}</div>
             </ionx-form-field>
 
             <ionx-form-field label="time zone not required">
-                <ionx-date-time placeholder="Shalalala" timeZoneRequired={false}/>
+                <$DateTimeInput placeholder="Shalalala" timeZoneRequired={false}/>
             </ionx-form-field>
 
             <ionx-form-field label="only date">
-                <ionx-date-time dateOnly={true} placeholder="Choose..."/>
+                <$DateTimeInput dateOnly={true} placeholder="Choose..."/>
             </ionx-form-field>
 
         </Host>

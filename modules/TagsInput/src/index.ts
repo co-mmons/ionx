@@ -1,1 +1,1 @@
-export const TagsInput = "ionx-tags-input";
+export const $TagsInput = "ionx-tags-input";

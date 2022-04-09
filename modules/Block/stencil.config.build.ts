@@ -12,6 +12,7 @@ export const config: Config = {
             empty: true,
             includeGlobalScripts: false,
             defineFunctionName: "defineIonxBlock",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/Block)/

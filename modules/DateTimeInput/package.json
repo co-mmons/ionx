@@ -4,5 +4,5 @@
         "start": "../../node_modules/.bin/stencil build --dev --watch --serve --config stencil.config.test.ts",
         "intl": "../../node_modules/.bin/js-intl-google-sheet-importer --output-path src/intl --output-type json --document 2PACX-1vR5jv8NqEb7E3wgHZaxjGZVeJaLCZN7F3qm8WkZN2tiCiv9EgYhjCK26LdFbiINdExItbehp_iVmEs9 --filterTags ionx/DateTime"
     },
-    "types": "../../dist/DateTime/index.d.ts"
+    "types": "../../dist/DateTimeInput/index.d.ts"
 }

@@ -111,13 +111,14 @@ export declare class SelectComponent implements SelectProps {
   get valueAsArray(): any[];
   protected disabledChanged(): void;
   optionsChanged(niu: SelectItem[]): void;
+  itemsChanged(): Promise<void>;
   valueChanged(niu: any, old: any): Promise<void>;
   setFocus(options?: FocusOptions): Promise<void>;
   setBlur(): Promise<void>;
   onFocus(): void;
   onBlur(): void;
   private emitStyle;
-  buildVisibleItems(): Promise<void>;
+  buildVisibleItems(forceRender?: boolean): Promise<void>;
   open(): Promise<void>;
   valuesReorder(ev: CustomEvent<ItemReorderEventDetail>): void;
   componentDidLoad(): void;

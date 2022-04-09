@@ -12,6 +12,7 @@ export const config: Config = {
             type: "dist-custom-elements-bundle",
             dir: "../../dist/Svg",
             defineFunctionName: "defineIonxSvg",
+            autoDefineCustomElements: true,
             includeGlobalScripts: false,
             external: [...defaultExternals, /ionx\/(?!modules\/Svg)/],
             empty: true

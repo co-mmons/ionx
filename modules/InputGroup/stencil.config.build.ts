@@ -10,6 +10,7 @@ export const config: Config = {
             type: "dist-custom-elements-bundle",
             dir: "../../dist/InputGroup",
             defineFunctionName: "defineIonxInputGroup",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/InputGroup)/
