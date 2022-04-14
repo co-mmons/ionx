@@ -12,7 +12,7 @@ import { FormControlState } from "./FormControlState";
 import { FormValidationError } from "./FormValidationError";
 import { MessageRef } from "@co.mmons/js-intl";
 export namespace Components {
-    interface IonxFormController {
+    interface IonxForm {
         "attach": (name: string, options?: FormControlAttachOptions) => Promise<void>;
         "controller": FormController;
         /**
@@ -46,11 +46,11 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLIonxFormControllerElement extends Components.IonxFormController, HTMLStencilElement {
+    interface HTMLIonxFormElement extends Components.IonxForm, HTMLStencilElement {
     }
-    var HTMLIonxFormControllerElement: {
-        prototype: HTMLIonxFormControllerElement;
-        new (): HTMLIonxFormControllerElement;
+    var HTMLIonxFormElement: {
+        prototype: HTMLIonxFormElement;
+        new (): HTMLIonxFormElement;
     };
     interface HTMLIonxFormFieldElement extends Components.IonxFormField, HTMLStencilElement {
     }
@@ -65,13 +65,13 @@ declare global {
         new (): HTMLIonxFormItemElement;
     };
     interface HTMLElementTagNameMap {
-        "ionx-form-controller": HTMLIonxFormControllerElement;
+        "ionx-form": HTMLIonxFormElement;
         "ionx-form-field": HTMLIonxFormFieldElement;
         "ionx-form-item": HTMLIonxFormItemElement;
     }
 }
 declare namespace LocalJSX {
-    interface IonxFormController {
+    interface IonxForm {
         "controller": FormController;
         /**
           * If controller should be disconnected when component is disconnected from the DOM. By default is true, but you can set to false when you expect that form controller component can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).
@@ -102,7 +102,7 @@ declare namespace LocalJSX {
     };
     }
     interface IntrinsicElements {
-        "ionx-form-controller": IonxFormController;
+        "ionx-form": IonxForm;
         "ionx-form-field": IonxFormField;
         "ionx-form-item": IonxFormItem;
     }
@@ -111,7 +111,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "ionx-form-controller": LocalJSX.IonxFormController & JSXBase.HTMLAttributes<HTMLIonxFormControllerElement>;
+            "ionx-form": LocalJSX.IonxForm & JSXBase.HTMLAttributes<HTMLIonxFormElement>;
             "ionx-form-field": LocalJSX.IonxFormField & JSXBase.HTMLAttributes<HTMLIonxFormFieldElement>;
             "ionx-form-item": LocalJSX.IonxFormItem & JSXBase.HTMLAttributes<HTMLIonxFormItemElement>;
         }

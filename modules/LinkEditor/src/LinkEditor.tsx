@@ -199,7 +199,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
 
         return <Host>
 
-            <ionx-form-controller controller={this.data}>
+            <ionx-form controller={this.data}>
 
                 {ErrorPresenter && <ErrorPresenter/>}
 
@@ -240,7 +240,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
                         options={targets.map(target => ({value: target, label: intl.message(target.label)}))}/>
                 </ionx-form-field>}
 
-            </ionx-form-controller>
+            </ionx-form>
         </Host>;
     }
 }

@@ -1,1 +1,1 @@
-export declare const $InputGroup = "ionx-input-group";
+export declare const InputGroup = "ionx-input-group";

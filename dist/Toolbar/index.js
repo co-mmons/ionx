@@ -4,7 +4,7 @@ import { waitTill } from '@co.mmons/js-utils/core';
 import { addEventListener, matchesMediaBreakpoint } from 'ionx/utils';
 import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
-const $Toolbar = "ionx-toolbar";
+const Toolbar$1 = "ionx-toolbar";
 
 const toolbarCss = ".sc-ionx-toolbar-h{display:block}.sc-ionx-toolbar-h ion-toolbar.sc-ionx-toolbar{--min-height:56px;--padding-top:0px;--padding-bottom:0px;--padding-start:0px;--padding-end:0px;--border-width:0;overflow:hidden}.sc-ionx-toolbar-h ion-back-button.sc-ionx-toolbar,.sc-ionx-toolbar-h ion-menu-button.sc-ionx-toolbar{align-self:flex-start;min-width:48px;height:48px;margin:4px 0}.sc-ionx-toolbar-h .menu-button-hidden.sc-ionx-toolbar+[ionx--inner].sc-ionx-toolbar{margin-left:16px}.sc-ionx-toolbar-h [ionx--inner].sc-ionx-toolbar{padding:15px 16px 15px 0;min-height:56px}.sc-ionx-toolbar-h [ionx--inner].sc-ionx-toolbar h1.sc-ionx-toolbar{color:var(--ion-toolbar-title-color, var(--color));font-family:var(--ion-toolbar-title-font-family, var(--ion-font-family, inherit));font-weight:var(--ion-toolbar-title-font-weight, 500);font-size:22px;display:block;margin:0;padding:0;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;-webkit-font-smoothing:antialiased;letter-spacing:0}.md .sc-ionx-toolbar-h [ionx--inner].sc-ionx-toolbar h1.sc-ionx-toolbar{letter-spacing:0.0125em}.ios .sc-ionx-toolbar-h [ionx--inner].sc-ionx-toolbar h1.sc-ionx-toolbar{font-weight:var(--ion-toolbar-title-font-weight, 600)}.sc-ionx-toolbar-h [ionx--inner].sc-ionx-toolbar h1.sc-ionx-toolbar:empty{display:none}.sc-ionx-toolbar-h [ionx--inner].sc-ionx-toolbar ion-buttons.sc-ionx-toolbar{float:right;padding:0;margin:0;position:relative;right:-8px;max-height:26px}.sc-ionx-toolbar-h [ionx--inner].sc-ionx-toolbar ion-buttons.sc-ionx-toolbar:empty{display:none}.ionx--title-wrap.sc-ionx-toolbar-h:not(.ionx--title-collapsed) [ionx--inner].sc-ionx-toolbar h1.sc-ionx-toolbar{display:inline;white-space:normal;text-overflow:initial;overflow:auto}.sc-ionx-toolbar-h .sc-ionx-toolbar-s>[ionx--inner] ion-button{margin-left:0;margin-right:0;--padding-start:4px;--padding-end:4px}.sc-ionx-toolbar-h .sc-ionx-toolbar-s>[slot=title]{line-height:1.1}.sc-ionx-toolbar-h .sc-ionx-toolbar-s>[slot=subtitle]{font-size:75%;font-weight:400}.sc-ionx-toolbar-h .sc-ionx-toolbar-s>[slot=subtitle]::before{content:\"\\a\";white-space:pre}.header-ios.sc-ionx-toolbar-h:last-child ion-toolbar.sc-ionx-toolbar,.header-ios .sc-ionx-toolbar-h:last-child ion-toolbar.sc-ionx-toolbar{--border-width:0 0 0.55px}";
 
@@ -127,4 +127,4 @@ const defineIonxToolbar = (opts) => {
 };
 defineIonxToolbar();
 
-export { $Toolbar, IonxToolbar, defineIonxToolbar };
+export { IonxToolbar, Toolbar$1 as Toolbar, defineIonxToolbar };

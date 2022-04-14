@@ -164,7 +164,7 @@ function isShowingLoadingOverlay() {
   return document.getElementsByClassName("ionx-loading-overlay").length > 0 || document.getElementsByClassName(".ionx-loading-popover").length > 0;
 }
 
-const $Loading = "ionx-loading";
+const Loading$1 = "ionx-loading";
 
 const loadingCss = "ionx-loading{display:flex;align-items:center;--loading-backdrop-opacity:0.8}ionx-loading[cover]{position:absolute;width:100%;height:100%;align-items:center;align-content:center;justify-items:center;justify-content:center;top:0px;left:0px}ionx-loading.ionx--backdrop-visible{background-color:rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity))}.ionx-loading-popover .popover-wrapper{display:flex;align-content:center;justify-content:center;align-items:center;justify-items:center}.ionx-loading-popover .popover-content{position:initial !important}";
 
@@ -223,4 +223,4 @@ const defineIonxLoading = (opts) => {
 };
 defineIonxLoading();
 
-export { $Loading, IonxLoading, defineIonxLoading, isShowingLoadingOverlay, showLoadingOverlay };
+export { IonxLoading, Loading$1 as Loading, defineIonxLoading, isShowingLoadingOverlay, showLoadingOverlay };

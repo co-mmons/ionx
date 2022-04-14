@@ -1,5 +1,5 @@
 import {Component, ComponentInterface, Element, Prop} from "@stencil/core";
-import {TooltipErrorPresenter} from "./TooltipErrorPresenter";
+import {TooltipErrorPresenterImpl} from "./TooltipErrorPresenterImpl";
 import {TooltipErrorPresenterOptions} from "./TooltipErrorPresenterOptions";
 
 @Component({
@@ -14,9 +14,9 @@ export class TooltipErrorPresenterComponent implements ComponentInterface {
     element: HTMLElement;
 
     @Prop()
-    instance?: TooltipErrorPresenter | false;
+    instance?: TooltipErrorPresenterImpl | false;
 
-    private instance$: TooltipErrorPresenter;
+    private instance$: TooltipErrorPresenterImpl;
 
     @Prop()
     options?: TooltipErrorPresenterOptions;
@@ -24,11 +24,11 @@ export class TooltipErrorPresenterComponent implements ComponentInterface {
     connectedCallback() {
 
         if (!this.instance$ && this.instance !== false) {
-            this.instance$ = this.instance ? this.instance : new TooltipErrorPresenter();
+            this.instance$ = this.instance ? this.instance : new TooltipErrorPresenterImpl();
         }
 
         if (this.instance$) {
-            const form = this.element.closest<HTMLIonxFormControllerElement>("ionx-form-controller");
+            const form = this.element.closest<HTMLIonxFormElement>("ionx-form");
             if (form?.controller) {
                 form.controller.errorPresenter = this.instance$;
             }

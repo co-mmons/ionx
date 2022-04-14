@@ -12,9 +12,9 @@ export function attachControl(elOrName: HTMLElement | string, nameOrOptions?: st
             return (el: HTMLElement) => attachControl(el, elOrName, nameOrOptions as FormControlAttachOptions);
         } else if (elOrName instanceof HTMLElement) {
             // let form: HTMLIonxFormControllerElement;
-            // waitTill(() => !!(form = elOrName.closest("ionx-form-controller")), 1, 10000)
+            // waitTill(() => !!(form = elOrName.closest("ionx-form")), 1, 10000)
             //     .then(() => form.attach(elOrName, nameOrOptions as string, options))
-            //     .catch(e => console.error("Not able to attach control to form, no ionx-form-controller found", elOrName, e))
+            //     .catch(e => console.error("Not able to attach control to form, no ionx-form found", elOrName, e))
         }
     }
 }

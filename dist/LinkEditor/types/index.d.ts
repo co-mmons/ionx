@@ -7,4 +7,4 @@ export { loadIntlMessages as loadIonxLinkEditorIntl } from "./intl/loadIntlMessa
 export { showLinkEditor } from "./showLinkEditor";
 export { unknownScheme } from "./unknownScheme";
 export { urlValidator } from "./urlValidator";
-export declare const $LinkEditor = "ionx-link-editor";
+export declare const LinkEditor = "ionx-link-editor";

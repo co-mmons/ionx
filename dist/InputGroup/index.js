@@ -1,7 +1,7 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
-const $InputGroup = "ionx-input-group";
+const InputGroup$1 = "ionx-input-group";
 
 const inputGroupCss = ".sc-ionx-input-group-h{display:flex}ionx-form-field.sc-ionx-input-group-s>ion-input,ionx-form-field .sc-ionx-input-group-s>ion-input{--padding-start:0;--padding-end:0}ionx-form-field.sc-ionx-input-group-s>ion-input:first-child,ionx-form-field .sc-ionx-input-group-s>ion-input:first-child{--padding-start:16px}ionx-form-field.sc-ionx-input-group-s>ion-input:last-child,ionx-form-field .sc-ionx-input-group-s>ion-input:last-child{--padding-end:16px}";
 
@@ -30,4 +30,4 @@ const defineIonxInputGroup = (opts) => {
 };
 defineIonxInputGroup();
 
-export { $InputGroup, IonxInputGroup, defineIonxInputGroup };
+export { InputGroup$1 as InputGroup, IonxInputGroup, defineIonxInputGroup };

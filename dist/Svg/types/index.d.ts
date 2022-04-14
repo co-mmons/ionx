@@ -1,1 +1,1 @@
-export declare const $Svg = "ionx-svg";
+export declare const Svg = "ionx-svg";

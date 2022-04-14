@@ -920,11 +920,11 @@ function isOnlyDirty(controller, ...controlNames) {
   }
 }
 
-const $FormField = "ionx-form-field";
-const $FormItem = "ionx-form-item";
-const $FormController = "ionx-form-controller";
+const FormField$1 = "ionx-form-field";
+const FormItem$1 = "ionx-form-item";
+const Form = "ionx-form";
 
-let FormControllerComponent = class extends HTMLElement {
+let FormComponent = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -1049,13 +1049,13 @@ let FormItem = class extends HTMLElement {
   static get style() { return formItemCss; }
 };
 
-const IonxFormController = /*@__PURE__*/proxyCustomElement(FormControllerComponent, [4,"ionx-form-controller",{"controller":[16],"disconnect":[4]}]);
+const IonxForm = /*@__PURE__*/proxyCustomElement(FormComponent, [4,"ionx-form",{"controller":[16],"disconnect":[4]}]);
 const IonxFormField = /*@__PURE__*/proxyCustomElement(FormField, [6,"ionx-form-field",{"label":[1],"flexContent":[4,"flex-content"],"control":[16],"error":[1],"errorMessage":[32]}]);
 const IonxFormItem = /*@__PURE__*/proxyCustomElement(FormItem, [6,"ionx-form-item",{"fill":[513],"control":[16],"error":[1],"hint":[1],"partProps":[16],"itemProps":[16],"itemStyle":[16],"errorMessage":[32]}]);
 const defineIonxForms = (opts) => {
   if (typeof customElements !== 'undefined') {
     [
-      IonxFormController,
+      IonxForm,
   IonxFormField,
   IonxFormItem
     ].forEach(cmp => {
@@ -1067,4 +1067,4 @@ const defineIonxForms = (opts) => {
 };
 defineIonxForms();
 
-export { $FormController, $FormField, $FormItem, FormController, FormFieldLabelButton, FormValidationError, IonxFormController, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, isOnlyDirty, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };
+export { Form, FormController, FormField$1 as FormField, FormFieldLabelButton, FormItem$1 as FormItem, FormValidationError, IonxForm, IonxFormField, IonxFormItem, RequiredError, defineIonxForms, formGrid, isOnlyDirty, loadIntlMessages as loadIonxFormsIntl, matchPattern, minLength, required, requiredTrue, validEmail };

@@ -3,7 +3,7 @@ import { Keymap } from "prosemirror-commands";
 import { Schema } from "prosemirror-model";
 import { EditorState, Plugin } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
-import { ToolbarItem } from "./toolbar/ToolbarItem";
+import { ToolbarItem } from "./toolbar";
 export declare class HtmlEditor implements ComponentInterface {
   element: HTMLElement;
   readonly: boolean;

@@ -1,1 +1,1 @@
-export const $VirtualScoller = "ionx-virtual-scroller";
+export const VirtualScroller = "ionx-virtual-scroller";

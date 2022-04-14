@@ -7,10 +7,10 @@
 
 ## Properties
 
-| Property   | Attribute  | Description | Type                               | Default     |
-| ---------- | ---------- | ----------- | ---------------------------------- | ----------- |
-| `instance` | `instance` |             | `TooltipErrorPresenter \| boolean` | `undefined` |
-| `options`  | --         |             | `TooltipErrorPresenterOptions`     | `undefined` |
+| Property   | Attribute  | Description | Type                                   | Default     |
+| ---------- | ---------- | ----------- | -------------------------------------- | ----------- |
+| `instance` | `instance` |             | `TooltipErrorPresenterImpl \| boolean` | `undefined` |
+| `options`  | --         |             | `TooltipErrorPresenterOptions`         | `undefined` |
 
 
 ----------------------------------------------

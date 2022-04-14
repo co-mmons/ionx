@@ -1,3 +1,3 @@
 export {lineBreak, lineBreakAttribute} from "./lineBreak";
 
-export const $MasonryGrid = "ionx-masonry-grid";
+export const MasonryGrid = "ionx-masonry-grid";

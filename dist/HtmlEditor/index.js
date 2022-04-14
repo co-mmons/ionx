@@ -1505,7 +1505,7 @@ const undoRedoKeymap = {
   ...(isApple ? { "Mod-y": redo } : {})
 };
 
-const $HtmlEditor = "ionx-html-editor";
+const HtmlEditor$1 = "ionx-html-editor";
 
 let loaded = [];
 async function importJson() {
@@ -1644,6 +1644,9 @@ let HtmlEditor = class extends HTMLElement$1 {
     this.ionChange = createEvent(this, "ionChange", 7);
   }
   async getView() {
+    if (!this.view) {
+      await waitTill(() => !!this.view, 10);
+    }
     return this.view;
   }
   async getState() {
@@ -1745,7 +1748,13 @@ let HtmlEditor = class extends HTMLElement$1 {
       const value = DOMSerializer.fromSchema(this.schema).serializeFragment(this.view.state.doc.content);
       const tmp = document.createElement("div");
       tmp.appendChild(value);
-      if (!tmp.innerText) {
+      let empty = !tmp.innerText.trim();
+      tmp.querySelectorAll("*").forEach((el) => {
+        if (el.tagName.includes("-")) {
+          empty = false;
+        }
+      });
+      if (empty) {
         return null;
       }
       else {
@@ -2420,4 +2429,4 @@ const defineIonxHtmlEditor = (opts) => {
 };
 defineIonxHtmlEditor();
 
-export { $HtmlEditor, AlignmentMark, AlignmentToolbarItem, BlockquoteNode, BulletListNode, DocNode, EmphasisMark, FontSizeMark, HardBreakNode, HeadingNode, HorizontalRuleNode, InsertLinkMenuItem, InsertListMenuItems, InsertMenuToolbarItem, IonxHtmlEditor, IonxHtmlEditorAlignmentMenu, IonxHtmlEditorInsertMenu, IonxHtmlEditorLinkMenu, IonxHtmlEditorListMenu, IonxHtmlEditorParagraphMenu, IonxHtmlEditorTextMenu, IonxHtmlEditorToolbar, LinkMark, LinkMenuToolbarItem, ListItemNode, ListMenuToolbarItem, MarkSpecExtended, NodeSpecExtended, OrderedListNode, ParagraphMenuToolbarItem, ParagraphNode, StrikethroughMark, StrongMark, SubscriptMark, SuperscriptMark, TextBackgroundColorMark, TextEmphasisToolbarItem, TextForegroundColorMark, TextMenuToolbarItem, TextNode, TextStrikethroughToolbarItem, TextStrongToolbarItem, TextSubscriptToolbarItem, TextSuperscriptToolbarItem, TextUnderlineToolbarItem, ToolbarItem, UnderlineMark, baseKeymap, buildSchema, buildSchemaWithOptions, defineIonxHtmlEditor, enterKeymap };
+export { AlignmentMark, AlignmentToolbarItem, BlockquoteNode, BulletListNode, DocNode, EmphasisMark, FontSizeMark, HardBreakNode, HeadingNode, HorizontalRuleNode, HtmlEditor$1 as HtmlEditor, InsertLinkMenuItem, InsertListMenuItems, InsertMenuToolbarItem, IonxHtmlEditor, IonxHtmlEditorAlignmentMenu, IonxHtmlEditorInsertMenu, IonxHtmlEditorLinkMenu, IonxHtmlEditorListMenu, IonxHtmlEditorParagraphMenu, IonxHtmlEditorTextMenu, IonxHtmlEditorToolbar, LinkMark, LinkMenuToolbarItem, ListItemNode, ListMenuToolbarItem, MarkSpecExtended, NodeSpecExtended, OrderedListNode, ParagraphMenuToolbarItem, ParagraphNode, StrikethroughMark, StrongMark, SubscriptMark, SuperscriptMark, TextBackgroundColorMark, TextEmphasisToolbarItem, TextForegroundColorMark, TextMenuToolbarItem, TextNode, TextStrikethroughToolbarItem, TextStrongToolbarItem, TextSubscriptToolbarItem, TextSuperscriptToolbarItem, TextUnderlineToolbarItem, ToolbarItem, UnderlineMark, baseKeymap, buildSchema, buildSchemaWithOptions, defineIonxHtmlEditor, enterKeymap };

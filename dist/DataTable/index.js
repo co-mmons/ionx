@@ -5,7 +5,7 @@ import { intl } from '@co.mmons/js-intl';
 import { popoverController } from '@ionic/core';
 import { defineIonxSelect, showSelectOverlay } from 'ionx/Select';
 
-const $DataTable = "ionx-data-table";
+const DataTable$1 = "ionx-data-table";
 
 const dataTableCss = "ionx-data-table{display:block;overflow:auto;max-height:100%;border:var(--ionx-border-width) solid var(--ion-border-color);border-radius:var(--ionx-border-radius);-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}ionx-data-table>table{width:100%}ionx-data-table>table>tbody{-webkit-user-select:auto;-moz-user-select:auto;-ms-user-select:auto;user-select:auto}ionx-data-table>table>tbody>tr>td{padding:8px;border:var(--ionx-border-width) solid var(--ion-border-color)}ionx-data-table>table>tbody>tr>td:first-child{border-left:0}ionx-data-table>table>tbody>tr>td:last-child{border-right:0}ionx-data-table>table>tbody>tr:last-child>td{border-bottom:0}";
 
@@ -265,4 +265,4 @@ const defineIonxDataTable = (opts) => {
 };
 defineIonxDataTable();
 
-export { $DataTable, IonxDataTable, IonxDataTableSearchFilter, IonxDataTableTh, defineIonxDataTable };
+export { DataTable$1 as DataTable, IonxDataTable, IonxDataTableSearchFilter, IonxDataTableTh, defineIonxDataTable };

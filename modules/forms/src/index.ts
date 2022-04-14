@@ -19,6 +19,6 @@ export {matchPattern} from "./validators/matchPattern";
 export {loadIntlMessages as loadIonxFormsIntl} from "./intl/loadIntlMessages";
 export {isOnlyDirty} from "./isOnlyDirty";
 
-export const $FormField = "ionx-form-field";
-export const $FormItem = "ionx-form-item";
-export const $FormController = "ionx-form-controller";
+export const FormField = "ionx-form-field";
+export const FormItem = "ionx-form-item";
+export const Form = "ionx-form";

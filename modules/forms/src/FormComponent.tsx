@@ -5,9 +5,9 @@ import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormCont
 import {loadIntlMessages} from "./intl/loadIntlMessages";
 
 @Component({
-    tag: "ionx-form-controller"
+    tag: "ionx-form"
 })
-export class FormControllerComponent implements ComponentInterface, FormControllerPublicApi {
+export class FormComponent implements ComponentInterface, FormControllerPublicApi {
 
     @Prop()
     controller!: FormController;

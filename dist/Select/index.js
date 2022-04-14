@@ -27,7 +27,7 @@ async function showSelectOverlay(overlay, event) {
   return { willDismiss, didDismiss };
 }
 
-const $Select = "ionx-select";
+const Select = "ionx-select";
 
 function isEqualValue(a, b, comparator) {
   if (comparator === "toString") {
@@ -583,4 +583,4 @@ const defineIonxSelect = (opts) => {
 };
 defineIonxSelect();
 
-export { $Select, IonxSelect, IonxSelectOverlay, defineIonxSelect, showSelectOverlay };
+export { IonxSelect, IonxSelectOverlay, Select, defineIonxSelect, showSelectOverlay };

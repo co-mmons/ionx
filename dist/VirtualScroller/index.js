@@ -1,8 +1,8 @@
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
-const $VirtualScoller = "ionx-virtual-scroller";
+const VirtualScroller = "ionx-virtual-scroller";
 
-export { $VirtualScoller };
+export { VirtualScroller };
 
 import {IonxVirtualScroller} from "./ionx-virtual-scroller";
 (function() {

@@ -1,1 +1,1 @@
-export declare const $ExpandingSearchbar = "ionx-expanding-searchbar";
+export declare const ExpandingSearchbar = "ionx-expanding-searchbar";

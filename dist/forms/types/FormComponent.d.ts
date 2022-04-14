@@ -2,7 +2,7 @@ import { ComponentInterface } from "@stencil/core";
 import { FormControlAttachOptions } from "./FormControlAttachOptions";
 import { FormController } from "./FormController";
 import { FormControllerPublicApi, FormControllerValidateOptions } from "./FormControllerPublicApi";
-export declare class FormControllerComponent implements ComponentInterface, FormControllerPublicApi {
+export declare class FormComponent implements ComponentInterface, FormControllerPublicApi {
   controller: FormController;
   /**
    * If controller should be disconnected when component is disconnected from the DOM.

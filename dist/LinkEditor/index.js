@@ -203,7 +203,7 @@ const unknownScheme = new class {
   }
 };
 
-const $LinkEditor = "ionx-link-editor";
+const LinkEditor$1 = "ionx-link-editor";
 
 const linkEditorCss = ".sc-ionx-link-editor-h{display:block}.sc-ionx-link-editor-h ionx-form-field.sc-ionx-link-editor:not(:first-child){margin-top:16px}ionx-form-field.sc-ionx-link-editor-h,ionx-form-field .sc-ionx-link-editor-h{margin:16px}";
 
@@ -346,7 +346,7 @@ let LinkEditor = class extends HTMLElement {
     const ValueComponent = this.data.controls.scheme.value?.valueComponent;
     const targets = scheme?.valueTargets?.(this.data.controls.value.value);
     const ErrorPresenter = this.errorPresenter;
-    return h(Host, null, h("ionx-form-controller", { controller: this.data }, ErrorPresenter && h(ErrorPresenter, null), h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.scheme.error, label: intl.message `ionx/LinkEditor#Link type` }, h("ionx-select", { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.scheme.attach(), empty: false, placeholder: intl.message `ionx/LinkEditor#Choose...`, options: schemes })), ValueComponent && h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.value.error, label: scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message `ionx/LinkEditor#Link` }, h(ValueComponent, { ...scheme.valueComponentProps, disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.value.attach() }), scheme.valueHint && h("span", { slot: "hint" }, intl.message(scheme.valueHint))), this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.target.error, label: intl.message `ionx/LinkEditor#Open in|link target` }, h("ionx-select", { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.target.attach(), placeholder: intl.message `ionx/LinkEditor#defaultTargetLabel`, options: targets.map(target => ({ value: target, label: intl.message(target.label) })) }))));
+    return h(Host, null, h("ionx-form", { controller: this.data }, ErrorPresenter && h(ErrorPresenter, null), h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.scheme.error, label: intl.message `ionx/LinkEditor#Link type` }, h("ionx-select", { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.scheme.attach(), empty: false, placeholder: intl.message `ionx/LinkEditor#Choose...`, options: schemes })), ValueComponent && h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.value.error, label: scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message `ionx/LinkEditor#Link` }, h(ValueComponent, { ...scheme.valueComponentProps, disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.value.attach() }), scheme.valueHint && h("span", { slot: "hint" }, intl.message(scheme.valueHint))), this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.target.error, label: intl.message `ionx/LinkEditor#Open in|link target` }, h("ionx-select", { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.target.attach(), placeholder: intl.message `ionx/LinkEditor#defaultTargetLabel`, options: targets.map(target => ({ value: target, label: intl.message(target.label) })) }))));
   }
   get element() { return this; }
   static get style() { return linkEditorCss; }
@@ -393,4 +393,4 @@ const defineIonxLinkEditor = (opts) => {
 };
 defineIonxLinkEditor();
 
-export { $LinkEditor, DefaultLinkScheme, DefaultLinkTarget, IonxLinkEditor, IonxLinkEditorDialog, defineIonxLinkEditor, loadIntlMessages as loadIonxLinkEditorIntl, showLinkEditor, unknownScheme, urlValidator };
+export { DefaultLinkScheme, DefaultLinkTarget, IonxLinkEditor, IonxLinkEditorDialog, LinkEditor$1 as LinkEditor, defineIonxLinkEditor, loadIntlMessages as loadIonxLinkEditorIntl, showLinkEditor, unknownScheme, urlValidator };

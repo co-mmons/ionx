@@ -10,7 +10,7 @@ import {EditorView} from "prosemirror-view";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
 import {undoRedoKeymap} from "./keymaps";
 import {MarkSpecExtended, NodeSpecExtended} from "./schema";
-import {ToolbarItem} from "./toolbar/ToolbarItem";
+import {ToolbarItem} from "./toolbar";
 import {findScrollParent} from "./utils/findScrollParent";
 import {fixIonItemOverflow} from "./utils/fixIonItemOverflow";
 import {scrollIntoView} from "./utils/scrollIntoView";
@@ -61,6 +61,9 @@ export class HtmlEditor implements ComponentInterface {
 
     @Method()
     async getView() {
+        if (!this.view) {
+            await waitTill(() => !!this.view, 10);
+        }
         return this.view;
     }
 
@@ -211,7 +214,15 @@ export class HtmlEditor implements ComponentInterface {
             const tmp = document.createElement("div");
             tmp.appendChild(value);
 
-            if (!tmp.innerText) {
+            let empty = !tmp.innerText.trim();
+
+            tmp.querySelectorAll("*").forEach((el) => {
+                if (el.tagName.includes("-")) {
+                    empty = false;
+                }
+            })
+
+            if (empty) {
                 return null;
             } else {
                 return tmp.innerHTML; // this.prepareOutputValue(tmp);

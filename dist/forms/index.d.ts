@@ -2,10 +2,10 @@
 
 import type { Components, JSX } from "./types/components";
 
-interface IonxFormController extends Components.IonxFormController, HTMLElement {}
-export const IonxFormController: {
-  prototype: IonxFormController;
-  new (): IonxFormController;
+interface IonxForm extends Components.IonxForm, HTMLElement {}
+export const IonxForm: {
+  prototype: IonxForm;
+  new (): IonxForm;
 };
 
 interface IonxFormField extends Components.IonxFormField, HTMLElement {}

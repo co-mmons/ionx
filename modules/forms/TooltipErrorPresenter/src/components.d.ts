@@ -5,11 +5,11 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { TooltipErrorPresenter } from "./TooltipErrorPresenter";
+import { TooltipErrorPresenterImpl } from "./TooltipErrorPresenterImpl";
 import { TooltipErrorPresenterOptions } from "./TooltipErrorPresenterOptions";
 export namespace Components {
     interface IonxFormTooltipErrorPresenter {
-        "instance"?: TooltipErrorPresenter | false;
+        "instance"?: TooltipErrorPresenterImpl | false;
         "options"?: TooltipErrorPresenterOptions;
     }
 }
@@ -26,7 +26,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxFormTooltipErrorPresenter {
-        "instance"?: TooltipErrorPresenter | false;
+        "instance"?: TooltipErrorPresenterImpl | false;
         "options"?: TooltipErrorPresenterOptions;
     }
     interface IntrinsicElements {

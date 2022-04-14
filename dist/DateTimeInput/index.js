@@ -4,9 +4,9 @@ import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import { TimeZoneDate, timeZoneOffset, sleep } from '@co.mmons/js-utils/core';
 import { popoverController, isPlatform } from '@ionic/core';
 import { addEventListener } from 'ionx/utils';
-import { $Select } from 'ionx/Select';
+import { Select } from 'ionx/Select';
 
-const $DateTimeInput = "ionx-date-time";
+const DateTimeInput = "ionx-date-time-input";
 
 const defaultDateTimeFormat = {
   year: "numeric", month: "numeric", day: "numeric",
@@ -481,7 +481,7 @@ let Overlay = class extends HTMLElement {
       return h("ion-item", null, h("ion-label", { class: "numeric-label" }, intl.message(`ionx/DateTimeInput#${part}`)), h("div", { class: "numeric-buttons", slot: "end" }, h("ion-button", { fill: "clear", size: "small", tabindex: -1, onClick: () => this.move(part, -1) }, h("ion-icon", { slot: "icon-only", name: "remove-circle-outline" })), h("ion-button", { fill: "clear", size: "small", tabindex: -1, onClick: () => this.move(part, 1) }, h("ion-icon", { slot: "icon-only", name: "add-circle" }))), h("ion-input", { type: "number", name: part, placeholder: `${def}`, value: val, min: `${range[0]}`, max: `${range[1]}` }));
     }
     else {
-      return h("ion-item", null, h("ion-label", { position: "stacked" }, intl.message(`ionx/DateTimeInput#${part}`)), h($Select, { overlay: "modal", placeholder: this.timeZoneRequired ? "Choose..." : intl.message(noTimeZoneSelectValue.label), value: this.timeZoneValue, lazyItems: timeZoneSelectItemsLoader(this.timeZoneRequired, this.date) }));
+      return h("ion-item", null, h("ion-label", { position: "stacked" }, intl.message(`ionx/DateTimeInput#${part}`)), h(Select, { overlay: "modal", placeholder: this.timeZoneRequired ? "Choose..." : intl.message(noTimeZoneSelectValue.label), value: this.timeZoneValue, lazyItems: timeZoneSelectItemsLoader(this.timeZoneRequired, this.date) }));
     }
   }
   render() {
@@ -508,4 +508,4 @@ const defineIonxDateTimeInput = (opts) => {
 };
 defineIonxDateTimeInput();
 
-export { $DateTimeInput, IonxDateTimeInput, IonxDateTimeInputOverlay, defineIonxDateTimeInput };
+export { DateTimeInput, IonxDateTimeInput, IonxDateTimeInputOverlay, defineIonxDateTimeInput };

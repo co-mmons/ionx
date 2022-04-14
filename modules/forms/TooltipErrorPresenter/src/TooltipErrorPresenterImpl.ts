@@ -4,7 +4,7 @@ import tippy, {Instance as TippyInstance} from "tippy.js";
 import {FormControl, FormController, FormValidationErrorPresenter} from "ionx/forms";
 import {TooltipErrorPresenterOptions} from "./TooltipErrorPresenterOptions";
 
-export class TooltipErrorPresenter implements FormValidationErrorPresenter {
+export class TooltipErrorPresenterImpl implements FormValidationErrorPresenter {
 
     constructor(private readonly options?: TooltipErrorPresenterOptions) {
     }

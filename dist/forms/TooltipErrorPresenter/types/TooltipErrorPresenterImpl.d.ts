@@ -1,6 +1,6 @@
 import { FormControl, FormController, FormValidationErrorPresenter } from "ionx/forms";
 import { TooltipErrorPresenterOptions } from "./TooltipErrorPresenterOptions";
-export declare class TooltipErrorPresenter implements FormValidationErrorPresenter {
+export declare class TooltipErrorPresenterImpl implements FormValidationErrorPresenter {
   private readonly options?;
   constructor(options?: TooltipErrorPresenterOptions);
   private instance;

@@ -1,7 +1,7 @@
 import {intl} from "@co.mmons/js-intl";
 import {TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
-import {$Select} from "ionx/Select";
+import {Select} from "ionx/Select";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
 import {noTimeZoneSelectValue} from "./noTimeZoneSelectValue";
 import {timeZoneSelectItemsLoader} from "./timeZoneSelectItemsLoader";
@@ -247,7 +247,7 @@ export class Overlay {
 
             return <ion-item>
                 <ion-label position="stacked">{intl.message(`ionx/DateTimeInput#${part}`)}</ion-label>
-                <$Select
+                <Select
                     overlay="modal"
                     placeholder={this.timeZoneRequired ? "Choose..." : intl.message(noTimeZoneSelectValue.label)}
                     value={this.timeZoneValue}

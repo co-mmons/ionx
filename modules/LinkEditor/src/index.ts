@@ -8,4 +8,4 @@ export {showLinkEditor} from "./showLinkEditor";
 export {unknownScheme} from "./unknownScheme";
 export {urlValidator} from "./urlValidator";
 
-export const $LinkEditor = "ionx-link-editor";
+export const LinkEditor = "ionx-link-editor";

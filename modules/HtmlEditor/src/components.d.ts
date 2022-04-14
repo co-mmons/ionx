@@ -8,9 +8,10 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Schema } from "prosemirror-model";
 import { EditorState, Plugin } from "prosemirror-state";
 import { Keymap } from "prosemirror-commands";
-import { ToolbarItem } from "./toolbar/ToolbarItem";
+import { ToolbarItem } from "./toolbar";
 import { EditorView } from "prosemirror-view";
 import { InsertMenuItem } from "./menus/InsertMenuItem";
+import { ToolbarItem as ToolbarItem1 } from "./toolbar/ToolbarItem";
 export namespace Components {
     interface IonxHtmlEditor {
         "disabled": boolean;
