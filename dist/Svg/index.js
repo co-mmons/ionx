@@ -12,7 +12,14 @@ let Svg = class extends HTMLElement {
     this.__attachShadow();
   }
   render() {
-    return h("span", { innerHTML: this.svg });
+    let xml;
+    if (typeof this.svg === "string") {
+      xml = this.svg;
+    }
+    else if (this.svg instanceof ArrayBuffer) {
+      xml = new TextDecoder().decode(this.svg);
+    }
+    return h("span", { innerHTML: xml });
   }
   static get style() { return svgCss; }
 };

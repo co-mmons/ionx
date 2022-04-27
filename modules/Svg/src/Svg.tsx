@@ -8,9 +8,17 @@ import {Component, h, Prop} from "@stencil/core";
 export class Svg {
 
     @Prop()
-    svg!: string;
+    svg!: string | ArrayBuffer;
 
     render() {
-        return <span innerHTML={this.svg}/>;
+
+        let xml: string;
+        if (typeof this.svg === "string") {
+            xml = this.svg;
+        } else if (this.svg instanceof ArrayBuffer) {
+            xml = new TextDecoder().decode(this.svg);
+        }
+
+        return <span innerHTML={xml}/>;
     }
 }

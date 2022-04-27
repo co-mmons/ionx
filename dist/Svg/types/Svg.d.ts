@@ -1,4 +1,4 @@
 export declare class Svg {
-  svg: string;
+  svg: string | ArrayBuffer;
   render(): any;
 }
