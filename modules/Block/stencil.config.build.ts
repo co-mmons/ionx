@@ -5,6 +5,7 @@ import {defaultExternals} from "../defaultExternals";
 export const config: Config = {
     namespace: "ionx",
     plugins: [sass()],
+    tsconfig: "tsconfig.build.json",
     outputTargets: [
         {
             type: "dist-custom-elements-bundle",

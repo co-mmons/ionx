@@ -5,4 +5,5 @@ export declare type BlockWidthsMap = {
   md?: BlockWidth;
   lg?: BlockWidth;
   xl?: BlockWidth;
+  xxl?: BlockWidth;
 };

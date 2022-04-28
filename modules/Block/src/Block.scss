@@ -1,11 +1,15 @@
-@import "../../styles/src/media-width-breakpoints-mixin";
+@import "../WidthBreakpoints/src/styles/set-prop";
 
 :host {
     display: block;
+    margin: 16px;
 
-    &.ionx--margins {
-        margin: 16px;
-    }
+    --block--inner-width-xs: var(--ionx-width-breakpoints-xs) var(--block-inner-width-xs, 100%);
+    --block--inner-width-sm: var(--ionx-width-breakpoints-sm) var(--block-inner-width-sm, 100%);
+    --block--inner-width-md: var(--ionx-width-breakpoints-md) var(--block-inner-width-md, 100%);
+    --block--inner-width-lg: var(--ionx-width-breakpoints-lg) var(--block-inner-width-lg, 100%);
+    --block--inner-width-xl: var(--ionx-width-breakpoints-xl) var(--block-inner-width-xl, 100%);
+    --block--inner-width-xxl: var(--ionx-width-breakpoints-xxl) var(--block-inner-width-xxl, 100%);
 
     [ionx--outer] {
         display: flex;
@@ -22,8 +26,14 @@
     [ionx--inner] {
         width: 100%;
     }
+}
 
-    &.ionx--has-inner-width > [ionx--outer] > [ionx--inner] {
-        @include ionx-media-width-breakpoints("--block-inner-width", "100%");
+:host(.ionx--no-margins) {
+    margin: 0;
+}
+
+:host(.ionx--has-inner-width) {
+    [ionx--inner] {
+        @include ionx-width-breakpoints-set-prop("width", "block--inner-width");
     }
 }
