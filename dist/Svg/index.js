@@ -1,11 +1,11 @@
-import { HTMLElement, h, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 
-const Svg$1 = "ionx-svg";
+const Svg = "ionx-svg";
 
-const svgCss = ":host{display:inline-block}:host svg{display:inline-block;width:100%;height:100%;fill:var(--svg-fill-color);stroke:var(--svg-stroke-color);position:absolute;left:0px;top:0px}";
+const svgComponentCss = ":host{display:inline-block;width:100%}:host svg{display:inline-block;width:100%;fill:var(--svg-fill-color);stroke:var(--svg-stroke-color)}";
 
-let Svg = class extends HTMLElement {
+let SvgComponent = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
@@ -13,18 +13,18 @@ let Svg = class extends HTMLElement {
   }
   render() {
     let xml;
-    if (typeof this.svg === "string") {
-      xml = this.svg;
+    if (typeof this.source === "string") {
+      xml = this.source;
     }
-    else if (this.svg instanceof ArrayBuffer) {
-      xml = new TextDecoder().decode(this.svg);
+    else if (this.source instanceof ArrayBuffer) {
+      xml = new TextDecoder().decode(this.source);
     }
-    return h("span", { innerHTML: xml });
+    return h(Host, null, h("span", { innerHTML: xml }));
   }
-  static get style() { return svgCss; }
+  static get style() { return svgComponentCss; }
 };
 
-const IonxSvg = /*@__PURE__*/proxyCustomElement(Svg, [1,"ionx-svg",{"svg":[1]}]);
+const IonxSvg = /*@__PURE__*/proxyCustomElement(SvgComponent, [1,"ionx-svg",{"source":[1]}]);
 const defineIonxSvg = (opts) => {
   if (typeof customElements !== 'undefined') {
     [
@@ -38,4 +38,4 @@ const defineIonxSvg = (opts) => {
 };
 defineIonxSvg();
 
-export { IonxSvg, Svg$1 as Svg, defineIonxSvg };
+export { IonxSvg, Svg, defineIonxSvg };

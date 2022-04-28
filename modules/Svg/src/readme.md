@@ -7,9 +7,9 @@
 
 ## Properties
 
-| Property           | Attribute | Description | Type                    | Default     |
-| ------------------ | --------- | ----------- | ----------------------- | ----------- |
-| `svg` _(required)_ | `svg`     |             | `ArrayBuffer \| string` | `undefined` |
+| Property              | Attribute | Description | Type                    | Default     |
+| --------------------- | --------- | ----------- | ----------------------- | ----------- |
+| `source` _(required)_ | `source`  |             | `ArrayBuffer \| string` | `undefined` |
 
 
 ----------------------------------------------
