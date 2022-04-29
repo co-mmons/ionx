@@ -42,7 +42,7 @@ export class Block {
     render() {
 
         const defaultWidth = typeof this.innerWidth === "string" ? this.innerWidth : null;
-        const widths = defaultWidth ? {} as BlockWidthsMap : this.innerWidth as BlockWidthsMap;
+        const widths = defaultWidth ? {} as BlockWidthsMap : (this.innerWidth ?? {}) as BlockWidthsMap;
 
         const xs = widths.xs || defaultWidth || null;
         const sm = widths.sm || xs || null;
