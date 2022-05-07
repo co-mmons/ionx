@@ -49,7 +49,6 @@ let Input = class extends HTMLElement {
     this.emitStyle();
   }
   valueChanged(value, old) {
-    this.formattedValue = this.formatValue();
     if (this.valueChanging && (value !== old || value?.getTime() !== old?.getTime() || value?.timeZone !== old?.timeZone)) {
       this.ionChange.emit({ value });
     }
@@ -216,10 +215,11 @@ let Input = class extends HTMLElement {
     }
   }
   render() {
+    const { value, placeholder, readonly, disabled, clearButtonVisible } = this;
     return h(Host, null, h("div", { class: {
         "ionx--text": true,
-        "ionx--placeholder-visible": !this.formattedValue && !!this.placeholder
-      } }, this.formattedValue ?? this.placeholder), !this.readonly && !this.disabled && h("div", { class: "ionx--icon", role: "presentation" }, h("div", { class: "ionx--icon-inner" })), this.clearButtonVisible && !this.readonly && !this.disabled && this.value && h("ion-button", { fill: "clear", size: "small", tabIndex: -1, onClick: ev => this.clearButtonClicked(ev) }, h("ion-icon", { name: "backspace", slot: "icon-only" })));
+        "ionx--placeholder-visible": !value && !!placeholder
+      } }, value ? this.formatValue() : placeholder), !readonly && !disabled && h("div", { class: "ionx--icon", role: "presentation" }, h("div", { class: "ionx--icon-inner" })), clearButtonVisible && !readonly && !disabled && value && h("ion-button", { fill: "clear", size: "small", tabIndex: -1, onClick: ev => this.clearButtonClicked(ev) }, h("ion-icon", { name: "backspace", slot: "icon-only" })));
   }
   get element() { return this; }
   static get watchers() { return {
@@ -492,7 +492,7 @@ let Overlay = class extends HTMLElement {
   static get style() { return overlayCss; }
 };
 
-const IonxDateTimeInput = /*@__PURE__*/proxyCustomElement(Input, [2,"ionx-date-time-input",{"placeholder":[1],"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"defaultTimeZone":[1,"default-time-zone"],"timeZoneRequired":[4,"time-zone-required"],"clearButtonVisible":[4,"clear-button-visible"],"clearButtonIcon":[1,"clear-button-icon"],"readonly":[516],"disabled":[516],"formatOptions":[16],"value":[1040],"formattedValue":[32]},[[0,"keydown","onKeyDown"],[0,"focus","onFocus"],[0,"blur","onBlur"],[0,"click","onClick"]]]);
+const IonxDateTimeInput = /*@__PURE__*/proxyCustomElement(Input, [2,"ionx-date-time-input",{"placeholder":[1],"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"defaultTimeZone":[1,"default-time-zone"],"timeZoneRequired":[4,"time-zone-required"],"clearButtonVisible":[4,"clear-button-visible"],"clearButtonIcon":[1,"clear-button-icon"],"readonly":[516],"disabled":[516],"formatOptions":[16],"value":[1040]},[[0,"keydown","onKeyDown"],[0,"focus","onFocus"],[0,"blur","onBlur"],[0,"click","onClick"]]]);
 const IonxDateTimeInputOverlay = /*@__PURE__*/proxyCustomElement(Overlay, [1,"ionx-date-time-input-overlay",{"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"timeZoneRequired":[4,"time-zone-required"],"value":[16],"date":[32]},[[0,"ionFocus","onFocus"],[0,"keydown","onKeyDown"],[0,"ionChange","onChange"]]]);
 const defineIonxDateTimeInput = (opts) => {
   if (typeof customElements !== 'undefined') {

@@ -8,9 +8,9 @@
         "build:module": "npx ts-node build.ts"
     },
     "optionalDependencies": {
+        "sortablejs": "github:appspltfrm/sortablejs-build",
         "swiper": "^7.0.8",
-        "tippy.js": "^6.2.6",
-        "sortablejs": "github:appspltfrm/sortablejs-build"
+        "tippy.js": "^6.2.6"
     },
     "dependencies": {
         "@co.mmons/js-intl": "github:co-mmons/js-intl",
@@ -23,6 +23,7 @@
         "@stencil/core": "github:CODE-AND-MORE/stencil-core-build",
         "bignumber.js": "^9.0.0",
         "fast-equals": "^3.0.0",
+        "intl-messageformat": "^9.13.0",
         "ionicons": "^6.0.0",
         "rxjs": "^7.4.0",
         "scroll-into-view": "^1.15.0",
@@ -31,12 +32,12 @@
         "ts-error": "^1.0.6"
     },
     "devDependencies": {
-        "autoprefixer": "^10.3.7",
-        "@stencil/postcss": "^2.1.0",
-        "@stencil/sass": "^1.5.0",
         "@appspltfrm/stencil-dev-utils": "github:appspltfrm/stencil-dev-utils",
         "@rollup/plugin-node-resolve": "^13.0.5",
+        "@stencil/postcss": "^2.1.0",
+        "@stencil/sass": "^1.5.0",
         "@types/node": "^16.6.1",
+        "autoprefixer": "^10.3.7",
         "typescript": "^4.5.4"
     }
 }

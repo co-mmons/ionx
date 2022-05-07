@@ -1,7 +1,7 @@
 import {intl} from "@co.mmons/js-intl";
 import {sleep, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
 import {isPlatform, popoverController, StyleEventDetail} from "@ionic/core";
-import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, State, Watch} from "@stencil/core";
+import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {DateTimeInputProps} from "./DateTimeInputProps";
 import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
@@ -95,9 +95,6 @@ export class Input implements DateTimeInputProps {
     @Event()
     ionStyle!: EventEmitter<StyleEventDetail>;
 
-    @State()
-    formattedValue: string;
-
     focused: boolean;
 
     nativePicker: HTMLInputElement;
@@ -120,8 +117,6 @@ export class Input implements DateTimeInputProps {
 
     @Watch("value")
     valueChanged(value: TimeZoneDate, old: TimeZoneDate) {
-
-        this.formattedValue = this.formatValue();
 
         if (this.valueChanging && (value !== old || value?.getTime() !== old?.getTime() || value?.timeZone !== old?.timeZone)) {
             this.ionChange.emit({value});
@@ -339,18 +334,20 @@ export class Input implements DateTimeInputProps {
 
     render() {
 
+        const {value, placeholder, readonly, disabled, clearButtonVisible} = this;
+
         return <Host>
 
             <div class={{
                 "ionx--text": true,
-                "ionx--placeholder-visible": !this.formattedValue && !!this.placeholder
-            }}>{this.formattedValue ?? this.placeholder }</div>
+                "ionx--placeholder-visible": !value && !!placeholder
+            }}>{value ? this.formatValue() : placeholder }</div>
 
-            {!this.readonly && !this.disabled && <div class="ionx--icon" role="presentation">
+            {!readonly && !disabled && <div class="ionx--icon" role="presentation">
                 <div class="ionx--icon-inner"/>
             </div>}
 
-            {this.clearButtonVisible && !this.readonly && !this.disabled && this.value && <ion-button
+            {clearButtonVisible && !readonly && !disabled && value && <ion-button
                 fill="clear"
                 size="small"
                 tabIndex={-1}

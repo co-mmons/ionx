@@ -58,7 +58,6 @@ export declare class Input implements DateTimeInputProps {
    * @internal
    */
   ionStyle: EventEmitter<StyleEventDetail>;
-  formattedValue: string;
   focused: boolean;
   nativePicker: HTMLInputElement;
   overlayVisible: boolean;
