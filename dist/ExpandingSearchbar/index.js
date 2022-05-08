@@ -1,18 +1,19 @@
-import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement as HTMLElement$1, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { addEventListener } from 'ionx/utils';
 
 const tagNameExpandingSearchbar = "ionx-expanding-searchbar";
 
-async function expandChildSearchbar(element) {
-  await element.querySelector(tagNameExpandingSearchbar)?.expand();
+async function expandSiblingSearchbar(evOrElement) {
+  await (evOrElement instanceof HTMLElement ? evOrElement : evOrElement.currentTarget)
+    .parentElement.querySelector(tagNameExpandingSearchbar)?.expand();
 }
 
 const ExpandingSearchbar$1 = tagNameExpandingSearchbar;
 
 const expandingSearchbarCss = ".sc-ionx-expanding-searchbar-h.sc-ionx-expanding-searchbar-s>ion-searchbar{position:absolute;top:0px;left:0px;width:0px;overflow:hidden;padding:0px;margin:0px;display:none}.sc-ionx-expanding-searchbar-h.sc-ionx-expanding-searchbar-s>ion-searchbar:not(.searchbar-show-cancel) .searchbar-clear-button{display:block !important}.sc-ionx-expanding-searchbar-h[expanded].sc-ionx-expanding-searchbar-s>ion-searchbar{display:flex;width:100%}.sc-ionx-expanding-searchbar-hion-toolbar.sc-ionx-expanding-searchbar-s>ion-searchbar,ion-toolbar .sc-ionx-expanding-searchbar-h.sc-ionx-expanding-searchbar-s>ion-searchbar{height:100%}.sc-ionx-expanding-searchbar-hion-toolbar[expanded].sc-ionx-expanding-searchbar-s>ion-searchbar,ion-toolbar .sc-ionx-expanding-searchbar-h[expanded].sc-ionx-expanding-searchbar-s>ion-searchbar{padding-top:var(--padding-top);padding-bottom:var(--padding-bottom);padding-left:16px;padding-right:16px}.sc-ionx-expanding-searchbar-hion-toolbar.ios[expanded].sc-ionx-expanding-searchbar-s>ion-searchbar,ion-toolbar.ios .sc-ionx-expanding-searchbar-h[expanded].sc-ionx-expanding-searchbar-s>ion-searchbar{padding-right:calc(var(--padding-start) + 8px);padding-left:calc(var(--padding-end) + 8px)}.sc-ionx-expanding-searchbar-hion-toolbar.md[expanded].sc-ionx-expanding-searchbar-s>ion-searchbar,ion-toolbar.md .sc-ionx-expanding-searchbar-h[expanded].sc-ionx-expanding-searchbar-s>ion-searchbar{padding-right:var(--padding-start);padding-left:var(--padding-end)}";
 
-let ExpandingSearchbar = class extends HTMLElement {
+let ExpandingSearchbar = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
@@ -62,7 +63,7 @@ let ExpandingSearchbar = class extends HTMLElement {
 
 const expandingSearchbarParentCss = "[ionx-expanding-searchbar-parent]>*:not(ionx-expanding-searchbar){visibility:hidden !important;transition:none}";
 
-let ExpandingSearchbarParent = class extends HTMLElement {
+let ExpandingSearchbarParent = class extends HTMLElement$1 {
   constructor() {
     super();
     this.__registerHost();
@@ -89,4 +90,4 @@ const defineIonxExpandingSearchbar = (opts) => {
 };
 defineIonxExpandingSearchbar();
 
-export { ExpandingSearchbar$1 as ExpandingSearchbar, IonxExpandingSearchbar, IonxExpandingSearchbarParent, defineIonxExpandingSearchbar, expandChildSearchbar };
+export { ExpandingSearchbar$1 as ExpandingSearchbar, IonxExpandingSearchbar, IonxExpandingSearchbarParent, defineIonxExpandingSearchbar, expandSiblingSearchbar };
