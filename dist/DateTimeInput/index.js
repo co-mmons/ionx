@@ -139,10 +139,10 @@ let Input = class extends HTMLElement {
       this.nativePicker.click();
     }
     else if (!this.nativePicker) {
-      let value = this.value;
+      let value = this.value || this.initialValue;
       let currentTimeZone;
       if (this.dateOnly) {
-        value = new TimeZoneDate(this.value ?? new Date());
+        value = new TimeZoneDate(value ?? new Date());
       }
       else {
         if (this.timeZoneRequired && (!value || !value.timeZone) && (!this.defaultTimeZone || this.defaultTimeZone === "current")) {
@@ -492,7 +492,7 @@ let Overlay = class extends HTMLElement {
   static get style() { return overlayCss; }
 };
 
-const IonxDateTimeInput = /*@__PURE__*/proxyCustomElement(Input, [2,"ionx-date-time-input",{"placeholder":[1],"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"defaultTimeZone":[1,"default-time-zone"],"timeZoneRequired":[4,"time-zone-required"],"clearButtonVisible":[4,"clear-button-visible"],"clearButtonIcon":[1,"clear-button-icon"],"readonly":[516],"disabled":[516],"formatOptions":[16],"value":[1040]},[[0,"keydown","onKeyDown"],[0,"focus","onFocus"],[0,"blur","onBlur"],[0,"click","onClick"]]]);
+const IonxDateTimeInput = /*@__PURE__*/proxyCustomElement(Input, [2,"ionx-date-time-input",{"placeholder":[1],"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"defaultTimeZone":[1,"default-time-zone"],"timeZoneRequired":[4,"time-zone-required"],"clearButtonVisible":[4,"clear-button-visible"],"clearButtonIcon":[1,"clear-button-icon"],"readonly":[516],"disabled":[516],"formatOptions":[16],"value":[1040],"initialValue":[16]},[[0,"keydown","onKeyDown"],[0,"focus","onFocus"],[0,"blur","onBlur"],[0,"click","onClick"]]]);
 const IonxDateTimeInputOverlay = /*@__PURE__*/proxyCustomElement(Overlay, [1,"ionx-date-time-input-overlay",{"dateOnly":[4,"date-only"],"timeZoneDisabled":[4,"time-zone-disabled"],"timeZoneRequired":[4,"time-zone-required"],"value":[16],"date":[32]},[[0,"ionFocus","onFocus"],[0,"keydown","onKeyDown"],[0,"ionChange","onChange"]]]);
 const defineIonxDateTimeInput = (opts) => {
   if (typeof customElements !== 'undefined') {

@@ -2,4 +2,4 @@ import {tagNameExpandingSearchbar} from "./tagNameExpandingSearchbar";
 
 export const ExpandingSearchbar = tagNameExpandingSearchbar;
 
-export {expandSiblingSearchbar} from "./expandSiblingSearchbar";
+export {expandSearchbarInToolbar} from "./expandSearchbarInToolbar";

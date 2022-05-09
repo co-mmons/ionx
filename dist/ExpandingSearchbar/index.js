@@ -4,9 +4,9 @@ import { addEventListener } from 'ionx/utils';
 
 const tagNameExpandingSearchbar = "ionx-expanding-searchbar";
 
-async function expandSiblingSearchbar(evOrElement) {
+async function expandSearchbarInToolbar(evOrElement) {
   await (evOrElement instanceof HTMLElement ? evOrElement : evOrElement.currentTarget)
-    .parentElement.querySelector(tagNameExpandingSearchbar)?.expand();
+    .closest("ion-toolbar").querySelector(tagNameExpandingSearchbar)?.expand();
 }
 
 const ExpandingSearchbar$1 = tagNameExpandingSearchbar;
@@ -90,4 +90,4 @@ const defineIonxExpandingSearchbar = (opts) => {
 };
 defineIonxExpandingSearchbar();
 
-export { ExpandingSearchbar$1 as ExpandingSearchbar, IonxExpandingSearchbar, IonxExpandingSearchbarParent, defineIonxExpandingSearchbar, expandSiblingSearchbar };
+export { ExpandingSearchbar$1 as ExpandingSearchbar, IonxExpandingSearchbar, IonxExpandingSearchbarParent, defineIonxExpandingSearchbar, expandSearchbarInToolbar };

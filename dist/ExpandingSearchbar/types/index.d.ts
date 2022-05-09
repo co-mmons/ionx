@@ -1,2 +1,2 @@
 export declare const ExpandingSearchbar = "ionx-expanding-searchbar";
-export { expandSiblingSearchbar } from "./expandSiblingSearchbar";
+export { expandSearchbarInToolbar } from "./expandSearchbarInToolbar";

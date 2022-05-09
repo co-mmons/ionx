@@ -82,6 +82,12 @@ export class Input implements DateTimeInputProps {
     @Prop({mutable: true})
     value: TimeZoneDate;
 
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    initialValue?: TimeZoneDate;
+
     @Event()
     ionChange: EventEmitter<{value: TimeZoneDate}>;
 
@@ -238,11 +244,11 @@ export class Input implements DateTimeInputProps {
 
         } else if (!this.nativePicker) {
 
-            let value: TimeZoneDate = this.value;
+            let value: TimeZoneDate = this.value || this.initialValue;
             let currentTimeZone: string;
 
             if (this.dateOnly) {
-                value = new TimeZoneDate(this.value ?? new Date());
+                value = new TimeZoneDate(value ?? new Date());
 
             } else {
 

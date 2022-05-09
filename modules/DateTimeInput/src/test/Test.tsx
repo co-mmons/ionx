@@ -15,6 +15,8 @@ export class Test {
         date1: {value: new TimeZoneDate()}
     }).bindRenderer(this)
 
+    initialValue = new TimeZoneDate(Date.UTC(2022, 2, 1));
+
     render() {
 
         return <Host>
@@ -29,7 +31,7 @@ export class Test {
             </ionx-form-field>
 
             <ionx-form-field label="only date">
-                <DateTimeInput dateOnly={true} placeholder="Choose..."/>
+                <DateTimeInput dateOnly={true} initialValue={this.initialValue} placeholder="Choose..."/>
             </ionx-form-field>
 
         </Host>

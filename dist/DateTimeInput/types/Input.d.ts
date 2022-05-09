@@ -49,6 +49,10 @@ export declare class Input implements DateTimeInputProps {
    * @inheritDoc
    */
   value: TimeZoneDate;
+  /**
+   * @inheritDoc
+   */
+  initialValue?: TimeZoneDate;
   ionChange: EventEmitter<{
     value: TimeZoneDate;
   }>;

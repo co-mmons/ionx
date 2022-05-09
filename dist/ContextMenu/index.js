@@ -77,5 +77,6 @@ const defineIonxContextMenu = (opts) => {
     });
   }
 };
+defineIonxContextMenu();
 
 export { IonxContextMenu, contextMenuToggleButton, defineIonxContextMenu, showContextMenu };

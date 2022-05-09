@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../dist/ContextMenu",
             defineFunctionName: "defineIonxContextMenu",
             includeGlobalScripts: false,
+            autoDefineCustomElements: true,
             external: [...defaultExternals, /ionx\/(?!modules\/ContextMenu)/],
             empty: true
         }

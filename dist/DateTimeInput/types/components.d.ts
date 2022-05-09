@@ -19,11 +19,12 @@ export namespace Components {
         "clearButtonVisible": boolean;
         "clearValue": () => Promise<void>;
         /**
+          * If only date can be chosen. Change will cause change of the value (if present), but ionChange event is not fired.
           * @inheritDoc
          */
         "dateOnly": boolean;
         /**
-          * Timezone, that will be set, when new value is picked from picker. By default  time zone of current device will be used.
+          * Timezone, that will be set, when new value is picked from picker. By default, time zone of current device will be used.
           * @inheritDoc
          */
         "defaultTimeZone": string | "current";
@@ -35,6 +36,11 @@ export namespace Components {
           * @inheritDoc
          */
         "formatOptions": Intl.DateTimeFormatOptions;
+        /**
+          * The value, that will be initialy set when user opens date/time picker.
+          * @inheritDoc
+         */
+        "initialValue"?: TimeZoneDate;
         "open": () => Promise<void>;
         /**
           * @inheritDoc
@@ -97,11 +103,12 @@ declare namespace LocalJSX {
          */
         "clearButtonVisible"?: boolean;
         /**
+          * If only date can be chosen. Change will cause change of the value (if present), but ionChange event is not fired.
           * @inheritDoc
          */
         "dateOnly"?: boolean;
         /**
-          * Timezone, that will be set, when new value is picked from picker. By default  time zone of current device will be used.
+          * Timezone, that will be set, when new value is picked from picker. By default, time zone of current device will be used.
           * @inheritDoc
          */
         "defaultTimeZone"?: string | "current";
@@ -113,6 +120,11 @@ declare namespace LocalJSX {
           * @inheritDoc
          */
         "formatOptions"?: Intl.DateTimeFormatOptions;
+        /**
+          * The value, that will be initialy set when user opens date/time picker.
+          * @inheritDoc
+         */
+        "initialValue"?: TimeZoneDate;
         "onIonChange"?: (event: CustomEvent<{value: TimeZoneDate}>) => void;
         "onIonFocus"?: (event: CustomEvent<any>) => void;
         /**
