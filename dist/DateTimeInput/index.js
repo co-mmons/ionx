@@ -8,6 +8,10 @@ import { Select } from 'ionx/Select';
 
 const DateTimeInput = "ionx-date-time-input";
 
+function currentTimeZone() {
+  return new Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
 const defaultDateTimeFormat = {
   year: "numeric", month: "numeric", day: "numeric",
   hour: "2-digit", minute: "2-digit", second: undefined
@@ -167,7 +171,6 @@ let Input = class extends HTMLElement {
     }
     else if (!this.nativePicker) {
       let value = this.value || this.initialValue;
-      let currentTimeZone;
       if (isDateOnly) {
         value = new NoTimeDate(value ?? new Date());
       }
@@ -181,26 +184,36 @@ let Input = class extends HTMLElement {
         }
       }
       else {
-        if (isDateTime && !isLocalDateTime && this.timeZoneRequired && (!value || !(value instanceof TimeZoneDate) || !value.timeZone) && !this.defaultTimeZone) {
-          currentTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+        let defaultTimeZone = this.timeZoneDisabled ? undefined : this.defaultTimeZone;
+        // musimy pobrać identyfikator aktualnej strefy czasowej
+        if (!defaultTimeZone && !this.timeZoneDisabled && isDateTime && !isLocalDateTime && (!value || !(value instanceof TimeZoneDate) || !value.timeZone)) {
+          defaultTimeZone = currentTimeZone();
         }
-        if (value instanceof LocalDate && this.timeZoneRequired) {
-          value = new TimeZoneDate(value, currentTimeZone);
+        if (value instanceof LocalDate) {
+          if (!this.isLocalDateTime) {
+            value = new TimeZoneDate(value, this.timeZoneRequired ? defaultTimeZone : undefined);
+          }
         }
-        else if (!this.timeZoneRequired) {
-          const now = new Date();
-          value = new TimeZoneDate(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0), currentTimeZone);
+        else if (!value) {
+          if (this.isLocalDateTime && !this.isDateTime) {
+            value = new LocalDate();
+          }
+          else {
+            const now = new Date();
+            value = new TimeZoneDate(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0), defaultTimeZone);
+          }
         }
+        else if (!value && !this.timeZoneRequired) ;
         else if (!value || !(value instanceof TimeZoneDate) || (!value.timeZone && this.timeZoneRequired)) {
-          value = new TimeZoneDate(value ?? new Date(), currentTimeZone);
+          value = new TimeZoneDate(value ?? new Date(), defaultTimeZone);
         }
-      }
-      if (value instanceof TimeZoneDate) {
-        if (!value.timeZone || value.timeZone === "UTC") {
-          value = new TimeZoneDate(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate(), value.getUTCHours(), value.getUTCMinutes(), 0, 0), value.timeZone);
-        }
-        else {
-          value = new TimeZoneDate(value.getTime() + (timeZoneOffset(value.timeZone, value) * -1), value.timeZone);
+        if (value instanceof TimeZoneDate) {
+          if (value.timeZone === "UTC") {
+            value = new TimeZoneDate(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate(), value.getUTCHours(), value.getUTCMinutes(), 0, 0), value.timeZone);
+          }
+          else {
+            value = new TimeZoneDate(value.getTime() + (timeZoneOffset(value.timeZone ?? defaultTimeZone, value) * -1), value.timeZone);
+          }
         }
       }
       value.setUTCSeconds(0, 0);
@@ -435,13 +448,13 @@ let Overlay = class extends HTMLElement {
     if (this.isDateOnly) {
       value = new NoTimeDate(this.date);
     }
-    else if (this.timeZoneValue === "local" || !(this.isLocalDateTime && !this.isDateTime)) {
+    else if (this.timeZoneValue === "local" || (this.isLocalDateTime && !this.isDateTime)) {
       value = new LocalDate(this.date);
     }
     else {
       value = new TimeZoneDate(this.date, this.timeZoneValue);
-      if (this.timeZoneValue && this.timeZoneValue !== "UTC") {
-        value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue, this.value) * -1), this.timeZoneValue);
+      if ((this.timeZoneValue && this.timeZoneValue !== "UTC") || (!this.timeZoneDisabled && !this.timeZoneValue)) {
+        value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue ?? currentTimeZone(), this.value) * -1), this.timeZoneValue);
       }
     }
     const popover = this.element.closest("ion-popover");

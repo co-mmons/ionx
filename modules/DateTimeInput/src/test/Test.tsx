@@ -1,4 +1,3 @@
-import {intl} from "@co.mmons/js-intl";
 import {LocalDate, NoTimeDate, TimeZoneDate} from "@co.mmons/js-utils/core";
 import {Component, h, Host} from "@stencil/core";
 import {FormController, FormField} from "ionx/forms";
@@ -8,7 +7,7 @@ import {DateTimeInput} from "../index";
 
 const instanceNoTimeDate = new NoTimeDate(Date.UTC(2022, 2, 1));
 const instanceTimeZoneDate = new TimeZoneDate(new Date(2022, 4, 2, 13, 13, 13, 134));
-const instanceTimeZoneDateNewYork = new TimeZoneDate(instanceTimeZoneDate, "America/New_York");
+const instanceTimeZoneDateNewYork = new TimeZoneDate(new Date(2022, 4, 13, 12, 0, 0, 0), "Europe/Warsaw");
 const instanceLocalDate = new LocalDate(2022, 4, 2, 13, 13, 13, 0);
 
 @Component({
@@ -18,6 +17,8 @@ export class Test {
 
     form = new FormController({
         date1: {value: instanceTimeZoneDateNewYork},
+        date2: {value: undefined as Date},
+        date3: {value: instanceLocalDate},
 
         dateOnly1: {value: undefined as Date},
         dateOnly2: {value: instanceTimeZoneDate},
@@ -42,8 +43,8 @@ export class Test {
                 <GridRow>
                     <GridCol>
                         <FormField label="time zone required">
-                            <DateTimeInput type="date-time" ref={controls.date1.attach()}/>
-                            <div slot="hint">{intl.dateTimeFormat(controls.date1.value)}</div>
+                            <DateTimeInput timeZoneRequired={false} type={["date-time", "local-date-time"]} ref={controls.date1.attach()}/>
+                            <div slot="hint">{controls.date1.value.toISOString()}</div>
                         </FormField>
                     </GridCol>
                 </GridRow>
@@ -51,7 +52,17 @@ export class Test {
                 <GridRow>
                     <GridCol>
                         <FormField label="time zone not required">
-                            <DateTimeInput type="date-time" placeholder="Shalalala" timeZoneRequired={false}/>
+                            <DateTimeInput type="date-time" placeholder="Shalalala" ref={controls.date2.attach()} timeZoneRequired={false}/>
+                            <div slot="hint">{controls.date2.value?.toISOString()}</div>
+                        </FormField>
+                    </GridCol>
+                </GridRow>
+
+                <GridRow>
+                    <GridCol>
+                        <FormField label="local time possible">
+                            <DateTimeInput type={["date-time", "local-date-time"]} placeholder="Choose me..." ref={controls.date3.attach()} timeZoneRequired={true}/>
+                            <div slot="hint">{controls.date3.value?.toISOString()}</div>
                         </FormField>
                     </GridCol>
                 </GridRow>

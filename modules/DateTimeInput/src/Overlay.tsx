@@ -3,6 +3,7 @@ import {LocalDate, NoTimeDate, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-
 import {isPlatform} from "@ionic/core";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
 import {Select} from "ionx/Select";
+import {currentTimeZone} from "./currentTimeZone";
 import {DateTimeInputType} from "./DateTimeInputType";
 import {DateTimeInputValue} from "./DateTimeInputValue";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
@@ -121,14 +122,14 @@ export class Overlay {
         if (this.isDateOnly) {
             value = new NoTimeDate(this.date);
 
-        } else if (this.timeZoneValue === "local" || !(this.isLocalDateTime && !this.isDateTime)) {
+        } else if (this.timeZoneValue === "local" || (this.isLocalDateTime && !this.isDateTime)) {
             value = new LocalDate(this.date);
 
         } else {
             value = new TimeZoneDate(this.date, this.timeZoneValue);
 
-            if (this.timeZoneValue && this.timeZoneValue !== "UTC") {
-                value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue, this.value) * -1), this.timeZoneValue);
+            if ((this.timeZoneValue && this.timeZoneValue !== "UTC") || (!this.timeZoneDisabled && !this.timeZoneValue)) {
+                value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue ?? currentTimeZone(), this.value) * -1), this.timeZoneValue);
             }
         }
 
