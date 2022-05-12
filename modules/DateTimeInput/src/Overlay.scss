@@ -29,6 +29,14 @@
         }
     }
 
+    .numeric-label {
+        white-space: normal;
+
+        small {
+            opacity: .5;
+        }
+    }
+
     .numeric-buttons {
         text-align: center;
         margin-left: 16px;

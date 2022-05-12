@@ -1,16 +1,22 @@
-import { TimeZoneDate } from "@co.mmons/js-utils/core";
+import { DateTimeInputType } from "./DateTimeInputType";
+import { DateTimeInputValue } from "./DateTimeInputValue";
 declare type NumericDateTimePart = "Hour" | "Minute" | "Year" | "Month" | "Day";
 export declare class Overlay {
   element: HTMLElement;
-  dateOnly: boolean;
+  type: DateTimeInputType;
   timeZoneDisabled: boolean;
   timeZoneRequired: boolean;
-  value: TimeZoneDate;
+  value: DateTimeInputValue;
   date: Date;
+  monthFormatter: Intl.DateTimeFormat;
+  dayOfWeekFormatter: Intl.DateTimeFormat;
   numericValues: {
     [key: string]: number;
   };
   timeZoneValue: string;
+  get isDateOnly(): boolean;
+  get isDateTime(): boolean;
+  get isLocalDateTime(): boolean;
   ranges(): {
     Year: number[];
     Month: number[];
@@ -25,6 +31,7 @@ export declare class Overlay {
   onFocus(event: CustomEvent): Promise<void>;
   onKeyDown(event: KeyboardEvent): Promise<void>;
   onChange(event: CustomEvent): void;
+  didEnter(): Promise<void>;
   componentWillLoad(): Promise<void>;
   connectedCallback(): void;
   renderPart(part: NumericDateTimePart | "Time zone", range?: number[]): any;

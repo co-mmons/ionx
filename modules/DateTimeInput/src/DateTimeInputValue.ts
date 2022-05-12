@@ -1,3 +1,3 @@
-import {TimeZoneDate} from "@co.mmons/js-utils/core";
+import {LocalDate, NoTimeDate, TimeZoneDate} from "@co.mmons/js-utils/core";
 
-export type DateTimeInputValue = Date | TimeZoneDate | number;
+export type DateTimeInputValue = LocalDate | TimeZoneDate | NoTimeDate;

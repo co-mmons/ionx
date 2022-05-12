@@ -13,6 +13,7 @@ const hu = {
 	Now: Now,
 	"Time zone": "Időzóna",
 	Today: Today,
+	"Unspecified|time zone": "Meghatározatlan",
 	Year: Year
 };
 

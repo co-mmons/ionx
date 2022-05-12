@@ -1,10 +1,15 @@
 import {intl} from "@co.mmons/js-intl";
-import {sleep, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
-import {isPlatform, popoverController, StyleEventDetail} from "@ionic/core";
+import {LocalDate, NoTimeDate, sleep, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
+import {popoverController, StyleEventDetail} from "@ionic/core";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {DateTimeInputProps} from "./DateTimeInputProps";
-import {defaultDateFormat, defaultDateTimeFormat} from "./defaultFormats";
+import {DateTimeInputType} from "./DateTimeInputType";
+import {DateTimeInputValue} from "./DateTimeInputValue";
+import {defaultDateTimeFormat, onlyDateDefaultFormat, onlyDateForceFormat} from "./defaultFormats";
+import {isDateOnlyType} from "./isDateOnlyType";
+import {isDateTimeType} from "./isDateTimeType";
+import {isLocalDateTimeType} from "./isLocaleDateTimeType";
 
 @Component({
     tag: "ionx-date-time-input",
@@ -20,43 +25,13 @@ export class Input implements DateTimeInputProps {
      * @inheritDoc
      */
     @Prop()
+    type!: DateTimeInputType;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
     placeholder: string = intl.message`@co.mmons/js-intl#Choose...`;
-
-    /**
-     * @inheritDoc
-     */
-    @Prop()
-    dateOnly: boolean;
-
-    /**
-     * @inheritDoc
-     */
-    @Prop()
-    timeZoneDisabled: boolean;
-
-    /**
-     * @inheritDoc
-     */
-    @Prop()
-    defaultTimeZone: string | "current" = "current";
-
-    /**
-     * @inheritDoc
-     */
-    @Prop()
-    timeZoneRequired: boolean = true;
-
-    /**
-     * @inheritDoc
-     */
-    @Prop()
-    clearButtonVisible: boolean = true;
-
-    /**
-     * @inheritDoc
-     */
-    @Prop()
-    clearButtonIcon: string;
 
     /**
      * @inheritDoc
@@ -73,23 +48,54 @@ export class Input implements DateTimeInputProps {
     /**
      * @inheritDoc
      */
+    @Prop({mutable: true})
+    value: DateTimeInputValue;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    initialValue?: DateTimeInputValue;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    timeZoneDisabled: boolean = false;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    timeZoneRequired: boolean = true;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    defaultTimeZone: string;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    clearButtonVisible: boolean = true;
+
+    /**
+     * @inheritDoc
+     */
+    @Prop()
+    clearButtonIcon: string;
+
+    /**
+     * @inheritDoc
+     */
     @Prop()
     formatOptions: Intl.DateTimeFormatOptions;
 
-    /**
-     * @inheritDoc
-     */
-    @Prop({mutable: true})
-    value: TimeZoneDate;
-
-    /**
-     * @inheritDoc
-     */
-    @Prop()
-    initialValue?: TimeZoneDate;
 
     @Event()
-    ionChange: EventEmitter<{value: TimeZoneDate}>;
+    ionChange: EventEmitter<{value: DateTimeInputValue}>;
 
     @Event()
     ionFocus: EventEmitter<any>;
@@ -100,6 +106,7 @@ export class Input implements DateTimeInputProps {
      */
     @Event()
     ionStyle!: EventEmitter<StyleEventDetail>;
+
 
     focused: boolean;
 
@@ -122,9 +129,9 @@ export class Input implements DateTimeInputProps {
     }
 
     @Watch("value")
-    valueChanged(value: TimeZoneDate, old: TimeZoneDate) {
+    valueChanged(value: DateTimeInputValue, old: DateTimeInputValue) {
 
-        if (this.valueChanging && (value !== old || value?.getTime() !== old?.getTime() || value?.timeZone !== old?.timeZone)) {
+        if (this.valueChanging && (!!value !== !!old || JSON.stringify(value.toJSON()) !== JSON.stringify(old.toJSON()))) {
             this.ionChange.emit({value});
         }
 
@@ -132,32 +139,44 @@ export class Input implements DateTimeInputProps {
         this.valueChanging = false;
     }
 
+    get isDateOnly() {
+        return isDateOnlyType(this.type);
+    }
+
+    get isDateTime() {
+        return isDateTimeType(this.type);
+    }
+
+    get isLocalDateTime() {
+        return isLocalDateTimeType(this.type);
+    }
+
     formatValue() {
 
         if (this.value) {
+            const {isDateOnly} = this;
+
             let value = this.value;
-            const options = Object.assign({}, this.formatOptions || (this.dateOnly ? defaultDateFormat : defaultDateTimeFormat));
+            const options = Object.assign({}, (isDateOnly ? onlyDateDefaultFormat : defaultDateTimeFormat), this.formatOptions, (isDateOnly ? onlyDateForceFormat : {}));
 
-            if (value.timeZone) {
-                options.timeZone = this.value.timeZone;
+            if (isDateOnly) {
+                return intl.dateFormat(value.getTime(), options);
 
-                if (!options.timeZoneName) {
-                    options.timeZoneName = "short";
+            } else {
+
+                if (value instanceof TimeZoneDate) {
+                    options.timeZone = value.timeZone ?? this.defaultTimeZone;
+
+                    if (!("timeZoneName" in options)) {
+                        options.timeZoneName = "short";
+                    }
+
+                } else {
+                    options.timeZone = "UTC";
+                    options.timeZoneName = undefined;
                 }
 
-            } else if (value instanceof TimeZoneDate && !value.timeZone && this.timeZoneRequired && !this.dateOnly) {
-                value = new TimeZoneDate(value, "current");
-                options.timeZoneName = "short";
-
-            } else {
-                options.timeZone = "UTC";
-                options.timeZoneName = undefined;
-            }
-
-            if (this.dateOnly) {
-                return intl.dateFormat(value, options);
-            } else {
-                return intl.dateTimeFormat(value, options);
+                return intl.dateTimeFormat(value.getTime(), options);
             }
 
         } else {
@@ -234,6 +253,8 @@ export class Input implements DateTimeInputProps {
     @Method()
     async open(): Promise<void> {
 
+        const {isLocalDateTime, isDateTime, isDateOnly} = this;
+
         if (this.nativePicker) {
 
             this.nativePicker = document.createElement("input");
@@ -244,39 +265,54 @@ export class Input implements DateTimeInputProps {
 
         } else if (!this.nativePicker) {
 
-            let value: TimeZoneDate = this.value || this.initialValue;
+            let value = this.value || this.initialValue;
             let currentTimeZone: string;
 
-            if (this.dateOnly) {
-                value = new TimeZoneDate(value ?? new Date());
+            if (isDateOnly) {
+                value = new NoTimeDate(value ?? new Date());
+
+            } else if (isLocalDateTime && !isDateTime) {
+
+                if (value instanceof TimeZoneDate) {
+                    value = new LocalDate(value.getFullYear(), value.getMonth(), value.getDate(), value.getHours(), value.getMinutes(), value.getSeconds(), value.getMilliseconds());
+                } else if (!value) {
+                    const now = new Date();
+                    value = new LocalDate(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+                }
 
             } else {
 
-                if (this.timeZoneRequired && (!value || !value.timeZone) && (!this.defaultTimeZone || this.defaultTimeZone === "current")) {
+                if (isDateTime && !isLocalDateTime && this.timeZoneRequired && (!value || !(value instanceof TimeZoneDate) || !value.timeZone) && !this.defaultTimeZone) {
                     currentTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
                 }
 
-                if (!value && !this.timeZoneRequired) {
+                if (value instanceof LocalDate && this.timeZoneRequired) {
+                    value = new TimeZoneDate(value, currentTimeZone);
+
+                } else if (!this.timeZoneRequired) {
                     const now = new Date();
                     value = new TimeZoneDate(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0 , 0), currentTimeZone);
-                } else if (!value || (!value.timeZone && this.timeZoneRequired)) {
+
+                } else if (!value || !(value instanceof TimeZoneDate) || (!value.timeZone && this.timeZoneRequired)) {
                     value = new TimeZoneDate(value ?? new Date(), currentTimeZone);
                 }
             }
 
-            if (!value.timeZone || value.timeZone === "UTC") {
-                value = new TimeZoneDate(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate(), value.getUTCHours(), value.getUTCMinutes(), 0, 0), value.timeZone);
-            } else {
-                value = new TimeZoneDate(value.getTime() + (timeZoneOffset(value.timeZone, value) * -1), value.timeZone);
+            if (value instanceof TimeZoneDate) {
+                if (!value.timeZone || value.timeZone === "UTC") {
+                    value = new TimeZoneDate(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate(), value.getUTCHours(), value.getUTCMinutes(), 0, 0), value.timeZone);
+                } else {
+                    value = new TimeZoneDate(value.getTime() + (timeZoneOffset(value.timeZone, value) * -1), value.timeZone);
+                }
             }
 
             value.setUTCSeconds(0, 0);
 
             const overlayProps = {
                 value,
-                dateOnly: !!this.dateOnly,
-                timeZoneDisabled: !!this.dateOnly || !!this.timeZoneDisabled,
-                timeZoneRequired: !this.dateOnly && !!this.timeZoneRequired
+                type: this.type,
+                timeZoneDisabled: isDateOnly || (isLocalDateTime && !isDateTime) || !!this.timeZoneDisabled,
+                timeZoneRequired: !isDateOnly && !!this.timeZoneRequired
             };
 
             const popover = await popoverController.create({
@@ -286,11 +322,9 @@ export class Input implements DateTimeInputProps {
                 showBackdrop: true
             });
 
-            if (isPlatform("mobile")) {
-                popover.style.setProperty("--width", "250px");
-            }
-
+            popover.style.setProperty("--width", "250px");
             popover.present();
+
             this.overlayVisible = true;
 
             const result = await popover.onWillDismiss();

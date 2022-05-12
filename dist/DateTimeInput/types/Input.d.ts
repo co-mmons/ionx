@@ -1,38 +1,19 @@
-import { TimeZoneDate } from "@co.mmons/js-utils/core";
 import { StyleEventDetail } from "@ionic/core";
 import { EventEmitter } from "@stencil/core";
 import { EventUnlisten } from "ionx/utils";
 import { DateTimeInputProps } from "./DateTimeInputProps";
+import { DateTimeInputType } from "./DateTimeInputType";
+import { DateTimeInputValue } from "./DateTimeInputValue";
 export declare class Input implements DateTimeInputProps {
   element: HTMLElement;
   /**
    * @inheritDoc
    */
+  type: DateTimeInputType;
+  /**
+   * @inheritDoc
+   */
   placeholder: string;
-  /**
-   * @inheritDoc
-   */
-  dateOnly: boolean;
-  /**
-   * @inheritDoc
-   */
-  timeZoneDisabled: boolean;
-  /**
-   * @inheritDoc
-   */
-  defaultTimeZone: string | "current";
-  /**
-   * @inheritDoc
-   */
-  timeZoneRequired: boolean;
-  /**
-   * @inheritDoc
-   */
-  clearButtonVisible: boolean;
-  /**
-   * @inheritDoc
-   */
-  clearButtonIcon: string;
   /**
    * @inheritDoc
    */
@@ -44,17 +25,37 @@ export declare class Input implements DateTimeInputProps {
   /**
    * @inheritDoc
    */
+  value: DateTimeInputValue;
+  /**
+   * @inheritDoc
+   */
+  initialValue?: DateTimeInputValue;
+  /**
+   * @inheritDoc
+   */
+  timeZoneDisabled: boolean;
+  /**
+   * @inheritDoc
+   */
+  timeZoneRequired: boolean;
+  /**
+   * @inheritDoc
+   */
+  defaultTimeZone: string;
+  /**
+   * @inheritDoc
+   */
+  clearButtonVisible: boolean;
+  /**
+   * @inheritDoc
+   */
+  clearButtonIcon: string;
+  /**
+   * @inheritDoc
+   */
   formatOptions: Intl.DateTimeFormatOptions;
-  /**
-   * @inheritDoc
-   */
-  value: TimeZoneDate;
-  /**
-   * @inheritDoc
-   */
-  initialValue?: TimeZoneDate;
   ionChange: EventEmitter<{
-    value: TimeZoneDate;
+    value: DateTimeInputValue;
   }>;
   ionFocus: EventEmitter<any>;
   /**
@@ -69,7 +70,10 @@ export declare class Input implements DateTimeInputProps {
   valueChanging: boolean;
   readonlyChanged(): void;
   disabledChanged(): void;
-  valueChanged(value: TimeZoneDate, old: TimeZoneDate): void;
+  valueChanged(value: DateTimeInputValue, old: DateTimeInputValue): void;
+  get isDateOnly(): boolean;
+  get isDateTime(): boolean;
+  get isLocalDateTime(): boolean;
   formatValue(): string;
   setFocus(options?: FocusOptions): Promise<void>;
   setBlur(): Promise<void>;

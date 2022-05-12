@@ -7,12 +7,12 @@
 
 ## Properties
 
-| Property           | Attribute            | Description | Type           | Default     |
-| ------------------ | -------------------- | ----------- | -------------- | ----------- |
-| `dateOnly`         | `date-only`          |             | `boolean`      | `undefined` |
-| `timeZoneDisabled` | `time-zone-disabled` |             | `boolean`      | `undefined` |
-| `timeZoneRequired` | `time-zone-required` |             | `boolean`      | `undefined` |
-| `value`            | --                   |             | `TimeZoneDate` | `undefined` |
+| Property           | Attribute            | Description | Type                                                                                                                                                                     | Default     |
+| ------------------ | -------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `timeZoneDisabled` | `time-zone-disabled` |             | `boolean`                                                                                                                                                                | `undefined` |
+| `timeZoneRequired` | `time-zone-required` |             | `boolean`                                                                                                                                                                | `undefined` |
+| `type`             | `type`               |             | `"date" \| "date-time" \| "local-date-time" \| ["date"] \| ["date-time", "local-date-time"] \| ["date-time"] \| ["local-date-time", "date-time"] \| ["local-date-time"]` | `undefined` |
+| `value`            | --                   |             | `LocalDate \| NoTimeDate \| TimeZoneDate`                                                                                                                                | `undefined` |
 
 
 ## Dependencies

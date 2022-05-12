@@ -13,6 +13,7 @@ const fr = {
 	Now: Now,
 	"Time zone": "Fuseau horaire",
 	Today: Today,
+	"Unspecified|time zone": "Non spécifié",
 	Year: Year
 };
 

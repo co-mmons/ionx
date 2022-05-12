@@ -7,6 +7,7 @@ import {FormControlImpl} from "./FormControlImpl";
 import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormControllerPublicApi";
 import {FormControlState} from "./FormControlState";
 import {FormState} from "./FormState";
+import {FormStateChange} from "./FormStateChange";
 import {FormValidationErrorPresenter} from "./FormValidationErrorPresenter";
 import {FormValidator} from "./FormValidator";
 
@@ -131,7 +132,7 @@ export class FormController<Controls extends FormKnownControls = any> implements
         return control.attach();
     }
 
-    onStateChange(observer: (event: {current: FormState, previous: FormState, value: boolean, status: boolean}) => void): Subscription {
+    onStateChange(observer: (event: FormStateChange) => void): Subscription {
         return this.stateChanged.subscribe(event => observer(event));
     }
 

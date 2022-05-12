@@ -13,6 +13,7 @@ const ru = {
 	Now: Now,
 	"Time zone": "Часовой пояс",
 	Today: Today,
+	"Unspecified|time zone": "Не указан",
 	Year: Year
 };
 

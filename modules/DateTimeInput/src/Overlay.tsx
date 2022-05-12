@@ -1,10 +1,16 @@
 import {intl} from "@co.mmons/js-intl";
-import {TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
+import {LocalDate, NoTimeDate, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
+import {isPlatform} from "@ionic/core";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
 import {Select} from "ionx/Select";
+import {DateTimeInputType} from "./DateTimeInputType";
+import {DateTimeInputValue} from "./DateTimeInputValue";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
-import {noTimeZoneSelectValue} from "./noTimeZoneSelectValue";
+import {isDateOnlyType} from "./isDateOnlyType";
+import {isDateTimeType} from "./isDateTimeType";
+import {isLocalDateTimeType} from "./isLocaleDateTimeType";
 import {timeZoneSelectItemsLoader} from "./timeZoneSelectItemsLoader";
+import {unspecifiedTimeZoneSelectValue} from "./unspecifiedTimeZoneSelectValue";
 
 type NumericDateTimePart = "Hour" | "Minute" | "Year" | "Month" | "Day";
 
@@ -19,7 +25,7 @@ export class Overlay {
     element: HTMLElement;
 
     @Prop()
-    dateOnly: boolean;
+    type: DateTimeInputType;
 
     @Prop()
     timeZoneDisabled: boolean;
@@ -28,14 +34,30 @@ export class Overlay {
     timeZoneRequired: boolean;
 
     @Prop()
-    value: TimeZoneDate;
+    value: DateTimeInputValue;
 
     @State()
     date: Date;
 
+    monthFormatter: Intl.DateTimeFormat;
+
+    dayOfWeekFormatter: Intl.DateTimeFormat;
+
     numericValues: {[key: string]: number} = {};
 
     timeZoneValue: string;
+
+    get isDateOnly() {
+        return isDateOnlyType(this.type);
+    }
+
+    get isDateTime() {
+        return isDateTimeType(this.type);
+    }
+
+    get isLocalDateTime() {
+        return isLocalDateTimeType(this.type);
+    }
 
     ranges() {
 
@@ -94,10 +116,20 @@ export class Overlay {
 
     ok() {
 
-        let value = new TimeZoneDate(this.date, this.timeZoneValue);
+        let value: DateTimeInputValue;
 
-        if (!this.dateOnly && this.timeZoneValue && this.timeZoneValue !== "UTC") {
-            value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue, this.value) * -1), this.timeZoneValue);
+        if (this.isDateOnly) {
+            value = new NoTimeDate(this.date);
+
+        } else if (this.timeZoneValue === "local" || !(this.isLocalDateTime && !this.isDateTime)) {
+            value = new LocalDate(this.date);
+
+        } else {
+            value = new TimeZoneDate(this.date, this.timeZoneValue);
+
+            if (this.timeZoneValue && this.timeZoneValue !== "UTC") {
+                value = new TimeZoneDate(value.getTime() - (timeZoneOffset(this.timeZoneValue, this.value) * -1), this.timeZoneValue);
+            }
         }
 
         const popover = this.element.closest<HTMLIonPopoverElement>("ion-popover");
@@ -182,19 +214,48 @@ export class Overlay {
 
     }
 
+    @Listen("ionViewDidEnter")
+    async didEnter() {
+        if (isPlatform("desktop")) {
+
+            let input: HTMLIonInputElement;
+            while (!input) {
+                input = this.element.shadowRoot.querySelector("ion-input");
+            }
+
+            input.setFocus();
+        }
+    }
+
     async componentWillLoad() {
         await loadIntlMessages();
     }
 
     connectedCallback() {
-        this.date = new Date(this.value);
-        this.timeZoneValue = this.value.timeZone || undefined;
 
-        if (this.dateOnly) {
+        if (this.value instanceof LocalDate) {
+            this.date = new Date(this.value.getTime());
+            this.timeZoneValue = "local";
+
+        } else if (this.value instanceof TimeZoneDate) {
+            this.date = new Date(this.value);
+            this.timeZoneValue = this.value.timeZone === "current" ? undefined : this.value.timeZone;
+
+        } else if (this.value instanceof NoTimeDate) {
+            this.date = new Date(this.value.getTime());
+
+        } else if (this.value) {
+            this.date = new Date(this.value);
+        }
+
+        if (this.isDateOnly) {
             this.date.setUTCHours(0, 0, 0, 0);
         } else {
             this.date.setUTCSeconds(0, 0);
         }
+
+        this.monthFormatter = new Intl.DateTimeFormat(undefined, {month: "long"});
+        this.dayOfWeekFormatter = new Intl.DateTimeFormat(undefined, {weekday: "long"});
     }
 
     renderPart(part: NumericDateTimePart | "Time zone", range?: number[]) {
@@ -203,6 +264,7 @@ export class Overlay {
 
             let def: number;
             let val: number;
+            let label: string;
 
             if (part === "Hour") {
                 def = val = this.date.getUTCHours();
@@ -212,8 +274,10 @@ export class Overlay {
                 def = val = this.date.getUTCFullYear(), length = 4;
             } else if (part === "Month") {
                 def = val = this.date.getUTCMonth() + 1;
+                label = this.monthFormatter.format(this.date);
             } else if (part === "Day") {
                 def = val = this.date.getUTCDate();
+                label = this.dayOfWeekFormatter.format(this.date);
             }
 
             if (part in this.numericValues && typeof this.numericValues[part] !== "number") {
@@ -222,7 +286,10 @@ export class Overlay {
 
             return <ion-item>
 
-                <ion-label class="numeric-label">{intl.message(`ionx/DateTimeInput#${part}`)}</ion-label>
+                <ion-label class="numeric-label">
+                    <div>{intl.message(`ionx/DateTimeInput#${part}`)}</div>
+                    {label && <small>{label}</small>}
+                </ion-label>
 
                 <div class="numeric-buttons" slot="end">
                     <ion-button fill="clear" size="small" tabindex={-1} onClick={() => this.move(part, -1)}>
@@ -249,15 +316,16 @@ export class Overlay {
                 <ion-label position="stacked">{intl.message(`ionx/DateTimeInput#${part}`)}</ion-label>
                 <Select
                     overlay="modal"
-                    placeholder={this.timeZoneRequired ? "Choose..." : intl.message(noTimeZoneSelectValue.label)}
+                    placeholder={this.timeZoneRequired ? "Choose..." : intl.message(unspecifiedTimeZoneSelectValue.label)}
                     value={this.timeZoneValue}
-                    lazyItems={timeZoneSelectItemsLoader(this.timeZoneRequired, this.date)}/>
+                    lazyItems={timeZoneSelectItemsLoader(this.timeZoneRequired, this.isLocalDateTime, this.date)}/>
             </ion-item>
         }
     }
 
     render() {
 
+        const {isDateOnly} = this;
         const ranges = this.ranges();
 
         return <Host>
@@ -267,11 +335,11 @@ export class Overlay {
                 {this.renderPart("Year", ranges["Year"])}
                 {this.renderPart("Month", ranges["Month"])}
                 {this.renderPart("Day", ranges["Day"])}
-                {!this.dateOnly && this.renderPart("Hour", ranges["Hour"])}
-                {!this.dateOnly && this.renderPart("Minute", ranges["Minute"])}
+                {!isDateOnly && this.renderPart("Hour", ranges["Hour"])}
+                {!isDateOnly && this.renderPart("Minute", ranges["Minute"])}
 
                 <ion-item>
-                    <ion-button size="small" slot="end" onClick={() => this.now()}>{this.dateOnly ? intl.message`ionx/DateTimeInput#Today` : intl.message`ionx/DateTimeInput#Now`}</ion-button>
+                    <ion-button size="small" slot="end" onClick={() => this.now()}>{isDateOnly ? intl.message`ionx/DateTimeInput#Today` : intl.message`ionx/DateTimeInput#Now`}</ion-button>
                 </ion-item>
 
                 {!this.timeZoneDisabled && this.renderPart("Time zone")}

@@ -13,6 +13,7 @@ const da = {
 	Now: Now,
 	"Time zone": "Tidszone",
 	Today: Today,
+	"Unspecified|time zone": "Uspecificeret",
 	Year: Year
 };
 

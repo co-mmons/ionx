@@ -13,6 +13,7 @@ const cs = {
 	Now: Now,
 	"Time zone": "Časové pásmo",
 	Today: Today,
+	"Unspecified|time zone": "Nespecifikované",
 	Year: Year
 };
 

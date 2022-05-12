@@ -13,6 +13,7 @@ const pl = {
 	Now: Now,
 	"Time zone": "Strefa czasowa",
 	Today: Today,
+	"Unspecified|time zone": "Nieokreślona",
 	Year: Year
 };
 

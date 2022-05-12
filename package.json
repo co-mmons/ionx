@@ -12,13 +12,11 @@
         "swiper": "^7.0.8",
         "tippy.js": "^6.2.6"
     },
-    "dependencies": {
-        "@co.mmons/js-intl": "github:co-mmons/js-intl",
-        "@co.mmons/js-utils": "github:co-mmons/js-utils",
-        "@co.mmons/rxjs-utils": "github:co-mmons/rxjs-utils"
-    },
     "peerDependencies": {
         "@capacitor/core": "^3.3.0",
+        "@co.mmons/rxjs-utils": "github:co-mmons/rxjs-utils",
+        "@co.mmons/js-intl": "github:co-mmons/js-intl",
+        "@co.mmons/js-utils": "github:co-mmons/js-utils",
         "@ionic/core": "^5.9.0",
         "@stencil/core": "github:CODE-AND-MORE/stencil-core-build",
         "bignumber.js": "^9.0.0",

@@ -5,7 +5,8 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { TimeZoneDate } from "@co.mmons/js-utils/core";
+import { DateTimeInputType } from "./DateTimeInputType";
+import { DateTimeInputValue } from "./DateTimeInputValue";
 import { StyleEventDetail } from "@ionic/core";
 export namespace Components {
     interface IonxDateTimeInput {
@@ -19,15 +20,10 @@ export namespace Components {
         "clearButtonVisible": boolean;
         "clearValue": () => Promise<void>;
         /**
-          * If only date can be chosen. Change will cause change of the value (if present), but ionChange event is not fired.
+          * Timezone, that will be set, when new value is picked from picker.
           * @inheritDoc
          */
-        "dateOnly": boolean;
-        /**
-          * Timezone, that will be set, when new value is picked from picker. By default, time zone of current device will be used.
-          * @inheritDoc
-         */
-        "defaultTimeZone": string | "current";
+        "defaultTimeZone": string;
         /**
           * @inheritDoc
          */
@@ -37,10 +33,10 @@ export namespace Components {
          */
         "formatOptions": Intl.DateTimeFormatOptions;
         /**
-          * The value, that will be initialy set when user opens date/time picker.
+          * The value, that will be initially set when user opens date/time picker.
           * @inheritDoc
          */
-        "initialValue"?: TimeZoneDate;
+        "initialValue"?: DateTimeInputValue;
         "open": () => Promise<void>;
         /**
           * @inheritDoc
@@ -53,7 +49,7 @@ export namespace Components {
         "setBlur": () => Promise<void>;
         "setFocus": (options?: FocusOptions) => Promise<void>;
         /**
-          * Whether timezone cannot be changed.
+          * Jeżeli wartością może być date-time to czy możliwość wyboru strefy czasowej jest zablokowana. Jeżeli true to strefa czasowa będzie taka jak określona w {@link value}, {@link initialValue} lub {@link defaultTimeZone}.
           * @inheritDoc
          */
         "timeZoneDisabled": boolean;
@@ -65,13 +61,17 @@ export namespace Components {
         /**
           * @inheritDoc
          */
-        "value": TimeZoneDate;
+        "type": DateTimeInputType;
+        /**
+          * @inheritDoc
+         */
+        "value": DateTimeInputValue;
     }
     interface IonxDateTimeInputOverlay {
-        "dateOnly": boolean;
         "timeZoneDisabled": boolean;
         "timeZoneRequired": boolean;
-        "value": TimeZoneDate;
+        "type": DateTimeInputType;
+        "value": DateTimeInputValue;
     }
 }
 declare global {
@@ -103,15 +103,10 @@ declare namespace LocalJSX {
          */
         "clearButtonVisible"?: boolean;
         /**
-          * If only date can be chosen. Change will cause change of the value (if present), but ionChange event is not fired.
+          * Timezone, that will be set, when new value is picked from picker.
           * @inheritDoc
          */
-        "dateOnly"?: boolean;
-        /**
-          * Timezone, that will be set, when new value is picked from picker. By default, time zone of current device will be used.
-          * @inheritDoc
-         */
-        "defaultTimeZone"?: string | "current";
+        "defaultTimeZone"?: string;
         /**
           * @inheritDoc
          */
@@ -121,11 +116,11 @@ declare namespace LocalJSX {
          */
         "formatOptions"?: Intl.DateTimeFormatOptions;
         /**
-          * The value, that will be initialy set when user opens date/time picker.
+          * The value, that will be initially set when user opens date/time picker.
           * @inheritDoc
          */
-        "initialValue"?: TimeZoneDate;
-        "onIonChange"?: (event: CustomEvent<{value: TimeZoneDate}>) => void;
+        "initialValue"?: DateTimeInputValue;
+        "onIonChange"?: (event: CustomEvent<{value: DateTimeInputValue}>) => void;
         "onIonFocus"?: (event: CustomEvent<any>) => void;
         /**
           * Emitted when the styles change.
@@ -140,7 +135,7 @@ declare namespace LocalJSX {
          */
         "readonly"?: boolean;
         /**
-          * Whether timezone cannot be changed.
+          * Jeżeli wartością może być date-time to czy możliwość wyboru strefy czasowej jest zablokowana. Jeżeli true to strefa czasowa będzie taka jak określona w {@link value}, {@link initialValue} lub {@link defaultTimeZone}.
           * @inheritDoc
          */
         "timeZoneDisabled"?: boolean;
@@ -152,13 +147,17 @@ declare namespace LocalJSX {
         /**
           * @inheritDoc
          */
-        "value"?: TimeZoneDate;
+        "type": DateTimeInputType;
+        /**
+          * @inheritDoc
+         */
+        "value"?: DateTimeInputValue;
     }
     interface IonxDateTimeInputOverlay {
-        "dateOnly"?: boolean;
         "timeZoneDisabled"?: boolean;
         "timeZoneRequired"?: boolean;
-        "value"?: TimeZoneDate;
+        "type"?: DateTimeInputType;
+        "value"?: DateTimeInputValue;
     }
     interface IntrinsicElements {
         "ionx-date-time-input": IonxDateTimeInput;

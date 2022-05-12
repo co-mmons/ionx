@@ -1,7 +1,8 @@
-import {Component, ComponentInterface, h, Host, Method, Prop} from "@stencil/core";
+import {Component, ComponentInterface, Event, EventEmitter, h, Host, Method, Prop} from "@stencil/core";
 import {FormControlAttachOptions} from "./FormControlAttachOptions";
 import {FormController} from "./FormController";
 import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormControllerPublicApi";
+import {FormStateChange} from "./FormStateChange";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
 
 @Component({
@@ -19,6 +20,9 @@ export class FormComponent implements ComponentInterface, FormControllerPublicAp
      */
     @Prop()
     disconnect?: boolean = true;
+
+    @Event()
+    stateChange: EventEmitter<FormStateChange>;
 
     @Method()
     async attach(name: string, options?: FormControlAttachOptions) {

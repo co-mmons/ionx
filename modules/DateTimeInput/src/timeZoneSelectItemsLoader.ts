@@ -1,8 +1,9 @@
 import {SelectValueItem} from "ionx/Select";
-import {noTimeZoneSelectValue} from "./noTimeZoneSelectValue";
+import {localTimeZoneSelectValue} from "./localTimeZoneSelectValue";
 import {TimeZone} from "./TimeZone";
+import {unspecifiedTimeZoneSelectValue} from "./unspecifiedTimeZoneSelectValue";
 
-export function timeZoneSelectItemsLoader(required: boolean, date?: Date) {
+export function timeZoneSelectItemsLoader(required: boolean, localAllowed: boolean, date?: Date) {
 
     return async (values?: string[]) => {
 
@@ -11,7 +12,7 @@ export function timeZoneSelectItemsLoader(required: boolean, date?: Date) {
         }
 
         if (values) {
-            return values.map(timeZone => (timeZone && {value: timeZone, label: TimeZone.get(timeZone)?.label} as SelectValueItem) ?? noTimeZoneSelectValue);
+            return values.map(timeZone => timeZone === "local" ? localTimeZoneSelectValue : (timeZone && {value: timeZone, label: TimeZone.get(timeZone)?.label} as SelectValueItem));
         }
 
         const {timeZones} = await import("./timeZones");
@@ -27,8 +28,13 @@ export function timeZoneSelectItemsLoader(required: boolean, date?: Date) {
         }
 
         const items: SelectValueItem[] = [];
+
         if (!required) {
-            items.push(noTimeZoneSelectValue);
+            items.push(unspecifiedTimeZoneSelectValue);
+        }
+
+        if (localAllowed) {
+            items.push(localTimeZoneSelectValue);
         }
 
         return items.concat(

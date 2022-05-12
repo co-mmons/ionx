@@ -1,44 +1,43 @@
-import {TimeZoneDate} from "@co.mmons/js-utils/core";
+import {DateTimeInputType} from "./DateTimeInputType";
+import {DateTimeInputValue} from "./DateTimeInputValue";
 
 export interface DateTimeInputProps {
+
+    type?: DateTimeInputType;
+
     placeholder?: string;
 
-    /**
-     * The value, that will be initialy set when user opens date/time picker.
-     */
-    initialValue?: TimeZoneDate;
+    readonly?: boolean;
+
+    disabled?: boolean;
 
     /**
-     * If only date can be chosen. Change will cause change of the value (if present), but ionChange event is not fired.
+     * The value, that will be initially set when user opens date/time picker.
      */
-    dateOnly?: boolean;
+    initialValue?: DateTimeInputValue;
+
+    value?: DateTimeInputValue;
 
     /**
-     * Whether timezone cannot be changed.
+     * Jeżeli wartością może być date-time to czy możliwość wyboru strefy czasowej jest zablokowana.
+     * Jeżeli true to strefa czasowa będzie taka jak określona w {@link value}, {@link initialValue} lub {@link defaultTimeZone}.
      */
     timeZoneDisabled?: boolean;
-
-    /**
-     * Timezone, that will be set, when new value is picked from picker.
-     * By default, time zone of current device will be used.
-     */
-    defaultTimeZone?: string | "current";
 
     /**
      * If time zone must be chosen, by default true.
      */
     timeZoneRequired?: boolean;
 
+    /**
+     * Timezone, that will be set, when new value is picked from picker.
+     */
+    defaultTimeZone?: string;
+
     clearButtonVisible?: boolean;
 
     clearButtonIcon?: string;
 
-    readonly?: boolean;
-
-    disabled?: boolean;
-
     formatOptions?: Intl.DateTimeFormatOptions;
-
-    value?: TimeZoneDate;
 
 }

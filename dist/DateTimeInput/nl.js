@@ -13,6 +13,7 @@ const nl = {
 	Now: Now,
 	"Time zone": "Tijdzone",
 	Today: Today,
+	"Unspecified|time zone": "Niet gespecificeerde",
 	Year: Year
 };
 

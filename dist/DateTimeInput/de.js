@@ -13,6 +13,7 @@ const de = {
 	Now: Now,
 	"Time zone": "Zeitzone",
 	Today: Today,
+	"Unspecified|time zone": "Unbestimmte",
 	Year: Year
 };
 
