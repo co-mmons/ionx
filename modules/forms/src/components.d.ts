@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { FormController } from "./FormController";
+import { FormStateChange } from "./FormStateChange";
 import { FormControlAttachOptions } from "./FormControlAttachOptions";
 import { FormControllerValidateOptions } from "./FormControllerPublicApi";
 import { FormControlState } from "./FormControlState";
@@ -77,6 +78,7 @@ declare namespace LocalJSX {
           * If controller should be disconnected when component is disconnected from the DOM. By default is true, but you can set to false when you expect that form controller component can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).
          */
         "disconnect"?: boolean;
+        "onStateChange"?: (event: CustomEvent<FormStateChange>) => void;
     }
     interface IonxFormField {
         "control"?: FormControlState;

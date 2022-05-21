@@ -39,6 +39,7 @@ graph TD;
   ionx-date-time-input-overlay --> ion-toolbar
   ion-item --> ion-icon
   ion-item --> ion-ripple-effect
+  ion-item --> ion-note
   ion-button --> ion-ripple-effect
   style ionx-date-time-input-overlay fill:#f9f,stroke:#333,stroke-width:4px
 ```

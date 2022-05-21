@@ -153,8 +153,11 @@ async function showLoadingOverlay(options) {
       componentProps: Object.assign({ type: "spinner" }, options, { backdropVisible: false })
     });
     popover.style.setProperty("--width", "auto");
-    const wrapper = popover.querySelector(".popover-content");
-    wrapper.style.padding = "16px";
+    const wrapper = popover.shadowRoot.querySelector(".popover-wrapper");
+    wrapper.style.maxWidth = "90%";
+    const content = popover.shadowRoot.querySelector(".popover-content");
+    content.style.padding = "16px";
+    content.style.position = "initial";
     await popover.present();
     return new LoadingProxy(popover.querySelector("ionx-loading"));
   }
@@ -166,7 +169,7 @@ function isShowingLoadingOverlay() {
 
 const Loading$1 = "ionx-loading";
 
-const loadingCss = "ionx-loading{display:flex;align-items:center;--loading-backdrop-opacity:0.8}ionx-loading[cover]{position:absolute;width:100%;height:100%;align-items:center;align-content:center;justify-items:center;justify-content:center;top:0px;left:0px}ionx-loading.ionx--backdrop-visible{background-color:rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity))}.ionx-loading-popover .popover-wrapper{display:flex;align-content:center;justify-content:center;align-items:center;justify-items:center}.ionx-loading-popover .popover-content{position:initial !important}";
+const loadingCss = "ionx-loading{display:flex;align-items:center;--loading-backdrop-opacity:0.8}ionx-loading[cover]{position:absolute;width:100%;height:100%;align-items:center;align-content:center;justify-items:center;justify-content:center;top:0px;left:0px}ionx-loading.ionx--backdrop-visible{background-color:rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity))}ionx-loading:not(.ionx--has-color){color:var(--loading-foreground-color, #000)}ionx-loading:not(.ionx--has-color) ion-spinner,ionx-loading:not(.ionx--has-color) ion-progress-bar{--color:var(--loading-foreground-color, #000)}.ionx-loading-popover::part(wrapper){display:flex;align-content:center;justify-content:center;align-items:center;justify-items:center}.ionx-loading-popover .popover-content{position:initial !important}";
 
 let Loading = class extends HTMLElement {
   constructor() {
@@ -203,7 +206,7 @@ let Loading = class extends HTMLElement {
     if (this.backdropTheme === "dark") {
       styles["--loading-backdrop-color"] = "0,0,0";
     }
-    return h(Host, { class: { "ionx--backdrop-visible": this.backdropVisible }, style: styles }, h("div", { style: { display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.cover ? "initial" : "1" } }, this.spinnerMode && h("ion-spinner", { color: this.color, style: { marginRight: !!(this.header || this.message) && "8px" } }), !!(this.header || this.message) && h("div", { style: { flexBasis: this.progressMode && "100%", display: "flex", flexDirection: "column", justifyItems: "center", flex: "1" } }, this.header ? h("h4", { style: { "margin": "0px" } }, this.header) : "", this.message ? h("ion-text", { color: this.color, innerHTML: this.message }) : ""), this.progressMode && h("ion-progress-bar", { color: this.color, style: { flexBasis: "100%", marginTop: !!(this.header || this.message) && "8px" }, value: this.progressValue, type: this.progressType, buffer: this.progressBuffer }), (!!this.progressMessage || this.progressPercentVisible) && h("div", { style: { display: "flex", flex: "1", marginTop: "8px" } }, h("ion-text", { color: this.color, innerHTML: this.progressMessage, style: { flex: "1" } }), this.progressPercentVisible && h("span", { style: { width: "60px", textAlign: "right" } }, intl.percentFormat(this.progressPercent, { maximumFractionDigits: 0 })))));
+    return h(Host, { class: { "ionx--backdrop-visible": this.backdropVisible, "ionx--has-color": !!this.color }, style: styles }, h("div", { style: { display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.cover ? "initial" : "1" } }, this.spinnerMode && h("ion-spinner", { color: this.color, style: { marginRight: !!(this.header || this.message) && "8px" } }), !!(this.header || this.message) && h("div", { style: { flexBasis: this.progressMode && "100%", display: "flex", flexDirection: "column", justifyItems: "center", flex: "1" } }, this.header ? h("h4", { style: { "margin": "0px" } }, this.header) : "", this.message ? h("ion-text", { color: this.color, innerHTML: this.message }) : ""), this.progressMode && h("ion-progress-bar", { color: this.color, style: { flexBasis: "100%", marginTop: !!(this.header || this.message) && "8px" }, value: this.progressValue, type: this.progressType, buffer: this.progressBuffer }), this.progressMode && (!!this.progressMessage || this.progressPercentVisible) && h("div", { style: { display: "flex", flex: "1", marginTop: "8px" } }, h("ion-text", { color: this.color, innerHTML: this.progressMessage, style: { flex: "1" } }), this.progressPercentVisible && h("span", { style: { width: "60px", textAlign: "right" } }, intl.percentFormat(this.progressPercent, { maximumFractionDigits: 0 })))));
   }
   get el() { return this; }
   static get style() { return loadingCss; }

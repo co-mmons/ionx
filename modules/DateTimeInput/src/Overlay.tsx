@@ -1,5 +1,5 @@
 import {intl} from "@co.mmons/js-intl";
-import {LocalDate, NoTimeDate, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
+import {LocalDate, NoTimeDate, TimeZoneDate, timeZoneOffset, toInteger} from "@co.mmons/js-utils/core";
 import {isPlatform} from "@ionic/core";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
 import {Select} from "ionx/Select";
@@ -182,11 +182,11 @@ export class Overlay {
 
             const stringed = `${input.value}`;
 
-            if (stringed.length < input.min.length) {
+            if (stringed.length < (typeof input.min === "number" ? input.min : input.min.length)) {
                 return;
             }
 
-            if (stringed.length > input.max.length || input.value > parseInt(input.max, 10)) {
+            if (stringed.length > (typeof input.max === "number" ? input.max : input.max.length) || input.value > toInteger(input.max)) {
                 input.value = this.numericValues[input.name];
                 return;
             }

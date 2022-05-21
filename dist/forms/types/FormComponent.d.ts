@@ -1,7 +1,8 @@
-import { ComponentInterface } from "@stencil/core";
+import { ComponentInterface, EventEmitter } from "@stencil/core";
 import { FormControlAttachOptions } from "./FormControlAttachOptions";
 import { FormController } from "./FormController";
 import { FormControllerPublicApi, FormControllerValidateOptions } from "./FormControllerPublicApi";
+import { FormStateChange } from "./FormStateChange";
 export declare class FormComponent implements ComponentInterface, FormControllerPublicApi {
   controller: FormController;
   /**
@@ -10,6 +11,7 @@ export declare class FormComponent implements ComponentInterface, FormController
    * can be connected/disconnected to DOM multiple times (e.g. when conditional rendering takes place).
    */
   disconnect?: boolean;
+  stateChange: EventEmitter<FormStateChange>;
   attach(name: string, options?: FormControlAttachOptions): Promise<void>;
   validate(options?: FormControllerValidateOptions): Promise<boolean>;
   componentWillLoad(): Promise<void>;

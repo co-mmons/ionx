@@ -34,6 +34,7 @@ graph TD;
   ionx-html-editor-text-menu --> ion-item-divider
   ion-item --> ion-icon
   ion-item --> ion-ripple-effect
+  ion-item --> ion-note
   ion-button --> ion-ripple-effect
   style ionx-html-editor-text-menu fill:#f9f,stroke:#333,stroke-width:4px
 ```

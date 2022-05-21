@@ -1,6 +1,7 @@
-import {AnimationBuilder, NavOutletElement, RouteChain, RouteID, RouterDirection} from "@ionic/core";
+import {AnimationBuilder, NavOutletElement, RouteID, RouterDirection} from "@ionic/core";
 
 import {ROUTER_INTENT_NONE} from "./constants";
+import {RouteChain} from "./interface";
 
 export const writeNavState = async (
     root: HTMLElement | undefined,

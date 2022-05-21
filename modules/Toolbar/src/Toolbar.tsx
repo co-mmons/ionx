@@ -162,7 +162,7 @@ export class Toolbar {
                     onClick={ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
                     defaultHref={(this.button === "back" && this.defaultBackHref) || null}/>}
 
-                <div ionx--inner>
+                <div ionx--inner class={{"ionx--no-button": this.button === "none"}}>
 
                     <ion-buttons>
                         <slot name="action"/>

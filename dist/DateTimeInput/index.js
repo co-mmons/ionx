@@ -1,7 +1,7 @@
 import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
-import { TimeZoneDate, NoTimeDate, LocalDate, timeZoneOffset, sleep } from '@co.mmons/js-utils/core';
+import { TimeZoneDate, NoTimeDate, LocalDate, timeZoneOffset, sleep, toInteger } from '@co.mmons/js-utils/core';
 import { popoverController, isPlatform } from '@ionic/core';
 import { addEventListener } from 'ionx/utils';
 import { Select } from 'ionx/Select';
@@ -162,7 +162,8 @@ let Input = class extends HTMLElement {
     this.value = undefined;
   }
   async open() {
-    const { isLocalDateTime, isDateTime, isDateOnly } = this;
+    const { isLocalDateTime, isDateTime, isDateOnly, timeZoneDisabled } = this;
+    const timeZoneRequired = this.timeZoneRequired && this.isDateTime && !this.isLocalDateTime;
     if (this.nativePicker) {
       this.nativePicker = document.createElement("input");
       this.nativePicker.type = "date";
@@ -184,14 +185,14 @@ let Input = class extends HTMLElement {
         }
       }
       else {
-        let defaultTimeZone = this.timeZoneDisabled ? undefined : this.defaultTimeZone;
+        let defaultTimeZone = timeZoneDisabled ? undefined : this.defaultTimeZone;
         // musimy pobrać identyfikator aktualnej strefy czasowej
-        if (!defaultTimeZone && !this.timeZoneDisabled && isDateTime && !isLocalDateTime && (!value || !(value instanceof TimeZoneDate) || !value.timeZone)) {
+        if (!defaultTimeZone && !timeZoneDisabled && isDateTime && !isLocalDateTime && (!value || !(value instanceof TimeZoneDate) || !value.timeZone)) {
           defaultTimeZone = currentTimeZone();
         }
         if (value instanceof LocalDate) {
           if (!this.isLocalDateTime) {
-            value = new TimeZoneDate(value, this.timeZoneRequired ? defaultTimeZone : undefined);
+            value = new TimeZoneDate(value, timeZoneRequired ? defaultTimeZone : undefined);
           }
         }
         else if (!value) {
@@ -200,11 +201,10 @@ let Input = class extends HTMLElement {
           }
           else {
             const now = new Date();
-            value = new TimeZoneDate(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0), defaultTimeZone);
+            value = new TimeZoneDate(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), 0, 0), timeZoneRequired ? defaultTimeZone : undefined);
           }
         }
-        else if (!value && !this.timeZoneRequired) ;
-        else if (!value || !(value instanceof TimeZoneDate) || (!value.timeZone && this.timeZoneRequired)) {
+        else if (timeZoneRequired && (!(value instanceof TimeZoneDate) || !value.timeZone)) {
           value = new TimeZoneDate(value ?? new Date(), defaultTimeZone);
         }
         if (value instanceof TimeZoneDate) {
@@ -491,10 +491,10 @@ let Overlay = class extends HTMLElement {
     const input = event.composedPath().find(t => t.tagName === "ION-INPUT");
     if (input) {
       const stringed = `${input.value}`;
-      if (stringed.length < input.min.length) {
+      if (stringed.length < (typeof input.min === "number" ? input.min : input.min.length)) {
         return;
       }
-      if (stringed.length > input.max.length || input.value > parseInt(input.max, 10)) {
+      if (stringed.length > (typeof input.max === "number" ? input.max : input.max.length) || input.value > toInteger(input.max)) {
         input.value = this.numericValues[input.name];
         return;
       }

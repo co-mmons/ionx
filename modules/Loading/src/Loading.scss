@@ -24,10 +24,18 @@ ionx-loading {
     &.ionx--backdrop-visible {
         background-color: rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity));
     }
+
+    &:not(.ionx--has-color) {
+        color: var(--loading-foreground-color, #000);
+
+        ion-spinner, ion-progress-bar {
+            --color: var(--loading-foreground-color, #000);
+        }
+    }
 }
 
 .ionx-loading-popover {
-    .popover-wrapper {
+    &::part(wrapper) {
         display: flex;
         align-content: center;
         justify-content: center;
