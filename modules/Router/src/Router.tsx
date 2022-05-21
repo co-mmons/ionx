@@ -1,10 +1,11 @@
-import {AnimationBuilder, BackButtonEvent, RouteChain, RouterDirection, RouterEventDetail} from "@ionic/core";
+import {AnimationBuilder, BackButtonEvent, RouterDirection, RouterEventDetail} from "@ionic/core";
 import {debounce} from "./utils/debounce";
 import {Component, ComponentInterface, Element, Event, EventEmitter, Listen, Method, Prop} from "@stencil/core";
 
 import {ROUTER_INTENT_BACK, ROUTER_INTENT_FORWARD, ROUTER_INTENT_NONE} from "./utils/constants";
 import {printRedirects, printRoutes} from "./utils/debug";
 import {readNavState, waitUntilNavNode, writeNavState} from "./utils/dom";
+import {RouteChain} from "./utils/interface";
 import {routeRedirect, routerIDsToChain, routerPathToChain} from "./utils/matching";
 import {readRedirects, readRoutes} from "./utils/parser";
 import {chainToPath, generatePath, parsePath, readPath, writePath} from "./utils/path";

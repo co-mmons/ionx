@@ -29,6 +29,10 @@
         padding: 15px 16px 15px 0;
         min-height: 56px;
 
+        &.ionx--no-button {
+            padding: 15px 16px;
+        }
+
         h1 {
             color: var(--ionx-toolbar-title-color, var(--ion-toolbar-title-color, var(--color)));
             font-family: var(--ionx-toolbar-title-font-family, var(--ion-toolbar-title-font-family, var(--ion-font-family, inherit)));

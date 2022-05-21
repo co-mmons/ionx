@@ -4,6 +4,7 @@ import { FormControlAttachOptions } from "./FormControlAttachOptions";
 import { FormControllerPublicApi, FormControllerValidateOptions } from "./FormControllerPublicApi";
 import { FormControlState } from "./FormControlState";
 import { FormState } from "./FormState";
+import { FormStateChange } from "./FormStateChange";
 import { FormValidationErrorPresenter } from "./FormValidationErrorPresenter";
 import { FormValidator } from "./FormValidator";
 export declare type FormKnownControls = {
@@ -54,12 +55,7 @@ export declare class FormController<Controls extends FormKnownControls = any> im
   }): FormControl<any> & FormControl<Controls[string]["value"]>;
   remove(controlName: (keyof Controls) | string): void;
   attach(name: (keyof Controls) | string, options?: FormControlAttachOptions): (el: HTMLElement) => void;
-  onStateChange(observer: (event: {
-    current: FormState;
-    previous: FormState;
-    value: boolean;
-    status: boolean;
-  }) => void): Subscription;
+  onStateChange(observer: (event: FormStateChange) => void): Subscription;
   get dirty(): boolean;
   get pristine(): boolean;
   get touched(): boolean;

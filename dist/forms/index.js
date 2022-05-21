@@ -1,4 +1,4 @@
-import { HTMLElement, h as h$1, Host, proxyCustomElement } from '@stencil/core/internal/client';
+import { HTMLElement, createEvent, h as h$1, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { forceUpdate, h } from '@stencil/core';
 import { deepEqual } from 'fast-equals';
@@ -928,6 +928,7 @@ let FormComponent = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
+    this.stateChange = createEvent(this, "stateChange", 7);
     /**
      * If controller should be disconnected when component is disconnected from the DOM.
      * By default is true, but you can set to false when you expect that form controller component

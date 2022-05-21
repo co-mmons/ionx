@@ -30,6 +30,7 @@ graph TD;
   ionx-context-menu --> ion-label
   ion-item --> ion-icon
   ion-item --> ion-ripple-effect
+  ion-item --> ion-note
   style ionx-context-menu fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

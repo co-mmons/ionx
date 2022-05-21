@@ -57,6 +57,7 @@ graph TD;
   ionx-select-overlay --> ion-footer
   ion-item --> ion-icon
   ion-item --> ion-ripple-effect
+  ion-item --> ion-note
   ion-button --> ion-ripple-effect
   ion-searchbar --> ion-icon
   style ionx-select-overlay fill:#f9f,stroke:#333,stroke-width:4px

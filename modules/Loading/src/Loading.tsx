@@ -91,7 +91,7 @@ export class Loading implements LoadingOptions {
             styles["--loading-backdrop-color"] = "0,0,0";
         }
 
-        return <Host class={{"ionx--backdrop-visible": this.backdropVisible}} style={styles}>
+        return <Host class={{"ionx--backdrop-visible": this.backdropVisible, "ionx--has-color": !!this.color}} style={styles}>
 
             <div style={{display: "flex", alignItems: "center", flexWrap: "wrap", flex: this.cover ? "initial" : "1"}}>
 
@@ -109,7 +109,7 @@ export class Loading implements LoadingOptions {
                     type={this.progressType}
                     buffer={this.progressBuffer}/>}
 
-                {(!!this.progressMessage || this.progressPercentVisible) && <div style={{display: "flex", flex: "1", marginTop: "8px"}}>
+                {this.progressMode && (!!this.progressMessage || this.progressPercentVisible) && <div style={{display: "flex", flex: "1", marginTop: "8px"}}>
 
                     <ion-text color={this.color} innerHTML={this.progressMessage} style={{flex: "1"}}/>
 

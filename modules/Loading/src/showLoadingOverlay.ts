@@ -44,8 +44,12 @@ export async function showLoadingOverlay(options?: LoadingOptions) {
 
         popover.style.setProperty("--width", "auto");
 
-        const wrapper = popover.querySelector<HTMLElement>(".popover-content");
-        wrapper.style.padding = "16px";
+        const wrapper = popover.shadowRoot.querySelector<HTMLElement>(".popover-wrapper");
+        wrapper.style.maxWidth = "90%";
+
+        const content = popover.shadowRoot.querySelector<HTMLElement>(".popover-content");
+        content.style.padding = "16px";
+        content.style.position = "initial";
 
         await popover.present();
 
