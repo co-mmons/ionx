@@ -1,10 +1,11 @@
 import {sleep} from "@co.mmons/js-utils/core";
 import {Component, h, Host} from "@stencil/core";
-import {defineIonxForms, FormController} from "ionx/forms";
+import {defineIonxForms, FormController, FormField} from "ionx/forms";
 import {Select} from "../index";
 import {SelectItem} from "../SelectItem";
 
 defineIonxForms()
+
 
 @Component({
     tag: "ionx-test"
@@ -67,12 +68,11 @@ export class Test {
 
         return <Host>
 
-            <fieldset>
-                <legend>Simple</legend>
+            <FormField label="Simple">
                 <ionx-select placeholder="Olahahas" items={this.basicItems} ref={this.data.controls.select1.attach()}>
                     <ion-icon name="language-outline" slot="icon"/>
                 </ionx-select>
-            </fieldset>
+            </FormField>
 
             <fieldset>
                 <legend>Simple multiple</legend>

@@ -344,7 +344,7 @@ export class SelectComponent implements SelectProps {
             checkValidator: this.checkValidator
         };
 
-        const {willDismiss, didDismiss} = await showSelectOverlay(overlayProps, {target: this.element} as any);
+        const {willDismiss, didDismiss} = await showSelectOverlay(overlayProps, {target: this.element.querySelector(".ionx--text")} as any);
 
         const result = await willDismiss;
         if (result.role === "ok") {

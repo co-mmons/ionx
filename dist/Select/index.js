@@ -13,7 +13,7 @@ async function showSelectOverlay(overlay, event) {
   let willDismiss;
   let didDismiss;
   if (overlay.overlay === "popover") {
-    const popover = await popoverController.create({ component: "ionx-select-overlay", componentProps: overlay, event });
+    const popover = await popoverController.create({ component: "ionx-select-overlay", componentProps: overlay, event, reference: "trigger" });
     popover.present();
     willDismiss = popover.onWillDismiss();
     didDismiss = popover.onDidDismiss();
@@ -235,7 +235,7 @@ let SelectComponent = class extends HTMLElement {
       // whiteSpace: this.overlayWhiteSpace,
       checkValidator: this.checkValidator
     };
-    const { willDismiss, didDismiss } = await showSelectOverlay(overlayProps, { target: this.element });
+    const { willDismiss, didDismiss } = await showSelectOverlay(overlayProps, { target: this.element.querySelector(".ionx--text") });
     const result = await willDismiss;
     if (result.role === "ok") {
       this.valueChanging = true;

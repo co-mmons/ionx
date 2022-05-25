@@ -139,7 +139,7 @@
     --padding-end: 16px;
 }
 
-::slotted(ion-list) {
+::slotted(.ion-list-wrapper > ion-list), ::slotted(ion-list) {
     background: transparent;
     margin: 10px 0 16px 0;
     padding: 0;

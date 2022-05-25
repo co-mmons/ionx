@@ -8,7 +8,7 @@ export async function showSelectOverlay<T = any>(overlay: SelectOverlayProps, ev
     let didDismiss: Promise<OverlayEventDetail<{values: T[], items: SelectValueItem[]}>>;
 
     if (overlay.overlay === "popover") {
-        const popover = await popoverController.create({component: "ionx-select-overlay", componentProps: overlay, event});
+        const popover = await popoverController.create({component: "ionx-select-overlay", componentProps: overlay, event, reference: "trigger"});
         popover.present();
 
         willDismiss = popover.onWillDismiss();
