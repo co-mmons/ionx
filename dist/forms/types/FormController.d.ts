@@ -3,6 +3,7 @@ import { FormControl } from "./FormControl";
 import { FormControlAttachOptions } from "./FormControlAttachOptions";
 import { FormControllerPublicApi, FormControllerValidateOptions } from "./FormControllerPublicApi";
 import { FormControlState } from "./FormControlState";
+import { FormControlStateChange } from "./FormControlStateChange";
 import { FormState } from "./FormState";
 import { FormStateChange } from "./FormStateChange";
 import { FormValidationErrorPresenter } from "./FormValidationErrorPresenter";
@@ -66,9 +67,7 @@ export declare class FormController<Controls extends FormKnownControls = any> im
   onStateChange(observer: (event: FormStateChange) => void): Subscription;
   onControlStateChange(observer: (event: {
     controlName: string;
-    current: FormControlState;
-    previous: FormControlState;
-  }) => void): Subscription;
+  } & FormControlStateChange) => void): Subscription;
   get dirty(): boolean;
   get pristine(): boolean;
   get touched(): boolean;

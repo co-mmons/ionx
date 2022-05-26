@@ -6,6 +6,7 @@ import scrollIntoView from "scroll-into-view";
 import {FormControl} from "./FormControl";
 import {FormControlElement} from "./FormControlElement";
 import {FormControlReadonlyState, FormControlState} from "./FormControlState";
+import {FormControlStateChange} from "./FormControlStateChange";
 import {FormControlReadonlyStatus} from "./FormControlStatus";
 import {FormValidator} from "./FormValidator";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
@@ -83,11 +84,11 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         return this.error$;
     }
 
-    get stateChanges(): Observable<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}> {
+    get stateChanges(): Observable<FormControlStateChange<Value>> {
         return this.stateChanges$;
     }
 
-    onStateChange(observer: (event: {current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}) => void) {
+    onStateChange(observer: (event: FormControlStateChange<Value>) => void) {
         return this.stateChanges$.subscribe(change => observer(change));
     }
 
@@ -357,7 +358,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private readonly$: boolean;
 
-    private stateChanges$ = new Subject<{current: FormControlReadonlyState<Value>, previous: FormControlReadonlyState<Value>}>();
+    private stateChanges$ = new Subject<FormControlStateChange<Value>>();
 
     private applyState(state: ApplyState, options?: {preventEvent?: boolean, trigger?: "elementValueChange"}): {valueChange: boolean, statusChange: boolean} {
         console.debug(`[ionx-form-control] apply "${this.name}" state`, state);

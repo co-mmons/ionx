@@ -2,6 +2,7 @@ import { Observable } from "rxjs";
 import { FormControl } from "./FormControl";
 import { FormControlElement } from "./FormControlElement";
 import { FormControlReadonlyState, FormControlState } from "./FormControlState";
+import { FormControlStateChange } from "./FormControlStateChange";
 import { FormControlReadonlyStatus } from "./FormControlStatus";
 import { FormValidator } from "./FormValidator";
 export declare class FormControlImpl<Value = any> implements FormControl<Value> {
@@ -20,14 +21,8 @@ export declare class FormControlImpl<Value = any> implements FormControl<Value> 
   get value(): Value;
   get element(): HTMLElement & Partial<FormControlElement>;
   get error(): Error;
-  get stateChanges(): Observable<{
-    current: FormControlReadonlyState<Value>;
-    previous: FormControlReadonlyState<Value>;
-  }>;
-  onStateChange(observer: (event: {
-    current: FormControlReadonlyState<Value>;
-    previous: FormControlReadonlyState<Value>;
-  }) => void): import("rxjs").Subscription;
+  get stateChanges(): Observable<FormControlStateChange<Value>>;
+  onStateChange(observer: (event: FormControlStateChange<Value>) => void): import("rxjs").Subscription;
   focus(options?: FocusOptions & {
     waitForElement?: boolean | number;
   }): Promise<void>;

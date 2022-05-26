@@ -834,12 +834,9 @@ class FormController {
   }
 }
 
-function formGrid(el) {
-  if (el) {
-    el.style.setProperty("--ion-grid-column-padding", "8px");
-    el.style.setProperty("--ion-grid-padding", "8px");
-  }
-}
+const FormFieldLabelButton = (props, children) => {
+  return h("ion-button", { ...props, size: "small", fill: "clear", slot: "label-end" }, children);
+};
 
 class FormValidationError extends ExtendableError {
   constructor(message) {
@@ -848,9 +845,47 @@ class FormValidationError extends ExtendableError {
   }
 }
 
-const FormFieldLabelButton = (props, children) => {
-  return h("ion-button", { ...props, size: "small", fill: "clear", slot: "label-end" }, children);
-};
+function formGrid(el) {
+  if (el) {
+    el.style.setProperty("--ion-grid-column-padding", "8px");
+    el.style.setProperty("--ion-grid-padding", "8px");
+  }
+}
+
+/**
+ * Checks if form's dirty controls are only of given names.
+ */
+function isOnlyDirty(controller, ...controlNames) {
+  const { controls } = controller;
+  for (const controlName in controls) {
+    if (controls[controlName].dirty && !controlNames.includes(controlName)) {
+      return false;
+    }
+  }
+}
+
+function matchPattern(pattern, message) {
+  return async function (control) {
+    const value = control.value;
+    if (typeof value !== "string" || !pattern.test(value)) {
+      throw new FormValidationError(message);
+    }
+  };
+}
+
+function minLength(minLength) {
+  return async function (control) {
+    const value = control.value;
+    if (typeof value !== "string" || value.length < minLength) {
+      throw new MinLengthError(minLength);
+    }
+  };
+}
+class MinLengthError extends FormValidationError {
+  constructor(minLength) {
+    super(intl.message("ionx/forms#MinLengthError|message", { length: minLength }));
+  }
+}
 
 async function required(control) {
   const value = control.value;
@@ -868,20 +903,6 @@ async function requiredTrue(control) {
   const value = control.value;
   if (value !== true) {
     throw new RequiredError();
-  }
-}
-
-function minLength(minLength) {
-  return async function (control) {
-    const value = control.value;
-    if (typeof value !== "string" || value.length < minLength) {
-      throw new MinLengthError(minLength);
-    }
-  };
-}
-class MinLengthError extends FormValidationError {
-  constructor(minLength) {
-    super(intl.message("ionx/forms#MinLengthError|message", { length: minLength }));
   }
 }
 
@@ -922,27 +943,6 @@ async function validEmail(control) {
 class InvalidEmailError extends FormValidationError {
   constructor() {
     super();
-  }
-}
-
-function matchPattern(pattern, message) {
-  return async function (control) {
-    const value = control.value;
-    if (typeof value !== "string" || !pattern.test(value)) {
-      throw new FormValidationError(message);
-    }
-  };
-}
-
-/**
- * Checks if form's dirty controls are only of given names.
- */
-function isOnlyDirty(controller, ...controlNames) {
-  const { controls } = controller;
-  for (const controlName in controls) {
-    if (controls[controlName].dirty && !controlNames.includes(controlName)) {
-      return false;
-    }
   }
 }
 

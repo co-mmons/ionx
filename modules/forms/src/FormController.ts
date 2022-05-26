@@ -5,7 +5,8 @@ import {FormControl} from "./FormControl";
 import {FormControlAttachOptions} from "./FormControlAttachOptions";
 import {FormControlImpl} from "./FormControlImpl";
 import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormControllerPublicApi";
-import {FormControlReadonlyState, FormControlState} from "./FormControlState";
+import {FormControlState} from "./FormControlState";
+import {FormControlStateChange} from "./FormControlStateChange";
 import {FormState} from "./FormState";
 import {FormStateChange} from "./FormStateChange";
 import {FormValidationErrorPresenter} from "./FormValidationErrorPresenter";
@@ -36,7 +37,7 @@ export class FormController<Controls extends FormKnownControls = any> implements
 
     private stateChanged = new BehaviorSubject({current: this.state(), previous: null as FormState, value: false, status: false});
 
-    private controlStateChanged = new Subject<{controlName: string, current: FormControlReadonlyState, previous: FormControlReadonlyState}>();
+    private controlStateChanged = new Subject<{controlName: string} & FormControlStateChange>();
 
     private bindHosts: Array<[any, {[controlName: string]: string}]> = [];
 
@@ -153,7 +154,7 @@ export class FormController<Controls extends FormKnownControls = any> implements
         return this.stateChanged.subscribe(event => observer(event));
     }
 
-    onControlStateChange(observer: (event: {controlName: string, current: FormControlState, previous: FormControlState}) => void): Subscription {
+    onControlStateChange(observer: (event: {controlName: string} & FormControlStateChange) => void): Subscription {
         return this.controlStateChanged.subscribe(observer);
     }
 
