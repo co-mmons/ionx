@@ -26,10 +26,17 @@ export declare class FormController<Controls extends FormKnownControls = any> im
     [controlName in keyof Controls]: FormControl<Controls[controlName]["value"]>;
   };
   private stateChanged;
+  private controlStateChanged;
   private bindHosts;
-  private renderer;
+  private renderer$;
   private errorPresenter$;
   private status;
+  get renderer(): {
+    render: () => void;
+  };
+  set renderer(renderer: {
+    render: () => void;
+  });
   set errorPresenter(presenter: FormValidationErrorPresenter);
   setErrorPresenter(errorHandler: FormValidationErrorPresenter): this;
   entries(): Array<[name: keyof Controls | string, control: FormControl<Controls[keyof Controls]["value"] | any>]>;
@@ -49,6 +56,7 @@ export declare class FormController<Controls extends FormKnownControls = any> im
   } & {
     [controlName: string]: FormControlState;
   };
+  has(controlName: string): boolean;
   add(controlName: string, options?: {
     value?: any;
     validators?: FormValidator[];
@@ -56,6 +64,11 @@ export declare class FormController<Controls extends FormKnownControls = any> im
   remove(controlName: (keyof Controls) | string): void;
   attach(name: (keyof Controls) | string, options?: FormControlAttachOptions): (el: HTMLElement) => void;
   onStateChange(observer: (event: FormStateChange) => void): Subscription;
+  onControlStateChange(observer: (event: {
+    controlName: string;
+    current: FormControlState;
+    previous: FormControlState;
+  }) => void): Subscription;
   get dirty(): boolean;
   get pristine(): boolean;
   get touched(): boolean;

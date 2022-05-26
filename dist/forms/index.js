@@ -429,6 +429,7 @@ class FormController {
   constructor(controls, options) {
     this.controls = {};
     this.stateChanged = new BehaviorSubject({ current: this.state(), previous: null, value: false, status: false });
+    this.controlStateChanged = new Subject();
     this.bindHosts = [];
     if (controls) {
       for (const controlName of (Array.isArray(controls) ? controls : Object.keys(controls))) {
@@ -438,6 +439,12 @@ class FormController {
     if (options?.errorHandler) {
       this.errorPresenter$ = options.errorHandler;
     }
+  }
+  get renderer() {
+    return this.renderer$;
+  }
+  set renderer(renderer) {
+    this.renderer$ = renderer;
   }
   set errorPresenter(presenter) {
     this.setErrorPresenter(presenter);
@@ -474,11 +481,17 @@ class FormController {
     }
     return states;
   }
+  has(controlName) {
+    return !!this.controls[controlName];
+  }
   add(controlName, options) {
     const exists = !!this.controls[controlName];
     if (!this.controls[controlName]) {
       this.controls[controlName] = new FormControlImpl(controlName);
-      this.controls[controlName].onStateChange(() => this.fireStateChange());
+      this.controls[controlName].onStateChange(ev => {
+        this.fireStateChange();
+        this.controlStateChanged.next({ controlName, ...ev });
+      });
     }
     if (options && "value" in options) {
       this.controls[controlName].setValue(options.value);
@@ -508,6 +521,9 @@ class FormController {
   }
   onStateChange(observer) {
     return this.stateChanged.subscribe(event => observer(event));
+  }
+  onControlStateChange(observer) {
+    return this.controlStateChanged.subscribe(observer);
   }
   get dirty() {
     return this.status?.dirty || false;
@@ -615,8 +631,8 @@ class FormController {
     if (!checkForChange || (checkForChange && (statusChange || valueChange))) {
       console.debug(`[ionx-form-controller] form state changed`, currentState);
       this.runBindHost(currentState);
-      if (this.renderer) {
-        forceUpdate(this.renderer);
+      if (this.renderer$) {
+        forceUpdate(this.renderer$);
       }
       this.stateChanged.next({ current: currentState, previous: previousEvent?.current, status: statusChange, value: valueChange });
     }
@@ -706,17 +722,25 @@ class FormController {
     let firstControl;
     const controls = [];
     const allControls = [];
-    for (const controlName in this.controls) {
-      allControls.push(this.controls[controlName]);
-      if (!firstControl && this.controls[controlName].element) {
-        firstControl = this.controls[controlName];
+    for (const control of this.list()) {
+      allControls.push(control);
+      if (!firstControl && control.element) {
+        firstControl = control;
       }
     }
     ORDERED: if (firstControl) {
-      const getParents = (parents, el) => (!!el.parentElement ? parents.push(el.parentElement) && getParents(parents, el.parentElement) : true) && parents;
+      const getParents = (parents, el) => {
+        const parent = el.parentElement;
+        if (parent) {
+          parents.push(parent);
+          if (parent.tagName !== "IONX-FORM") {
+            getParents(parents, el.parentElement);
+          }
+        }
+        return parents;
+      };
       const tree = getParents([], firstControl.element);
-      for (const controlName in this.controls) {
-        const control = this.controls[controlName];
+      for (const control of allControls) {
         if (control === firstControl || !control.element) {
           // omit controls without element
           continue;
@@ -741,7 +765,7 @@ class FormController {
       if (topParent) {
         const elements = topParent.querySelectorAll("[ionx-form-control]");
         for (let i = 0; i < elements.length; i++) {
-          const control = this.controls[elements[i].getAttribute("ionx-form-control")];
+          const control = allControls.find(c => c.element === elements[i]);
           if (control) {
             controls.push(control);
           }
@@ -789,7 +813,7 @@ class FormController {
     return this;
   }
   bindRenderer(component) {
-    this.renderer = component;
+    this.renderer$ = component;
     return this;
   }
   /**
@@ -798,10 +822,12 @@ class FormController {
    */
   disconnect() {
     this.bindHosts = [];
-    this.renderer = undefined;
+    this.renderer$ = undefined;
     const lastState = this.stateChanged.value;
     this.stateChanged.complete();
     this.stateChanged = new BehaviorSubject(lastState);
+    this.controlStateChanged.complete();
+    this.controlStateChanged = new Subject();
     for (const controlName in this.controls) {
       this.controls[controlName].disconnect();
     }

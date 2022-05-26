@@ -1,11 +1,11 @@
 import {forceUpdate} from "@stencil/core";
 import {deepEqual} from "fast-equals";
-import {BehaviorSubject, Subscription} from "rxjs";
+import {BehaviorSubject, Subject, Subscription} from "rxjs";
 import {FormControl} from "./FormControl";
 import {FormControlAttachOptions} from "./FormControlAttachOptions";
 import {FormControlImpl} from "./FormControlImpl";
 import {FormControllerPublicApi, FormControllerValidateOptions} from "./FormControllerPublicApi";
-import {FormControlState} from "./FormControlState";
+import {FormControlReadonlyState, FormControlState} from "./FormControlState";
 import {FormState} from "./FormState";
 import {FormStateChange} from "./FormStateChange";
 import {FormValidationErrorPresenter} from "./FormValidationErrorPresenter";
@@ -36,13 +36,23 @@ export class FormController<Controls extends FormKnownControls = any> implements
 
     private stateChanged = new BehaviorSubject({current: this.state(), previous: null as FormState, value: false, status: false});
 
+    private controlStateChanged = new Subject<{controlName: string, current: FormControlReadonlyState, previous: FormControlReadonlyState}>();
+
     private bindHosts: Array<[any, {[controlName: string]: string}]> = [];
 
-    private renderer: any;
+    private renderer$: {render: () => void};
 
     private errorPresenter$: FormValidationErrorPresenter;
 
     private status: Omit<FormState, "controls">;
+
+    get renderer() {
+        return this.renderer$;
+    }
+
+    set renderer(renderer: {render: () => void}) {
+        this.renderer$ = renderer;
+    }
 
     set errorPresenter(presenter: FormValidationErrorPresenter) {
         this.setErrorPresenter(presenter);
@@ -90,13 +100,20 @@ export class FormController<Controls extends FormKnownControls = any> implements
         return states;
     }
 
+    has(controlName: string) {
+        return !!this.controls[controlName];
+    }
+
     add(controlName: string, options?: {value?: any, validators?: FormValidator[]}) {
 
         const exists = !!this.controls[controlName];
 
         if (!this.controls[controlName]) {
             (this.controls[controlName] as any) = new FormControlImpl(controlName);
-            this.controls[controlName].onStateChange(() => this.fireStateChange());
+            this.controls[controlName].onStateChange(ev => {
+                this.fireStateChange();
+                this.controlStateChanged.next({controlName, ...ev});
+            });
         }
 
         if (options && "value" in options) {
@@ -134,6 +151,10 @@ export class FormController<Controls extends FormKnownControls = any> implements
 
     onStateChange(observer: (event: FormStateChange) => void): Subscription {
         return this.stateChanged.subscribe(event => observer(event));
+    }
+
+    onControlStateChange(observer: (event: {controlName: string, current: FormControlState, previous: FormControlState}) => void): Subscription {
+        return this.controlStateChanged.subscribe(observer);
     }
 
     get dirty() {
@@ -282,8 +303,8 @@ export class FormController<Controls extends FormKnownControls = any> implements
 
             this.runBindHost(currentState);
 
-            if (this.renderer) {
-                forceUpdate(this.renderer);
+            if (this.renderer$) {
+                forceUpdate(this.renderer$);
             }
 
             this.stateChanged.next({current: currentState, previous: previousEvent?.current, status: statusChange, value: valueChange});
@@ -396,23 +417,34 @@ export class FormController<Controls extends FormKnownControls = any> implements
         let firstControl: FormControl;
         const controls = [];
 
-        const allControls = [];
-        for (const controlName in this.controls) {
-            allControls.push(this.controls[controlName]);
+        const allControls: FormControl[] = [];
+        for (const control of this.list()) {
+            allControls.push(control);
 
-            if (!firstControl && this.controls[controlName].element) {
-                firstControl = this.controls[controlName];
+            if (!firstControl && control.element) {
+                firstControl = control;
             }
         }
 
         ORDERED: if (firstControl) {
 
-            const getParents = (parents: HTMLElement[], el: HTMLElement) => (!!el.parentElement ? parents.push(el.parentElement) && getParents(parents, el.parentElement) : true) && parents;
+            const getParents = (parents: HTMLElement[], el: HTMLElement) => {
+
+                const parent = el.parentElement;
+                if (parent) {
+                    parents.push(parent);
+
+                    if (parent.tagName !== "IONX-FORM") {
+                        getParents(parents, el.parentElement);
+                    }
+                }
+
+                return parents;
+            }
+
             const tree = getParents([], firstControl.element);
 
-            for (const controlName in this.controls) {
-
-                const control = this.controls[controlName];
+            for (const control of allControls) {
 
                 if (control === firstControl || !control.element) {
                     // omit controls without element
@@ -446,7 +478,7 @@ export class FormController<Controls extends FormKnownControls = any> implements
 
                 const elements = topParent.querySelectorAll("[ionx-form-control]");
                 for (let i = 0; i < elements.length; i++) {
-                    const control = this.controls[elements[i].getAttribute("ionx-form-control")];
+                    const control = allControls.find(c => c.element === elements[i]);
                     if (control) {
                         controls.push(control);
                     }
@@ -502,7 +534,7 @@ export class FormController<Controls extends FormKnownControls = any> implements
     }
 
     bindRenderer(component: {render: () => void}): this {
-        this.renderer = component;
+        this.renderer$ = component;
         return this;
     }
 
@@ -513,11 +545,14 @@ export class FormController<Controls extends FormKnownControls = any> implements
     disconnect() {
 
         this.bindHosts = [];
-        this.renderer = undefined;
+        this.renderer$ = undefined;
 
         const lastState = this.stateChanged.value;
         this.stateChanged.complete();
         this.stateChanged = new BehaviorSubject(lastState);
+
+        this.controlStateChanged.complete();
+        this.controlStateChanged = new Subject();
 
         for (const controlName in this.controls) {
             (this.controls[controlName] as FormControlImpl).disconnect();
