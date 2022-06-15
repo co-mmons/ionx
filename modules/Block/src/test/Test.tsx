@@ -23,7 +23,12 @@ export class Test {
 
     render() {
         return <Host>
-            <ionx-block innerWidth={{md: "50%"}} innerStyle={{background: "red"}}>aaaa</ionx-block>
+
+            <ionx-block innerStyle={{background: "green"}}>no innerWidth</ionx-block>
+
+            <ionx-block innerWidth={{md: "100%"}} innerStyle={{background: "orange"}}>always 100%</ionx-block>
+
+            <ionx-block innerWidth={{xs: "25%", md: "50%"}} innerStyle={{background: "red"}}>aaaa</ionx-block>
         </Host>
     }
 }

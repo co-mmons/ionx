@@ -1,4 +1,4 @@
-import {Component, Element, h, Host, Prop} from "@stencil/core";
+import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
 import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {BlockWidth} from "./BlockWidth";
 import {BlockWidthsMap} from "./BlockWidthsMap";
@@ -30,8 +30,25 @@ export class Block {
 
     breakpoints: WidthBreakpointsContainer;
 
+    @Watch("innerWidth")
+    initBreakpoints(innerWidth: BlockWidth | BlockWidthsMap) {
+
+        if (this.breakpoints) {
+            return;
+        }
+
+        if (this.hasInnerWidth(innerWidth)) {
+            this.breakpoints = new WidthBreakpointsContainer(this.element);
+        }
+    }
+
+    hasInnerWidth(innerWidth: BlockWidth | BlockWidthsMap) {
+        return !!(innerWidth && (typeof innerWidth === "string" || Object.values(innerWidth).find(v => v && v !== "100%")));
+    }
+
+
     connectedCallback() {
-        this.breakpoints = new WidthBreakpointsContainer(this.element);
+        this.initBreakpoints(this.innerWidth);
     }
 
     disconnectedCallback() {
@@ -40,6 +57,9 @@ export class Block {
     }
 
     render() {
+
+        const {innerWidth} = this;
+        const hasInnerWidth = this.hasInnerWidth(innerWidth);
 
         const defaultWidth = typeof this.innerWidth === "string" ? this.innerWidth : null;
         const widths = defaultWidth ? {} as BlockWidthsMap : (this.innerWidth ?? {}) as BlockWidthsMap;
@@ -51,16 +71,18 @@ export class Block {
         const xl = widths.xl || lg || null;
         const xxl = widths.xxl || xl || null;
 
+        const style = hasInnerWidth && {
+            "--block-inner-width-xs": xs,
+            "--block-inner-width-sm": sm,
+            "--block-inner-width-md": md,
+            "--block-inner-width-lg": lg,
+            "--block-inner-width-xl": xl,
+            "--block-inner-width-xxl": xxl,
+        }
+
         return <Host
-            class={{"ionx--no-margins": this.margins === false, "ionx--has-inner-width": !!this.innerWidth}}
-            style={{
-                "--block-inner-width-xs": xs,
-                "--block-inner-width-sm": sm,
-                "--block-inner-width-md": md,
-                "--block-inner-width-lg": lg,
-                "--block-inner-width-xl": xl,
-                "--block-inner-width-xxl": xxl,
-            }}>
+            class={{"ionx--no-margins": this.margins === false, "ionx--has-inner-width": hasInnerWidth}}
+            style={style}>
 
             <div ionx--outer ionx--inner-alignment={this.innerAlignment || null} part="outer">
                 <div ionx--inner style={this.innerStyle} part="inner">

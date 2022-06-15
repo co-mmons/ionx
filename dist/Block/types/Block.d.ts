@@ -11,6 +11,8 @@ export declare class Block {
   margins: boolean;
   padding: boolean;
   breakpoints: WidthBreakpointsContainer;
+  initBreakpoints(innerWidth: BlockWidth | BlockWidthsMap): void;
+  hasInnerWidth(innerWidth: BlockWidth | BlockWidthsMap): boolean;
   connectedCallback(): void;
   disconnectedCallback(): void;
   render(): any;
