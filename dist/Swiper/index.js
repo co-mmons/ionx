@@ -1,5 +1,5 @@
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { Navigation, Pagination } from 'swiper';
+import { Navigation, Pagination, FreeMode } from 'swiper';
 export { Swiper as SwiperInstance } from 'swiper';
 
 const NavigationModule = (context) => {
@@ -12,13 +12,17 @@ const PaginationModule = (context) => {
   context.extendParams({ pagination: { el: ".swiper-pagination" } });
 };
 
+const FreeModeModule = (context) => {
+  FreeMode(context);
+};
+
 const Swiper = "ionx-swiper";
 const SwiperSlides = "ionx-swiper-slides";
 const SwiperSlide = "ionx-swiper-slide";
 const SwiperNavigation = "ionx-swiper-navigation";
 const SwiperPagination = "ionx-swiper-pagination";
 
-export { NavigationModule, PaginationModule, Swiper, SwiperNavigation, SwiperPagination, SwiperSlide, SwiperSlides };
+export { FreeModeModule, NavigationModule, PaginationModule, Swiper, SwiperNavigation, SwiperPagination, SwiperSlide, SwiperSlides };
 
 import {IonxSwiper} from "./ionx-swiper";
 import {IonxSwiperNavigation} from "./ionx-swiper-navigation";
