@@ -4,7 +4,7 @@ import { downloadFile } from 'ionx/utils';
 
 const Svg = "ionx-svg";
 
-const svgComponentCss = ":host{display:inline-block;width:100%}:host svg{display:inline-block;width:100%;fill:var(--svg-fill-color);stroke:var(--svg-stroke-color)}";
+const svgComponentCss = ":host{display:inline-block;width:100%}:host svg{display:inline-block;width:100%;height:100%;fill:var(--svg-fill-color);stroke:var(--svg-stroke-color)}";
 
 let SvgComponent = class extends HTMLElement {
   constructor() {
