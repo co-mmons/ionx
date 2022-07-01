@@ -7,9 +7,10 @@
 
 ## Properties
 
-| Property              | Attribute | Description | Type                    | Default     |
-| --------------------- | --------- | ----------- | ----------------------- | ----------- |
-| `source` _(required)_ | `source`  |             | `ArrayBuffer \| string` | `undefined` |
+| Property | Attribute | Description | Type                    | Default     |
+| -------- | --------- | ----------- | ----------------------- | ----------- |
+| `source` | `source`  |             | `ArrayBuffer \| string` | `undefined` |
+| `src`    | `src`     |             | `string`                | `undefined` |
 
 
 ----------------------------------------------

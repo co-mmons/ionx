@@ -1,4 +1,5 @@
 import {Component, h, Host} from "@stencil/core";
+import {Svg} from "ionx/Svg";
 import {lazyLoadItem} from "../lazyLoadItem";
 
 @Component({
@@ -17,6 +18,11 @@ export class Test {
             </div>
 
             <ionx-test-shadow/>
+
+            <h1>test svg</h1>
+
+            <Svg ref={lazyLoadItem({src: "https://appspltfrm.imgix.net/customers/r4sb2xoai4/upload/2022-6/82I7h6tLmZduAg9Rqs7YCPKqeujk23.svg"})}/>
+
         </Host>
     }
 }

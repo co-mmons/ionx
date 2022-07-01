@@ -25,6 +25,9 @@ export class Test {
 
     render() {
         return <Host>
+
+            <ionx-svg src="https://appspltfrm.imgix.net/customers/r4sb2xoai4/upload/2022-6/82I7h6tLmZduAg9Rqs7YCPKqeujk23.svg"/>
+
             <ionx-svg source={this.source}/>
         </Host>
     }

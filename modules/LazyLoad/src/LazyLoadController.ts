@@ -1,4 +1,5 @@
 import type {Components as ionic} from "@ionic/core";
+import {Svg} from "ionx/Svg";
 import {isHydrated, waitTillHydrated} from "ionx/utils";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";
 import {ExtendedContent} from "./ExtendedContent";
@@ -7,7 +8,7 @@ import {realContainerElement} from "./realContainerElement";
 import {LazyLoadableCustomElement} from "./LazyLoadableCustomElement";
 import {styleParents} from "./styleParents";
 
-const srcSupportedTagNames = ["IMG", "VIDEO", "IFRAME"];
+const srcSupportedTagNames = ["IMG", "VIDEO", "IFRAME", Svg.toUpperCase()];
 
 export class LazyLoadController {
 

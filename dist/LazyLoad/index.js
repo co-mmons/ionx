@@ -1,5 +1,6 @@
 import { HTMLElement as HTMLElement$1, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
+import { Svg } from 'ionx/Svg';
 import { isHydrated, waitTillHydrated } from 'ionx/utils';
 import { waitTill } from '@co.mmons/js-utils/core';
 
@@ -54,7 +55,7 @@ function styleParents(element, parents) {
   }
 }
 
-const srcSupportedTagNames = ["IMG", "VIDEO", "IFRAME"];
+const srcSupportedTagNames = ["IMG", "VIDEO", "IFRAME", Svg.toUpperCase()];
 class LazyLoadController {
   constructor(content) {
     this.containers = [];

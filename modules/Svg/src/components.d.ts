@@ -8,6 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface IonxSvg {
         "source": string | ArrayBuffer;
+        "src": string;
     }
 }
 declare global {
@@ -23,7 +24,8 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxSvg {
-        "source": string | ArrayBuffer;
+        "source"?: string | ArrayBuffer;
+        "src"?: string;
     }
     interface IntrinsicElements {
         "ionx-svg": IonxSvg;
