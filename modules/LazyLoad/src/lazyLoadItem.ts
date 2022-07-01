@@ -1,4 +1,5 @@
 import type {Components as ionic} from "@ionic/core";
+import {deepEqual} from "fast-equals";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";
 import {ensureLazyLoad} from "./ensureLazyLoad";
 import {ExtendedItemElement} from "./ExtendedItemElement";
@@ -15,16 +16,23 @@ export function lazyLoadItem<T extends HTMLElement = HTMLElement>(elementOrOptio
 
     if (elementOrOptions instanceof HTMLElement) {
 
-        const wasLoaded = elementOrOptions.classList.contains(itemLoadedCssClass) || elementOrOptions.classList.contains(itemLoadingCssClass) || elementOrOptions.classList.contains(itemErrorCssClass);
+        const element = elementOrOptions as HTMLElement & ExtendedItemElement;
+        const isLoaded = element.classList.contains(itemLoadedCssClass);
 
-        elementOrOptions.classList.add(itemPendingCssClass);
-        elementOrOptions.classList.remove(itemErrorCssClass, itemLoadingCssClass, itemLoadedCssClass);
-        styleParents(elementOrOptions, options?.styleParents);
+        if (isLoaded && deepEqual(element.__lazyLoadOptions, options)) {
+            return;
+        }
 
-        (elementOrOptions as HTMLElement & ExtendedItemElement).__lazyLoadOptions = Object.assign({}, options);
+        const wasLoaded = isLoaded || element.classList.contains(itemLoadingCssClass) || element.classList.contains(itemErrorCssClass);
+
+        element.classList.add(itemPendingCssClass);
+        element.classList.remove(itemErrorCssClass, itemLoadingCssClass, itemLoadedCssClass);
+        styleParents(element, options?.styleParents);
+
+        element.__lazyLoadOptions = Object.assign({}, options);
 
         if (wasLoaded) {
-            ensureLazyLoad(elementOrOptions.closest<HTMLElement & ionic.IonContent>("ion-content"));
+            ensureLazyLoad(element.closest<HTMLElement & ionic.IonContent>("ion-content"));
         }
 
     } else if (arguments.length === 1) {

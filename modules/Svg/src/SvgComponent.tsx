@@ -11,7 +11,7 @@ export class SvgComponent implements ComponentInterface {
     @Element()
     element: HTMLElement;
 
-    @Prop({mutable: true})
+    @Prop({mutable: true, reflect: true})
     src: string;
 
     @Prop({mutable: true})
@@ -37,6 +37,7 @@ export class SvgComponent implements ComponentInterface {
                 this.element.dispatchEvent(new Event("load"));
 
             } catch (error) {
+                console.error(error);
                 this.element.dispatchEvent(new Event("error"));
             }
 

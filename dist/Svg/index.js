@@ -26,6 +26,7 @@ let SvgComponent = class extends HTMLElement {
         this.element.dispatchEvent(new Event("load"));
       }
       catch (error) {
+        console.error(error);
         this.element.dispatchEvent(new Event("error"));
       }
       forceUpdate(this);
@@ -55,7 +56,7 @@ let SvgComponent = class extends HTMLElement {
   static get style() { return svgComponentCss; }
 };
 
-const IonxSvg = /*@__PURE__*/proxyCustomElement(SvgComponent, [1,"ionx-svg",{"src":[1025],"source":[1025]}]);
+const IonxSvg = /*@__PURE__*/proxyCustomElement(SvgComponent, [1,"ionx-svg",{"src":[1537],"source":[1025]}]);
 const defineIonxSvg = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

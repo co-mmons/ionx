@@ -2,6 +2,7 @@ import { HTMLElement as HTMLElement$1, h, Host, proxyCustomElement } from '@sten
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { Svg } from 'ionx/Svg';
 import { isHydrated, waitTillHydrated } from 'ionx/utils';
+import { deepEqual } from 'fast-equals';
 import { waitTill } from '@co.mmons/js-utils/core';
 
 function ensureLazyLoad(contentOrOptions, options) {
@@ -92,7 +93,8 @@ class LazyLoadController {
           markAsError();
         }
         else {
-          const lastSrcIndex = src.lastIndexOf((srcSupported && element.getAttribute("src")) || element.__lazyLoadSrc || null);
+          const lastSrc = (srcSupported && element.getAttribute("src")) || element.__lazyLoadSrc || null;
+          const lastSrcIndex = src.lastIndexOf(lastSrc);
           if (lastSrcIndex >= src.length - 1) {
             markAsError();
           }
@@ -212,13 +214,18 @@ class LazyLoadController {
 
 function lazyLoadItem(elementOrOptions, options) {
   if (elementOrOptions instanceof HTMLElement) {
-    const wasLoaded = elementOrOptions.classList.contains(itemLoadedCssClass) || elementOrOptions.classList.contains(itemLoadingCssClass) || elementOrOptions.classList.contains(itemErrorCssClass);
-    elementOrOptions.classList.add(itemPendingCssClass);
-    elementOrOptions.classList.remove(itemErrorCssClass, itemLoadingCssClass, itemLoadedCssClass);
-    styleParents(elementOrOptions, options?.styleParents);
-    elementOrOptions.__lazyLoadOptions = Object.assign({}, options);
+    const element = elementOrOptions;
+    const isLoaded = element.classList.contains(itemLoadedCssClass);
+    if (isLoaded && deepEqual(element.__lazyLoadOptions, options)) {
+      return;
+    }
+    const wasLoaded = isLoaded || element.classList.contains(itemLoadingCssClass) || element.classList.contains(itemErrorCssClass);
+    element.classList.add(itemPendingCssClass);
+    element.classList.remove(itemErrorCssClass, itemLoadingCssClass, itemLoadedCssClass);
+    styleParents(element, options?.styleParents);
+    element.__lazyLoadOptions = Object.assign({}, options);
     if (wasLoaded) {
-      ensureLazyLoad(elementOrOptions.closest("ion-content"));
+      ensureLazyLoad(element.closest("ion-content"));
     }
   }
   else if (arguments.length === 1) {

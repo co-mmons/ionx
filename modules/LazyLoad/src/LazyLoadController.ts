@@ -74,12 +74,15 @@ export class LazyLoadController {
 
                 } else {
 
-                    const lastSrcIndex = src.lastIndexOf((srcSupported && element.getAttribute("src")) || element.__lazyLoadSrc || null);
+                    const lastSrc = (srcSupported && element.getAttribute("src")) || element.__lazyLoadSrc || null;
+                    const lastSrcIndex = src.lastIndexOf(lastSrc);
 
                     if (lastSrcIndex >= src.length - 1) {
                         markAsError();
+
                     } else if (srcSupported) {
                         element.setAttribute("src", src[lastSrcIndex + 1]);
+
                     } else {
                         const img = new Image();
                         img.addEventListener("error", onItemError);
@@ -91,6 +94,7 @@ export class LazyLoadController {
         }
 
         const markAsError = () => {
+
             element.classList.add(itemErrorCssClass);
             element.classList.remove(itemLoadedCssClass, itemPendingCssClass, itemLoadingCssClass);
             styleParents(element, options?.styleParents);
