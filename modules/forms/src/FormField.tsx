@@ -1,5 +1,5 @@
 import {intl, MessageRef} from "@co.mmons/js-intl";
-import {Component, ComponentInterface, h, Host, Prop, State, Watch} from "@stencil/core";
+import {Component, ComponentInterface, h, Host, Method, Prop, State, Watch} from "@stencil/core";
 import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
@@ -17,6 +17,12 @@ export class FormField implements ComponentInterface {
     @Prop()
     flexContent?: boolean;
 
+    @Prop({reflect: true})
+    expanded?: boolean;
+
+    @Prop({reflect: true})
+    collapsible?: boolean;
+
     @Prop()
     control?: FormControlState;
 
@@ -25,6 +31,16 @@ export class FormField implements ComponentInterface {
 
     @State()
     errorMessage: string;
+
+    @Method()
+    async toggleExpanded() {
+        this.expanded = !this.expanded;
+    }
+
+    @Method()
+    async setExpanded(expanded: boolean) {
+        this.expanded = expanded;
+    }
 
     @Watch("control")
     @Watch("error")
@@ -67,6 +83,10 @@ export class FormField implements ComponentInterface {
                     <div slot-container="label-end">
                         <slot name="label-end"/>
                     </div>
+
+                    {this.collapsible && <ion-button class="ionx--expand-toggle" shape="round" size="small" fill="clear" onClick={() => this.toggleExpanded()}>
+                        <ion-icon name="chevron-up" slot="icon-only"/>
+                    </ion-button>}
                 </legend>
 
                 <div slot-container="description">

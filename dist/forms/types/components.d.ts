@@ -23,10 +23,14 @@ export namespace Components {
         "validate": (options?: FormControllerValidateOptions) => Promise<boolean>;
     }
     interface IonxFormField {
+        "collapsible"?: boolean;
         "control"?: FormControlState;
         "error"?: string | FormValidationError | MessageRef | Error;
+        "expanded"?: boolean;
         "flexContent"?: boolean;
         "label"?: string;
+        "setExpanded": (expanded: boolean) => Promise<void>;
+        "toggleExpanded": () => Promise<void>;
     }
     interface IonxFormItem {
         "control"?: FormControlState;
@@ -81,8 +85,10 @@ declare namespace LocalJSX {
         "onStateChange"?: (event: CustomEvent<FormStateChange>) => void;
     }
     interface IonxFormField {
+        "collapsible"?: boolean;
         "control"?: FormControlState;
         "error"?: string | FormValidationError | MessageRef | Error;
+        "expanded"?: boolean;
         "flexContent"?: boolean;
         "label"?: string;
     }

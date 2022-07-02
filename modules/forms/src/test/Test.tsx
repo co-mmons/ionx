@@ -21,6 +21,13 @@ export class Test {
             {!this.readonly && <ionx-form-field label="Test">
                 <ion-input ref={this.data.controls.test.attach()}/>
             </ionx-form-field>}
+
+            <div style={{margin: "16px"}}>
+                <h1>Expand/collapse</h1>
+                <ionx-form-field label="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s" collapsible={true} expanded={false}>
+                    <div>ahahah</div>
+                </ionx-form-field>
+            </div>
         </Host>
     }
 }

@@ -109,6 +109,31 @@
             color: var(--form-field-invalid-label-color, var(--form-field--invalid-color));
         }
     }
+
+    > fieldset > legend > .ionx--expand-toggle {
+        --padding-start: 2px;
+        --padding-end: 2px;
+        margin: 0 0 0 8px;
+
+        ion-icon {
+            transition: 300ms transform cubic-bezier(0.25, 0.8, 0.5, 1);
+        }
+    }
+
+    &[collapsible]:not([expanded]) > fieldset {
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+        border-right-color: transparent;
+        border-radius: 0 !important;
+
+        > div {
+            display: none !important;
+        }
+
+        > legend > .ionx--expand-toggle ion-icon {
+            transform: rotate(180deg);
+        }
+    }
 }
 
 ::slotted([slot=label-end]) {
