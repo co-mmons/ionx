@@ -91,6 +91,7 @@ declare namespace LocalJSX {
         "expanded"?: boolean;
         "flexContent"?: boolean;
         "label"?: string;
+        "onExpandCollapse"?: (event: CustomEvent<boolean>) => void;
     }
     interface IonxFormItem {
         "control"?: FormControlState;

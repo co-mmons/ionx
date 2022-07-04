@@ -1,8 +1,30 @@
 import {intl} from "@co.mmons/js-intl";
-import {Component, ComponentInterface, Element, Event, EventEmitter, FunctionalComponent, h, Host, Listen, Method, Prop} from "@stencil/core";
-import {defineIonxForms, FormControl, FormControlElement, FormController, FormValidationError, required} from "ionx/forms";
+import {
+    Component,
+    ComponentInterface,
+    Element,
+    Event,
+    EventEmitter,
+    FunctionalComponent,
+    h,
+    Host,
+    Listen,
+    Method,
+    Prop
+} from "@stencil/core";
+import {
+    defineIonxForms,
+    Form,
+    FormControl,
+    FormControlElement,
+    FormController,
+    FormField,
+    FormValidationError,
+    required
+} from "ionx/forms";
 import {defineIonxFormsTooltipErrorPresenter} from "ionx/forms/TooltipErrorPresenter";
-import {defineIonxSelect, SelectOption} from "ionx/Select";
+import {defineIonxSelect, Select, SelectOption} from "ionx/Select";
+import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {DefaultLinkScheme} from "./DefaultLinkScheme";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
 import {Link} from "./Link";
@@ -44,6 +66,8 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
     ionChange: EventEmitter<{value: Link}>;
 
     errorPresenter: string | FunctionalComponent;
+
+    breakpoints: WidthBreakpointsContainer;
 
     async formValidate() {
 
@@ -166,9 +190,16 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
         await loadIntlMessages();
     }
 
-    connectedCallback() {
-        this.prepare();
+    disconnectedCallback() {
+        this.breakpoints.disconnect();
+        this.breakpoints = undefined;
+    }
 
+    connectedCallback() {
+
+        this.breakpoints = new WidthBreakpointsContainer(this.element);
+
+        this.prepare();
 
         if (this.element.closest("ionx-link-editor-dialog")) {
             this.errorPresenter = "ionx-form-tooltip-error-presenter";
@@ -199,23 +230,23 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
 
         return <Host>
 
-            <ionx-form controller={this.data}>
+            <Form controller={this.data}>
 
                 {ErrorPresenter && <ErrorPresenter/>}
 
-                <ionx-form-field
+                <FormField
                     error={!this.errorPresenter && this.data.controls.scheme.error}
                     label={intl.message`ionx/LinkEditor#Link type`}>
-                    <ionx-select
+                    <Select
                         disabled={this.disabled}
                         readonly={this.readonly}
                         ref={this.data.controls.scheme.attach()}
                         empty={false}
                         placeholder={intl.message`ionx/LinkEditor#Choose...`}
                         options={schemes}/>
-                </ionx-form-field>
+                </FormField>
 
-                {ValueComponent && <ionx-form-field
+                {ValueComponent && <FormField
                     error={!this.errorPresenter && this.data.controls.value.error}
                     label={scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message`ionx/LinkEditor#Link`}>
 
@@ -227,20 +258,20 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
 
                     {scheme.valueHint && <span slot="hint">{intl.message(scheme.valueHint)}</span>}
 
-                </ionx-form-field>}
+                </FormField>}
 
-                {this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && <ionx-form-field
+                {this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && <FormField
                     error={!this.errorPresenter && this.data.controls.target.error}
                     label={intl.message`ionx/LinkEditor#Open in|link target`}>
-                    <ionx-select
+                    <Select
                         disabled={this.disabled}
                         readonly={this.readonly}
                         ref={this.data.controls.target.attach()}
                         placeholder={intl.message`ionx/LinkEditor#defaultTargetLabel`}
                         options={targets.map(target => ({value: target, label: intl.message(target.label)}))}/>
-                </ionx-form-field>}
+                </FormField>}
 
-            </ionx-form>
+            </Form>
         </Host>;
     }
 }

@@ -1,5 +1,5 @@
 import {intl, MessageRef} from "@co.mmons/js-intl";
-import {Component, ComponentInterface, h, Host, Method, Prop, State, Watch} from "@stencil/core";
+import {Component, ComponentInterface, Event, EventEmitter, h, Host, Method, Prop, State, Watch} from "@stencil/core";
 import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
@@ -32,6 +32,9 @@ export class FormField implements ComponentInterface {
     @State()
     errorMessage: string;
 
+    @Event()
+    expandCollapse: EventEmitter<boolean>;
+
     @Method()
     async toggleExpanded() {
         this.expanded = !this.expanded;
@@ -46,6 +49,11 @@ export class FormField implements ComponentInterface {
     @Watch("error")
     watchErrorProps() {
         this.buildErrorMessage();
+    }
+
+    async expandCollapseClicked() {
+        await this.toggleExpanded();
+        this.expandCollapse.emit(this.expanded);
     }
 
     private buildErrorMessage() {
@@ -84,7 +92,7 @@ export class FormField implements ComponentInterface {
                         <slot name="label-end"/>
                     </div>
 
-                    {this.collapsible && <ion-button class="ionx--expand-toggle" shape="round" size="small" fill="clear" onClick={() => this.toggleExpanded()}>
+                    {this.collapsible && <ion-button class="ionx--expand-toggle" shape="round" size="small" fill="clear" onClick={() => this.expandCollapseClicked()}>
                         <ion-icon name="chevron-up" slot="icon-only"/>
                     </ion-button>}
                 </legend>
