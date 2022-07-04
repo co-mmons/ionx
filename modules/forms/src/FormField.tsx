@@ -17,7 +17,7 @@ export class FormField implements ComponentInterface {
     @Prop()
     flexContent?: boolean;
 
-    @Prop({reflect: true})
+    @Prop({reflect: true, mutable: true})
     expanded?: boolean;
 
     @Prop({reflect: true})

@@ -1088,7 +1088,7 @@ let FormItem = class extends HTMLElement {
 };
 
 const IonxForm = /*@__PURE__*/proxyCustomElement(FormComponent, [4,"ionx-form",{"controller":[16],"disconnect":[4]}]);
-const IonxFormField = /*@__PURE__*/proxyCustomElement(FormField, [6,"ionx-form-field",{"label":[1],"flexContent":[4,"flex-content"],"expanded":[516],"collapsible":[516],"control":[16],"error":[1],"errorMessage":[32]}]);
+const IonxFormField = /*@__PURE__*/proxyCustomElement(FormField, [6,"ionx-form-field",{"label":[1],"flexContent":[4,"flex-content"],"expanded":[1540],"collapsible":[516],"control":[16],"error":[1],"errorMessage":[32]}]);
 const IonxFormItem = /*@__PURE__*/proxyCustomElement(FormItem, [6,"ionx-form-item",{"fill":[513],"control":[16],"error":[1],"hint":[1],"partProps":[16],"itemProps":[16],"itemStyle":[16],"errorMessage":[32]}]);
 const defineIonxForms = (opts) => {
   if (typeof customElements !== 'undefined') {
