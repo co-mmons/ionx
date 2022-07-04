@@ -1755,7 +1755,7 @@ let HtmlEditor = class extends HTMLElement$1 {
         }
       });
       if (empty) {
-        return null;
+        return this.emptyValue;
       }
       else {
         return tmp.innerHTML; // this.prepareOutputValue(tmp);
@@ -2401,7 +2401,7 @@ let Toolbar = class extends HTMLElement$1 {
   static get style() { return toolbarCss; }
 };
 
-const IonxHtmlEditor = /*@__PURE__*/proxyCustomElement(HtmlEditor, [0,"ionx-html-editor",{"readonly":[4],"disabled":[4],"value":[1025],"schema":[16],"plugins":[16],"keymap":[16],"historyDisabled":[4,"history-disabled"],"toolbarItems":[16]}]);
+const IonxHtmlEditor = /*@__PURE__*/proxyCustomElement(HtmlEditor, [0,"ionx-html-editor",{"readonly":[4],"disabled":[4],"value":[1025],"emptyValue":[1,"empty-value"],"schema":[16],"plugins":[16],"keymap":[16],"historyDisabled":[4,"history-disabled"],"toolbarItems":[16]}]);
 const IonxHtmlEditorAlignmentMenu = /*@__PURE__*/proxyCustomElement(AlignmentMenu, [1,"ionx-html-editor-alignment-menu",{"editor":[16]}]);
 const IonxHtmlEditorInsertMenu = /*@__PURE__*/proxyCustomElement(InsertMenu, [1,"ionx-html-editor-insert-menu",{"editor":[16],"items":[16]}]);
 const IonxHtmlEditorLinkMenu = /*@__PURE__*/proxyCustomElement(LinkMenu, [1,"ionx-html-editor-link-menu",{"editor":[16]}]);

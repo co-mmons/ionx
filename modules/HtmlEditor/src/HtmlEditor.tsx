@@ -36,6 +36,9 @@ export class HtmlEditor implements ComponentInterface {
     value: string;
 
     @Prop()
+    emptyValue: string | null | undefined;
+
+    @Prop()
     schema: Schema;
 
     @Prop()
@@ -223,7 +226,7 @@ export class HtmlEditor implements ComponentInterface {
             })
 
             if (empty) {
-                return null;
+                return this.emptyValue;
             } else {
                 return tmp.innerHTML; // this.prepareOutputValue(tmp);
             }

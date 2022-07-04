@@ -10,6 +10,7 @@
 | Property          | Attribute          | Description | Type                           | Default     |
 | ----------------- | ------------------ | ----------- | ------------------------------ | ----------- |
 | `disabled`        | `disabled`         |             | `boolean`                      | `undefined` |
+| `emptyValue`      | `empty-value`      |             | `string`                       | `undefined` |
 | `historyDisabled` | `history-disabled` |             | `boolean`                      | `undefined` |
 | `keymap`          | --                 |             | `Keymap<any> \| Keymap<any>[]` | `undefined` |
 | `plugins`         | --                 |             | `Plugin<any, any>[]`           | `undefined` |

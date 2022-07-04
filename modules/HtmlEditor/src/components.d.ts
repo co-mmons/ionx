@@ -15,6 +15,7 @@ import { ToolbarItem as ToolbarItem1 } from "./toolbar/ToolbarItem";
 export namespace Components {
     interface IonxHtmlEditor {
         "disabled": boolean;
+        "emptyValue": string | null | undefined;
         "getScheme": () => Promise<Schema>;
         "getState": () => Promise<EditorState<Schema>>;
         "getView": () => Promise<EditorView<Schema<any, any>>>;
@@ -114,6 +115,7 @@ declare global {
 declare namespace LocalJSX {
     interface IonxHtmlEditor {
         "disabled"?: boolean;
+        "emptyValue"?: string | null | undefined;
         "historyDisabled"?: boolean;
         "keymap"?: Keymap | Keymap[];
         "onEditorSelectionChange"?: (event: CustomEvent<any>) => void;

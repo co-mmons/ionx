@@ -9,6 +9,7 @@ export declare class HtmlEditor implements ComponentInterface {
   readonly: boolean;
   disabled: boolean;
   value: string;
+  emptyValue: string | null | undefined;
   schema: Schema;
   plugins: Plugin[];
   keymap: Keymap | Keymap[];
