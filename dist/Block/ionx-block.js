@@ -26,7 +26,7 @@ let Block = class extends HTMLElement {
     this.initBreakpoints(this.innerWidth);
   }
   disconnectedCallback() {
-    this.breakpoints.disconnect();
+    this.breakpoints?.disconnect();
     this.breakpoints = undefined;
   }
   render() {

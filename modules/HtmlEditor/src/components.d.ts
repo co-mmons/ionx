@@ -14,6 +14,7 @@ import { InsertMenuItem } from "./menus/InsertMenuItem";
 import { ToolbarItem as ToolbarItem1 } from "./toolbar/ToolbarItem";
 export namespace Components {
     interface IonxHtmlEditor {
+        "beforeInitCallback": (() => Promise<any>);
         "disabled": boolean;
         "emptyValue": string | null | undefined;
         "getScheme": () => Promise<Schema>;
@@ -114,6 +115,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxHtmlEditor {
+        "beforeInitCallback"?: (() => Promise<any>);
         "disabled"?: boolean;
         "emptyValue"?: string | null | undefined;
         "historyDisabled"?: boolean;

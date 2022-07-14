@@ -15,6 +15,7 @@ export declare class HtmlEditor implements ComponentInterface {
   keymap: Keymap | Keymap[];
   historyDisabled: boolean;
   toolbarItems: ToolbarItem[];
+  beforeInitCallback: (() => Promise<any>);
   /**
    * @internal
    */

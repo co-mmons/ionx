@@ -53,6 +53,9 @@ export class HtmlEditor implements ComponentInterface {
     @Prop()
     toolbarItems: ToolbarItem[];
 
+    @Prop()
+    beforeInitCallback: (() => Promise<any>);
+
     /**
      * @internal
      */
@@ -144,6 +147,14 @@ export class HtmlEditor implements ComponentInterface {
 
         const container = this.element.getElementsByClassName("ionx--prosemirror");
         await waitTill(() => container.length > 0, 1);
+
+        if (this.beforeInitCallback) {
+            try {
+                await this.beforeInitCallback();
+            } catch (error) {
+                console.error(error);
+            }
+        }
 
         const plugins = [
 

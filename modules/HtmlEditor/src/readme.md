@@ -7,17 +7,18 @@
 
 ## Properties
 
-| Property          | Attribute          | Description | Type                           | Default     |
-| ----------------- | ------------------ | ----------- | ------------------------------ | ----------- |
-| `disabled`        | `disabled`         |             | `boolean`                      | `undefined` |
-| `emptyValue`      | `empty-value`      |             | `string`                       | `undefined` |
-| `historyDisabled` | `history-disabled` |             | `boolean`                      | `undefined` |
-| `keymap`          | --                 |             | `Keymap<any> \| Keymap<any>[]` | `undefined` |
-| `plugins`         | --                 |             | `Plugin<any, any>[]`           | `undefined` |
-| `readonly`        | `readonly`         |             | `boolean`                      | `undefined` |
-| `schema`          | --                 |             | `Schema<any, any>`             | `undefined` |
-| `toolbarItems`    | --                 |             | `ToolbarItem[]`                | `undefined` |
-| `value`           | `value`            |             | `string`                       | `undefined` |
+| Property             | Attribute          | Description | Type                           | Default     |
+| -------------------- | ------------------ | ----------- | ------------------------------ | ----------- |
+| `beforeInitCallback` | --                 |             | `() => Promise<any>`           | `undefined` |
+| `disabled`           | `disabled`         |             | `boolean`                      | `undefined` |
+| `emptyValue`         | `empty-value`      |             | `string`                       | `undefined` |
+| `historyDisabled`    | `history-disabled` |             | `boolean`                      | `undefined` |
+| `keymap`             | --                 |             | `Keymap<any> \| Keymap<any>[]` | `undefined` |
+| `plugins`            | --                 |             | `Plugin<any, any>[]`           | `undefined` |
+| `readonly`           | `readonly`         |             | `boolean`                      | `undefined` |
+| `schema`             | --                 |             | `Schema<any, any>`             | `undefined` |
+| `toolbarItems`       | --                 |             | `ToolbarItem[]`                | `undefined` |
+| `value`              | `value`            |             | `string`                       | `undefined` |
 
 
 ## Events

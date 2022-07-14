@@ -52,7 +52,7 @@ export class Block {
     }
 
     disconnectedCallback() {
-        this.breakpoints.disconnect();
+        this.breakpoints?.disconnect();
         this.breakpoints = undefined;
     }
 
