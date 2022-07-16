@@ -6,4 +6,8 @@
     ion-list {
         @include ionx-popover-context-menu-list;
     }
+
+    ion-label {
+        white-space: normal;
+    }
 }
