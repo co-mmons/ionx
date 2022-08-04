@@ -33,7 +33,7 @@
         --ionx-hide-when--display-xxl: var(--ionx-width-breakpoints-xxl) none;
     }
 
-    &[ionx-hide-when="<=xs"], [ionx-hide-when="<sm"] {
+    &[ionx-hide-when="<=xs"], &[ionx-hide-when="<sm"] {
         --ionx-hide-when--display-xs: var(--ionx-width-breakpoints-xs) none;
     }
 
@@ -41,7 +41,7 @@
         display: none;
     }
 
-    &[ionx-hide-when=">=sm"], [ionx-hide-when=">xs"] {
+    &[ionx-hide-when=">=sm"], &[ionx-hide-when=">xs"] {
         --ionx-hide-when--display-sm: var(--ionx-width-breakpoints-sm) none;
         --ionx-hide-when--display-md: var(--ionx-width-breakpoints-md) none;
         --ionx-hide-when--display-lg: var(--ionx-width-breakpoints-lg) none;
@@ -49,43 +49,43 @@
         --ionx-hide-when--display-xxl: var(--ionx-width-breakpoints-xxl) none;
     }
 
-    &[ionx-hide-when="<=sm"], [ionx-hide-when="<md"] {
+    &[ionx-hide-when="<=sm"], &[ionx-hide-when="<md"] {
         --ionx-hide-when--display-xs: var(--ionx-width-breakpoints-xs) none;
         --ionx-hide-when--display-sm: var(--ionx-width-breakpoints-sm) none;
     }
 
-    &[ionx-hide-when=">=md"], [ionx-hide-when=">sm"] {
+    &[ionx-hide-when=">=md"], &[ionx-hide-when=">sm"] {
         --ionx-hide-when--display-md: var(--ionx-width-breakpoints-md) none;
         --ionx-hide-when--display-lg: var(--ionx-width-breakpoints-lg) none;
         --ionx-hide-when--display-xl: var(--ionx-width-breakpoints-xl) none;
         --ionx-hide-when--display-xxl: var(--ionx-width-breakpoints-xxl) none;
     }
 
-    &[ionx-hide-when="<=md"], [ionx-hide-when="<lg"] {
+    &[ionx-hide-when="<=md"], &[ionx-hide-when="<lg"] {
         --ionx-hide-when--display-xs: var(--ionx-width-breakpoints-xs) none;
         --ionx-hide-when--display-sm: var(--ionx-width-breakpoints-sm) none;
         --ionx-hide-when--display-md: var(--ionx-width-breakpoints-md) none;
     }
 
-    &[ionx-hide-when=">=lg"], [ionx-hide-when=">md"] {
+    &[ionx-hide-when=">=lg"], &[ionx-hide-when=">md"] {
         --ionx-hide-when--display-lg: var(--ionx-width-breakpoints-lg) none;
         --ionx-hide-when--display-xl: var(--ionx-width-breakpoints-xl) none;
         --ionx-hide-when--display-xxl: var(--ionx-width-breakpoints-xxl) none;
     }
 
-    &[ionx-hide-when="<=lg"], [ionx-hide-when="<xl"] {
+    &[ionx-hide-when="<=lg"], &[ionx-hide-when="<xl"] {
         --ionx-hide-when--display-xs: var(--ionx-width-breakpoints-xs) none;
         --ionx-hide-when--display-sm: var(--ionx-width-breakpoints-sm) none;
         --ionx-hide-when--display-md: var(--ionx-width-breakpoints-md) none;
         --ionx-hide-when--display-lg: var(--ionx-width-breakpoints-lg) none;
     }
 
-    &[ionx-hide-when=">=xl"], [ionx-hide-when=">lg"] {
+    &[ionx-hide-when=">=xl"], &[ionx-hide-when=">lg"] {
         --ionx-hide-when--display-xl: var(--ionx-width-breakpoints-xl) none;
         --ionx-hide-when--display-xxl: var(--ionx-width-breakpoints-xxl) none;
     }
 
-    &[ionx-hide-when="<=xl"], [ionx-hide-when="<xxl"] {
+    &[ionx-hide-when="<=xl"], &[ionx-hide-when="<xxl"] {
         --ionx-hide-when--display-xs: var(--ionx-width-breakpoints-xs) none;
         --ionx-hide-when--display-sm: var(--ionx-width-breakpoints-sm) none;
         --ionx-hide-when--display-md: var(--ionx-width-breakpoints-md) none;
@@ -93,7 +93,7 @@
         --ionx-hide-when--display-xl: var(--ionx-width-breakpoints-xl) none;
     }
 
-    &[ionx-hide-when=">=xxl"], [ionx-hide-when=">xl"] {
+    &[ionx-hide-when=">=xxl"], &[ionx-hide-when=">xl"] {
         --ionx-hide-when--display-xxl: var(--ionx-width-breakpoints-xxl) none;
     }
 

@@ -85,10 +85,11 @@ export class FormField implements ComponentInterface {
             <fieldset>
 
                 <legend>
-                    <div slot-container="label">
+                    <div key="label" slot-container="label">
                         <slot name="label">{this.label}</slot>
                     </div>
-                    <div slot-container="label-end">
+
+                    <div key="label-end" slot-container="label-end">
                         <slot name="label-end"/>
                     </div>
 
@@ -97,25 +98,25 @@ export class FormField implements ComponentInterface {
                     </ion-button>}
                 </legend>
 
-                <div slot-container="description">
+                <div key="description" slot-container="description">
                     <slot name="description"/>
                 </div>
 
-                <div slot-container="placeholder">
+                <div key="placeholder" slot-container="placeholder">
                     <slot name="placeholder"/>
                 </div>
 
                 <div ionx--content style={{display: this.flexContent ? "flex" : "block"}}>
 
-                    <div slot-container="start">
+                    <div key="start" slot-container="start">
                         <slot name="start"/>
                     </div>
 
-                    <div slot-container="default">
+                    <div key="default" slot-container="default">
                         <slot/>
                     </div>
 
-                    <div slot-container="end">
+                    <div key="end" slot-container="end">
                         <slot name="end"/>
                     </div>
                 </div>
