@@ -49,8 +49,8 @@
 
         > [slot-container=description] {
             margin: 4px 16px 0 16px;
-            font-size: calc(var(--form-field--label-font-size) - 1px);
-            line-height: 1.1;
+            font-size: var(--form-field--label-font-size);
+            line-height: 1.2;
             color: var(--form-field-description-color, rgba(var(--ion-text-color-rgb), .8));
 
             &:empty {

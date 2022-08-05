@@ -16,10 +16,11 @@
     }
 
     ion-list-header {
-        padding: 8px 0;
-        font-size: calc(var(--ionx-default-font-size) + 2px);
-        font-weight: 600;
+        padding: 8px 16px;
+        font-size: calc(var(--ionx-default-font-size) - 3px);
+        font-weight: 700;
         align-items: flex-start;
+        min-height: auto;
     }
 
     ion-item > [slot=start] {
