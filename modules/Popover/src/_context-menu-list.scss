@@ -15,8 +15,20 @@
         --border-width: 0;
     }
 
+    ion-list-header {
+        padding: 8px 0;
+        font-size: calc(var(--ionx-default-font-size) + 2px);
+        font-weight: 600;
+        align-items: flex-start;
+    }
+
     ion-item > [slot=start] {
         margin-right: 16px;
         margin-left: 0px;
+    }
+
+    ion-item ion-radio {
+        width: 1.5em;
+        height: 1.5em;
     }
 }

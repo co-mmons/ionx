@@ -27,7 +27,7 @@ export class ContextMenu {
     render() {
         return <ion-list>
             {this.items.map(item => <ion-item button={true} disabled={item.disabled} detail={false} onClick={() => this.itemClicked(item)}>
-                {(item.iconSrc || item.iconName) && <ion-icon color={item.color} name={item.iconName} src={item.iconSrc} slot="start"/>}
+                {(item.iconSrc || item.iconName) && <ion-icon color={item.color} name={item.iconName} src={item.iconSrc} size="small" slot="start"/>}
                 <ion-label color={item.color}>{item.label}</ion-label>
             </ion-item>)}
         </ion-list>
