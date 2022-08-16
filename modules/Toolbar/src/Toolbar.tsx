@@ -29,6 +29,9 @@ export class Toolbar {
     defaultBackHref: string;
 
     @Prop()
+    titleVisible: boolean = true;
+
+    @Prop()
     titleWrap: ToolbarTitleWrap = false;
 
     @Watch("titleWrap")
@@ -168,10 +171,10 @@ export class Toolbar {
                         <slot name="action"/>
                     </ion-buttons>
 
-                    <h1>
+                    {this.titleVisible && <h1>
                         <slot name="title"/>
                         <slot name="subtitle"/>
-                    </h1>
+                    </h1>}
 
                 </div>
 

@@ -2,11 +2,12 @@ import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { MessageRef, intl, setGlobalValues } from '@co.mmons/js-intl';
 import { Enum } from '@co.mmons/js-utils/core';
-import { FormValidationError, validEmail, defineIonxForms, FormController, required } from 'ionx/forms';
+import { FormValidationError, validEmail, defineIonxForms, FormController, required, Form, FormField } from 'ionx/forms';
 import { createAnimation } from '@ionic/core';
 import { defineIonxDialog, showDialog } from 'ionx/Dialog';
 import { defineIonxFormsTooltipErrorPresenter } from 'ionx/forms/TooltipErrorPresenter';
-import { defineIonxSelect } from 'ionx/Select';
+import { defineIonxSelect, Select } from 'ionx/Select';
+import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
 class DefaultLinkTarget extends Enum {
   constructor(name) {
@@ -322,7 +323,12 @@ let LinkEditor = class extends HTMLElement {
   async componentWillLoad() {
     await loadIntlMessages();
   }
+  disconnectedCallback() {
+    this.breakpoints.disconnect();
+    this.breakpoints = undefined;
+  }
   connectedCallback() {
+    this.breakpoints = new WidthBreakpointsContainer(this.element);
     this.prepare();
     if (this.element.closest("ionx-link-editor-dialog")) {
       this.errorPresenter = "ionx-form-tooltip-error-presenter";
@@ -346,7 +352,7 @@ let LinkEditor = class extends HTMLElement {
     const ValueComponent = this.data.controls.scheme.value?.valueComponent;
     const targets = scheme?.valueTargets?.(this.data.controls.value.value);
     const ErrorPresenter = this.errorPresenter;
-    return h(Host, null, h("ionx-form", { controller: this.data }, ErrorPresenter && h(ErrorPresenter, null), h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.scheme.error, label: intl.message `ionx/LinkEditor#Link type` }, h("ionx-select", { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.scheme.attach(), empty: false, placeholder: intl.message `ionx/LinkEditor#Choose...`, options: schemes })), ValueComponent && h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.value.error, label: scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message `ionx/LinkEditor#Link` }, h(ValueComponent, { ...scheme.valueComponentProps, disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.value.attach() }), scheme.valueHint && h("span", { slot: "hint" }, intl.message(scheme.valueHint))), this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && h("ionx-form-field", { error: !this.errorPresenter && this.data.controls.target.error, label: intl.message `ionx/LinkEditor#Open in|link target` }, h("ionx-select", { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.target.attach(), placeholder: intl.message `ionx/LinkEditor#defaultTargetLabel`, options: targets.map(target => ({ value: target, label: intl.message(target.label) })) }))));
+    return h(Host, null, h(Form, { controller: this.data }, ErrorPresenter && h(ErrorPresenter, null), h(FormField, { error: !this.errorPresenter && this.data.controls.scheme.error, label: intl.message `ionx/LinkEditor#Link type` }, h(Select, { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.scheme.attach(), empty: this.empty, placeholder: intl.message `ionx/LinkEditor#Choose...`, options: schemes })), ValueComponent && h(FormField, { error: !this.errorPresenter && this.data.controls.value.error, label: scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message `ionx/LinkEditor#Link` }, h(ValueComponent, { ...scheme.valueComponentProps, disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.value.attach() }), scheme.valueHint && h("span", { slot: "hint" }, intl.message(scheme.valueHint))), this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && h(FormField, { error: !this.errorPresenter && this.data.controls.target.error, label: intl.message `ionx/LinkEditor#Open in|link target` }, h(Select, { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.target.attach(), placeholder: intl.message `ionx/LinkEditor#defaultTargetLabel`, options: targets.map(target => ({ value: target, label: intl.message(target.label) })) }))));
   }
   get element() { return this; }
   static get style() { return linkEditorCss; }
@@ -377,7 +383,7 @@ let LinkEditorDialog = class extends HTMLElement {
   get element() { return this; }
 };
 
-const IonxLinkEditor = /*@__PURE__*/proxyCustomElement(LinkEditor, [2,"ionx-link-editor",{"value":[1025],"schemes":[16],"targetVisible":[4,"target-visible"],"readonly":[4],"disabled":[4]},[[0,"ionChange","onChanges"]]]);
+const IonxLinkEditor = /*@__PURE__*/proxyCustomElement(LinkEditor, [2,"ionx-link-editor",{"empty":[4],"value":[1025],"schemes":[16],"targetVisible":[4,"target-visible"],"readonly":[4],"disabled":[4]},[[0,"ionChange","onChanges"]]]);
 const IonxLinkEditorDialog = /*@__PURE__*/proxyCustomElement(LinkEditorDialog, [2,"ionx-link-editor-dialog",{"editorProps":[16]}]);
 const defineIonxLinkEditor = (opts) => {
   if (typeof customElements !== 'undefined') {

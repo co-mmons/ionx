@@ -9,6 +9,7 @@ export declare class Toolbar {
   buttonIcon: string;
   buttonHandler: () => void;
   defaultBackHref: string;
+  titleVisible: boolean;
   titleWrap: ToolbarTitleWrap;
   titleWrapChanged(niu: ToolbarTitleWrap, old: ToolbarTitleWrap): void;
   breakpoints: WidthBreakpointsContainer;

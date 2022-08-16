@@ -13,6 +13,7 @@ export namespace Components {
         "buttonHandler": () => void;
         "buttonIcon": string;
         "defaultBackHref": string;
+        "titleVisible": boolean;
         "titleWrap": ToolbarTitleWrap;
     }
 }
@@ -33,6 +34,7 @@ declare namespace LocalJSX {
         "buttonHandler"?: () => void;
         "buttonIcon"?: string;
         "defaultBackHref"?: string;
+        "titleVisible"?: boolean;
         "titleWrap"?: ToolbarTitleWrap;
     }
     interface IntrinsicElements {

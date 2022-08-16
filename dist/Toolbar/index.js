@@ -12,6 +12,7 @@ let Toolbar = class extends HTMLElement {
   constructor() {
     super();
     this.__registerHost();
+    this.titleVisible = true;
     this.titleWrap = false;
   }
   titleWrapChanged(niu, old) {
@@ -104,7 +105,7 @@ let Toolbar = class extends HTMLElement {
   }
   render() {
     const closeIcon = this.button === "close" && matchesMediaBreakpoint(this, "md") ? "close" : undefined;
-    return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-back-button", { slot: "start", style: { display: closeIcon ? "inline-block" : null }, icon: closeIcon ? "close" : undefined, onClick: ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()], defaultHref: (this.button === "back" && this.defaultBackHref) || null }), h("div", { "ionx--inner": true, class: { "ionx--no-button": this.button === "none" } }, h("ion-buttons", null, h("slot", { name: "action" })), h("h1", null, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
+    return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-back-button", { slot: "start", style: { display: closeIcon ? "inline-block" : null }, icon: closeIcon ? "close" : undefined, onClick: ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()], defaultHref: (this.button === "back" && this.defaultBackHref) || null }), h("div", { "ionx--inner": true, class: { "ionx--no-button": this.button === "none" } }, h("ion-buttons", null, h("slot", { name: "action" })), this.titleVisible && h("h1", null, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
   }
   get element() { return this; }
   static get watchers() { return {
@@ -113,7 +114,7 @@ let Toolbar = class extends HTMLElement {
   static get style() { return toolbarCss; }
 };
 
-const IonxToolbar = /*@__PURE__*/proxyCustomElement(Toolbar, [6,"ionx-toolbar",{"button":[1],"buttonIcon":[1,"button-icon"],"buttonHandler":[16],"defaultBackHref":[1,"default-back-href"],"titleWrap":[8,"title-wrap"]}]);
+const IonxToolbar = /*@__PURE__*/proxyCustomElement(Toolbar, [6,"ionx-toolbar",{"button":[1],"buttonIcon":[1,"button-icon"],"buttonHandler":[16],"defaultBackHref":[1,"default-back-href"],"titleVisible":[4,"title-visible"],"titleWrap":[8,"title-wrap"]}]);
 const defineIonxToolbar = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

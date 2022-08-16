@@ -13,6 +13,7 @@
 | `buttonHandler`       | --                  |             | `() => void`                            | `undefined` |
 | `buttonIcon`          | `button-icon`       |             | `string`                                | `undefined` |
 | `defaultBackHref`     | `default-back-href` |             | `string`                                | `undefined` |
+| `titleVisible`        | `title-visible`     |             | `boolean`                               | `true`      |
 | `titleWrap`           | `title-wrap`        |             | `"collapse" \| boolean`                 | `false`     |
 
 

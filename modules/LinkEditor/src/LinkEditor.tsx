@@ -47,6 +47,9 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
     @Element()
     element: HTMLElement;
 
+    @Prop()
+    empty: boolean;
+
     @Prop({mutable: true})
     value: string | Link;
 
@@ -241,7 +244,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
                         disabled={this.disabled}
                         readonly={this.readonly}
                         ref={this.data.controls.scheme.attach()}
-                        empty={false}
+                        empty={this.empty}
                         placeholder={intl.message`ionx/LinkEditor#Choose...`}
                         options={schemes}/>
                 </FormField>

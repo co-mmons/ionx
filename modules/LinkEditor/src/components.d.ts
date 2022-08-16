@@ -13,6 +13,7 @@ export namespace Components {
     interface IonxLinkEditor {
         "buildLink": () => Promise<Link>;
         "disabled": boolean;
+        "empty": boolean;
         "readonly": boolean;
         "schemes"?: SelectOption[] | LinkScheme[];
         "targetVisible": boolean;
@@ -43,6 +44,7 @@ declare global {
 declare namespace LocalJSX {
     interface IonxLinkEditor {
         "disabled"?: boolean;
+        "empty"?: boolean;
         "onIonChange"?: (event: CustomEvent<{value: Link}>) => void;
         "readonly"?: boolean;
         "schemes"?: SelectOption[] | LinkScheme[];
