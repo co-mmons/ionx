@@ -225,7 +225,7 @@ let LinkEditor = class extends HTMLElement {
     this.__registerHost();
     this.ionChange = createEvent(this, "ionChange", 7);
     this.data = new FormController({
-      scheme: { value: null, validators: [required] },
+      scheme: { value: null, validators: [async (ctrl) => !this.empty && required(ctrl)] },
       value: { value: null, validators: [required, this.valueValidator.bind(this)] },
       target: { value: null }
     });

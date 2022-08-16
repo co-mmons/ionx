@@ -104,7 +104,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
     }
 
     data = new FormController({
-        scheme: {value: null as LinkScheme, validators: [required]},
+        scheme: {value: null as LinkScheme, validators: [async (ctrl) => !this.empty && required(ctrl)]},
         value: {value: null as any, validators: [required, this.valueValidator.bind(this)]},
         target: {value: null as LinkTarget}
     });

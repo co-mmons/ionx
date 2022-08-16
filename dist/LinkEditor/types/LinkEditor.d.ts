@@ -1,5 +1,5 @@
 import { ComponentInterface, EventEmitter, FunctionalComponent } from "@stencil/core";
-import { FormControl, FormControlElement, FormController, required } from "ionx/forms";
+import { FormControl, FormControlElement, FormController } from "ionx/forms";
 import { SelectOption } from "ionx/Select";
 import { WidthBreakpointsContainer } from "ionx/WidthBreakpoints";
 import { Link } from "./Link";
@@ -26,7 +26,7 @@ export declare class LinkEditor implements LinkEditorProps, ComponentInterface, 
   data: FormController<{
     scheme: {
       value: LinkScheme;
-      validators: (typeof required)[];
+      validators: ((ctrl: FormControl<any>) => Promise<void>)[];
     };
     value: {
       value: any;
