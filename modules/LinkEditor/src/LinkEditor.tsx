@@ -1,4 +1,4 @@
-import {intl} from "@co.mmons/js-intl";
+import {MessageRef, translate} from "@co.mmons/js-intl";
 import {
     Component,
     ComponentInterface,
@@ -13,7 +13,6 @@ import {
     Prop
 } from "@stencil/core";
 import {
-    defineIonxForms,
     Form,
     FormControl,
     FormControlElement,
@@ -22,8 +21,9 @@ import {
     FormValidationError,
     required
 } from "ionx/forms";
-import {defineIonxFormsTooltipErrorPresenter} from "ionx/forms/TooltipErrorPresenter";
-import {defineIonxSelect, Select, SelectOption} from "ionx/Select";
+import {TooltipErrorPresenter} from "ionx/forms/TooltipErrorPresenter";
+import {Select, SelectOption} from "ionx/Select";
+import {innerProp} from "ionx/utils";
 import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {DefaultLinkScheme} from "./DefaultLinkScheme";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
@@ -32,10 +32,6 @@ import {LinkEditorProps} from "./LinkEditorProps";
 import {LinkScheme} from "./LinkScheme";
 import {LinkTarget} from "./LinkTarget";
 import {unknownScheme} from "./unknownScheme";
-
-defineIonxForms();
-defineIonxSelect();
-defineIonxFormsTooltipErrorPresenter();
 
 @Component({
     tag: "ionx-link-editor",
@@ -205,7 +201,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
         this.prepare();
 
         if (this.element.closest("ionx-link-editor-dialog")) {
-            this.errorPresenter = "ionx-form-tooltip-error-presenter";
+            this.errorPresenter = TooltipErrorPresenter;
         }
     }
 
@@ -213,21 +209,27 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
 
         let schemes: SelectOption[];
         if (this.schemes) {
-            schemes = (this.schemes as []).map(scheme => (scheme as SelectOption).value ? scheme as SelectOption : {value: scheme, label: intl.message((scheme as LinkScheme).label)});
+            schemes = (this.schemes as []).map(scheme => (scheme as SelectOption).value ? scheme as SelectOption : {
+                value: scheme,
+                label: ((scheme as LinkScheme).label instanceof MessageRef && translate((scheme as LinkScheme).label)) || (scheme as LinkScheme).label
+            });
         } else {
             schemes = (DefaultLinkScheme.values() as LinkScheme[]).concat(unknownScheme).map(type => ({
                 value: type,
-                label: intl.message(type.label)
+                label: translate(type.label)
             }));
         }
 
-        if (this.data.controls.scheme.value === unknownScheme) {
-            schemes.push({value: unknownScheme, label: intl.message(unknownScheme.label)});
+        const {disabled, readonly} = this;
+        const controls = this.data.controls;
+
+        if (controls.scheme.value === unknownScheme) {
+            schemes.push({value: unknownScheme, label: translate(unknownScheme.label)});
         }
 
-        const scheme = this.data.controls.scheme.value;
-        const ValueComponent: any = this.data.controls.scheme.value?.valueComponent;
-        const targets = scheme?.valueTargets?.(this.data.controls.value.value);
+        const scheme = controls.scheme.value;
+        const ValueComponent: any = controls.scheme.value?.valueComponent;
+        const targets = scheme?.valueTargets?.(controls.value.value);
 
         const ErrorPresenter = this.errorPresenter;
 
@@ -238,40 +240,40 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
                 {ErrorPresenter && <ErrorPresenter/>}
 
                 <FormField
-                    error={!this.errorPresenter && this.data.controls.scheme.error}
-                    label={intl.message`ionx/LinkEditor#Link type`}>
+                    error={!ErrorPresenter && controls.scheme.error}
+                    label={translate("ionx/LinkEditor#Link type")}>
                     <Select
-                        disabled={this.disabled}
-                        readonly={this.readonly}
-                        ref={this.data.controls.scheme.attach()}
+                        disabled={disabled}
+                        readonly={readonly}
+                        ref={controls.scheme.attach()}
                         empty={this.empty}
-                        placeholder={intl.message`ionx/LinkEditor#Choose...`}
+                        placeholder={translate("ionx/LinkEditor#Choose...")}
                         options={schemes}/>
                 </FormField>
 
                 {ValueComponent && <FormField
-                    error={!this.errorPresenter && this.data.controls.value.error}
-                    label={scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message`ionx/LinkEditor#Link`}>
+                    error={!ErrorPresenter && controls.value.error}
+                    label={(scheme.valueLabel instanceof MessageRef && translate(scheme.valueLabel)) || (typeof scheme.valueLabel === "string" && scheme.valueLabel) || translate("ionx/LinkEditor#Link")}>
 
                     <ValueComponent
                         {...scheme.valueComponentProps}
-                        disabled={this.disabled}
-                        readonly={this.readonly}
-                        ref={this.data.controls.value.attach()}/>
+                        disabled={disabled}
+                        readonly={readonly}
+                        ref={controls.value.attach()}/>
 
-                    {scheme.valueHint && <span slot="hint">{intl.message(scheme.valueHint)}</span>}
+                    {scheme.valueHint && <span slot="hint" {...innerProp((scheme.valueHint instanceof MessageRef && translate(scheme.valueHint)) || scheme.valueHint)}/>}
 
                 </FormField>}
 
-                {this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && <FormField
-                    error={!this.errorPresenter && this.data.controls.target.error}
-                    label={intl.message`ionx/LinkEditor#Open in|link target`}>
+                {this.targetVisible !== false && targets?.length > 0 && (!readonly || controls.target.value) && <FormField
+                    error={!ErrorPresenter && controls.target.error}
+                    label={translate("ionx/LinkEditor#Open in|link target")}>
                     <Select
-                        disabled={this.disabled}
-                        readonly={this.readonly}
-                        ref={this.data.controls.target.attach()}
-                        placeholder={intl.message`ionx/LinkEditor#defaultTargetLabel`}
-                        options={targets.map(target => ({value: target, label: intl.message(target.label)}))}/>
+                        disabled={disabled}
+                        readonly={readonly}
+                        ref={controls.target.attach()}
+                        placeholder={translate("ionx/LinkEditor#defaultTargetLabel")}
+                        options={targets.map(target => ({value: target, label: (target instanceof MessageRef && translate(target.label)) || target.label}))}/>
                 </FormField>}
 
             </Form>

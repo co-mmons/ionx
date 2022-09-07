@@ -14,3 +14,4 @@ export {matchesMediaQuery} from "./matchesMediaQuery";
 export {prefetchComponent} from "./prefetchComponent";
 export {waitTillHydrated} from "./waitTillHydrated";
 export {windowSize, WindowSize, WindowSizeOptions, WindowOrientation} from "./windowSize";
+export {innerProp} from "./innerProp";

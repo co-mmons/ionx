@@ -13,3 +13,4 @@ export { matchesMediaQuery } from "./matchesMediaQuery";
 export { prefetchComponent } from "./prefetchComponent";
 export { waitTillHydrated } from "./waitTillHydrated";
 export { windowSize } from "./windowSize";
+export { innerProp } from "./innerProp";

@@ -1,12 +1,13 @@
 import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { MessageRef, intl, setGlobalValues } from '@co.mmons/js-intl';
+import { MessageRef, intl, setGlobalValues, translate } from '@co.mmons/js-intl';
 import { Enum } from '@co.mmons/js-utils/core';
-import { FormValidationError, validEmail, defineIonxForms, FormController, required, Form, FormField } from 'ionx/forms';
+import { FormValidationError, validEmail, FormController, required, Form, FormField } from 'ionx/forms';
 import { createAnimation } from '@ionic/core';
 import { defineIonxDialog, showDialog } from 'ionx/Dialog';
-import { defineIonxFormsTooltipErrorPresenter } from 'ionx/forms/TooltipErrorPresenter';
-import { defineIonxSelect, Select } from 'ionx/Select';
+import { TooltipErrorPresenter } from 'ionx/forms/TooltipErrorPresenter';
+import { Select } from 'ionx/Select';
+import { innerProp } from 'ionx/utils';
 import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
 class DefaultLinkTarget extends Enum {
@@ -216,9 +217,6 @@ var __classPrivateFieldGet = (undefined && undefined.__classPrivateFieldGet) || 
   return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _LinkEditor_buildLink;
-defineIonxForms();
-defineIonxSelect();
-defineIonxFormsTooltipErrorPresenter();
 let LinkEditor = class extends HTMLElement {
   constructor() {
     super();
@@ -331,28 +329,33 @@ let LinkEditor = class extends HTMLElement {
     this.breakpoints = new WidthBreakpointsContainer(this.element);
     this.prepare();
     if (this.element.closest("ionx-link-editor-dialog")) {
-      this.errorPresenter = "ionx-form-tooltip-error-presenter";
+      this.errorPresenter = TooltipErrorPresenter;
     }
   }
   render() {
     let schemes;
     if (this.schemes) {
-      schemes = this.schemes.map(scheme => scheme.value ? scheme : { value: scheme, label: intl.message(scheme.label) });
+      schemes = this.schemes.map(scheme => scheme.value ? scheme : {
+        value: scheme,
+        label: (scheme.label instanceof MessageRef && translate(scheme.label)) || scheme.label
+      });
     }
     else {
       schemes = DefaultLinkScheme.values().concat(unknownScheme).map(type => ({
         value: type,
-        label: intl.message(type.label)
+        label: translate(type.label)
       }));
     }
-    if (this.data.controls.scheme.value === unknownScheme) {
-      schemes.push({ value: unknownScheme, label: intl.message(unknownScheme.label) });
+    const { disabled, readonly } = this;
+    const controls = this.data.controls;
+    if (controls.scheme.value === unknownScheme) {
+      schemes.push({ value: unknownScheme, label: translate(unknownScheme.label) });
     }
-    const scheme = this.data.controls.scheme.value;
-    const ValueComponent = this.data.controls.scheme.value?.valueComponent;
-    const targets = scheme?.valueTargets?.(this.data.controls.value.value);
+    const scheme = controls.scheme.value;
+    const ValueComponent = controls.scheme.value?.valueComponent;
+    const targets = scheme?.valueTargets?.(controls.value.value);
     const ErrorPresenter = this.errorPresenter;
-    return h(Host, null, h(Form, { controller: this.data }, ErrorPresenter && h(ErrorPresenter, null), h(FormField, { error: !this.errorPresenter && this.data.controls.scheme.error, label: intl.message `ionx/LinkEditor#Link type` }, h(Select, { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.scheme.attach(), empty: this.empty, placeholder: intl.message `ionx/LinkEditor#Choose...`, options: schemes })), ValueComponent && h(FormField, { error: !this.errorPresenter && this.data.controls.value.error, label: scheme.valueLabel ? intl.message(scheme.valueLabel) : intl.message `ionx/LinkEditor#Link` }, h(ValueComponent, { ...scheme.valueComponentProps, disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.value.attach() }), scheme.valueHint && h("span", { slot: "hint" }, intl.message(scheme.valueHint))), this.targetVisible !== false && targets?.length > 0 && (!this.readonly || this.data.controls.target.value) && h(FormField, { error: !this.errorPresenter && this.data.controls.target.error, label: intl.message `ionx/LinkEditor#Open in|link target` }, h(Select, { disabled: this.disabled, readonly: this.readonly, ref: this.data.controls.target.attach(), placeholder: intl.message `ionx/LinkEditor#defaultTargetLabel`, options: targets.map(target => ({ value: target, label: intl.message(target.label) })) }))));
+    return h(Host, null, h(Form, { controller: this.data }, ErrorPresenter && h(ErrorPresenter, null), h(FormField, { error: !ErrorPresenter && controls.scheme.error, label: translate("ionx/LinkEditor#Link type") }, h(Select, { disabled: disabled, readonly: readonly, ref: controls.scheme.attach(), empty: this.empty, placeholder: translate("ionx/LinkEditor#Choose..."), options: schemes })), ValueComponent && h(FormField, { error: !ErrorPresenter && controls.value.error, label: (scheme.valueLabel instanceof MessageRef && translate(scheme.valueLabel)) || (typeof scheme.valueLabel === "string" && scheme.valueLabel) || translate("ionx/LinkEditor#Link") }, h(ValueComponent, { ...scheme.valueComponentProps, disabled: disabled, readonly: readonly, ref: controls.value.attach() }), scheme.valueHint && h("span", { slot: "hint", ...innerProp((scheme.valueHint instanceof MessageRef && translate(scheme.valueHint)) || scheme.valueHint) })), this.targetVisible !== false && targets?.length > 0 && (!readonly || controls.target.value) && h(FormField, { error: !ErrorPresenter && controls.target.error, label: translate("ionx/LinkEditor#Open in|link target") }, h(Select, { disabled: disabled, readonly: readonly, ref: controls.target.attach(), placeholder: translate("ionx/LinkEditor#defaultTargetLabel"), options: targets.map(target => ({ value: target, label: (target instanceof MessageRef && translate(target.label)) || target.label })) }))));
   }
   get element() { return this; }
   static get style() { return linkEditorCss; }
