@@ -171,10 +171,10 @@ export class Toolbar {
                         <slot name="action"/>
                     </ion-buttons>
 
-                    {this.titleVisible && <h1>
+                    <h1 style={{display: this.titleVisible ? null : "none"}}>
                         <slot name="title"/>
                         <slot name="subtitle"/>
-                    </h1>}
+                    </h1>
 
                 </div>
 

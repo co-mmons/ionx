@@ -1,6 +1,7 @@
 import {sleep} from "@co.mmons/js-utils/core";
 import {Component, h, Host} from "@stencil/core";
 import {defineIonxForms, FormController, FormField} from "ionx/forms";
+import {SelectLazyGroupItem} from "ionx/Select";
 import {Select} from "../index";
 import {SelectItem} from "../SelectItem";
 
@@ -15,7 +16,8 @@ export class Test {
     data = new FormController({
         select1: {value: undefined as number},
         select2: {value: [2, 1] as number[]},
-        select3: {value: undefined as string[]}
+        select3: {value: undefined as string[]},
+        select4: {value: ["a:1", "a:2"] as string[]},
     }).bindRenderer(this)
 
     basicItems: SelectItem[] = [
@@ -64,6 +66,24 @@ export class Test {
         },
     ]
 
+    lazyGroup: SelectLazyGroupItem = {
+        group: true,
+        label: "Group B",
+        id: "b",
+        values(values: any[]) {
+            return values.filter(value => typeof value === "string" && value.startsWith("a:"));
+        },
+        items: async () => {
+            await sleep(500);
+            const items = [];
+            for (let i = 0; i <= 60; i++) {
+                items.push({value: "a:" + i, label: "Ahahaha A" + i});
+            }
+            return items;
+        }
+    }
+
+
     render() {
 
         return <Host>
@@ -103,6 +123,18 @@ export class Test {
                     multiple={true}
                     items={this.groupItems}
                     ref={this.data.controls.select3.attach()}/>
+
+            </fieldset>
+
+            <fieldset>
+                <legend>lazy group</legend>
+                <Select
+                    placeholder="Choose..."
+                    overlayTitle="Title here"
+                    overlay="modal"
+                    multiple={true}
+                    lazyItems={this.lazyGroup}
+                    ref={this.data.controls.select4.attach()}/>
 
             </fieldset>
 
