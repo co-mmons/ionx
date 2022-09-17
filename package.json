@@ -13,7 +13,7 @@
         "tippy.js": "^6.2.6"
     },
     "peerDependencies": {
-        "@capacitor/core": "^3.3.0",
+        "@capacitor/core": "^4.0.0",
         "@co.mmons/js-intl": "github:co-mmons/js-intl",
         "@co.mmons/js-utils": "github:co-mmons/js-utils",
         "@co.mmons/rxjs-utils": "github:co-mmons/rxjs-utils",
@@ -23,7 +23,7 @@
         "fast-equals": "^3.0.0",
         "intl-messageformat": "^9.13.0",
         "ionicons": "^6.0.0",
-        "rxjs": "^7.4.0",
+        "rxjs": "^7.0.0",
         "scroll-into-view": "^1.15.0",
         "swiper": "^7.0.8",
         "tippy.js": "^6.2.6",
