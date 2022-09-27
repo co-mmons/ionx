@@ -7,6 +7,7 @@ export default async function() {
     INTL_LOCALE_URL_PARAM = "locale";
     INTL_LOCALE_URL_PATH = "__";
     INTL_LOCALE = bestLocale();
+    INTL_DEFAULT_CONTEXT = intl;
 
     intl.setLocale(INTL_LOCALE);
 }

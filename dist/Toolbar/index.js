@@ -1,7 +1,7 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { waitTill } from '@co.mmons/js-utils/core';
-import { addEventListener, matchesMediaBreakpoint } from 'ionx/utils';
+import { addEventListener } from 'ionx/utils';
 import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
 const Toolbar$1 = "ionx-toolbar";
@@ -104,8 +104,7 @@ let Toolbar = class extends HTMLElement {
     this.breakpoints = undefined;
   }
   render() {
-    const closeIcon = this.button === "close" && matchesMediaBreakpoint(this, "md") ? "close" : undefined;
-    return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-back-button", { slot: "start", style: { display: closeIcon ? "inline-block" : null }, icon: closeIcon ? "close" : undefined, onClick: ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()], defaultHref: (this.button === "back" && this.defaultBackHref) || null }), h("div", { "ionx--inner": true, class: { "ionx--no-button": this.button === "none" } }, h("ion-buttons", null, h("slot", { name: "action" })), h("h1", { style: { display: this.titleVisible ? null : "none" } }, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
+    return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-back-button", { slot: "start", style: { display: this.button === "close" ? "inline-block" : null }, icon: this.button === "close" ? "close" : undefined, onClick: ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()], defaultHref: (this.button === "back" && this.defaultBackHref) || null }), h("div", { "ionx--inner": true, class: { "ionx--no-button": this.button === "none" } }, h("ion-buttons", null, h("slot", { name: "action" })), h("h1", { style: { display: this.titleVisible ? null : "none" } }, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
   }
   get element() { return this; }
   static get watchers() { return {

@@ -1,7 +1,7 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import type {Components as ionic} from "@ionic/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
-import {addEventListener, EventUnlisten, matchesMediaBreakpoint} from "ionx/utils";
+import {addEventListener, EventUnlisten} from "ionx/utils";
 import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {ToolbarButtonType} from "./ToolbarButtonType";
 import {ToolbarTitleWrap} from "./ToolbarTitleWrap";
@@ -151,8 +151,6 @@ export class Toolbar {
 
     render() {
 
-        const closeIcon = this.button === "close" && matchesMediaBreakpoint(this, "md") ? "close" : undefined;
-
         return <Host class={{"ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse"}}>
             <ion-toolbar ref={el => this.toolbarElement = el}>
 
@@ -160,8 +158,8 @@ export class Toolbar {
 
                 {(this.button === "back" || this.button === "close") && <ion-back-button
                     slot="start"
-                    style={{display: closeIcon ? "inline-block" : null}}
-                    icon={closeIcon ? "close" : undefined}
+                    style={{display: this.button === "close" ? "inline-block" : null}}
+                    icon={this.button === "close" ? "close" : undefined}
                     onClick={ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
                     defaultHref={(this.button === "back" && this.defaultBackHref) || null}/>}
 
