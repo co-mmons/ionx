@@ -45,3 +45,13 @@ ion-toolbar {
     }
 
 }
+
+html.ios ion-modal ion-toolbar {
+    padding-right: unset;
+    padding-left: unset;
+}
+
+html.ios ion-header ion-toolbar:first-of-type {
+    padding-top: unset;
+}
+
