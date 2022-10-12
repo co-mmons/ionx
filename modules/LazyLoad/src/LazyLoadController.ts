@@ -202,13 +202,13 @@ export class LazyLoadController {
 
     private init() {
 
-        this.mutationObserver = new MutationObserver(records => records.find(record => record.addedNodes) && this.ensureLoaded());
-        this.mutationObserver.observe(this.content, {subtree: true, childList: true});
-
         this.intersectionObserver = new IntersectionObserver(entries => this.callback(entries), {
             root: this.content,
             threshold: 0,
         });
+
+        this.mutationObserver = new MutationObserver(records => records.find(record => record.addedNodes) && this.ensureLoaded());
+        this.mutationObserver.observe(this.content, {subtree: true, childList: true});
 
         this.items = this.content.getElementsByClassName(itemPendingCssClass);
         this.errors = this.content.getElementsByClassName(itemErrorCssClass);
