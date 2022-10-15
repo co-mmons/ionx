@@ -13,7 +13,7 @@ export async function findSelectValueItem(items: SelectItem[], value: any, compa
 
     for (const item of items) {
         if (item.group) {
-            const subitems = typeof item.items === "function" ? await item.items(value) : item.items;
+            const subitems = typeof item.items === "function" ? await item.items([value]) : item.items;
             if (subitems) {
                 const i = findSelectValueItem(subitems, value, comparator);
                 if (i) {
