@@ -117,8 +117,6 @@ export namespace Components {
         "sortable": boolean;
         "values": any[];
     }
-    interface IonxTest {
-    }
 }
 declare global {
     interface HTMLIonxSelectElement extends Components.IonxSelect, HTMLStencilElement {
@@ -133,16 +131,9 @@ declare global {
         prototype: HTMLIonxSelectOverlayElement;
         new (): HTMLIonxSelectOverlayElement;
     };
-    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
-    }
-    var HTMLIonxTestElement: {
-        prototype: HTMLIonxTestElement;
-        new (): HTMLIonxTestElement;
-    };
     interface HTMLElementTagNameMap {
         "ionx-select": HTMLIonxSelectElement;
         "ionx-select-overlay": HTMLIonxSelectOverlayElement;
-        "ionx-test": HTMLIonxTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -253,12 +244,9 @@ declare namespace LocalJSX {
         "sortable"?: boolean;
         "values"?: any[];
     }
-    interface IonxTest {
-    }
     interface IntrinsicElements {
         "ionx-select": IonxSelect;
         "ionx-select-overlay": IonxSelectOverlay;
-        "ionx-test": IonxTest;
     }
 }
 export { LocalJSX as JSX };
@@ -267,7 +255,6 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ionx-select": LocalJSX.IonxSelect & JSXBase.HTMLAttributes<HTMLIonxSelectElement>;
             "ionx-select-overlay": LocalJSX.IonxSelectOverlay & JSXBase.HTMLAttributes<HTMLIonxSelectOverlayElement>;
-            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
         }
     }
 }

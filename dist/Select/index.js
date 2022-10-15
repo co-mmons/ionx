@@ -27,8 +27,6 @@ async function showSelectOverlay(overlay, event) {
   return { willDismiss, didDismiss };
 }
 
-const Select = "ionx-select";
-
 function isEqualValue(a, b, comparator) {
   if (comparator === "toString") {
     if (a !== undefined && a !== null && b !== undefined && b !== null) {
@@ -47,6 +45,27 @@ function isEqualValue(a, b, comparator) {
   }
   return a === b;
 }
+
+async function findSelectValueItem(items, value, comparator) {
+  for (const item of items) {
+    if ("value" in item && isEqualValue(item.value, value, comparator)) {
+      return item;
+    }
+  }
+  for (const item of items) {
+    if (item.group) {
+      const subitems = typeof item.items === "function" ? await item.items(value) : item.items;
+      if (subitems) {
+        const i = findSelectValueItem(subitems, value, comparator);
+        if (i) {
+          return i;
+        }
+      }
+    }
+  }
+}
+
+const Select = "ionx-select";
 
 function findValueItem(items, value, comparator) {
   if (items) {
@@ -583,4 +602,4 @@ const defineIonxSelect = (opts) => {
 };
 defineIonxSelect();
 
-export { IonxSelect, IonxSelectOverlay, Select, defineIonxSelect, showSelectOverlay };
+export { IonxSelect, IonxSelectOverlay, Select, defineIonxSelect, findSelectValueItem, showSelectOverlay };
