@@ -18,7 +18,7 @@ export declare class SelectOverlay implements ComponentInterface {
   values: any[];
   empty: boolean;
   comparator: ValueComparator;
-  checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+  checkValidator: SelectProps.CheckValidatorFn;
   labelFormatter?: SelectProps.LabelFormatterFn;
   didEnter: boolean;
   expandedGroups: {

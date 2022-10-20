@@ -9,7 +9,7 @@
 
 | Property               | Attribute       | Description | Type                                                                   | Default     |
 | ---------------------- | --------------- | ----------- | ---------------------------------------------------------------------- | ----------- |
-| `checkValidator`       | --              |             | `(value: any, checked: boolean, otherCheckedValues: any[]) => any[]`   | `undefined` |
+| `checkValidator`       | --              |             | `CheckValidatorFn`                                                     | `undefined` |
 | `comparator`           | `comparator`    |             | `"deepEqual" \| "toString" \| ((a: any, b: any) => number \| boolean)` | `undefined` |
 | `empty`                | `empty`         |             | `boolean`                                                              | `undefined` |
 | `items`                | --              |             | `SelectItem[]`                                                         | `undefined` |

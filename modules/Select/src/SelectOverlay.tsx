@@ -64,7 +64,7 @@ export class SelectOverlay implements ComponentInterface {
     comparator: ValueComparator;
 
     @Prop()
-    checkValidator: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+    checkValidator: SelectProps.CheckValidatorFn;
 
     @Prop()
     labelFormatter?: SelectProps.LabelFormatterFn;
@@ -272,7 +272,7 @@ export class SelectOverlay implements ComponentInterface {
         }
 
         if (this.multiple && this.checkValidator) {
-            this.values = this.checkValidator(item.value, checked, valuesBefore ?? this.values.slice()) || [];
+            this.values = this.checkValidator(item.value, checked, valuesBefore ?? this.values.slice(), {items: this.items}) || [];
         }
 
         if (!this.multiple) {

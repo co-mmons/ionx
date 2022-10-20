@@ -104,7 +104,7 @@ export namespace Components {
         "value": any;
     }
     interface IonxSelectOverlay {
-        "checkValidator": (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+        "checkValidator": SelectProps.CheckValidatorFn;
         "comparator": ValueComparator;
         "empty": boolean;
         "items": SelectItem[];
@@ -231,7 +231,7 @@ declare namespace LocalJSX {
         "value"?: any;
     }
     interface IonxSelectOverlay {
-        "checkValidator"?: (value: any, checked: boolean, otherCheckedValues: any[]) => any[];
+        "checkValidator"?: SelectProps.CheckValidatorFn;
         "comparator"?: ValueComparator;
         "empty"?: boolean;
         "items"?: SelectItem[];

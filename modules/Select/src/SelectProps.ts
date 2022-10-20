@@ -68,7 +68,7 @@ export namespace SelectProps {
     }
 
     export interface CheckValidatorFn {
-        (value: any, checked: boolean, otherCheckedValues: any[]): any[];
+        (value: any, checked: boolean, otherCheckedValues: any[], extras?: {items: SelectItem[]}): any[];
     }
 
     export interface LazyItemsFn {

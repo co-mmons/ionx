@@ -494,7 +494,7 @@ let SelectOverlay = class extends HTMLElement {
       }
     }
     if (this.multiple && this.checkValidator) {
-      this.values = this.checkValidator(item.value, checked, valuesBefore ?? this.values.slice()) || [];
+      this.values = this.checkValidator(item.value, checked, valuesBefore ?? this.values.slice(), { items: this.items }) || [];
     }
     if (!this.multiple) {
       this.ok();

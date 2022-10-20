@@ -44,7 +44,9 @@ export declare namespace SelectProps {
     (query: string, value: any, label: string): boolean;
   }
   interface CheckValidatorFn {
-    (value: any, checked: boolean, otherCheckedValues: any[]): any[];
+    (value: any, checked: boolean, otherCheckedValues: any[], extras?: {
+      items: SelectItem[];
+    }): any[];
   }
   interface LazyItemsFn {
     (): Promise<Array<SelectValueItem | SelectDividerItem>>;
