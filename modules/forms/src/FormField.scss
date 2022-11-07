@@ -163,6 +163,8 @@
 ::slotted(ion-input), ::slotted(ion-textarea) {
     --padding-start: 16px;
     --padding-end: 16px;
+    overflow: hidden;
+    border-radius: var(--ionx-border-radius);
 }
 
 ::slotted(.ion-list-wrapper > ion-list), ::slotted(ion-list) {
