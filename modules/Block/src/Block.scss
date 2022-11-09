@@ -4,28 +4,28 @@
     display: block;
     margin: 16px;
 
-    [ionx--outer] {
+    .outer {
         display: flex;
 
-        &[ionx--inner-alignment=center] {
+        &[block-inner-alignment=center] {
             justify-content: center;
         }
 
-        &[ionx--inner-alignment=end] {
+        &[block-inner-alignment=end] {
             justify-content: flex-end;
         }
     }
 
-    [ionx--inner] {
+    .inner {
         width: 100%;
     }
 }
 
-:host(.ionx--no-margins) {
+:host(.no-margins) {
     margin: 0;
 }
 
-:host(.ionx--has-inner-width) {
+:host(.has-inner-width) {
     --block--inner-width-xs: var(--ionx-width-breakpoints-xs) var(--block-inner-width-xs, 100%);
     --block--inner-width-sm: var(--ionx-width-breakpoints-sm) var(--block-inner-width-sm, 100%);
     --block--inner-width-md: var(--ionx-width-breakpoints-md) var(--block-inner-width-md, 100%);
@@ -33,7 +33,7 @@
     --block--inner-width-xl: var(--ionx-width-breakpoints-xl) var(--block-inner-width-xl, 100%);
     --block--inner-width-xxl: var(--ionx-width-breakpoints-xxl) var(--block-inner-width-xxl, 100%);
 
-    [ionx--inner] {
+    .inner {
         @include ionx-width-breakpoints-set-prop("width", "block--inner-width");
     }
 }

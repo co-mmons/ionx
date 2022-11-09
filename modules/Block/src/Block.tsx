@@ -81,11 +81,11 @@ export class Block {
         }
 
         return <Host
-            class={{"ionx--no-margins": this.margins === false, "ionx--has-inner-width": hasInnerWidth}}
+            class={{"no-margins": this.margins === false, "has-inner-width": hasInnerWidth}}
             style={style}>
 
-            <div ionx--outer ionx--inner-alignment={this.innerAlignment || null} part="outer">
-                <div ionx--inner style={this.innerStyle} part="inner">
+            <div class="outer" block-inner-alignment={this.innerAlignment || null} part="outer">
+                <div class="inner" style={this.innerStyle} part="inner">
                     <slot/>
                 </div>
             </div>
