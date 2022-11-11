@@ -1,3 +1,4 @@
+import { Subject } from 'rxjs';
 import { MediaBreakpoint } from 'ionx/utils';
 
 const reversedBreakpoints = MediaBreakpoint.values().reverse();
@@ -10,6 +11,9 @@ class WidthBreakpointsContainer {
       this.accessorName = WidthBreakpointsContainer.defaultAccessorName;
     }
   }
+  get onBreakpointChange() {
+    return this.changeObservable;
+  }
   resized() {
     const element = this.element;
     const page = this.element.closest(".ion-page");
@@ -19,6 +23,7 @@ class WidthBreakpointsContainer {
     const style = element.style;
     const { width } = element.getBoundingClientRect();
     style.setProperty(`--${this.accessorName}`, `${width}px`);
+    const oldQueries = element.getAttribute(this.accessorName);
     const queries = [];
     let breakpoint;
     for (const bp of reversedBreakpoints) {
@@ -34,16 +39,23 @@ class WidthBreakpointsContainer {
       }
       style.setProperty(`--${this.accessorName}-${bp.name}`, bp === breakpoint ? "\t" : "initial");
     }
-    element.setAttribute(this.accessorName, queries.join(" "));
+    const newQueries = queries.join(" ");
+    element.setAttribute(this.accessorName, newQueries);
+    if (oldQueries !== newQueries) {
+      this.changeObservable.next({ breakpoint, queries });
+    }
   }
   connect() {
     if (this.observer) {
       return;
     }
+    this.changeObservable = new Subject();
     this.observer = new ResizeObserver(this.resized.bind(this));
     this.observer.observe(this.element);
   }
   disconnect() {
+    this.changeObservable.complete();
+    this.changeObservable = undefined;
     this.observer.disconnect();
     this.observer = undefined;
   }

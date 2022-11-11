@@ -1,7 +1,13 @@
 import {MediaBreakpoint} from "ionx/utils";
+import {Observable, Subject} from "rxjs";
 import {WidthBreakpoint} from "./WidthBreakpoint";
 
 const reversedBreakpoints = WidthBreakpoint.values().reverse();
+
+export interface WidthBreakpointChange {
+    breakpoint: MediaBreakpoint;
+    queries: string[];
+}
 
 export class WidthBreakpointsContainer {
 
@@ -11,6 +17,12 @@ export class WidthBreakpointsContainer {
         if (!this.accessorName) {
             this.accessorName = WidthBreakpointsContainer.defaultAccessorName;
         }
+    }
+
+    private changeObservable: Subject<WidthBreakpointChange>;
+
+    get onBreakpointChange(): Observable<WidthBreakpointChange> {
+        return this.changeObservable;
     }
 
     private observer: ResizeObserver;
@@ -29,6 +41,7 @@ export class WidthBreakpointsContainer {
 
         style.setProperty(`--${this.accessorName}`, `${width}px`);
 
+        const oldQueries = element.getAttribute(this.accessorName);
         const queries: string[] = [];
 
         let breakpoint: MediaBreakpoint;
@@ -46,8 +59,12 @@ export class WidthBreakpointsContainer {
 
             style.setProperty(`--${this.accessorName}-${bp.name}`, bp === breakpoint ? "\t" : "initial");
         }
+        const newQueries = queries.join(" ");
+        element.setAttribute(this.accessorName, newQueries);
 
-        element.setAttribute(this.accessorName, queries.join(" "));
+        if (oldQueries !== newQueries) {
+            this.changeObservable.next({breakpoint, queries})
+        }
     }
 
     private connect() {
@@ -56,11 +73,14 @@ export class WidthBreakpointsContainer {
             return;
         }
 
+        this.changeObservable = new Subject<WidthBreakpointChange>();
         this.observer = new ResizeObserver(this.resized.bind(this));
         this.observer.observe(this.element);
     }
 
     disconnect() {
+        this.changeObservable.complete();
+        this.changeObservable = undefined;
         this.observer.disconnect();
         this.observer = undefined;
     }
