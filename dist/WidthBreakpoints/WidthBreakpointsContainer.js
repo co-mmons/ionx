@@ -11,7 +11,7 @@ class WidthBreakpointsContainer {
       this.accessorName = WidthBreakpointsContainer.defaultAccessorName;
     }
   }
-  get onBreakpointChange() {
+  get breakpointChange() {
     return this.changeObservable;
   }
   resized() {

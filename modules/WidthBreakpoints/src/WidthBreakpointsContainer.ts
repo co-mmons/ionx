@@ -21,7 +21,7 @@ export class WidthBreakpointsContainer {
 
     private changeObservable: Subject<WidthBreakpointChange>;
 
-    get onBreakpointChange(): Observable<WidthBreakpointChange> {
+    get breakpointChange(): Observable<WidthBreakpointChange> {
         return this.changeObservable;
     }
 

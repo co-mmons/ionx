@@ -9,7 +9,7 @@ export declare class WidthBreakpointsContainer {
   private accessorName?;
   constructor(element: HTMLElement, accessorName?: string);
   private changeObservable;
-  get onBreakpointChange(): Observable<WidthBreakpointChange>;
+  get breakpointChange(): Observable<WidthBreakpointChange>;
   private observer;
   private resized;
   private connect;
