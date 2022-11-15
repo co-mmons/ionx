@@ -32,6 +32,9 @@ export declare class LinkEditor implements LinkEditorProps, ComponentInterface, 
       value: any;
       validators: any[];
     };
+    params: {
+      value: any;
+    };
     target: {
       value: LinkTarget;
     };

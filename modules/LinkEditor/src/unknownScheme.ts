@@ -13,7 +13,7 @@ export const unknownScheme = new class implements LinkScheme {
     }
 
     parseLink(link: string | Link): LinkScheme.ParsedLink {
-        return {scheme: this, value: typeof link === "string"  ? link : link.href};
+        return {scheme: this, value: typeof link === "string"  ? link : link.href, params: typeof link === "object" ? link.params : undefined};
     }
 
 }

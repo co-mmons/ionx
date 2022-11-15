@@ -21,7 +21,9 @@ export interface LinkScheme {
 
     valueTargets?(value?: any): LinkTarget[];
 
-    buildHref(value: any, params?: any): string;
+    buildHref?(value: any, params?: any): string;
+
+    buildLink?(value: any, params?: any, target?: LinkTarget): Link;
 
     parseLink(link: string | Link): LinkScheme.ParsedLink;
 }
@@ -31,6 +33,7 @@ export namespace LinkScheme {
     export interface ParsedLink {
         scheme: LinkScheme;
         value: any;
+        params?: {[key: string]: any};
         target?: LinkTarget;
     }
 }

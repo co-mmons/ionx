@@ -22,8 +22,6 @@ export namespace Components {
     interface IonxLinkEditorDialog {
         "editorProps": LinkEditorProps;
     }
-    interface IonxLinkEditorTest {
-    }
 }
 declare global {
     interface HTMLIonxLinkEditorElement extends Components.IonxLinkEditor, HTMLStencilElement {
@@ -38,16 +36,9 @@ declare global {
         prototype: HTMLIonxLinkEditorDialogElement;
         new (): HTMLIonxLinkEditorDialogElement;
     };
-    interface HTMLIonxLinkEditorTestElement extends Components.IonxLinkEditorTest, HTMLStencilElement {
-    }
-    var HTMLIonxLinkEditorTestElement: {
-        prototype: HTMLIonxLinkEditorTestElement;
-        new (): HTMLIonxLinkEditorTestElement;
-    };
     interface HTMLElementTagNameMap {
         "ionx-link-editor": HTMLIonxLinkEditorElement;
         "ionx-link-editor-dialog": HTMLIonxLinkEditorDialogElement;
-        "ionx-link-editor-test": HTMLIonxLinkEditorTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -63,12 +54,9 @@ declare namespace LocalJSX {
     interface IonxLinkEditorDialog {
         "editorProps"?: LinkEditorProps;
     }
-    interface IonxLinkEditorTest {
-    }
     interface IntrinsicElements {
         "ionx-link-editor": IonxLinkEditor;
         "ionx-link-editor-dialog": IonxLinkEditorDialog;
-        "ionx-link-editor-test": IonxLinkEditorTest;
     }
 }
 export { LocalJSX as JSX };
@@ -77,7 +65,6 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ionx-link-editor": LocalJSX.IonxLinkEditor & JSXBase.HTMLAttributes<HTMLIonxLinkEditorElement>;
             "ionx-link-editor-dialog": LocalJSX.IonxLinkEditorDialog & JSXBase.HTMLAttributes<HTMLIonxLinkEditorDialogElement>;
-            "ionx-link-editor-test": LocalJSX.IonxLinkEditorTest & JSXBase.HTMLAttributes<HTMLIonxLinkEditorTestElement>;
         }
     }
 }

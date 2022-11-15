@@ -14,13 +14,17 @@ export interface LinkScheme {
   readonly valueHint?: MessageRef | string | HtmlString;
   readonly valueLabel?: MessageRef | string;
   valueTargets?(value?: any): LinkTarget[];
-  buildHref(value: any, params?: any): string;
+  buildHref?(value: any, params?: any): string;
+  buildLink?(value: any, params?: any, target?: LinkTarget): Link;
   parseLink(link: string | Link): LinkScheme.ParsedLink;
 }
 export declare namespace LinkScheme {
   interface ParsedLink {
     scheme: LinkScheme;
     value: any;
+    params?: {
+      [key: string]: any;
+    };
     target?: LinkTarget;
   }
 }

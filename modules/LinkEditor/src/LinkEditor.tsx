@@ -100,9 +100,10 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
     }
 
     data = new FormController({
-        scheme: {value: null as LinkScheme, validators: [async (ctrl) => !this.empty && required(ctrl)]},
-        value: {value: null as any, validators: [required, this.valueValidator.bind(this)]},
-        target: {value: null as LinkTarget}
+        scheme: {value: undefined as LinkScheme, validators: [async (ctrl) => !this.empty && required(ctrl)]},
+        value: {value: undefined as any, validators: [required, this.valueValidator.bind(this)]},
+        params: {value: undefined},
+        target: {value: undefined as LinkTarget}
     });
 
     /**
@@ -110,11 +111,21 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
      */
     #buildLink = () => {
 
-        const href = this.data.controls.scheme.value?.buildHref(this.data.controls.value.value);
-        const target = this.data.controls.target.value?.target;
+        const {data} = this;
+        const scheme = data.controls.scheme.value;
+
+        if (scheme.buildLink) {
+            return scheme.buildLink(data.controls.value.value, data.controls.params.value, data.controls.target.value);
+        }
+
+        if (!scheme.buildHref) {
+            throw new Error("Link scheme implementation missing buildHref or buildLink");
+        }
+
+        const href = scheme.buildHref(data.controls.value.value);
 
         if (href) {
-            return {href, target};
+            return {href, target: data.controls.target.value?.target, params: data.controls.params.value};
         }
     }
 
@@ -155,6 +166,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
         this.data.controls.scheme.setValue(link?.scheme);
         this.data.controls.value.setValue(link ? link.value : (typeof this.value === "string" ? this.value : this.value?.href));
         this.data.controls.target.setValue(link?.target);
+        this.data.controls.params.setValue(link?.scheme);
 
         this.data.bindRenderer(this);
 

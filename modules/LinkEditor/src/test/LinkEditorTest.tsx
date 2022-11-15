@@ -1,5 +1,7 @@
 import {Component, h, Host} from "@stencil/core";
+import {DefaultLinkScheme} from "../DefaultLinkScheme";
 import {showLinkEditor} from "../showLinkEditor";
+import {TestScheme} from "./TestScheme";
 
 @Component({
     tag: "ionx-link-editor-test"
@@ -10,7 +12,11 @@ export class LinkEditorTest {
         return <Host>
 
             <ionx-form-field label="Inline editor">
-                <ionx-link-editor style={{margin: "16px"}} onIonChange={ev => console.log(ev)}/>
+                <ionx-link-editor
+                    style={{margin: "16px"}}
+                    schemes={[DefaultLinkScheme.www, new TestScheme()]}
+                    value={{href: "ola:test"}}
+                    onIonChange={ev => console.log(ev.detail.value)}/>
             </ionx-form-field>
 
             <ionx-form-field label="Dialog editor">
