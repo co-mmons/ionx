@@ -12,6 +12,7 @@ import {
     Method,
     Prop
 } from "@stencil/core";
+import {deepEqual} from "fast-equals";
 import {
     Form,
     FormControl,
@@ -56,6 +57,9 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
     targetVisible: boolean;
 
     @Prop()
+    placeholder: string;
+
+    @Prop()
     readonly: boolean;
 
     @Prop()
@@ -90,8 +94,18 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
     }
 
     async valueValidator(control: FormControl) {
+        const {data, empty} = this;
+        const {controls} = data;
 
-        const validators = this.data.controls.scheme.value.valueValidators;
+        if (!controls.scheme.value || !controls.scheme.value.valueComponent) {
+            return;
+        }
+
+        if (!empty && !control.value) {
+            return required(control);
+        }
+
+        const validators = controls.scheme.value.valueValidators;
         if (validators) {
             for (const v of validators) {
                 await v(control);
@@ -101,7 +115,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
 
     data = new FormController({
         scheme: {value: undefined as LinkScheme, validators: [async (ctrl) => !this.empty && required(ctrl)]},
-        value: {value: undefined as any, validators: [required, this.valueValidator.bind(this)]},
+        value: {value: undefined as any, validators: [this.valueValidator.bind(this)]},
         params: {value: undefined},
         target: {value: undefined as LinkTarget}
     });
@@ -113,6 +127,10 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
 
         const {data} = this;
         const scheme = data.controls.scheme.value;
+
+        if (!scheme) {
+            return;
+        }
 
         if (scheme.buildLink) {
             return scheme.buildLink(data.controls.value.value, data.controls.params.value, data.controls.target.value);
@@ -148,48 +166,48 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
 
     prepare() {
 
-        let link: LinkScheme.ParsedLink;
+        const {data, value} = this;
+        const {controls} = data;
 
-        if (this.value) {
+        if (value) {
             for (const item of ((this.schemes ?? DefaultLinkScheme.values()) as Array<LinkScheme | SelectOption>).concat(unknownScheme)) {
                 const asOption = (item as SelectOption);
                 const scheme = asOption.value as LinkScheme ?? (item as LinkScheme);
                 if (scheme.parseLink) {
-                    link = scheme.parseLink(this.value);
+                    const link = scheme.parseLink(value);
                     if (link) {
+                        controls.scheme.setValue(link.scheme);
+                        controls.value.setValue(link.value);
+                        controls.target.setValue(link.target);
+                        controls.params.setValue(undefined);
                         break;
                     }
                 }
             }
         }
 
-        this.data.controls.scheme.setValue(link?.scheme);
-        this.data.controls.value.setValue(link ? link.value : (typeof this.value === "string" ? this.value : this.value?.href));
-        this.data.controls.target.setValue(link?.target);
-        this.data.controls.params.setValue(link?.scheme);
+        data.bindRenderer(this);
 
-        this.data.bindRenderer(this);
-
-        this.data.controls.scheme.onStateChange(state => {
-            if (state.current.value !== state.previous?.value) {
-                this.data.controls.value.setValue(undefined);
-                this.data.controls.target.setValue(undefined);
+        controls.scheme.onStateChange(state => {
+            if (!deepEqual(state.current.value, state.previous?.value)) {
+                controls.value.setValue(undefined);
+                controls.target.setValue(undefined);
             }
         });
 
-        this.data.controls.value.onStateChange(state => {
+        controls.value.onStateChange(state => {
             if (state.current.value !== state.previous?.value) {
-                const targets = this.data.controls.scheme.value?.valueTargets?.(state.current.value);
-                if (!targets?.includes(this.data.controls.target.value)) {
-                    this.data.controls.target.setValue(undefined);
+                const targets = controls.scheme.value?.valueTargets?.(state.current.value);
+                if (!targets?.includes(controls.target.value)) {
+                    controls.target.setValue(undefined);
                 }
             }
         });
 
-        this.data.onStateChange(({value}) => {
+        data.onStateChange(({value}) => {
             if (value) {
                 const link = this.#buildLink();
-                if (JSON.stringify(this.value || null) !== JSON.stringify(link || null)) {
+                if (JSON.stringify(this.value || undefined) !== JSON.stringify(link || undefined)) {
                     this.value = link;
                     this.ionChange.emit({value: link});
                 }
@@ -259,7 +277,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
                         readonly={readonly}
                         ref={controls.scheme.attach()}
                         empty={this.empty}
-                        placeholder={translate("ionx/LinkEditor#Choose...")}
+                        placeholder={this.placeholder ?? translate("ionx/LinkEditor#Choose...")}
                         options={schemes}/>
                 </FormField>
 

@@ -13,6 +13,7 @@ export declare class LinkEditor implements LinkEditorProps, ComponentInterface, 
   value: string | Link;
   schemes?: SelectOption[] | LinkScheme[];
   targetVisible: boolean;
+  placeholder: string;
   readonly: boolean;
   disabled: boolean;
   ionChange: EventEmitter<{

@@ -5,6 +5,7 @@ import { Enum } from '@co.mmons/js-utils/core';
 import { FormValidationError, validEmail, FormController, required, Form, FormField } from 'ionx/forms';
 import { createAnimation } from '@ionic/core';
 import { defineIonxDialog, showDialog } from 'ionx/Dialog';
+import { deepEqual } from 'fast-equals';
 import { TooltipErrorPresenter } from 'ionx/forms/TooltipErrorPresenter';
 import { Select } from 'ionx/Select';
 import { innerProp } from 'ionx/utils';
@@ -224,7 +225,7 @@ let LinkEditor = class extends HTMLElement {
     this.ionChange = createEvent(this, "ionChange", 7);
     this.data = new FormController({
       scheme: { value: undefined, validators: [async (ctrl) => !this.empty && required(ctrl)] },
-      value: { value: undefined, validators: [required, this.valueValidator.bind(this)] },
+      value: { value: undefined, validators: [this.valueValidator.bind(this)] },
       params: { value: undefined },
       target: { value: undefined }
     });
@@ -234,6 +235,9 @@ let LinkEditor = class extends HTMLElement {
     _LinkEditor_buildLink.set(this, () => {
       const { data } = this;
       const scheme = data.controls.scheme.value;
+      if (!scheme) {
+        return;
+      }
       if (scheme.buildLink) {
         return scheme.buildLink(data.controls.value.value, data.controls.params.value, data.controls.target.value);
       }
@@ -265,7 +269,15 @@ let LinkEditor = class extends HTMLElement {
     }
   }
   async valueValidator(control) {
-    const validators = this.data.controls.scheme.value.valueValidators;
+    const { data, empty } = this;
+    const { controls } = data;
+    if (!controls.scheme.value || !controls.scheme.value.valueComponent) {
+      return;
+    }
+    if (!empty && !control.value) {
+      return required(control);
+    }
+    const validators = controls.scheme.value.valueValidators;
     if (validators) {
       for (const v of validators) {
         await v(control);
@@ -285,42 +297,43 @@ let LinkEditor = class extends HTMLElement {
     }
   }
   prepare() {
-    let link;
-    if (this.value) {
+    const { data, value } = this;
+    const { controls } = data;
+    if (value) {
       for (const item of (this.schemes ?? DefaultLinkScheme.values()).concat(unknownScheme)) {
         const asOption = item;
         const scheme = asOption.value ?? item;
         if (scheme.parseLink) {
-          link = scheme.parseLink(this.value);
+          const link = scheme.parseLink(value);
           if (link) {
+            controls.scheme.setValue(link.scheme);
+            controls.value.setValue(link.value);
+            controls.target.setValue(link.target);
+            controls.params.setValue(undefined);
             break;
           }
         }
       }
     }
-    this.data.controls.scheme.setValue(link?.scheme);
-    this.data.controls.value.setValue(link ? link.value : (typeof this.value === "string" ? this.value : this.value?.href));
-    this.data.controls.target.setValue(link?.target);
-    this.data.controls.params.setValue(link?.scheme);
-    this.data.bindRenderer(this);
-    this.data.controls.scheme.onStateChange(state => {
-      if (state.current.value !== state.previous?.value) {
-        this.data.controls.value.setValue(undefined);
-        this.data.controls.target.setValue(undefined);
+    data.bindRenderer(this);
+    controls.scheme.onStateChange(state => {
+      if (!deepEqual(state.current.value, state.previous?.value)) {
+        controls.value.setValue(undefined);
+        controls.target.setValue(undefined);
       }
     });
-    this.data.controls.value.onStateChange(state => {
+    controls.value.onStateChange(state => {
       if (state.current.value !== state.previous?.value) {
-        const targets = this.data.controls.scheme.value?.valueTargets?.(state.current.value);
-        if (!targets?.includes(this.data.controls.target.value)) {
-          this.data.controls.target.setValue(undefined);
+        const targets = controls.scheme.value?.valueTargets?.(state.current.value);
+        if (!targets?.includes(controls.target.value)) {
+          controls.target.setValue(undefined);
         }
       }
     });
-    this.data.onStateChange(({ value }) => {
+    data.onStateChange(({ value }) => {
       if (value) {
         const link = __classPrivateFieldGet(this, _LinkEditor_buildLink, "f").call(this);
-        if (JSON.stringify(this.value || null) !== JSON.stringify(link || null)) {
+        if (JSON.stringify(this.value || undefined) !== JSON.stringify(link || undefined)) {
           this.value = link;
           this.ionChange.emit({ value: link });
         }
@@ -364,7 +377,7 @@ let LinkEditor = class extends HTMLElement {
     const ValueComponent = controls.scheme.value?.valueComponent;
     const targets = scheme?.valueTargets?.(controls.value.value);
     const ErrorPresenter = this.errorPresenter;
-    return h(Host, null, h(Form, { controller: this.data }, ErrorPresenter && h(ErrorPresenter, null), h(FormField, { error: !ErrorPresenter && controls.scheme.error, label: translate("ionx/LinkEditor#Link type") }, h(Select, { disabled: disabled, readonly: readonly, ref: controls.scheme.attach(), empty: this.empty, placeholder: translate("ionx/LinkEditor#Choose..."), options: schemes })), ValueComponent && h(FormField, { error: !ErrorPresenter && controls.value.error, label: (scheme.valueLabel instanceof MessageRef && translate(scheme.valueLabel)) || (typeof scheme.valueLabel === "string" && scheme.valueLabel) || translate("ionx/LinkEditor#Link") }, h(ValueComponent, { ...scheme.valueComponentProps, disabled: disabled, readonly: readonly, ref: controls.value.attach() }), scheme.valueHint && h("span", { slot: "hint", ...innerProp((scheme.valueHint instanceof MessageRef && translate(scheme.valueHint)) || scheme.valueHint) })), this.targetVisible !== false && targets?.length > 0 && (!readonly || controls.target.value) && h(FormField, { error: !ErrorPresenter && controls.target.error, label: translate("ionx/LinkEditor#Open in|link target") }, h(Select, { disabled: disabled, readonly: readonly, ref: controls.target.attach(), placeholder: translate("ionx/LinkEditor#defaultTargetLabel"), options: targets.map(target => ({ value: target, label: (target instanceof MessageRef && translate(target.label)) || target.label })) }))));
+    return h(Host, null, h(Form, { controller: this.data }, ErrorPresenter && h(ErrorPresenter, null), h(FormField, { error: !ErrorPresenter && controls.scheme.error, label: translate("ionx/LinkEditor#Link type") }, h(Select, { disabled: disabled, readonly: readonly, ref: controls.scheme.attach(), empty: this.empty, placeholder: this.placeholder ?? translate("ionx/LinkEditor#Choose..."), options: schemes })), ValueComponent && h(FormField, { error: !ErrorPresenter && controls.value.error, label: (scheme.valueLabel instanceof MessageRef && translate(scheme.valueLabel)) || (typeof scheme.valueLabel === "string" && scheme.valueLabel) || translate("ionx/LinkEditor#Link") }, h(ValueComponent, { ...scheme.valueComponentProps, disabled: disabled, readonly: readonly, ref: controls.value.attach() }), scheme.valueHint && h("span", { slot: "hint", ...innerProp((scheme.valueHint instanceof MessageRef && translate(scheme.valueHint)) || scheme.valueHint) })), this.targetVisible !== false && targets?.length > 0 && (!readonly || controls.target.value) && h(FormField, { error: !ErrorPresenter && controls.target.error, label: translate("ionx/LinkEditor#Open in|link target") }, h(Select, { disabled: disabled, readonly: readonly, ref: controls.target.attach(), placeholder: translate("ionx/LinkEditor#defaultTargetLabel"), options: targets.map(target => ({ value: target, label: (target instanceof MessageRef && translate(target.label)) || target.label })) }))));
   }
   get element() { return this; }
   static get style() { return linkEditorCss; }
@@ -395,7 +408,7 @@ let LinkEditorDialog = class extends HTMLElement {
   get element() { return this; }
 };
 
-const IonxLinkEditor = /*@__PURE__*/proxyCustomElement(LinkEditor, [2,"ionx-link-editor",{"empty":[4],"value":[1025],"schemes":[16],"targetVisible":[4,"target-visible"],"readonly":[4],"disabled":[4]},[[0,"ionChange","onChanges"]]]);
+const IonxLinkEditor = /*@__PURE__*/proxyCustomElement(LinkEditor, [2,"ionx-link-editor",{"empty":[4],"value":[1025],"schemes":[16],"targetVisible":[4,"target-visible"],"placeholder":[1],"readonly":[4],"disabled":[4]},[[0,"ionChange","onChanges"]]]);
 const IonxLinkEditorDialog = /*@__PURE__*/proxyCustomElement(LinkEditorDialog, [2,"ionx-link-editor-dialog",{"editorProps":[16]}]);
 const defineIonxLinkEditor = (opts) => {
   if (typeof customElements !== 'undefined') {

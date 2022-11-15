@@ -14,6 +14,7 @@ export namespace Components {
         "buildLink": () => Promise<Link>;
         "disabled": boolean;
         "empty": boolean;
+        "placeholder": string;
         "readonly": boolean;
         "schemes"?: SelectOption[] | LinkScheme[];
         "targetVisible": boolean;
@@ -46,6 +47,7 @@ declare namespace LocalJSX {
         "disabled"?: boolean;
         "empty"?: boolean;
         "onIonChange"?: (event: CustomEvent<{value: Link}>) => void;
+        "placeholder"?: string;
         "readonly"?: boolean;
         "schemes"?: SelectOption[] | LinkScheme[];
         "targetVisible"?: boolean;

@@ -14,6 +14,8 @@ export class LinkEditorTest {
             <ionx-form-field label="Inline editor">
                 <ionx-link-editor
                     style={{margin: "16px"}}
+                    empty={true}
+                    placeholder="No link"
                     schemes={[DefaultLinkScheme.www, new TestScheme()]}
                     value={{href: "ola:test"}}
                     onIonChange={ev => console.log(ev.detail.value)}/>
