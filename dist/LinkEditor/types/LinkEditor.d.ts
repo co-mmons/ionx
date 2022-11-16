@@ -1,7 +1,6 @@
 import { ComponentInterface, EventEmitter, FunctionalComponent } from "@stencil/core";
 import { FormControl, FormControlElement, FormController } from "ionx/forms";
-import { SelectOption } from "ionx/Select";
-import { WidthBreakpointsContainer } from "ionx/WidthBreakpoints";
+import { SelectItem } from "ionx/Select";
 import { Link } from "./Link";
 import { LinkEditorProps } from "./LinkEditorProps";
 import { LinkScheme } from "./LinkScheme";
@@ -11,7 +10,7 @@ export declare class LinkEditor implements LinkEditorProps, ComponentInterface, 
   element: HTMLElement;
   empty: boolean;
   value: string | Link;
-  schemes?: SelectOption[] | LinkScheme[];
+  schemes?: SelectItem[] | LinkScheme[];
   targetVisible: boolean;
   placeholder: string;
   readonly: boolean;
@@ -20,7 +19,6 @@ export declare class LinkEditor implements LinkEditorProps, ComponentInterface, 
     value: Link;
   }>;
   errorPresenter: string | FunctionalComponent;
-  breakpoints: WidthBreakpointsContainer;
   formValidate(): Promise<void>;
   setFocus(options?: FocusOptions): Promise<void>;
   valueValidator(control: FormControl): Promise<void>;
@@ -44,7 +42,6 @@ export declare class LinkEditor implements LinkEditorProps, ComponentInterface, 
   onChanges(ev: CustomEvent): void;
   prepare(): void;
   componentWillLoad(): Promise<void>;
-  disconnectedCallback(): void;
   connectedCallback(): void;
   render(): any;
 }

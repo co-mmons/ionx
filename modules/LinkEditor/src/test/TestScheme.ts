@@ -4,10 +4,10 @@ import {LinkTarget} from "../LinkTarget";
 
 export class TestScheme implements LinkScheme {
     readonly label = "test";
-    readonly valueComponent = "ion-input";
+    readonly valueComponent = undefined;
 
-    buildLink(value: any, _params?: any, target?: LinkTarget): Link {
-        return {href: "ola:" + value, target: target?.target};
+    buildLink(_value: any, _params?: any, _target?: LinkTarget): Link {
+        return {href: "ola:"};
     }
 
     parseLink(link: string | Link): LinkScheme.ParsedLink {
@@ -15,7 +15,7 @@ export class TestScheme implements LinkScheme {
         const href = typeof link === "string" ? link : link.href;
 
         if (href.startsWith("ola:")) {
-            return {scheme: this, value: href.substring(4), target: undefined};
+            return {scheme: this, value: "ola:", target: undefined};
         }
 
         return undefined;

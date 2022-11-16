@@ -6,7 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Link } from "./Link";
-import { SelectOption } from "ionx/Select";
+import { SelectItem } from "ionx/Select";
 import { LinkScheme } from "./LinkScheme";
 import { LinkEditorProps } from "./LinkEditorProps";
 export namespace Components {
@@ -16,12 +16,14 @@ export namespace Components {
         "empty": boolean;
         "placeholder": string;
         "readonly": boolean;
-        "schemes"?: SelectOption[] | LinkScheme[];
+        "schemes"?: SelectItem[] | LinkScheme[];
         "targetVisible": boolean;
         "value": string | Link;
     }
     interface IonxLinkEditorDialog {
         "editorProps": LinkEditorProps;
+    }
+    interface IonxLinkEditorTest {
     }
 }
 declare global {
@@ -37,9 +39,16 @@ declare global {
         prototype: HTMLIonxLinkEditorDialogElement;
         new (): HTMLIonxLinkEditorDialogElement;
     };
+    interface HTMLIonxLinkEditorTestElement extends Components.IonxLinkEditorTest, HTMLStencilElement {
+    }
+    var HTMLIonxLinkEditorTestElement: {
+        prototype: HTMLIonxLinkEditorTestElement;
+        new (): HTMLIonxLinkEditorTestElement;
+    };
     interface HTMLElementTagNameMap {
         "ionx-link-editor": HTMLIonxLinkEditorElement;
         "ionx-link-editor-dialog": HTMLIonxLinkEditorDialogElement;
+        "ionx-link-editor-test": HTMLIonxLinkEditorTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -49,16 +58,19 @@ declare namespace LocalJSX {
         "onIonChange"?: (event: CustomEvent<{value: Link}>) => void;
         "placeholder"?: string;
         "readonly"?: boolean;
-        "schemes"?: SelectOption[] | LinkScheme[];
+        "schemes"?: SelectItem[] | LinkScheme[];
         "targetVisible"?: boolean;
         "value"?: string | Link;
     }
     interface IonxLinkEditorDialog {
         "editorProps"?: LinkEditorProps;
     }
+    interface IonxLinkEditorTest {
+    }
     interface IntrinsicElements {
         "ionx-link-editor": IonxLinkEditor;
         "ionx-link-editor-dialog": IonxLinkEditorDialog;
+        "ionx-link-editor-test": IonxLinkEditorTest;
     }
 }
 export { LocalJSX as JSX };
@@ -67,6 +79,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ionx-link-editor": LocalJSX.IonxLinkEditor & JSXBase.HTMLAttributes<HTMLIonxLinkEditorElement>;
             "ionx-link-editor-dialog": LocalJSX.IonxLinkEditorDialog & JSXBase.HTMLAttributes<HTMLIonxLinkEditorDialogElement>;
+            "ionx-link-editor-test": LocalJSX.IonxLinkEditorTest & JSXBase.HTMLAttributes<HTMLIonxLinkEditorTestElement>;
         }
     }
 }

@@ -23,9 +23,8 @@ import {
     required
 } from "ionx/forms";
 import {TooltipErrorPresenter} from "ionx/forms/TooltipErrorPresenter";
-import {Select, SelectOption} from "ionx/Select";
+import {Select, SelectItem, SelectOption} from "ionx/Select";
 import {innerProp} from "ionx/utils";
-import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {DefaultLinkScheme} from "./DefaultLinkScheme";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
 import {Link} from "./Link";
@@ -51,7 +50,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
     value: string | Link;
 
     @Prop()
-    schemes?: SelectOption[] | LinkScheme[];
+    schemes?: SelectItem[] | LinkScheme[];
 
     @Prop()
     targetVisible: boolean;
@@ -69,8 +68,6 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
     ionChange: EventEmitter<{value: Link}>;
 
     errorPresenter: string | FunctionalComponent;
-
-    breakpoints: WidthBreakpointsContainer;
 
     async formValidate() {
 
@@ -207,7 +204,8 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
         data.onStateChange(({value}) => {
             if (value) {
                 const link = this.#buildLink();
-                if (JSON.stringify(this.value || undefined) !== JSON.stringify(link || undefined)) {
+                console.log(link, this.value)
+                if (!deepEqual(link, this.value)) {
                     this.value = link;
                     this.ionChange.emit({value: link});
                 }
@@ -219,15 +217,7 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
         await loadIntlMessages();
     }
 
-    disconnectedCallback() {
-        this.breakpoints.disconnect();
-        this.breakpoints = undefined;
-    }
-
     connectedCallback() {
-
-        this.breakpoints = new WidthBreakpointsContainer(this.element);
-
         this.prepare();
 
         if (this.element.closest("ionx-link-editor-dialog")) {
@@ -237,11 +227,15 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
 
     render() {
 
-        let schemes: SelectOption[];
+        const {disabled, readonly, data} = this;
+        const {controls} = data;
+        const scheme = controls.scheme.value;
+
+        let schemes: SelectItem[];
         if (this.schemes) {
-            schemes = (this.schemes as []).map(scheme => (scheme as SelectOption).value ? scheme as SelectOption : {
-                value: scheme,
-                label: ((scheme as LinkScheme).label instanceof MessageRef && translate((scheme as LinkScheme).label)) || (scheme as LinkScheme).label
+            schemes = (this.schemes as []).map(s => (s as SelectItem).value ? s as SelectItem : {
+                value: s,
+                label: ((s as LinkScheme).label instanceof MessageRef && translate((s as LinkScheme).label)) || (s as LinkScheme).label
             });
         } else {
             schemes = (DefaultLinkScheme.values() as LinkScheme[]).concat(unknownScheme).map(type => ({
@@ -250,14 +244,10 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
             }));
         }
 
-        const {disabled, readonly} = this;
-        const controls = this.data.controls;
-
-        if (controls.scheme.value === unknownScheme) {
+        if (scheme === unknownScheme && !schemes.find(o => o.value === unknownScheme)) {
             schemes.push({value: unknownScheme, label: translate(unknownScheme.label)});
         }
 
-        const scheme = controls.scheme.value;
         const ValueComponent: any = controls.scheme.value?.valueComponent;
         const targets = scheme?.valueTargets?.(controls.value.value);
 

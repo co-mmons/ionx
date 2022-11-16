@@ -9,7 +9,6 @@ import { deepEqual } from 'fast-equals';
 import { TooltipErrorPresenter } from 'ionx/forms/TooltipErrorPresenter';
 import { Select } from 'ionx/Select';
 import { innerProp } from 'ionx/utils';
-import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
 class DefaultLinkTarget extends Enum {
   constructor(name) {
@@ -333,7 +332,7 @@ let LinkEditor = class extends HTMLElement {
     data.onStateChange(({ value }) => {
       if (value) {
         const link = __classPrivateFieldGet(this, _LinkEditor_buildLink, "f").call(this);
-        if (JSON.stringify(this.value || undefined) !== JSON.stringify(link || undefined)) {
+        if (!deepEqual(link, this.value)) {
           this.value = link;
           this.ionChange.emit({ value: link });
         }
@@ -343,23 +342,21 @@ let LinkEditor = class extends HTMLElement {
   async componentWillLoad() {
     await loadIntlMessages();
   }
-  disconnectedCallback() {
-    this.breakpoints.disconnect();
-    this.breakpoints = undefined;
-  }
   connectedCallback() {
-    this.breakpoints = new WidthBreakpointsContainer(this.element);
     this.prepare();
     if (this.element.closest("ionx-link-editor-dialog")) {
       this.errorPresenter = TooltipErrorPresenter;
     }
   }
   render() {
+    const { disabled, readonly, data } = this;
+    const { controls } = data;
+    const scheme = controls.scheme.value;
     let schemes;
     if (this.schemes) {
-      schemes = this.schemes.map(scheme => scheme.value ? scheme : {
-        value: scheme,
-        label: (scheme.label instanceof MessageRef && translate(scheme.label)) || scheme.label
+      schemes = this.schemes.map(s => s.value ? s : {
+        value: s,
+        label: (s.label instanceof MessageRef && translate(s.label)) || s.label
       });
     }
     else {
@@ -368,12 +365,9 @@ let LinkEditor = class extends HTMLElement {
         label: translate(type.label)
       }));
     }
-    const { disabled, readonly } = this;
-    const controls = this.data.controls;
-    if (controls.scheme.value === unknownScheme) {
+    if (scheme === unknownScheme && !schemes.find(o => o.value === unknownScheme)) {
       schemes.push({ value: unknownScheme, label: translate(unknownScheme.label) });
     }
-    const scheme = controls.scheme.value;
     const ValueComponent = controls.scheme.value?.valueComponent;
     const targets = scheme?.valueTargets?.(controls.value.value);
     const ErrorPresenter = this.errorPresenter;

@@ -6,7 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Link } from "./Link";
-import { SelectOption } from "ionx/Select";
+import { SelectItem } from "ionx/Select";
 import { LinkScheme } from "./LinkScheme";
 import { LinkEditorProps } from "./LinkEditorProps";
 export namespace Components {
@@ -16,7 +16,7 @@ export namespace Components {
         "empty": boolean;
         "placeholder": string;
         "readonly": boolean;
-        "schemes"?: SelectOption[] | LinkScheme[];
+        "schemes"?: SelectItem[] | LinkScheme[];
         "targetVisible": boolean;
         "value": string | Link;
     }
@@ -49,7 +49,7 @@ declare namespace LocalJSX {
         "onIonChange"?: (event: CustomEvent<{value: Link}>) => void;
         "placeholder"?: string;
         "readonly"?: boolean;
-        "schemes"?: SelectOption[] | LinkScheme[];
+        "schemes"?: SelectItem[] | LinkScheme[];
         "targetVisible"?: boolean;
         "value"?: string | Link;
     }
