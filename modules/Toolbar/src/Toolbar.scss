@@ -9,9 +9,9 @@
         --padding-start: 0px;
         --padding-end: 0px;
         --border-width: 0;
-        --background: var(--ionx-toolbar-background-color, var(--ion-toolbar-background, var(--ion-color-step-50, #fff)));
-        --color: var(--ionx-toolbar-foreground-color, var(--ion-toolbar-color, var(--ion-text-color, #000)));
-        --border-color: var(--ionx-toolbar-border-color, var(--ion-toolbar-border-color, var(--ion-border-color, var(--ion-color-step-150, rgba(0, 0, 0, 0.2)))));
+        --background: var(--toolbar-background-color, var(--app-toolbar-background-color, var(--ionx-toolbar-background-color, var(--ion-toolbar-background, var(--ion-color-step-50, #fff)))));
+        --color: var(--toolbar-foreground-color, var(--app-toolbar-background-color, var(--ionx-toolbar-foreground-color, var(--ion-toolbar-color, var(--ion-text-color, #000)))));
+        --border-color: var(--toolbar-border-color, var(--app-toolbar-border-color, var(--ionx-toolbar-border-color, var(--ion-toolbar-border-color, var(--ion-border-color, var(--ion-color-step-150, rgba(0, 0, 0, 0.2)))))));
     }
 
     ion-back-button, ion-menu-button {
@@ -19,7 +19,7 @@
         min-width: 48px;
         height: 48px;
         margin: 4px 0;
-        --color: var(--ion-color-primary);
+        --color: var(--app-primary-color, var(--ion-color-primary));
     }
 
     .menu-button-hidden + [ionx--inner] {
@@ -35,10 +35,10 @@
         }
 
         h1 {
-            color: var(--ionx-toolbar-title-color, var(--ion-toolbar-title-color, var(--color)));
-            font-family: var(--ionx-toolbar-title-font-family, var(--ion-toolbar-title-font-family, var(--ion-font-family, inherit)));
-            font-weight: var(--ionx-toolbar-title-font-weight, var(--ion-toolbar-title-font-weight, 500));
-            font-size: var(--ionx-toolbar-title-font-size, var(--ion-toolbar-title-font-size, 22px));
+            color: var(--toolbar-heading-color, var(--app-toolbar-heading-color, var(--ionx-toolbar-title-color, var(--ion-toolbar-title-color, var(--color)))));
+            font-family: var(--toolbar-heading-font-family, var(--app-toolbar-heading-font-family, var(--ionx-toolbar-title-font-family, var(--ion-toolbar-title-font-family, var(--ion-font-family, inherit)))));
+            font-weight: var(--toolbar-heading-font-weight, var(--app-toolbar-heading-font-weight, var(--ionx-toolbar-title-font-weight, var(--ion-toolbar-title-font-weight, 500))));
+            font-size: var(--toolbar-heading-font-size, var(--app-toolbar-heading-font-size, var(--ionx-toolbar-title-font-size, var(--ion-toolbar-title-font-size, 22px))));
             display: block;
             margin: 0;
             padding: 0;
@@ -54,7 +54,7 @@
             }
 
             .ios & {
-                font-weight: var(--ionx-toolbar-title-font-weight, var(--ion-toolbar-title-font-weight, 600));
+                font-weight: var(--toolbar-heading-font-weight, var(--app-toolbar-heading-font-weight, var(--ionx-toolbar-title-font-weight, var(--ion-toolbar-title-font-weight, 600))));
             }
 
             &:empty {

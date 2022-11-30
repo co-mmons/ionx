@@ -324,23 +324,8 @@ let MasonryGrid = class extends HTMLElement {
       this.viewResumed();
     }
   }
-  onMutation(mutations) {
-    for (const mutation of mutations) {
-      for (let i = 0; i < mutation.addedNodes.length; i++) {
-        if (mutation.addedNodes[i] instanceof HTMLElement) {
-          console.debug("[ionx-masonry-grid] added nodes");
-          this.arrange();
-          return;
-        }
-      }
-      for (let i = 0; i < mutation.removedNodes.length; i++) {
-        if (mutation.removedNodes[i] instanceof HTMLElement) {
-          console.debug("[ionx-masonry-grid] removed nodes");
-          this.arrange();
-          return;
-        }
-      }
-    }
+  onMutation(_mutations) {
+    this.arrange();
   }
   connectedCallback() {
     markAsUnready(this);
@@ -357,7 +342,7 @@ let MasonryGrid = class extends HTMLElement {
     this.resumeUnlisten = addEventListener(document, "resume", () => this.viewPaused());
     this.viewDidEnterUnlisten = addEventListener(this.parentViewElement, "ionViewDidEnter", () => this.viewDidEnter());
     this.mutationObserver = new MutationObserver(mutations => this.onMutation(mutations));
-    this.mutationObserver.observe(this.itemsElement, { childList: true });
+    this.mutationObserver.observe(this.itemsElement, { childList: true, subtree: true, attributes: true });
     this.resizeObserver = new ResizeObserver(() => {
       const width = this.itemsElement.getBoundingClientRect().width;
       if (width > 0 && width !== this.lastWidth) {

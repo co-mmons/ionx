@@ -45,7 +45,7 @@ export declare class MasonryGrid implements ComponentInterface {
   viewResumed(): void;
   viewDidEnter(): void;
   visibilityChanged(): void;
-  onMutation(mutations: MutationRecord[]): void;
+  onMutation(_mutations: MutationRecord[]): void;
   connectedCallback(): void;
   init(): void;
   disconnectedCallback(): void;

@@ -1,4 +1,4 @@
-import {AnimationBuilder, NavOutletElement, RouteID, RouterDirection} from "@ionic/core";
+import {AnimationBuilder, componentOnReady, NavOutletElement, RouteID, RouterDirection} from "@ionic/core/components";
 
 import {ROUTER_INTENT_NONE} from "./constants";
 import {RouteChain} from "./interface";
@@ -19,7 +19,8 @@ export const writeNavState = async (
         if (index >= chain.length || !outlet) {
             return changed;
         }
-        await outlet.componentOnReady();
+
+        await new Promise((resolve) => componentOnReady(outlet, resolve));
 
         const route = chain[index];
 

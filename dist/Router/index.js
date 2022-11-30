@@ -1,5 +1,6 @@
 import { HTMLElement, createEvent, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
+import { componentOnReady } from '@ionic/core/components';
 
 // copied from https://github.com/troch/path-parser/blob/master/src/rules.ts
 const matchMatrix = /;([a-zA-Z0-9-_]*[a-zA-Z0-9]{1})(<(.+?)>)?=([a-zA-Z0-9-_.~%':|=+\*@$]+)/g;
@@ -387,7 +388,7 @@ const writeNavState = async (root, chain, direction, index, changed = false, ani
     if (index >= chain.length || !outlet) {
       return changed;
     }
-    await outlet.componentOnReady();
+    await new Promise((resolve) => componentOnReady(outlet, resolve));
     const route = chain[index];
     const result = await outlet.setRouteId(route.id, route.params, direction, animation);
     // if the outlet changed the page, reset navigation to neutral (no direction)
