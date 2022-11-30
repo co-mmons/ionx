@@ -6,6 +6,7 @@ import { ExtendedItemElement } from "./ExtendedItemElement";
 export declare class MasonryGrid implements ComponentInterface {
   element: HTMLElement;
   block: boolean;
+  innerStyle: any;
   busy: boolean;
   /**
    * If at least one layout call is waiting.

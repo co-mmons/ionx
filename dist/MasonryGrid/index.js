@@ -372,13 +372,13 @@ let MasonryGrid = class extends HTMLElement {
     this.viewDidEnterUnlisten = undefined;
   }
   render() {
-    return h(Host, { class: { "ionx--block": this.block } }, h("div", { "ionx--grid-items": true, ref: el => this.itemsElement = el }, h("slot", null)));
+    return h(Host, { class: { "ionx--block": this.block } }, h("div", { "ionx--grid-items": true, style: this.innerStyle, ref: el => this.itemsElement = el }, h("slot", null)));
   }
   get element() { return this; }
   static get style() { return masonryGridCss; }
 };
 
-const IonxMasonryGrid = /*@__PURE__*/proxyCustomElement(MasonryGrid, [6,"ionx-masonry-grid",{"block":[4]},[[8,"beforeresize","resized"],[9,"resize","resized"],[4,"visibilitychange","visibilityChanged"]]]);
+const IonxMasonryGrid = /*@__PURE__*/proxyCustomElement(MasonryGrid, [6,"ionx-masonry-grid",{"block":[4],"innerStyle":[8,"inner-style"]},[[8,"beforeresize","resized"],[9,"resize","resized"],[4,"visibilitychange","visibilityChanged"]]]);
 const defineIonxMasonryGrid = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

@@ -7,9 +7,10 @@
 
 ## Properties
 
-| Property | Attribute | Description | Type      | Default     |
-| -------- | --------- | ----------- | --------- | ----------- |
-| `block`  | `block`   |             | `boolean` | `undefined` |
+| Property     | Attribute     | Description | Type      | Default     |
+| ------------ | ------------- | ----------- | --------- | ----------- |
+| `block`      | `block`       |             | `boolean` | `undefined` |
+| `innerStyle` | `inner-style` |             | `any`     | `undefined` |
 
 
 ## Methods

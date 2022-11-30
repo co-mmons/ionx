@@ -20,6 +20,9 @@ export class MasonryGrid implements ComponentInterface {
     @Prop()
     block: boolean;
 
+    @Prop()
+    innerStyle: any;
+
     busy: boolean;
 
     /**
@@ -514,7 +517,7 @@ export class MasonryGrid implements ComponentInterface {
 
     render() {
         return <Host class={{"ionx--block": this.block}}>
-            <div ionx--grid-items ref={el => this.itemsElement = el}>
+            <div ionx--grid-items style={this.innerStyle} ref={el => this.itemsElement = el}>
                 <slot/>
             </div>
         </Host>;
