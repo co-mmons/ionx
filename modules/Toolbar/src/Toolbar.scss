@@ -14,11 +14,14 @@
         --border-color: var(--toolbar-border-color, var(--app-toolbar-border-color, var(--ionx-toolbar-border-color, var(--ion-toolbar-border-color, var(--ion-border-color, var(--ion-color-step-150, rgba(0, 0, 0, 0.2)))))));
     }
 
-    ion-back-button, ion-menu-button {
+    ion-back-button, ion-menu-button, .back-close-button {
         align-self: flex-start;
         min-width: 48px;
         height: 48px;
         margin: 4px 0;
+        --border-radius: 48px;
+        --padding-start: 0;
+        --padding-end: 0;
         --color: var(--app-primary-color, var(--ion-color-primary));
     }
 

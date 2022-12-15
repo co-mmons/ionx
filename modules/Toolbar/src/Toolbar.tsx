@@ -1,5 +1,6 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import type {Components as ionic} from "@ionic/core";
+import {getMode} from "@ionic/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
 import {openUrl} from "ionx/Router";
 import {addEventListener, EventUnlisten} from "ionx/utils";
@@ -183,17 +184,20 @@ export class Toolbar {
 
     render() {
 
+        const mode = getMode();
+
         return <Host class={{"ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse"}}>
             <ion-toolbar ref={el => this.toolbarElement = el}>
 
                 {this.button === "menu" && <ion-menu-button slot="start"/>}
 
-                {(this.button === "back" || this.button === "close") && <ion-back-button
+                {(this.button === "back" || this.button === "close") && <ion-button
+                    class="back-close-button"
                     slot="start"
-                    style={{display: this.button === "close" ? "inline-block" : null}}
-                    icon={this.button === "close" ? "close" : undefined}
-                    onClick={ev => this.buttonClicked(ev)}
-                    defaultHref={(this.button === "back" && this.defaultBackHref) || null}/>}
+                    fill="clear"
+                    onClick={ev => this.buttonClicked(ev)}>
+                    <ion-icon name={this.button === "close" ? "close" : (mode === "ios" ? "chevron-back" : "arrow-back")} slot="icon-only"/>
+                </ion-button>}
 
                 <div ionx--inner class={{"ionx--no-button": this.button === "none"}}>
 
