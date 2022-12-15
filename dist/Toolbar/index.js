@@ -1,6 +1,7 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { waitTill } from '@co.mmons/js-utils/core';
+import { openUrl } from 'ionx/Router';
 import { addEventListener } from 'ionx/utils';
 import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 
@@ -91,6 +92,30 @@ let Toolbar = class extends HTMLElement {
       return;
     }
   }
+  async buttonClicked(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (this.button === "close") {
+      if (this.buttonHandler) {
+        this.buttonHandler();
+      }
+      this.dismissOverlay();
+    }
+    else if (this.button === "back") {
+      const nav = this.element.closest("ion-nav");
+      if (nav && await nav.canGoBack()) {
+        const router = document.querySelector("ion-router");
+        if (router && !nav.closest("[no-router]")) {
+          const canTransition = await router.canTransition();
+          if (canTransition === true) {
+            return await router.back();
+          }
+        }
+        return nav.pop({ skipIfBusy: true });
+      }
+      return openUrl(this.defaultBackHref, "back");
+    }
+  }
   connectedCallback() {
     this.breakpoints = new WidthBreakpointsContainer(this.element);
     if (this.titleWrap === "collapse") {
@@ -104,7 +129,7 @@ let Toolbar = class extends HTMLElement {
     this.breakpoints = undefined;
   }
   render() {
-    return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-back-button", { slot: "start", style: { display: this.button === "close" ? "inline-block" : null }, icon: this.button === "close" ? "close" : undefined, onClick: ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()], defaultHref: (this.button === "back" && this.defaultBackHref) || null }), h("div", { "ionx--inner": true, class: { "ionx--no-button": this.button === "none" } }, h("ion-buttons", null, h("slot", { name: "action" })), h("h1", { style: { display: this.titleVisible ? null : "none" } }, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
+    return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-back-button", { slot: "start", style: { display: this.button === "close" ? "inline-block" : null }, icon: this.button === "close" ? "close" : undefined, onClick: ev => this.buttonClicked(ev), defaultHref: (this.button === "back" && this.defaultBackHref) || null }), h("div", { "ionx--inner": true, class: { "ionx--no-button": this.button === "none" } }, h("ion-buttons", null, h("slot", { name: "action" })), h("h1", { style: { display: this.titleVisible ? null : "none" } }, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
   }
   get element() { return this; }
   static get watchers() { return {

@@ -1,6 +1,7 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import type {Components as ionic} from "@ionic/core";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
+import {openUrl} from "ionx/Router";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {ToolbarButtonType} from "./ToolbarButtonType";
@@ -132,6 +133,37 @@ export class Toolbar {
         }
     }
 
+    async buttonClicked(ev: Event) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        if (this.button === "close") {
+            if (this.buttonHandler) {
+                this.buttonHandler()
+            }
+
+            this.dismissOverlay();
+
+        } else if (this.button === "back") {
+            const nav = this.element.closest("ion-nav");
+
+            if (nav && await nav.canGoBack()) {
+                const router = document.querySelector("ion-router");
+
+                if (router && !nav.closest("[no-router]")) {
+                    const canTransition = await router.canTransition();
+                    if (canTransition === true) {
+                        return await router.back();
+                    }
+                }
+
+                return nav.pop({skipIfBusy: true});
+            }
+
+            return openUrl(this.defaultBackHref, "back");
+        }
+    }
+
     connectedCallback() {
 
         this.breakpoints = new WidthBreakpointsContainer(this.element);
@@ -160,7 +192,7 @@ export class Toolbar {
                     slot="start"
                     style={{display: this.button === "close" ? "inline-block" : null}}
                     icon={this.button === "close" ? "close" : undefined}
-                    onClick={ev => this.button === "close" && [ev.preventDefault(), this.buttonHandler ? this.buttonHandler() : this.dismissOverlay()]}
+                    onClick={ev => this.buttonClicked(ev)}
                     defaultHref={(this.button === "back" && this.defaultBackHref) || null}/>}
 
                 <div ionx--inner class={{"ionx--no-button": this.button === "none"}}>

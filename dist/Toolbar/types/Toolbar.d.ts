@@ -20,6 +20,7 @@ export declare class Toolbar {
   enableCollapsibleTitle(): Promise<void>;
   disableCollapsibleTitle(): void;
   dismissOverlay(): void;
+  buttonClicked(ev: Event): Promise<boolean | void>;
   connectedCallback(): void;
   disconnectedCallback(): void;
   render(): any;
