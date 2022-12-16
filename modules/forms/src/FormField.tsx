@@ -15,6 +15,9 @@ export class FormField implements ComponentInterface {
     label?: string;
 
     @Prop()
+    hasLabel = true;
+
+    @Prop()
     flexContent?: boolean;
 
     @Prop({reflect: true, mutable: true})
@@ -84,7 +87,7 @@ export class FormField implements ComponentInterface {
         return <Host class={{"ionx--has-error": !!this.errorMessage}}>
             <fieldset>
 
-                <legend>
+                {this.hasLabel && <legend>
                     <div key="label" slot-container="label">
                         <slot name="label">{this.label}</slot>
                     </div>
@@ -96,7 +99,7 @@ export class FormField implements ComponentInterface {
                     {this.collapsible && <ion-button class="ionx--expand-toggle" shape="round" size="small" fill="clear" onClick={() => this.expandCollapseClicked()}>
                         <ion-icon name="chevron-up" slot="icon-only"/>
                     </ion-button>}
-                </legend>
+                </legend>}
 
                 <div key="description" slot-container="description">
                     <slot name="description"/>

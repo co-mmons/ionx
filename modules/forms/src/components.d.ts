@@ -28,6 +28,7 @@ export namespace Components {
         "error"?: string | FormValidationError | MessageRef | Error;
         "expanded"?: boolean;
         "flexContent"?: boolean;
+        "hasLabel": boolean;
         "label"?: string;
         "setExpanded": (expanded: boolean) => Promise<void>;
         "toggleExpanded": () => Promise<void>;
@@ -90,6 +91,7 @@ declare namespace LocalJSX {
         "error"?: string | FormValidationError | MessageRef | Error;
         "expanded"?: boolean;
         "flexContent"?: boolean;
+        "hasLabel"?: boolean;
         "label"?: string;
         "onExpandCollapse"?: (event: CustomEvent<boolean>) => void;
     }

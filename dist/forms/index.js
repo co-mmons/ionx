@@ -988,6 +988,7 @@ let FormField = class extends HTMLElement {
     super();
     this.__registerHost();
     this.expandCollapse = createEvent(this, "expandCollapse", 7);
+    this.hasLabel = true;
   }
   async toggleExpanded() {
     this.expanded = !this.expanded;
@@ -1029,7 +1030,7 @@ let FormField = class extends HTMLElement {
     await loadIntlMessages();
   }
   render() {
-    return h$1(Host, { class: { "ionx--has-error": !!this.errorMessage } }, h$1("fieldset", null, h$1("legend", null, h$1("div", { key: "label", "slot-container": "label" }, h$1("slot", { name: "label" }, this.label)), h$1("div", { key: "label-end", "slot-container": "label-end" }, h$1("slot", { name: "label-end" })), this.collapsible && h$1("ion-button", { class: "ionx--expand-toggle", shape: "round", size: "small", fill: "clear", onClick: () => this.expandCollapseClicked() }, h$1("ion-icon", { name: "chevron-up", slot: "icon-only" }))), h$1("div", { key: "description", "slot-container": "description" }, h$1("slot", { name: "description" })), h$1("div", { key: "placeholder", "slot-container": "placeholder" }, h$1("slot", { name: "placeholder" })), h$1("div", { "ionx--content": true, style: { display: this.flexContent ? "flex" : "block" } }, h$1("div", { key: "start", "slot-container": "start" }, h$1("slot", { name: "start" })), h$1("div", { key: "default", "slot-container": "default" }, h$1("slot", null)), h$1("div", { key: "end", "slot-container": "end" }, h$1("slot", { name: "end" })))), h$1("div", { "slot-container": "error" }, this.errorMessage && h$1("span", { slot: "error" }, this.errorMessage), h$1("slot", { name: "error" })), h$1("div", { "slot-container": "hint" }, h$1("slot", { name: "hint" })));
+    return h$1(Host, { class: { "ionx--has-error": !!this.errorMessage } }, h$1("fieldset", null, this.hasLabel && h$1("legend", null, h$1("div", { key: "label", "slot-container": "label" }, h$1("slot", { name: "label" }, this.label)), h$1("div", { key: "label-end", "slot-container": "label-end" }, h$1("slot", { name: "label-end" })), this.collapsible && h$1("ion-button", { class: "ionx--expand-toggle", shape: "round", size: "small", fill: "clear", onClick: () => this.expandCollapseClicked() }, h$1("ion-icon", { name: "chevron-up", slot: "icon-only" }))), h$1("div", { key: "description", "slot-container": "description" }, h$1("slot", { name: "description" })), h$1("div", { key: "placeholder", "slot-container": "placeholder" }, h$1("slot", { name: "placeholder" })), h$1("div", { "ionx--content": true, style: { display: this.flexContent ? "flex" : "block" } }, h$1("div", { key: "start", "slot-container": "start" }, h$1("slot", { name: "start" })), h$1("div", { key: "default", "slot-container": "default" }, h$1("slot", null)), h$1("div", { key: "end", "slot-container": "end" }, h$1("slot", { name: "end" })))), h$1("div", { "slot-container": "error" }, this.errorMessage && h$1("span", { slot: "error" }, this.errorMessage), h$1("slot", { name: "error" })), h$1("div", { "slot-container": "hint" }, h$1("slot", { name: "hint" })));
   }
   static get watchers() { return {
     "control": ["watchErrorProps"],
@@ -1088,7 +1089,7 @@ let FormItem = class extends HTMLElement {
 };
 
 const IonxForm = /*@__PURE__*/proxyCustomElement(FormComponent, [4,"ionx-form",{"controller":[16],"disconnect":[4]}]);
-const IonxFormField = /*@__PURE__*/proxyCustomElement(FormField, [6,"ionx-form-field",{"label":[1],"flexContent":[4,"flex-content"],"expanded":[1540],"collapsible":[516],"control":[16],"error":[1],"errorMessage":[32]}]);
+const IonxFormField = /*@__PURE__*/proxyCustomElement(FormField, [6,"ionx-form-field",{"label":[1],"hasLabel":[4,"has-label"],"flexContent":[4,"flex-content"],"expanded":[1540],"collapsible":[516],"control":[16],"error":[1],"errorMessage":[32]}]);
 const IonxFormItem = /*@__PURE__*/proxyCustomElement(FormItem, [6,"ionx-form-item",{"fill":[513],"control":[16],"error":[1],"hint":[1],"partProps":[16],"itemProps":[16],"itemStyle":[16],"errorMessage":[32]}]);
 const defineIonxForms = (opts) => {
   if (typeof customElements !== 'undefined') {
