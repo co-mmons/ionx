@@ -47,6 +47,8 @@ export class LazyLoadController {
         const srcSupported = srcSupportedTagNames.includes(element.tagName);
         const options = element.__lazyLoadOptions;
 
+        const loadEventName = element.tagName === "VIDEO" ? "loadedmetadata" : "load";
+
         delete element.__lazyLoadSrc;
 
         element.classList.remove(itemPendingCssClass);
@@ -99,18 +101,19 @@ export class LazyLoadController {
             element.classList.remove(itemLoadedCssClass, itemPendingCssClass, itemLoadingCssClass);
             styleParents(element, options?.styleParents);
 
-            element.removeEventListener("load", onItemLoad);
+            element.removeEventListener(loadEventName, onItemLoad);
             element.removeEventListener("error", onItemError);
 
             this.intersectionObserver.unobserve(element);
         }
 
         const onItemError = (_ev: Event) => {
+            console.debug(_ev);
 
             const target = _ev.target as Element;
 
             if (target !== element) {
-                target.removeEventListener("load", onItemLoad);
+                target.removeEventListener(loadEventName, onItemLoad);
                 target.removeEventListener("error", onItemError);
             }
 
@@ -127,9 +130,9 @@ export class LazyLoadController {
 
             this.intersectionObserver.unobserve(element);
 
-            target.removeEventListener("load", onItemLoad);
+            target.removeEventListener(loadEventName, onItemLoad);
             target.removeEventListener("error", onItemError);
-            element.removeEventListener("load", onItemLoad);
+            element.removeEventListener(loadEventName, onItemLoad);
             element.removeEventListener("error", onItemError);
 
             if (target !== element) {
@@ -139,7 +142,7 @@ export class LazyLoadController {
 
         if (srcSupported || element.lazyLoad) {
             element.addEventListener("error", onItemError);
-            element.addEventListener("load", onItemLoad);
+            element.addEventListener(loadEventName, onItemLoad);
         }
 
         load(false);

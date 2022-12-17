@@ -15,9 +15,9 @@ export function styleParents(element: Element, parents: {[parentSelector: string
 
             for (const state of ["loading", "loaded", "error"]) {
                 if (element.classList.contains(`${itemCssClassPrefix}-${state}`)) {
-                    parent.classList.add(`${prefix}${state}`);
+                    parent.classList.add(`${prefix}-${state}`);
                 } else {
-                    parent.classList.remove(`${prefix}${state}`);
+                    parent.classList.remove(`${prefix}-${state}`);
                 }
             }
         }

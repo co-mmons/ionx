@@ -46,10 +46,10 @@ function styleParents(element, parents) {
       parent.classList.remove(`${prefix}-pending`);
       for (const state of ["loading", "loaded", "error"]) {
         if (element.classList.contains(`${itemCssClassPrefix}-${state}`)) {
-          parent.classList.add(`${prefix}${state}`);
+          parent.classList.add(`${prefix}-${state}`);
         }
         else {
-          parent.classList.remove(`${prefix}${state}`);
+          parent.classList.remove(`${prefix}-${state}`);
         }
       }
     }
@@ -73,6 +73,7 @@ class LazyLoadController {
   loadItem(element) {
     const srcSupported = srcSupportedTagNames.includes(element.tagName);
     const options = element.__lazyLoadOptions;
+    const loadEventName = element.tagName === "VIDEO" ? "loadedmetadata" : "load";
     delete element.__lazyLoadSrc;
     element.classList.remove(itemPendingCssClass);
     element.classList.add(itemLoadingCssClass);
@@ -114,14 +115,15 @@ class LazyLoadController {
       element.classList.add(itemErrorCssClass);
       element.classList.remove(itemLoadedCssClass, itemPendingCssClass, itemLoadingCssClass);
       styleParents(element, options?.styleParents);
-      element.removeEventListener("load", onItemLoad);
+      element.removeEventListener(loadEventName, onItemLoad);
       element.removeEventListener("error", onItemError);
       this.intersectionObserver.unobserve(element);
     };
     const onItemError = (_ev) => {
+      console.debug(_ev);
       const target = _ev.target;
       if (target !== element) {
-        target.removeEventListener("load", onItemLoad);
+        target.removeEventListener(loadEventName, onItemLoad);
         target.removeEventListener("error", onItemError);
       }
       load(true);
@@ -132,9 +134,9 @@ class LazyLoadController {
       element.classList.remove(itemPendingCssClass, itemLoadingCssClass, itemErrorCssClass);
       styleParents(element, options?.styleParents);
       this.intersectionObserver.unobserve(element);
-      target.removeEventListener("load", onItemLoad);
+      target.removeEventListener(loadEventName, onItemLoad);
       target.removeEventListener("error", onItemError);
-      element.removeEventListener("load", onItemLoad);
+      element.removeEventListener(loadEventName, onItemLoad);
       element.removeEventListener("error", onItemError);
       if (target !== element) {
         element.style.backgroundImage = `url(${target.getAttribute("src")})`;
@@ -142,7 +144,7 @@ class LazyLoadController {
     };
     if (srcSupported || element.lazyLoad) {
       element.addEventListener("error", onItemError);
-      element.addEventListener("load", onItemLoad);
+      element.addEventListener(loadEventName, onItemLoad);
     }
     load(false);
   }
