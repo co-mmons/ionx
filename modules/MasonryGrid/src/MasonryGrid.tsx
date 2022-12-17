@@ -257,7 +257,7 @@ export class MasonryGrid implements ComponentInterface {
                 // const itemsPositions: {[index: number]: {left: number, top: number}} = {};
 
                 let gridRect = this.itemsElement.getBoundingClientRect();
-                let gridBottom = 0;
+                let gridHeight = 0;
 
                 for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 
@@ -307,7 +307,8 @@ export class MasonryGrid implements ComponentInterface {
                         sibling = sectionItems.pop();
                     }
 
-                    while(sectionItems.length > 1 && previous !== sibling && ~~(sibling[gridCacheProp].left + itemWidth) > gridRect.width) {
+                    // usuwamy itemy z sekcji, bo wychodzimy poza szerokość gridu
+                    while (sectionItems.length > 1 && previous !== sibling && ~~(sibling[gridCacheProp].left + itemWidth) > gridRect.width) {
                         sibling = sectionItems.pop();
                     }
 
@@ -329,6 +330,7 @@ export class MasonryGrid implements ComponentInterface {
                         }
                     }
 
+                    // usuwamy poprzednie itemy z sekcji, jeżeli koniec poprzedniego jest dokładnie w tym samym miejscu gdzie obecny
                     for (let i = sectionItems.length - 1; i >= 0; i--) {
                         const ic = sectionItems[i][gridCacheProp];
                         if (itemLeft + itemWidth === ic.left + ic.width) {
@@ -353,8 +355,8 @@ export class MasonryGrid implements ComponentInterface {
                     }
 
                     const bottom = item[gridCacheProp].top + item[gridCacheProp].height;
-                    if (bottom > gridBottom) {
-                        gridBottom = bottom;
+                    if (bottom > gridHeight) {
+                        gridHeight = bottom;
                     }
 
                     // console.log(item, itemLeft, itemTop);
@@ -366,8 +368,8 @@ export class MasonryGrid implements ComponentInterface {
 
                 gridRect = this.itemsElement.getBoundingClientRect();
 
-                if (gridBottom) {
-                    this.itemsElement.style.height = `${gridBottom}px`;
+                if (gridHeight) {
+                    this.itemsElement.style.height = `${gridHeight}px`;
                 } else {
                     this.itemsElement.style.height = "0px";
                 }

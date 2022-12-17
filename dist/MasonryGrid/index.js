@@ -171,7 +171,7 @@ let MasonryGrid = class extends HTMLElement {
         let sectionItems = [];
         // const itemsPositions: {[index: number]: {left: number, top: number}} = {};
         let gridRect = this.itemsElement.getBoundingClientRect();
-        let gridBottom = 0;
+        let gridHeight = 0;
         for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
           const item = items[itemIndex];
           const previous = itemIndex > 0 ? items[itemIndex - 1] : undefined;
@@ -209,6 +209,7 @@ let MasonryGrid = class extends HTMLElement {
           if (cascade) {
             sibling = sectionItems.pop();
           }
+          // usuwamy itemy z sekcji, bo wychodzimy poza szerokość gridu
           while (sectionItems.length > 1 && previous !== sibling && ~~(sibling[gridCacheProp].left + itemWidth) > gridRect.width) {
             sibling = sectionItems.pop();
           }
@@ -227,6 +228,7 @@ let MasonryGrid = class extends HTMLElement {
               break;
             }
           }
+          // usuwamy poprzednie itemy z sekcji, jeżeli koniec poprzedniego jest dokładnie w tym samym miejscu gdzie obecny
           for (let i = sectionItems.length - 1; i >= 0; i--) {
             const ic = sectionItems[i][gridCacheProp];
             if (itemLeft + itemWidth === ic.left + ic.width) {
@@ -247,8 +249,8 @@ let MasonryGrid = class extends HTMLElement {
             sectionItems.sort(sortSectionItems);
           }
           const bottom = item[gridCacheProp].top + item[gridCacheProp].height;
-          if (bottom > gridBottom) {
-            gridBottom = bottom;
+          if (bottom > gridHeight) {
+            gridHeight = bottom;
           }
           // console.log(item, itemLeft, itemTop);
           // console.log(itemTop, siblingRect?.height);
@@ -257,8 +259,8 @@ let MasonryGrid = class extends HTMLElement {
           // }
         }
         gridRect = this.itemsElement.getBoundingClientRect();
-        if (gridBottom) {
-          this.itemsElement.style.height = `${gridBottom}px`;
+        if (gridHeight) {
+          this.itemsElement.style.height = `${gridHeight}px`;
         }
         else {
           this.itemsElement.style.height = "0px";
