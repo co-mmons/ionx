@@ -7,7 +7,8 @@ export interface ExtendedItemElement {
     index?: number;
     left?: number;
     top?: number;
-    rect?: DOMRect;
+    width: number;
+    height: number;
   };
   /**
    * If item was already laid on the grid.
