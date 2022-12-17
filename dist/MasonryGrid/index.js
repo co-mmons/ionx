@@ -19,6 +19,8 @@ const MasonryGrid$1 = "ionx-masonry-grid";
 
 const masonryGridCss = ".sc-ionx-masonry-grid-h{display:block;position:relative;margin:8px}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{display:block;position:relative;--grid-container-width:100%}.ionx--block.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{height:auto !important}.sc-ionx-masonry-grid-h:not(.ionx--block) [ionx--grid-items].sc-ionx-masonry-grid-s>*{position:absolute;display:none}.sc-ionx-masonry-grid-h.ionx--block [ionx--grid-items].sc-ionx-masonry-grid-s>*{left:unset;top:unset}";
 
+const gridCacheProp = "__ionxMasonryGridCache";
+const gridReadyProp = "__ionxMasonryGridReady";
 let MasonryGrid = class extends HTMLElement {
   constructor() {
     super();
@@ -40,7 +42,7 @@ let MasonryGrid = class extends HTMLElement {
   }
   async markItemAsDirty(item) {
     const extended = item;
-    extended.__ionxMasonryGridReady = false;
+    extended[gridReadyProp] = false;
     this.arrange({ force: true });
   }
   async arrange(options) {
@@ -100,7 +102,7 @@ let MasonryGrid = class extends HTMLElement {
         console.debug("[ionx-masonry-grid] container width changed new:" + this.itemsElement.getBoundingClientRect().width + ", old:" + this.lastWidth);
         doArrange = true;
         for (const item of items) {
-          item.__ionxMasonryGridReady = false;
+          item[gridReadyProp] = false;
           item.style.display = "none";
         }
       }
@@ -109,21 +111,21 @@ let MasonryGrid = class extends HTMLElement {
         for (let i = 0; i < items.length; i++) {
           const item = items[i];
           // zmieniła się pozycja itemu
-          if (item.__ionxMasonryGridCache?.index !== i) {
-            item.__ionxMasonryGridReady = false;
+          if (item[gridCacheProp]?.index !== i) {
+            item[gridReadyProp] = false;
           }
           // jeżeli poprzedni item wymaga renderu, to jego sąsiad również
-          if (i > 0 && !items[i - 1].__ionxMasonryGridReady) {
-            item.__ionxMasonryGridReady = false;
+          if (i > 0 && !items[i - 1][gridReadyProp]) {
+            item[gridReadyProp] = false;
           }
           const rect = item.getBoundingClientRect();
-          if (item.__ionxMasonryGridCache?.rect?.width !== rect.width || item.__ionxMasonryGridCache?.rect?.height !== rect.height) {
-            item.__ionxMasonryGridReady = false;
-            if (!item.__ionxMasonryGridCache) {
-              item.__ionxMasonryGridCache = { rect };
+          if (item[gridCacheProp]?.rect?.width !== rect.width || item[gridCacheProp]?.rect?.height !== rect.height) {
+            item[gridReadyProp] = false;
+            if (!item[gridCacheProp]) {
+              item[gridCacheProp] = { rect };
             }
           }
-          if (!item.__ionxMasonryGridReady) {
+          if (!item[gridReadyProp]) {
             doArrange = true;
             item.style.display = "none";
           }
@@ -148,7 +150,7 @@ let MasonryGrid = class extends HTMLElement {
         }
         // resetujemy brudne itemy - ustawiamy pozycję na 0x0
         for (const item of items) {
-          if (!item.__ionxMasonryGridReady) {
+          if (!item[gridReadyProp]) {
             item.style.top = "-100%";
             item.style.left = "-100%";
             item.style.display = "block";
@@ -171,23 +173,23 @@ let MasonryGrid = class extends HTMLElement {
         // czy w ramach sekcji itemy są już zawijane, czyli dodawane nie w pierwszej lini
         // a wg wysokości itemów
         let sectionCascade = false;
-        const itemsPositions = {};
+        // const itemsPositions: {[index: number]: {left: number, top: number}} = {};
         let gridRect = this.itemsElement.getBoundingClientRect();
         for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
           const item = items[itemIndex];
           const previous = itemIndex > 0 ? items[itemIndex - 1] : undefined;
-          if (!item.__ionxMasonryGridCache) {
-            item.__ionxMasonryGridCache = {};
+          if (!item[gridCacheProp]) {
+            item[gridCacheProp] = {};
           }
-          item.__ionxMasonryGridCache.index = itemIndex;
+          item[gridCacheProp].index = itemIndex;
           // czekamy na hydrację
           while (!isHydrated(item)) {
             await sleep(10);
           }
-          if (!item.__ionxMasonryGridReady || !item.__ionxMasonryGridCache.rect) {
-            item.__ionxMasonryGridCache.rect = item.getBoundingClientRect();
+          if (!item[gridReadyProp] || !item[gridCacheProp].rect) {
+            item[gridCacheProp].rect = item.getBoundingClientRect();
           }
-          const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after") || gridRect.width === item.__ionxMasonryGridCache.rect.width;
+          const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after") || gridRect.width === item[gridCacheProp].rect.width;
           const isNewSection = sectionItems.length === 0 || breakLine;
           // element, pod którym mam być wstawiony ten element
           // w przypadku nowej lini albo puste, albo element, który jest najbardziej wysunięty do dołu
@@ -203,7 +205,7 @@ let MasonryGrid = class extends HTMLElement {
             // console.log((sibling.__ionxMasonryCache.rect.left - gridRect.left + sibling.__ionxMasonryCache.rect.width + item.__ionxMasonryCache.rect.width), gridRect.width);
             // console.log(sibling.__ionxMasonryCache.rect.left, gridRect.left, sibling.__ionxMasonryCache.rect.width, item.__ionxMasonryCache.rect.width, gridRect.width);
             // nie ma już miejsca w pierwszej lini sekcji, trzeba zawijać i szukać itemu, pod którym jest miejsce
-            if (~~(sibling.__ionxMasonryGridCache.rect.left - gridRect.left + sibling.__ionxMasonryGridCache.rect.width + item.__ionxMasonryGridCache.rect.width) > gridRect.width) {
+            if (~~(sibling[gridCacheProp].left - gridRect.left + sibling[gridCacheProp].rect.width + item[gridCacheProp].rect.width) > gridRect.width) {
               sectionCascade = true;
               sibling = undefined;
               // console.log("newline item", item);
@@ -213,28 +215,30 @@ let MasonryGrid = class extends HTMLElement {
           }
           if (sectionCascade) {
             sibling = sectionItems.pop();
+            while (sibling[gridCacheProp].left + item[gridCacheProp].rect.width > gridRect.width) {
+              sibling = sectionItems.pop();
+            }
           }
           let itemLeft;
           let itemTop;
-          if (!item.__ionxMasonryGridReady) {
+          if (!item[gridReadyProp]) {
             // console.log("item", item);
             // console.log("sibling", sibling);
             // console.log("---", itemIndex);
-            itemLeft = isNewSection ? 0 : (itemsPositions[sibling.__ionxMasonryGridCache.index].left + (!sectionCascade ? sibling.__ionxMasonryGridCache.rect.width : 0));
-            itemTop = !sibling ? 0 : (itemsPositions[sibling.__ionxMasonryGridCache.index].top + (sectionCascade || isNewSection ? sibling.__ionxMasonryGridCache.rect.height : 0));
+            itemLeft = isNewSection ? 0 : (sibling[gridCacheProp].left + (!sectionCascade ? sibling[gridCacheProp].rect.width : 0));
+            itemTop = !sibling ? 0 : (sibling[gridCacheProp].top + (sectionCascade || isNewSection ? sibling[gridCacheProp].rect.height : 0));
             // console.log(itemLeft, sibling, sibling && itemsPositions[sibling.__ionxMasonryCache.index].left);
             item.style.left = `${itemLeft}px`;
             item.style.top = `${itemTop}px`;
-            item.__ionxMasonryGridReady = true;
-            item.__ionxMasonryGridCache.left = itemLeft;
-            item.__ionxMasonryGridCache.top = itemTop;
-            item.__ionxMasonryGridCache.rect = item.getBoundingClientRect();
+            item[gridReadyProp] = true;
+            item[gridCacheProp].left = itemLeft;
+            item[gridCacheProp].top = itemTop;
+            item[gridCacheProp].rect = item.getBoundingClientRect();
           }
           else {
-            itemLeft = item.__ionxMasonryGridCache.left;
-            itemTop = item.__ionxMasonryGridCache.top;
+            itemLeft = item[gridCacheProp].left;
+            itemTop = item[gridCacheProp].top;
           }
-          itemsPositions[item.__ionxMasonryGridCache.index] = { left: itemLeft, top: itemTop };
           item.style.visibility = "visible";
           if (!isNewSection || !breakLine) {
             sectionItems.push(item);
