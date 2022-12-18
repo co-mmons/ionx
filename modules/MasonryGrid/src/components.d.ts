@@ -9,7 +9,6 @@ import { ExtendedItemElement } from "./ExtendedItemElement";
 export namespace Components {
     interface IonxMasonryGrid {
         "arrange": (options?: { force?: boolean; trigger?: "onresize"; }) => Promise<void>;
-        "block": boolean;
         "innerStyle": any;
         "markItemAsDirty": (item: HTMLElement) => Promise<void>;
     }
@@ -27,7 +26,6 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxMasonryGrid {
-        "block"?: boolean;
         "innerStyle"?: any;
     }
     interface IntrinsicElements {

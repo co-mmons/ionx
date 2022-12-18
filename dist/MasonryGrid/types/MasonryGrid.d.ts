@@ -5,7 +5,6 @@ import { WidthBreakpointsContainer } from "ionx/WidthBreakpoints";
 import { ExtendedItemElement } from "./ExtendedItemElement";
 export declare class MasonryGrid implements ComponentInterface {
   element: HTMLElement;
-  block: boolean;
   innerStyle: any;
   busy: boolean;
   /**

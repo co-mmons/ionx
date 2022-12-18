@@ -17,7 +17,7 @@ function lineBreak(beforeOrAfter = "before") {
 
 const MasonryGrid$1 = "ionx-masonry-grid";
 
-const masonryGridCss = ".sc-ionx-masonry-grid-h{display:block;position:relative;margin:8px}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{display:block;position:relative;--grid-container-width:100%}.ionx--block.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{height:auto !important}.sc-ionx-masonry-grid-h:not(.ionx--block) [ionx--grid-items].sc-ionx-masonry-grid-s>*{position:absolute;display:none}.sc-ionx-masonry-grid-h.ionx--block [ionx--grid-items].sc-ionx-masonry-grid-s>*{left:unset;top:unset}";
+const masonryGridCss = ".sc-ionx-masonry-grid-h{display:block;position:relative;margin:8px}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid{display:block;position:relative;--grid-container-width:100%}.sc-ionx-masonry-grid-h [ionx--grid-items].sc-ionx-masonry-grid-s>*{position:absolute !important;display:none}";
 
 const gridCacheProp = "__ionxMasonryGridCache";
 const gridReadyProp = "__ionxMasonryGridReady";
@@ -61,21 +61,6 @@ let MasonryGrid = class extends HTMLElement {
     let doArrange = false;
     this.busy = true;
     this.waiting = undefined;
-    // grid is to be displayed as block element, just make sure that items are hydrated
-    // when yes, mark as ready and we are done
-    if (this.block) {
-      console.debug("[ionx-masonry-grid] render as block");
-      const items = this.items();
-      // czekamy na hydrację
-      for (let i = 0; i < items.length; i++) {
-        while (!isHydrated(items[i])) {
-          await sleep(10);
-        }
-      }
-      markAsReady(this);
-      this.busy = false;
-      return;
-    }
     try {
       this.queuedArrange = false;
       // kolejkujemy renderowania jeżeli strona nie jest widoczna lub aplikacja w pauzie
@@ -114,6 +99,7 @@ let MasonryGrid = class extends HTMLElement {
           // zmieniła się pozycja itemu
           if (item[gridCacheProp]?.index !== i) {
             item[gridReadyProp] = false;
+            // console.debug("item index change")
           }
           // jeżeli poprzedni item wymaga renderu, to jego sąsiad również
           if (i > 0 && !items[i - 1][gridReadyProp]) {
@@ -122,6 +108,7 @@ let MasonryGrid = class extends HTMLElement {
           const rect = item.getBoundingClientRect();
           if (item[gridCacheProp]?.width !== rect.width || item[gridCacheProp]?.height !== rect.height) {
             item[gridReadyProp] = false;
+            // console.debug("width or height change")
           }
           if (!item[gridReadyProp]) {
             item[gridCacheProp] = { width: rect.width, height: rect.height };
@@ -132,6 +119,7 @@ let MasonryGrid = class extends HTMLElement {
         // najpewniej usunięte zostały itemy na końcu gridu
         if (items.length !== this.lastItemsCount) {
           doArrange = true;
+          // console.debug("items count change")
         }
       }
       // ok, możemy przystąpić do renderowania
@@ -156,22 +144,128 @@ let MasonryGrid = class extends HTMLElement {
             item.style.visibility = "hidden";
           }
         }
-        const sortSectionItems = (a, b) => {
-          const ar = a[gridCacheProp];
-          const br = b[gridCacheProp];
-          if (ar.top + ar.height === br.top + br.height) {
-            return br.left - ar.left;
-          }
-          else {
-            return (br.top + br.height) - (ar.top + ar.height);
-          }
-        };
-        // itemy aktualnie przetwarzanej sekcji
-        // po każdym dodaniu, należy posortować
-        let sectionItems = [];
-        // const itemsPositions: {[index: number]: {left: number, top: number}} = {};
-        let gridRect = this.itemsElement.getBoundingClientRect();
+        const gridRect = this.itemsElement.getBoundingClientRect();
+        const gridWidth = gridRect.width;
         let gridHeight = 0;
+        const gridLines = [[0, gridWidth]];
+        function itemFitsLine(line, itemStart, itemLength) {
+          let areaStart = 0;
+          for (let i = 1, area = line[i]; i < line.length; i++, area = line[i]) {
+            if (area < 0) {
+              areaStart += Math.abs(area);
+            }
+            else if (area >= itemLength && areaStart <= itemStart && areaStart + area >= itemStart + itemLength) {
+              return areaStart + area <= gridWidth;
+            }
+            else {
+              areaStart += area;
+            }
+          }
+          return false;
+        }
+        function addItemToLines(startLineIndex, itemStart, itemWidth, itemHeight) {
+          let lastLine;
+          let lastLineIndex;
+          for (let nextIndex = startLineIndex, nextLine = gridLines[nextIndex]; nextIndex < startLineIndex + itemHeight; nextIndex++, nextLine = gridLines[nextIndex]) {
+            if (gridLines.length <= nextIndex) {
+              const prev = gridLines.length > 0 ? gridLines[nextIndex - 1] : undefined;
+              gridLines.push([prev ? prev[0] + 1 : 0, gridWidth]);
+              nextLine = gridLines[nextIndex];
+            }
+            lastLine = nextLine;
+            lastLineIndex = nextIndex;
+            let areaStart = 0;
+            for (let i = 1, area = nextLine[i]; i < nextLine.length; i++, area = nextLine[i]) {
+              if (area < 0) {
+                areaStart += Math.abs(area);
+              }
+              else if (area >= itemWidth && areaStart <= itemStart && areaStart + area >= itemStart + itemWidth) {
+                const newAreas = [];
+                if (itemStart > areaStart) {
+                  newAreas.push(itemStart - areaStart);
+                }
+                newAreas.push(-itemWidth);
+                if (areaStart + area > itemStart + itemWidth) {
+                  newAreas.push((areaStart + area) - (itemStart + itemWidth));
+                }
+                nextLine.splice(i, 1, ...newAreas);
+                break;
+              }
+              else {
+                areaStart += area;
+              }
+            }
+          }
+          return { lastLine, lastLineIndex };
+        }
+        function addItemToMatrix(itemWidth, itemHeight) {
+          let itemLeft;
+          let itemTop;
+          let lastLineIndex;
+          for (let lineIndex = 0, line = gridLines[lineIndex]; lineIndex < gridLines.length; lineIndex++, line = gridLines[lineIndex]) {
+            let itemStart = -1;
+            let areaStart = 0;
+            AREAS: for (let i = 1, area = line[i]; i < line.length; i++, area = line[i]) {
+              if (area < 0) {
+                areaStart += Math.abs(area);
+              }
+              else if (area >= itemWidth && itemFitsLine(line, areaStart, itemWidth)) {
+                if (gridLines.length < lineIndex + 1) {
+                  // mamy to! możemy wstawić tutaj item, bo kolejne linie są puste
+                  itemStart = areaStart;
+                  break AREAS;
+                }
+                else {
+                  // sprawdzamy każdą linię poniżej, czy możemy wstawić do niej item
+                  NEXT_LINES: for (let nextIndex = lineIndex + 1, nextLine = gridLines[nextIndex]; nextIndex < lineIndex + itemHeight; nextIndex++, nextLine = gridLines[nextIndex]) {
+                    if (gridLines.length <= nextIndex) {
+                      // nie ma więcej linii
+                      break NEXT_LINES;
+                    }
+                    if (!itemFitsLine(nextLine, areaStart, itemWidth)) {
+                      // niestety w następnej lini nie wstawimy, przechodzimy do kolejnego obszaru
+                      areaStart += area;
+                      continue AREAS;
+                    }
+                  }
+                  // skoro tu dotarliśmy, to znaczy, że w kolejnych liniach możemy wstawić item
+                  itemStart = areaStart;
+                  break AREAS;
+                }
+              }
+              else {
+                areaStart += area;
+              }
+            }
+            if (itemStart > -1) {
+              const r = addItemToLines(lineIndex, itemStart, itemWidth, itemHeight);
+              itemLeft = itemStart;
+              itemTop = line[0];
+              lastLineIndex = r.lastLineIndex;
+              break;
+            }
+          }
+          if (itemLeft === undefined) {
+            // nie możemy dodać linii już istniejących, trzeba dodać nową linię
+            const prev = gridLines.length > 0 ? gridLines[gridLines.length - 1] : undefined;
+            const realLineIndex = prev ? prev[0] + 1 : 0;
+            gridLines.push([realLineIndex, gridWidth]);
+            const r = addItemToLines(gridLines.length - 1, 0, itemWidth, itemHeight);
+            lastLineIndex = r.lastLineIndex;
+            itemLeft = 0;
+            itemTop = realLineIndex;
+          }
+          for (let i = lastLineIndex; i >= 0; i--) {
+            if (gridLines[i].reduce((a, b) => a + (b > 0 ? 0 : b), gridWidth) <= 0) {
+              gridLines.splice(0, i);
+              break;
+            }
+            else {
+              break;
+            }
+          }
+          return { itemLeft, itemTop };
+        }
         for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
           const item = items[itemIndex];
           const previous = itemIndex > 0 ? items[itemIndex - 1] : undefined;
@@ -185,87 +279,30 @@ let MasonryGrid = class extends HTMLElement {
           }
           item[gridCacheProp].index = itemIndex;
           const itemWidth = item[gridCacheProp].width;
-          const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after") || gridRect.width === itemWidth;
-          const isNewSection = sectionItems.length === 0 || breakLine;
-          // czy w ramach sekcji itemy są już zawijane, czyli dodawane nie w pierwszej linii
-          // a wg wysokości itemów
-          let cascade = false;
-          // element, pod którym mam być wstawiony ten element
-          // w przypadku nowej linii albo puste, albo element, który jest najbardziej wysunięty do dołu
-          let sibling;
-          if (isNewSection) {
-            sibling = (sectionItems.length && sectionItems[0]) || (itemIndex > 0 && items[itemIndex - 1]);
-            sectionItems = [];
-            cascade = false;
-          }
-          else {
-            sibling = previous;
-            // nie ma już miejsca w pierwszej lini sekcji, trzeba zawijać i szukać itemu, pod którym jest miejsce
-            if (~~(sibling[gridCacheProp].left - gridRect.left + sibling[gridCacheProp].width + itemWidth) > gridRect.width) {
-              cascade = true;
-              sibling = undefined;
-            }
-          }
-          if (cascade) {
-            sibling = sectionItems.pop();
-          }
-          // usuwamy itemy z sekcji, bo wychodzimy poza szerokość gridu
-          while (sectionItems.length > 1 && previous !== sibling && ~~(sibling[gridCacheProp].left + itemWidth) > gridRect.width) {
-            sibling = sectionItems.pop();
-          }
-          // usuwamy itemy z sekcji, bo sibling.left koliduje z poprzednim item - dlugosc poprzedniego wykracza poza sibling.left
-          while (previous && sibling && previous !== sibling && sectionItems.length > 1 && sibling && sibling[gridCacheProp].top !== previous[gridCacheProp].top && previous[gridCacheProp].left < sibling[gridCacheProp].left && previous[gridCacheProp].left + previous[gridCacheProp].width >= sibling[gridCacheProp].left) {
-            sibling = sectionItems.pop();
-          }
-          let itemLeft = isNewSection ? 0 : (sibling[gridCacheProp].left + (!cascade ? sibling[gridCacheProp].width : 0));
-          let itemTop = !sibling ? 0 : (sibling[gridCacheProp].top + (cascade || isNewSection ? sibling[gridCacheProp].height : 0));
-          // usuwamy poprzednie itemy z sekcji, jeżeli item nachodzi na poprzedni
-          for (const i of sectionItems.reverse()) {
-            const ic = i[gridCacheProp];
-            if (itemTop !== ic.top && ic.left > itemLeft && itemTop < ic.top + ic.height && itemLeft + itemWidth > ic.left) {
-              sectionItems.pop();
-              itemTop = ic.top + ic.height;
-              break;
-            }
-          }
-          // usuwamy poprzednie itemy z sekcji, jeżeli koniec poprzedniego jest dokładnie w tym samym miejscu gdzie obecny
-          for (let i = sectionItems.length - 1; i >= 0; i--) {
-            const ic = sectionItems[i][gridCacheProp];
-            if (itemLeft + itemWidth === ic.left + ic.width) {
-              sectionItems.splice(i, 1);
-            }
-          }
+          const itemHeight = item[gridCacheProp].height;
+          // @ts-ignore
+          item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after") || gridRect.width === itemWidth;
+          const { itemLeft, itemTop } = addItemToMatrix(itemWidth, itemHeight);
           if (!item[gridReadyProp]) {
             item.style.left = `${itemLeft}px`;
             item.style.top = `${itemTop}px`;
             item[gridReadyProp] = true;
             item[gridCacheProp].left = itemLeft;
             item[gridCacheProp].top = itemTop;
-            // item[gridCacheProp].bottom = item.getBoundingClientRect().bottom;
           }
           item.style.visibility = "visible";
-          if (!isNewSection || !breakLine) {
-            sectionItems.push(item);
-            sectionItems.sort(sortSectionItems);
-          }
           const bottom = item[gridCacheProp].top + item[gridCacheProp].height;
           if (bottom > gridHeight) {
             gridHeight = bottom;
           }
-          // console.log(item, itemLeft, itemTop);
-          // console.log(itemTop, siblingRect?.height);
-          // if (sibling && itemLeft === itemsPositions[sibling["index"]].left && itemsPositions[sibling["index"]].top + siblingRect.height > itemTop) {
-          // console.log("error", item.element.innerText, itemTop, "sibling", sibling.element.innerText, itemsPositions[sibling["index"]].top, siblingRect.top, siblingRect.height);
-          // }
         }
-        gridRect = this.itemsElement.getBoundingClientRect();
         if (gridHeight) {
           this.itemsElement.style.height = `${gridHeight}px`;
         }
         else {
           this.itemsElement.style.height = "0px";
         }
-        this.lastWidth = gridRect.width;
+        this.lastWidth = this.itemsElement.getBoundingClientRect().width;
         this.lastItemsCount = items.length;
         if (Capacitor.getPlatform() === "ios") {
           this.itemsElement.style.transform = "translateZ(0)";
@@ -336,7 +373,9 @@ let MasonryGrid = class extends HTMLElement {
     }
   }
   onMutation(_mutations) {
-    this.arrange();
+    if (!this.waiting) {
+      this.arrange();
+    }
   }
   connectedCallback() {
     markAsUnready(this);
@@ -383,13 +422,13 @@ let MasonryGrid = class extends HTMLElement {
     this.viewDidEnterUnlisten = undefined;
   }
   render() {
-    return h(Host, { class: { "ionx--block": this.block } }, h("div", { "ionx--grid-items": true, style: this.innerStyle, ref: el => this.itemsElement = el }, h("slot", null)));
+    return h(Host, null, h("div", { "ionx--grid-items": true, style: this.innerStyle, ref: el => this.itemsElement = el }, h("slot", null)));
   }
   get element() { return this; }
   static get style() { return masonryGridCss; }
 };
 
-const IonxMasonryGrid = /*@__PURE__*/proxyCustomElement(MasonryGrid, [6,"ionx-masonry-grid",{"block":[4],"innerStyle":[8,"inner-style"]},[[8,"beforeresize","resized"],[9,"resize","resized"],[4,"visibilitychange","visibilityChanged"]]]);
+const IonxMasonryGrid = /*@__PURE__*/proxyCustomElement(MasonryGrid, [6,"ionx-masonry-grid",{"innerStyle":[8,"inner-style"]},[[8,"beforeresize","resized"],[9,"resize","resized"],[4,"visibilitychange","visibilityChanged"]]]);
 const defineIonxMasonryGrid = (opts) => {
   if (typeof customElements !== 'undefined') {
     [

@@ -9,19 +9,8 @@
         --grid-container-width: 100%;
     }
 
-    &.ionx--block {
-        [ionx--grid-items] {
-            height: auto !important;
-        }
+    [ionx--grid-items]::slotted(*) {
+        position: absolute !important;
+        display: none;
     }
-}
-
-:host(:not(.ionx--block)) [ionx--grid-items]::slotted(*) {
-    position: absolute;
-    display: none;
-}
-
-:host(.ionx--block) [ionx--grid-items]::slotted(*) {
-    left: unset;
-    top: unset;
 }

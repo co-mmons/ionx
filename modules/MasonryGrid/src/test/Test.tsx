@@ -24,9 +24,18 @@ export class Test {
             <button onClick={() => this.change()}>change</button>
 
             <ionx-masonry-grid>
-                {[231,122,35,234,245,656,227,128,129].map(i => <div style={{width: "50%"}}>
-                    <div style={{margin: "16px", border: "1px solid red"}}>{this.loremIpsum.substring(1, i)}</div>
-                </div>)}
+                <div style={{width: "25%"}}>
+                    <div style={{margin: "16px", border: "1px solid red"}}>{this.loremIpsum.substring(1, 100)}</div>
+                </div>
+                <div style={{width: "100%"}}>
+                    <div style={{margin: "16px", border: "1px solid red"}}>{this.loremIpsum.substring(1, 100)}</div>
+                </div>
+                <div style={{width: "50%"}}>
+                    <div style={{margin: "16px", border: "1px solid red"}}>{this.loremIpsum.substring(1, 300)}</div>
+                </div>
+                <div style={{width: "50%"}}>
+                    <div style={{margin: "16px", border: "1px solid red"}}>{this.loremIpsum.substring(1, 400)}</div>
+                </div>
             </ionx-masonry-grid>
         </Host>
     }

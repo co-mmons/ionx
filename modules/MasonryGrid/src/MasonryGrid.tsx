@@ -21,9 +21,6 @@ export class MasonryGrid implements ComponentInterface {
     element: HTMLElement;
 
     @Prop()
-    block: boolean;
-
-    @Prop()
     innerStyle: any;
 
     busy: boolean;
@@ -117,27 +114,6 @@ export class MasonryGrid implements ComponentInterface {
         this.busy = true;
         this.waiting = undefined;
 
-        // grid is to be displayed as block element, just make sure that items are hydrated
-        // when yes, mark as ready and we are done
-        if (this.block) {
-            console.debug("[ionx-masonry-grid] render as block")
-
-            const items = this.items();
-
-            // czekamy na hydrację
-            for (let i = 0; i < items.length; i++) {
-                while (!isHydrated(items[i])) {
-                    await sleep(10);
-                }
-            }
-
-            markAsReady(this);
-
-            this.busy = false;
-
-            return;
-        }
-
         try {
 
             this.queuedArrange = false;
@@ -189,6 +165,7 @@ export class MasonryGrid implements ComponentInterface {
                     // zmieniła się pozycja itemu
                     if (item[gridCacheProp]?.index !== i) {
                         item[gridReadyProp] = false;
+                        // console.debug("item index change")
                     }
 
                     // jeżeli poprzedni item wymaga renderu, to jego sąsiad również
@@ -199,6 +176,7 @@ export class MasonryGrid implements ComponentInterface {
                     const rect = item.getBoundingClientRect();
                     if (item[gridCacheProp]?.width !== rect.width || item[gridCacheProp]?.height !== rect.height) {
                         item[gridReadyProp] = false;
+                        // console.debug("width or height change")
                     }
 
                     if (!item[gridReadyProp]) {
@@ -211,6 +189,7 @@ export class MasonryGrid implements ComponentInterface {
                 // najpewniej usunięte zostały itemy na końcu gridu
                 if (items.length !== this.lastItemsCount) {
                     doArrange = true;
+                    // console.debug("items count change")
                 }
 
             }
@@ -239,25 +218,158 @@ export class MasonryGrid implements ComponentInterface {
                     }
                 }
 
-                const sortSectionItems = (a: HTMLElement & ExtendedItemElement, b: HTMLElement & ExtendedItemElement) => {
-                    const ar = a[gridCacheProp];
-                    const br = b[gridCacheProp];
-
-                    if (ar.top + ar.height === br.top + br.height) {
-                        return br.left - ar.left;
-                    } else {
-                        return (br.top + br.height) - (ar.top + ar.height);
-                    }
-                };
-
-                // itemy aktualnie przetwarzanej sekcji
-                // po każdym dodaniu, należy posortować
-                let sectionItems: (HTMLElement & ExtendedItemElement)[] = [];
-
-                // const itemsPositions: {[index: number]: {left: number, top: number}} = {};
-
-                let gridRect = this.itemsElement.getBoundingClientRect();
+                const gridRect = this.itemsElement.getBoundingClientRect();
+                const gridWidth = gridRect.width;
                 let gridHeight = 0;
+
+                const gridLines: [realLineIndex: number, ...linePixels: number[]][] = [[0, gridWidth]];
+
+                function itemFitsLine(line: number[], itemStart: number, itemLength: number) {
+
+                    let areaStart = 0;
+                    for (let i = 1, area = line[i]; i < line.length; i++, area = line[i]) {
+                        if (area < 0) {
+                            areaStart += Math.abs(area);
+                        } else if (area >= itemLength && areaStart <= itemStart && areaStart + area >= itemStart + itemLength) {
+                            return areaStart + area <= gridWidth;
+                        } else {
+                            areaStart += area;
+                        }
+                    }
+
+                    return false;
+                }
+
+                function addItemToLines(startLineIndex: number, itemStart: number, itemWidth: number, itemHeight: number) {
+
+                    let lastLine: number[];
+                    let lastLineIndex: number;
+
+                    LINES: for (let nextIndex = startLineIndex, nextLine = gridLines[nextIndex]; nextIndex < startLineIndex + itemHeight; nextIndex++, nextLine = gridLines[nextIndex]) {
+
+                        if (gridLines.length <= nextIndex) {
+                            const prev = gridLines.length > 0 ? gridLines[nextIndex - 1] : undefined;
+                            gridLines.push([prev ? prev[0] + 1 : 0, gridWidth]);
+                            nextLine = gridLines[nextIndex];
+                        }
+
+                        lastLine = nextLine;
+                        lastLineIndex = nextIndex;
+
+                        let areaStart = 0;
+
+                        for (let i = 1, area = nextLine[i]; i < nextLine.length; i++, area = nextLine[i]) {
+                            if (area < 0) {
+                                areaStart += Math.abs(area);
+
+                            } else if (area >= itemWidth && areaStart <= itemStart && areaStart + area >= itemStart + itemWidth) {
+
+                                const newAreas = [];
+
+                                if (itemStart > areaStart) {
+                                    newAreas.push(itemStart - areaStart);
+                                }
+
+                                newAreas.push(-itemWidth);
+
+                                if (areaStart + area > itemStart + itemWidth) {
+                                    newAreas.push((areaStart + area) - (itemStart + itemWidth));
+                                }
+
+                                nextLine.splice(i, 1, ...newAreas);
+                                break;
+
+                            } else {
+                                areaStart += area;
+                            }
+                        }
+                    }
+
+                    return {lastLine, lastLineIndex};
+                }
+
+                function addItemToMatrix(itemWidth: number, itemHeight: number) {
+
+                    let itemLeft: number;
+                    let itemTop: number;
+                    let lastLineIndex: number;
+
+                    for (let lineIndex = 0, line = gridLines[lineIndex]; lineIndex < gridLines.length; lineIndex++, line = gridLines[lineIndex]) {
+
+                        let itemStart = -1;
+                        let areaStart = 0;
+
+                        AREAS: for (let i = 1, area = line[i]; i < line.length; i++, area = line[i]) {
+
+                            if (area < 0) {
+                                areaStart += Math.abs(area);
+
+                            } else if (area >= itemWidth && itemFitsLine(line, areaStart, itemWidth)) {
+
+                                if (gridLines.length < lineIndex + 1) {
+                                    // mamy to! możemy wstawić tutaj item, bo kolejne linie są puste
+                                    itemStart = areaStart;
+                                    break AREAS;
+
+                                } else {
+                                    // sprawdzamy każdą linię poniżej, czy możemy wstawić do niej item
+                                    NEXT_LINES: for (let nextIndex = lineIndex + 1, nextLine = gridLines[nextIndex]; nextIndex < lineIndex + itemHeight; nextIndex++, nextLine = gridLines[nextIndex]) {
+
+                                        if (gridLines.length <= nextIndex) {
+                                            // nie ma więcej linii
+                                            break NEXT_LINES;
+                                        }
+
+                                        if (!itemFitsLine(nextLine, areaStart, itemWidth)) {
+                                            // niestety w następnej lini nie wstawimy, przechodzimy do kolejnego obszaru
+                                            areaStart += area;
+                                            continue AREAS;
+                                        }
+                                    }
+
+                                    // skoro tu dotarliśmy, to znaczy, że w kolejnych liniach możemy wstawić item
+                                    itemStart = areaStart;
+                                    break AREAS;
+                                }
+
+                            } else {
+                                areaStart += area;
+                            }
+                        }
+
+                        if (itemStart > -1) {
+                            const r = addItemToLines(lineIndex, itemStart, itemWidth, itemHeight);
+                            itemLeft = itemStart;
+                            itemTop = line[0];
+                            lastLineIndex = r.lastLineIndex;
+                            break;
+                        }
+                    }
+
+                    if (itemLeft === undefined) {
+
+                        // nie możemy dodać linii już istniejących, trzeba dodać nową linię
+                        const prev = gridLines.length > 0 ? gridLines[gridLines.length - 1] : undefined;
+                        const realLineIndex = prev ? prev[0] + 1 : 0;
+                        gridLines.push([realLineIndex, gridWidth]);
+
+                        const r = addItemToLines(gridLines.length - 1, 0, itemWidth, itemHeight);
+                        lastLineIndex = r.lastLineIndex;
+                        itemLeft = 0;
+                        itemTop = realLineIndex;
+                    }
+
+                    for (let i = lastLineIndex; i >= 0; i--) {
+                        if (gridLines[i].reduce((a, b) => a + (b > 0 ? 0 : b), gridWidth) <= 0) {
+                            gridLines.splice(0, i);
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    return {itemLeft, itemTop};
+                }
 
                 for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 
@@ -277,66 +389,12 @@ export class MasonryGrid implements ComponentInterface {
                     item[gridCacheProp].index = itemIndex;
 
                     const itemWidth = item[gridCacheProp].width;
+                    const itemHeight = item[gridCacheProp].height;
+
+                    // @ts-ignore
                     const breakLine = item.getAttribute(lineBreakAttribute) === "before" || item.classList.contains(lineBreakAttribute) || (previous?.getAttribute(lineBreakAttribute) === "after") || gridRect.width === itemWidth;
-                    const isNewSection = sectionItems.length === 0 || breakLine;
 
-                    // czy w ramach sekcji itemy są już zawijane, czyli dodawane nie w pierwszej linii
-                    // a wg wysokości itemów
-                    let cascade = false;
-
-                    // element, pod którym mam być wstawiony ten element
-                    // w przypadku nowej linii albo puste, albo element, który jest najbardziej wysunięty do dołu
-                    let sibling: HTMLElement & ExtendedItemElement;
-
-                    if (isNewSection) {
-                        sibling = (sectionItems.length && sectionItems[0]) || (itemIndex > 0 && items[itemIndex - 1]);
-                        sectionItems = [];
-                        cascade = false;
-
-                    } else {
-                        sibling = previous;
-
-                        // nie ma już miejsca w pierwszej lini sekcji, trzeba zawijać i szukać itemu, pod którym jest miejsce
-                        if (~~(sibling[gridCacheProp].left - gridRect.left + sibling[gridCacheProp].width + itemWidth) > gridRect.width) {
-                            cascade = true;
-                            sibling = undefined;
-                        }
-                    }
-
-                    if (cascade) {
-                        sibling = sectionItems.pop();
-                    }
-
-                    // usuwamy itemy z sekcji, bo wychodzimy poza szerokość gridu
-                    while (sectionItems.length > 1 && previous !== sibling && ~~(sibling[gridCacheProp].left + itemWidth) > gridRect.width) {
-                        sibling = sectionItems.pop();
-                    }
-
-                    // usuwamy itemy z sekcji, bo sibling.left koliduje z poprzednim item - dlugosc poprzedniego wykracza poza sibling.left
-                    while (previous && sibling && previous !== sibling && sectionItems.length > 1 && sibling && sibling[gridCacheProp].top !== previous[gridCacheProp].top && previous[gridCacheProp].left < sibling[gridCacheProp].left && previous[gridCacheProp].left + previous[gridCacheProp].width >= sibling[gridCacheProp].left) {
-                        sibling = sectionItems.pop();
-                    }
-
-                    let itemLeft = isNewSection ? 0 : (sibling[gridCacheProp].left + (!cascade ? sibling[gridCacheProp].width : 0));
-                    let itemTop = !sibling ? 0 : (sibling[gridCacheProp].top + (cascade || isNewSection ? sibling[gridCacheProp].height : 0));
-
-                    // usuwamy poprzednie itemy z sekcji, jeżeli item nachodzi na poprzedni
-                    for (const i of sectionItems.reverse()) {
-                        const ic = i[gridCacheProp];
-                        if (itemTop !== ic.top && ic.left > itemLeft && itemTop < ic.top + ic.height && itemLeft + itemWidth > ic.left) {
-                            sectionItems.pop();
-                            itemTop = ic.top + ic.height;
-                            break;
-                        }
-                    }
-
-                    // usuwamy poprzednie itemy z sekcji, jeżeli koniec poprzedniego jest dokładnie w tym samym miejscu gdzie obecny
-                    for (let i = sectionItems.length - 1; i >= 0; i--) {
-                        const ic = sectionItems[i][gridCacheProp];
-                        if (itemLeft + itemWidth === ic.left + ic.width) {
-                            sectionItems.splice(i, 1);
-                        }
-                    }
+                    const {itemLeft, itemTop} = addItemToMatrix(itemWidth, itemHeight);
 
                     if (!item[gridReadyProp]) {
                         item.style.left = `${itemLeft}px`;
@@ -344,29 +402,15 @@ export class MasonryGrid implements ComponentInterface {
                         item[gridReadyProp] = true;
                         item[gridCacheProp].left = itemLeft;
                         item[gridCacheProp].top = itemTop;
-                        // item[gridCacheProp].bottom = item.getBoundingClientRect().bottom;
                     }
 
                     item.style.visibility = "visible";
-
-                    if (!isNewSection || !breakLine) {
-                        sectionItems.push(item);
-                        sectionItems.sort(sortSectionItems);
-                    }
 
                     const bottom = item[gridCacheProp].top + item[gridCacheProp].height;
                     if (bottom > gridHeight) {
                         gridHeight = bottom;
                     }
-
-                    // console.log(item, itemLeft, itemTop);
-                    // console.log(itemTop, siblingRect?.height);
-                    // if (sibling && itemLeft === itemsPositions[sibling["index"]].left && itemsPositions[sibling["index"]].top + siblingRect.height > itemTop) {
-                    // console.log("error", item.element.innerText, itemTop, "sibling", sibling.element.innerText, itemsPositions[sibling["index"]].top, siblingRect.top, siblingRect.height);
-                    // }
                 }
-
-                gridRect = this.itemsElement.getBoundingClientRect();
 
                 if (gridHeight) {
                     this.itemsElement.style.height = `${gridHeight}px`;
@@ -374,7 +418,7 @@ export class MasonryGrid implements ComponentInterface {
                     this.itemsElement.style.height = "0px";
                 }
 
-                this.lastWidth = gridRect.width;
+                this.lastWidth = this.itemsElement.getBoundingClientRect().width;
                 this.lastItemsCount = items.length;
 
                 if (Capacitor.getPlatform() === "ios") {
@@ -461,7 +505,9 @@ export class MasonryGrid implements ComponentInterface {
     }
 
     onMutation(_mutations: MutationRecord[]) {
-        this.arrange();
+        if (!this.waiting) {
+            this.arrange();
+        }
     }
 
     connectedCallback() {
@@ -527,7 +573,7 @@ export class MasonryGrid implements ComponentInterface {
     }
 
     render() {
-        return <Host class={{"ionx--block": this.block}}>
+        return <Host>
             <div ionx--grid-items style={this.innerStyle} ref={el => this.itemsElement = el}>
                 <slot/>
             </div>
