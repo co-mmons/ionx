@@ -38,7 +38,7 @@
         }
 
         h1 {
-            color: var(--toolbar-heading-color, var(--app-toolbar-heading-color, var(--app-toolbar-foreground-color, var(--app-toolbar-background-color-contrast))));
+            color: var(--toolbar-heading-color, var(--toolbar-foreground-color, var(--app-toolbar-heading-color, var(--app-toolbar-foreground-color, var(--app-toolbar-background-color-contrast)))));
             font-family: var(--toolbar-heading-font-family, var(--app-toolbar-heading-font-family, var(--ionx-toolbar-title-font-family, var(--ion-toolbar-title-font-family, var(--ion-font-family, inherit)))));
             font-weight: var(--toolbar-heading-font-weight, var(--app-toolbar-heading-font-weight, var(--ionx-toolbar-title-font-weight, var(--ion-toolbar-title-font-weight, 500))));
             font-size: var(--toolbar-heading-font-size, var(--app-toolbar-heading-font-size, var(--ionx-toolbar-title-font-size, var(--ion-toolbar-title-font-size, 22px))));
