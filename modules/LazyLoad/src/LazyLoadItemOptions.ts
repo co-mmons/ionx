@@ -1,5 +1,5 @@
 export interface LazyLoadItemOptions {
-    src?: string | string[];
+    src?: string | Array<string | (() => Promise<string>)>;
 
     /**
      * If style classes should be copied to parent elements.

@@ -78,35 +78,41 @@ class LazyLoadController {
     element.classList.remove(itemPendingCssClass);
     element.classList.add(itemLoadingCssClass);
     styleParents(element, options?.styleParents);
-    const load = (afterError) => {
+    const load = async (afterError) => {
       if (element.lazyLoad) {
         if (!afterError) {
-          element.lazyLoad(options);
+          await element.lazyLoad(options);
         }
         else {
           markAsError();
         }
       }
       else if (options?.src) {
-        const src = Array.isArray(options.src) ? options.src : [options.src];
-        if (src.length === 0) {
+        const srcs = Array.isArray(options.src) ? options.src : [options.src];
+        if (srcs.length === 0) {
           console.warn("[ionx-lazy-load] element cannot be lazy loaded, no src given", element);
           markAsError();
         }
         else {
           const lastSrc = (srcSupported && element.getAttribute("src")) || element.__lazyLoadSrc || null;
-          const lastSrcIndex = src.lastIndexOf(lastSrc);
-          if (lastSrcIndex >= src.length - 1) {
+          const lastSrcIndex = srcs.lastIndexOf(lastSrc);
+          if (lastSrcIndex >= srcs.length - 1) {
             markAsError();
           }
-          else if (srcSupported) {
-            element.setAttribute("src", src[lastSrcIndex + 1]);
-          }
           else {
-            const img = new Image();
-            img.addEventListener("error", onItemError);
-            img.addEventListener("load", onItemLoad);
-            element.__lazyLoadSrc = img.src = src[lastSrcIndex + 1];
+            let src = srcs[lastSrcIndex + 1];
+            if (typeof src === "function") {
+              src = await src();
+            }
+            if (srcSupported) {
+              element.setAttribute("src", src);
+            }
+            else {
+              const img = new Image();
+              img.addEventListener("error", onItemError);
+              img.addEventListener("load", onItemLoad);
+              element.__lazyLoadSrc = img.src = src;
+            }
           }
         }
       }

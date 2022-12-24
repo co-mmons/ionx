@@ -1,5 +1,5 @@
 export interface LazyLoadItemOptions {
-  src?: string | string[];
+  src?: string | Array<string | (() => Promise<string>)>;
   /**
    * If style classes should be copied to parent elements.
    * A map, where key is parent selector (used with Element.closest) and value
