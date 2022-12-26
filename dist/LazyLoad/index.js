@@ -102,7 +102,14 @@ class LazyLoadController {
           else {
             let src = srcs[lastSrcIndex + 1];
             if (typeof src === "function") {
-              src = await src();
+              try {
+                srcs[lastSrcIndex + 1] = src = await src();
+              }
+              catch (e) {
+                srcs.splice(lastSrcIndex + 1, 1);
+                onItemError({ target: element, error: e });
+                return;
+              }
             }
             if (srcSupported) {
               element.setAttribute("src", src);
@@ -125,9 +132,9 @@ class LazyLoadController {
       element.removeEventListener("error", onItemError);
       this.intersectionObserver.unobserve(element);
     };
-    const onItemError = (_ev) => {
-      console.debug(_ev);
-      const target = _ev.target;
+    const onItemError = (ev) => {
+      console.debug(ev);
+      const target = ev.target;
       if (target !== element) {
         target.removeEventListener(loadEventName, onItemLoad);
         target.removeEventListener("error", onItemError);
