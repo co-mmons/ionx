@@ -9,6 +9,7 @@
         --inner-padding-end: 0;
         --padding-start: 16px;
         --padding-end: 16px;
+        font-size: var(--app-font-size, var(--ionx-default-font-size));
     }
 
     & > ion-item.item:last-child, & > *:last-child > ion-item.item:last-child {
