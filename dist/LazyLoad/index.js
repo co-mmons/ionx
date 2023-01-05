@@ -112,7 +112,7 @@ class LazyLoadController {
               }
             }
             if (src instanceof Blob) {
-              src = URL.createObjectURL(src);
+              src = URL.createObjectURL(src) + "#lazy-revoke";
             }
             if (srcSupported) {
               element.setAttribute("src", src);
@@ -143,8 +143,8 @@ class LazyLoadController {
         target.removeEventListener("error", onItemError);
       }
       const src = target !== element ? target.getAttribute("src") : element.getAttribute("src");
-      if (src.startsWith("blob:")) {
-        URL.revokeObjectURL(src);
+      if (src.startsWith("blob:") && src.endsWith("#lazy-revoke")) {
+        setTimeout(() => URL.revokeObjectURL(src.replace("#lazy-revoke", "")), 5000);
       }
       load(true);
     };
@@ -162,8 +162,8 @@ class LazyLoadController {
         element.style.backgroundImage = `url(${target.getAttribute("src")})`;
       }
       const src = target !== element ? target.getAttribute("src") : element.getAttribute("src");
-      if (src.startsWith("blob:")) {
-        URL.revokeObjectURL(src);
+      if (src.startsWith("blob:") && src.endsWith("#lazy-revoke")) {
+        setTimeout(() => URL.revokeObjectURL(src.replace("#lazy-revoke", "")), 5000);
       }
     };
     if (srcSupported || element.lazyLoad) {
