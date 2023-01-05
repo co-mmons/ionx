@@ -142,6 +142,10 @@ class LazyLoadController {
         target.removeEventListener(loadEventName, onItemLoad);
         target.removeEventListener("error", onItemError);
       }
+      const src = target !== element ? target.getAttribute("src") : element.getAttribute("src");
+      if (src.startsWith("blob:")) {
+        URL.revokeObjectURL(src);
+      }
       load(true);
     };
     const onItemLoad = (_ev) => {

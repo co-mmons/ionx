@@ -68,7 +68,7 @@ export class LazyLoadController {
 
             } else if (options?.src) {
 
-                const srcs = Array.isArray(options.src) ? options.src : [options.src];
+                const srcs: Array<string | (() => Promise<string>) | (() => Promise<Blob>) | Blob> = Array.isArray(options.src) ? options.src : [options.src];
 
                 if (srcs.length === 0) {
                     console.warn("[ionx-lazy-load] element cannot be lazy loaded, no src given", element);

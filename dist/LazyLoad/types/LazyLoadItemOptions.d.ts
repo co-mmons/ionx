@@ -1,6 +1,5 @@
-declare type Src = string | Blob;
 export interface LazyLoadItemOptions {
-  src?: Src | Array<Src | (() => Promise<Src>)>;
+  src?: string | Array<string | (() => Promise<string>) | (() => Promise<Blob>)>;
   /**
    * If style classes should be copied to parent elements.
    * A map, where key is parent selector (used with Element.closest) and value
@@ -10,4 +9,3 @@ export interface LazyLoadItemOptions {
     [closestSelector: string]: string;
   };
 }
-export {};
