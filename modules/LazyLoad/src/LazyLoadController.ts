@@ -94,6 +94,10 @@ export class LazyLoadController {
                             }
                         }
 
+                        if (src instanceof Blob) {
+                            src = URL.createObjectURL(src);
+                        }
+
                         if (srcSupported) {
                             element.setAttribute("src", src);
 
@@ -130,6 +134,11 @@ export class LazyLoadController {
                 target.removeEventListener("error", onItemError);
             }
 
+            const src = target !== element ? target.getAttribute("src") : element.getAttribute("src");
+            if (src.startsWith("blob:")) {
+                URL.revokeObjectURL(src);
+            }
+
             load(true);
         }
 
@@ -150,6 +159,11 @@ export class LazyLoadController {
 
             if (target !== element) {
                 (element as HTMLElement).style.backgroundImage = `url(${target.getAttribute("src")})`;
+            }
+
+            const src = target !== element ? target.getAttribute("src") : element.getAttribute("src");
+            if (src.startsWith("blob:")) {
+                URL.revokeObjectURL(src);
             }
         }
 
