@@ -10,7 +10,7 @@ export interface ComponentDisconnectHook {
     disconnect: () => void;
 }
 
-export function addComponentDisconnectHook(component: ComponentInterface, hookName: string, hook: ComponentDisconnectHook, options?: DisconnectHookOptions) {
+export function addComponentDisconnectHook(component: ComponentInterface, hookName: string | symbol, hook: ComponentDisconnectHook, options?: DisconnectHookOptions) {
 
     const existing = component[hooksProperty]?.[hookName];
 
@@ -40,7 +40,7 @@ export function addComponentDisconnectHook(component: ComponentInterface, hookNa
     component[hooksProperty][hookName] = hook;
 }
 
-function disconnectHook(component: ComponentInterface, hookName: string) {
+function disconnectHook(component: ComponentInterface, hookName: string | symbol) {
 
     if (!component[hooksProperty]) {
         return;
@@ -48,7 +48,7 @@ function disconnectHook(component: ComponentInterface, hookName: string) {
 
     const hook: ComponentDisconnectHook = component[hooksProperty][hookName];
     if (hook) {
-        console.debug(`[ionx/componentDisconnectHooks] disconnected hook "${hookName}"`);
+        console.debug(`[ionx/componentDisconnectHooks] disconnected hook "${hookName.toString()}"`);
 
         delete component[hooksProperty][hookName];
         try {
@@ -61,10 +61,17 @@ function disconnectHook(component: ComponentInterface, hookName: string) {
     return hook;
 }
 
-export function getComponentDisconnectHook<T extends ComponentDisconnectHook>(component: ComponentInterface, hookName: string): T {
-    return component?.[hooksProperty]?.[hookName];
+export function getComponentDisconnectHook<T extends ComponentDisconnectHook>(component: ComponentInterface, hookName: string | symbol, createFactory?: () => T): T {
+
+    let hook = component?.[hooksProperty]?.[hookName];
+    if (!hook && createFactory) {
+        hook = createFactory();
+        addComponentDisconnectHook(component, hookName, hook);
+    }
+
+    return hook;
 }
 
-export function removeComponentDisconnectHook<T extends ComponentDisconnectHook>(component: ComponentInterface, hookName: string): T {
+export function removeComponentDisconnectHook<T extends ComponentDisconnectHook>(component: ComponentInterface, hookName: string | symbol): T {
     return disconnectHook(component, hookName) as T;
 }

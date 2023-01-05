@@ -27,7 +27,7 @@ function disconnectHook(component, hookName) {
     }
     const hook = component[hooksProperty][hookName];
     if (hook) {
-        console.debug(`[ionx/componentDisconnectHooks] disconnected hook "${hookName}"`);
+        console.debug(`[ionx/componentDisconnectHooks] disconnected hook "${hookName.toString()}"`);
         delete component[hooksProperty][hookName];
         try {
             hook.disconnect?.();
@@ -38,8 +38,13 @@ function disconnectHook(component, hookName) {
     }
     return hook;
 }
-export function getComponentDisconnectHook(component, hookName) {
-    return component?.[hooksProperty]?.[hookName];
+export function getComponentDisconnectHook(component, hookName, createFactory) {
+    let hook = component?.[hooksProperty]?.[hookName];
+    if (!hook && createFactory) {
+        hook = createFactory();
+        addComponentDisconnectHook(component, hookName, hook);
+    }
+    return hook;
 }
 export function removeComponentDisconnectHook(component, hookName) {
     return disconnectHook(component, hookName);
