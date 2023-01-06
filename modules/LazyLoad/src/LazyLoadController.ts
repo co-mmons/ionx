@@ -83,12 +83,13 @@ export class LazyLoadController {
                         markAsError();
 
                     } else {
+                        const srcIndex = lastSrcIndex + 1;
                         let src = srcs[lastSrcIndex + 1];
                         if (typeof src === "function") {
                             try {
-                                srcs[lastSrcIndex + 1] = src = await src();
+                                srcs[srcIndex] = src = await src();
                             } catch (e) {
-                                srcs.splice(lastSrcIndex + 1, 1);
+                                srcs.splice(srcIndex, 1);
                                 onItemError({target: element, error: e})
                                 return;
                             }
@@ -135,7 +136,7 @@ export class LazyLoadController {
             }
 
             const src = target !== element ? target.getAttribute("src") : element.getAttribute("src");
-            if (src.startsWith("blob:") && src.endsWith("#lazy-revoke")) {
+            if (src && src.startsWith("blob:") && src.endsWith("#lazy-revoke")) {
                 setTimeout(() => URL.revokeObjectURL(src.replace("#lazy-revoke", "")), 5000);
             }
 
@@ -162,7 +163,7 @@ export class LazyLoadController {
             }
 
             const src = target !== element ? target.getAttribute("src") : element.getAttribute("src");
-            if (src.startsWith("blob:") && src.endsWith("#lazy-revoke")) {
+            if (src && src.startsWith("blob:") && src.endsWith("#lazy-revoke")) {
                 setTimeout(() => URL.revokeObjectURL(src.replace("#lazy-revoke", "")), 5000);
             }
         }
