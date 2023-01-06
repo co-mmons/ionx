@@ -105,7 +105,7 @@ let Toolbar = class extends HTMLElement {
     else if (this.button === "back") {
       const nav = this.element.closest("ion-nav");
       if (nav && await nav.canGoBack()) {
-        const router = document.querySelector("ion-router");
+        const router = !nav.swipeGesture && document.querySelector("ion-router");
         if (router && !nav.closest("[no-router]")) {
           const canTransition = await router.canTransition();
           if (canTransition === true) {
