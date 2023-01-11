@@ -585,7 +585,7 @@ let Overlay = class extends HTMLElement {
       return h("ion-item", null, h("ion-label", { class: "numeric-label" }, h("div", null, intl.message(`ionx/DateTimeInput#${part}`)), label && h("small", null, label)), h("div", { class: "numeric-buttons", slot: "end" }, h("ion-button", { fill: "clear", size: "small", tabindex: -1, onClick: () => this.move(part, -1) }, h("ion-icon", { slot: "icon-only", name: "remove-circle-outline" })), h("ion-button", { fill: "clear", size: "small", tabindex: -1, onClick: () => this.move(part, 1) }, h("ion-icon", { slot: "icon-only", name: "add-circle" }))), h("ion-input", { type: "number", name: part, placeholder: `${def}`, value: val, min: `${range[0]}`, max: `${range[1]}` }));
     }
     else {
-      return h("ion-item", null, h("ion-label", { position: "stacked" }, intl.message(`ionx/DateTimeInput#${part}`)), h(Select, { overlay: "modal", placeholder: this.timeZoneRequired ? "Choose..." : intl.message(unspecifiedTimeZoneSelectValue.label), value: this.timeZoneValue, lazyItems: timeZoneSelectItemsLoader(this.timeZoneRequired, this.isLocalDateTime, this.date) }));
+      return h("ion-item", null, h("ion-label", { position: "stacked" }, intl.message(`ionx/DateTimeInput#${part}`)), h(Select, { overlay: "modal", placeholder: this.timeZoneRequired ? intl.message("@co.mmons/js-intl#Choose...") : intl.message(unspecifiedTimeZoneSelectValue.label), value: this.timeZoneValue, lazyItems: timeZoneSelectItemsLoader(this.timeZoneRequired, this.isLocalDateTime, this.date) }));
     }
   }
   render() {

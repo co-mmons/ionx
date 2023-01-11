@@ -317,7 +317,7 @@ export class Overlay {
                 <ion-label position="stacked">{intl.message(`ionx/DateTimeInput#${part}`)}</ion-label>
                 <Select
                     overlay="modal"
-                    placeholder={this.timeZoneRequired ? "Choose..." : intl.message(unspecifiedTimeZoneSelectValue.label)}
+                    placeholder={this.timeZoneRequired ? intl.message("@co.mmons/js-intl#Choose...") : intl.message(unspecifiedTimeZoneSelectValue.label)}
                     value={this.timeZoneValue}
                     lazyItems={timeZoneSelectItemsLoader(this.timeZoneRequired, this.isLocalDateTime, this.date)}/>
             </ion-item>
