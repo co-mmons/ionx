@@ -12,9 +12,25 @@
         }
     }
 
-    ion-checkbox {
-        margin-right: 16px;
-        margin-left: 0px;
+    ion-checkbox[slot=start] {
+        margin: 0 16px 0 0;
+
+        &.md {
+            margin: 0 13px 0 3px;
+        }
+    }
+
+    ion-icon[slot=start] {
+        margin: 0 16px 0 0;
+
+        &.ios {
+            width: 26px;
+            height: 26px;
+        }
+
+        &.md {
+            margin-right: 10px;
+        }
     }
 
     ion-item.ionx--divider {

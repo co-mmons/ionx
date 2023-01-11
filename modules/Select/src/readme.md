@@ -28,6 +28,7 @@
 ### Depends on
 
 - ion-item
+- ion-icon
 - ion-label
 - ion-spinner
 - ion-checkbox
@@ -44,6 +45,7 @@
 ```mermaid
 graph TD;
   ionx-select-overlay --> ion-item
+  ionx-select-overlay --> ion-icon
   ionx-select-overlay --> ion-label
   ionx-select-overlay --> ion-spinner
   ionx-select-overlay --> ion-checkbox

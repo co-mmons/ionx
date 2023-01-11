@@ -381,9 +381,10 @@ export class SelectOverlay implements ComponentInterface {
             return <ion-item
                 key={`group:${item.id}`}
                 button={true}
-                detail={true}
-                detailIcon={this.expandedGroups[item.id] ? "chevron-up" : "chevron-down"}
+                detail={false}
                 onClick={() => this.toggleGroup(item as SelectGroupItem)}>
+
+                <ion-icon slot="start" name={this.expandedGroups[item.id] ? "chevron-up" : "chevron-down"}/>
 
                 <ion-label>{(label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)}</ion-label>
 
