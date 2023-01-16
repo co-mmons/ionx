@@ -76,7 +76,7 @@ let MasonryGrid = class extends HTMLElement {
             }
           }
         }
-        console.debug("[ionx-masonry-grid] queue arrange new:" + this.itemsElement.getBoundingClientRect().width + ", old:" + this.lastWidth);
+        console.debug("[ionx-masonry-grid] queue arrange new", `new width: ${this.itemsElement.getBoundingClientRect().width}`, `old width: ${this.lastWidth}`, `parent view active: ${this.isParentViewActive()}`, `paused: ${!!this.paused}`);
         this.queuedArrange = true;
         this.busy = false;
         return;
@@ -389,7 +389,7 @@ let MasonryGrid = class extends HTMLElement {
       return;
     }
     this.pauseUnlisten = addEventListener(document, "pause", () => this.viewPaused());
-    this.resumeUnlisten = addEventListener(document, "resume", () => this.viewPaused());
+    this.resumeUnlisten = addEventListener(document, "resume", () => this.viewResumed());
     this.viewDidEnterUnlisten = addEventListener(this.parentViewElement, "ionViewDidEnter", () => this.viewDidEnter());
     this.mutationObserver = new MutationObserver(mutations => this.onMutation(mutations));
     this.mutationObserver.observe(this.itemsElement, { childList: true, subtree: true, attributes: true });
