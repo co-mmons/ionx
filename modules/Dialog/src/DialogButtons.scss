@@ -19,6 +19,7 @@
             --ion-toolbar-background: var(--dialog--background-color, #ffffff);
             --ion-toolbar-background-color: var(--dialog--background-color, #000000);
             --ion-toolbar-color: var(--dialog--foreground-color, #000000);
+            padding: 0 !important;
         }
 
         ion-buttons {
