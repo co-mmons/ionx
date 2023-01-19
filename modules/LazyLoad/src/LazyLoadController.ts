@@ -1,11 +1,11 @@
 import type {Components as ionic} from "@ionic/core";
 import {Svg} from "ionx/Svg";
-import {isHydrated, waitTillHydrated} from "ionx/utils";
+import {addEventListener, EventUnlisten, isHydrated, waitTillHydrated} from "ionx/utils";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";
 import {ExtendedContent} from "./ExtendedContent";
 import {ExtendedItemElement} from "./ExtendedItemElement";
-import {realContainerElement} from "./realContainerElement";
 import {LazyLoadableCustomElement} from "./LazyLoadableCustomElement";
+import {realContainerElement} from "./realContainerElement";
 import {styleParents} from "./styleParents";
 
 const srcSupportedTagNames = ["IMG", "VIDEO", "IFRAME", Svg.toUpperCase()];
@@ -26,6 +26,8 @@ export class LazyLoadController {
     private items: HTMLCollectionOf<Element>;
 
     private errors: HTMLCollectionOf<Element>;
+
+    resumeUnlisten: EventUnlisten;
 
     private containers: {
         element: HTMLIonxLazyLoadElement,
@@ -68,7 +70,9 @@ export class LazyLoadController {
 
             } else if (options?.src) {
 
-                const srcs: Array<string | (() => Promise<string>) | (() => Promise<Blob>) | Blob> = Array.isArray(options.src) ? options.src : [options.src];
+                type UrlProvider = (() => Promise<string>) | (() => Promise<Blob>) | Blob;
+                type ProcessedUrlProvider = [provider: UrlProvider, url: string];
+                const srcs: Array<string | (() => Promise<string>) | (() => Promise<Blob>) | Blob | ProcessedUrlProvider> = Array.isArray(options.src) ? options.src : [options.src];
 
                 if (srcs.length === 0) {
                     console.warn("[ionx-lazy-load] element cannot be lazy loaded, no src given", element);
@@ -77,26 +81,36 @@ export class LazyLoadController {
                 } else {
 
                     const lastSrc = (srcSupported && element.getAttribute("src")) || element.__lazyLoadSrc || null;
-                    const lastSrcIndex = srcs.lastIndexOf(lastSrc);
+                    const lastSrcIndex = srcs.findIndex(s => Array.isArray(s) ? s[1] === lastSrc : s === lastSrc);
 
                     if (lastSrcIndex >= srcs.length - 1) {
                         markAsError();
 
                     } else {
                         const srcIndex = lastSrcIndex + 1;
-                        let src = srcs[lastSrcIndex + 1];
+                        let src: any = srcs[lastSrcIndex + 1];
+                        const provider: UrlProvider = Array.isArray(src) ? src[0] : (src instanceof Blob || typeof src === "function" ? src : undefined);
+
+                        // najpewniej ponowna próba ładowania już wcześniej ładowanego url'a, który nie był stringiem
+                        if (Array.isArray(src)) {
+                            src = provider;
+                        }
+
                         if (typeof src === "function") {
                             try {
-                                srcs[srcIndex] = src = await src();
+                                src = await src();
                             } catch (e) {
-                                srcs.splice(srcIndex, 1);
-                                onItemError({target: element, error: e})
-                                return;
+                                console.debug("[ionx-lazy-load] item provider error", e);
+                                src = `#lazy-error-${srcIndex}-${Date.now()}`;
                             }
                         }
 
                         if (src instanceof Blob) {
                             src = URL.createObjectURL(src) + "#lazy-revoke";
+                        }
+
+                        if (provider) {
+                            srcs[srcIndex] = [provider, src];
                         }
 
                         if (srcSupported) {
@@ -205,14 +219,24 @@ export class LazyLoadController {
     }
 
     async ensureLoaded(options?: {retryError?: boolean}) {
+        console.debug("[ionx-lazy-load] ensure loaded")
 
         if (options?.retryError) {
             for (const errors of [this.errors, ...this.containers.map(c => c.errors), ...this.containers.map(c => c.shadowErrors())]) {
                 if (errors) {
                     for (let i = 0; i < errors.length; i++) {
                         const item = errors[i];
+                        console.debug("[ionx-lazy-load] retry item after error", item)
+
                         item.classList.add(itemPendingCssClass);
                         item.classList.remove(itemErrorCssClass);
+                        styleParents(item, (item as ExtendedItemElement).__lazyLoadOptions?.styleParents);
+
+                        if (srcSupportedTagNames.includes(item.tagName)) {
+                            item.removeAttribute("src");
+                        } else {
+                            item["__lazyLoadSrc"] = undefined;
+                        }
                     }
                 }
             }
@@ -243,6 +267,8 @@ export class LazyLoadController {
 
         this.items = this.content.getElementsByClassName(itemPendingCssClass);
         this.errors = this.content.getElementsByClassName(itemErrorCssClass);
+
+        this.resumeUnlisten = addEventListener(document, "resume", () => this.ensureLoaded({retryError: true}));
     }
 
     disconnect() {
@@ -256,5 +282,7 @@ export class LazyLoadController {
 
         this.content.__ionxLazyLoad = undefined;
         this.content = undefined;
+
+        this.resumeUnlisten?.();
     }
 }

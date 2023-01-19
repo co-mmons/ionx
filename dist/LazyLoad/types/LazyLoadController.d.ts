@@ -1,4 +1,5 @@
 import type { Components as ionic } from "@ionic/core";
+import { EventUnlisten } from "ionx/utils";
 export declare class LazyLoadController {
   constructor(content: HTMLElement & ionic.IonContent);
   private content;
@@ -6,6 +7,7 @@ export declare class LazyLoadController {
   private mutationObserver;
   private items;
   private errors;
+  resumeUnlisten: EventUnlisten;
   private containers;
   private callback;
   private loadItem;

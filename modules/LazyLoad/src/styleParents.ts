@@ -11,9 +11,7 @@ export function styleParents(element: Element, parents: {[parentSelector: string
         if (parent) {
             const prefix = parents[parentSelector] || "";
 
-            parent.classList.remove(`${prefix}-pending`);
-
-            for (const state of ["loading", "loaded", "error"]) {
+            for (const state of ["pending", "loading", "loaded", "error"]) {
                 if (element.classList.contains(`${itemCssClassPrefix}-${state}`)) {
                     parent.classList.add(`${prefix}-${state}`);
                 } else {
