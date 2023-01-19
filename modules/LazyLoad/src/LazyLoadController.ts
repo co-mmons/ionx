@@ -235,7 +235,7 @@ export class LazyLoadController {
                         if (srcSupportedTagNames.includes(item.tagName)) {
                             item.removeAttribute("src");
                         } else {
-                            item["__lazyLoadSrc"] = undefined;
+                            delete item["__lazyLoadSrc"];
                         }
                     }
                 }
