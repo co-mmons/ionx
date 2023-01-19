@@ -226,7 +226,6 @@ export class LazyLoadController {
                 if (errors) {
                     for (let i = 0; i < errors.length; i++) {
                         const item = errors[i];
-                        console.debug("[ionx-lazy-load] retry item after error", item)
 
                         item.classList.add(itemPendingCssClass);
                         item.classList.remove(itemErrorCssClass);
