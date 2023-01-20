@@ -85,9 +85,7 @@ export class VirtualScrollerComponent implements ComponentInterface {
             this.initScroller();
             setTimeout(() => this.scroller.start());
         } else {
-            const {preserveScrollPositionOnPrependItems, state} = this;
-            const firstItemPosition = this.scroller.getItemScrollPosition(state.firstShownItemIndex);
-            console.log(firstItemPosition)
+            const {preserveScrollPositionOnPrependItems} = this;
             this.scroller.setItems(items, {preserveScrollPositionOnPrependItems});
         }
     }
