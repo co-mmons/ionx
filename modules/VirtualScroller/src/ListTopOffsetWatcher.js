@@ -18,18 +18,19 @@ const WATCH_LIST_TOP_OFFSET_MAX_DURATION = 3000
 // returns "incorrect" `top` position because the styles haven't been applied yet.
 //
 // For example, consider a page:
+//
 // <div class="page">
 //   <nav class="sidebar">...</nav>
 //   <main>...</main>
 // </div>
 //
-// The sidebar is styled as `position: fixed`, but until
-// the page styles have been applied it's gonna be a regular `<div/>`
+// The sidebar is styled as `position: fixed`, but, until
+// the page styles have been applied, it's gonna be a regular `<div/>`
 // meaning that `<main/>` will be rendered below the sidebar
-// and will appear offscreen and so it will only render the first item.
+// and will appear offscreen, and so it will only render the first item.
 //
-// Then, the page styles are loaded and applied and the sidebar
-// is now `position: fixed` so `<main/>` is now rendered at the top of the page
+// Then, the page styles are loaded and applied, and the sidebar
+// is now `position: fixed`, so `<main/>` is now rendered at the top of the page,
 // but `VirtualScroller`'s `.render()` has already been called
 // and it won't re-render until the user scrolls or the window is resized.
 //
@@ -57,69 +58,73 @@ const WATCH_LIST_TOP_OFFSET_MAX_DURATION = 3000
 // There is `IntersectionObserver` API but it doesn't exactly do that.
 //
 export default class ListTopOffsetWatcher {
-	constructor({
-		getListTopOffset,
-		onListTopOffsetChange
-	}) {
-		this.getListTopOffset = getListTopOffset
-		this.onListTopOffsetChange = onListTopOffsetChange
-	}
+    constructor({
+                    getListTopOffset,
+                    onListTopOffsetChange
+                }) {
+        this.getListTopOffset = getListTopOffset
+        this.onListTopOffsetChange = onListTopOffsetChange
+    }
 
-	onListTopOffset(listTopOffset) {
-		if (this.listTopOffsetInsideScrollableContainer === undefined) {
-			// Start periodical checks of the list's top offset
-			// in order to perform a re-layout in case it changes.
-			// See the comments in `ListTopOffsetWatcher.js` file
-			// on why can the list's top offset change, and in which circumstances.
-			this.start()
-		}
-		this.listTopOffsetInsideScrollableContainer = listTopOffset
-	}
+    onListTopOffset(listTopOffset) {
+        if (this.listTopOffsetInsideScrollableContainer === undefined) {
+            // Start periodical checks of the list's top offset
+            // in order to perform a re-layout in case it changes.
+            // See the comments in `ListTopOffsetWatcher.js` file
+            // on why can the list's top offset change, and in which circumstances.
+            this.start()
+        }
+        this.listTopOffsetInsideScrollableContainer = listTopOffset
+    }
 
-	start() {
-		this.isRendered = true
-		this.watchListTopOffset()
-	}
+    start() {
+        this._isActive = true
+        this.watchListTopOffset()
+    }
 
-	stop() {
-		this.isRendered = false
+    isStarted() {
+        return this._isActive
+    }
 
-		if (this.watchListTopOffsetTimer) {
-			clearTimeout(this.watchListTopOffsetTimer)
-			this.watchListTopOffsetTimer = undefined
-		}
-	}
+    stop() {
+        this._isActive = false
 
-	watchListTopOffset() {
-		const startedAt = Date.now()
-		const check = () => {
-			// If `VirtualScroller` has been unmounted
-			// while `setTimeout()` was waiting, then exit.
-			if (!this.isRendered) {
-				return
-			}
-			// Skip comparing `top` coordinate of the list
-			// when this function is called for the first time.
-			if (this.listTopOffsetInsideScrollableContainer !== undefined) {
-				// Calling `this.getListTopOffset()` on an element
-				// runs about 0.003 milliseconds on a modern desktop CPU,
-				// so I guess it's fine calling it twice a second.
-				if (this.getListTopOffset() !== this.listTopOffsetInsideScrollableContainer) {
-					this.onListTopOffsetChange()
-				}
-			}
-			// Compare `top` coordinate of the list twice a second
-			// to find out if it has changed as a result of loading CSS styles.
-			// The total duration of 3 seconds would be enough for any styles to load, I guess.
-			// There could be other cases changing the `top` coordinate
-			// of the list (like collapsing an "accordeon" panel above the list
-			// without scrolling the page), but those cases should be handled
-			// by manually calling `.updateLayout()` instance method on `VirtualScroller` instance.
-			if (Date.now() - startedAt < WATCH_LIST_TOP_OFFSET_MAX_DURATION) {
-				this.watchListTopOffsetTimer = setTimeout(check, WATCH_LIST_TOP_OFFSET_INTERVAL)
-			}
-		}
-		// Run the cycle.
-		check()
-	}
+        if (this.watchListTopOffsetTimer) {
+            clearTimeout(this.watchListTopOffsetTimer)
+            this.watchListTopOffsetTimer = undefined
+        }
+    }
+
+    watchListTopOffset() {
+        const startedAt = Date.now()
+        const check = () => {
+            // If `VirtualScroller` has been unmounted
+            // while `setTimeout()` was waiting, then exit.
+            if (!this._isActive) {
+                return
+            }
+            // Skip comparing `top` coordinate of the list
+            // when this function is called for the first time.
+            if (this.listTopOffsetInsideScrollableContainer !== undefined) {
+                // Calling `this.getListTopOffset()` on an element
+                // runs about 0.003 milliseconds on a modern desktop CPU,
+                // so I guess it's fine calling it twice a second.
+                if (this.getListTopOffset() !== this.listTopOffsetInsideScrollableContainer) {
+                    this.onListTopOffsetChange()
+                }
+            }
+            // Compare `top` coordinate of the list twice a second
+            // to find out if it has changed as a result of loading CSS styles.
+            // The total duration of 3 seconds would be enough for any styles to load, I guess.
+            // There could be other cases changing the `top` coordinate
+            // of the list (like collapsing an "accordeon" panel above the list
+            // without scrolling the page), but those cases should be handled
+            // by manually calling `.updateLayout()` instance method on `VirtualScroller` instance.
+            if (Date.now() - startedAt < WATCH_LIST_TOP_OFFSET_MAX_DURATION) {
+                this.watchListTopOffsetTimer = setTimeout(check, WATCH_LIST_TOP_OFFSET_INTERVAL)
+            }
+        }
+        // Run the cycle.
+        check()
+    }
 }

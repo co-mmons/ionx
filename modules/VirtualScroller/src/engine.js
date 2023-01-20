@@ -11,8 +11,8 @@ export default {
 	// Creates a `scrollableContainer`.
 	// On client side, `scrollableContainer` is always created.
 	// On server side, `scrollableContainer` is not created (and not used).
-	createScrollableContainer(scrollableContainer, getItemsContainerElement) {
-        return new ScrollableContainer(scrollableContainer, getItemsContainerElement)
+	createScrollableContainer(getScrollableContainer, getItemsContainerElement) {
+        return new ScrollableContainer(getScrollableContainer(), getItemsContainerElement)
 	},
 	watchListTopOffset({
 		getListTopOffset,

@@ -36,9 +36,9 @@ export class Page1 {
 
                     <ion-button onClick={() => this.items = [{id: 0, label: "ahahah"}].concat(this.items.slice().splice(1))}>change first item</ion-button>
 
-                    <ion-button onClick={() => this.items = this.items.slice().splice(1)}>remove first item</ion-button>
+                    <ion-button onClick={() => this.items = this.items.slice(1)}>remove first item</ion-button>
 
-                    <ion-button onClick={() => this.items = (this.items.length > 0 ? [] : new Array(1000).fill(undefined).map((_v, id)=> ({id, label: loremIpsum.substr(0, Math.random() * 400)})))}>new</ion-button>
+                    <ion-button onClick={() => this.items = (this.items.length > 10000 ? [] : new Array(1000).fill(undefined).map((_v, id)=> ({id, label: loremIpsum.substr(0, Math.random() * 400)})))}>new</ion-button>
 
                 </div>
                 <ion-list lines="full">

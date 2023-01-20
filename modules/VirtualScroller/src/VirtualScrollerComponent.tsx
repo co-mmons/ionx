@@ -1,9 +1,8 @@
 import {Component, ComponentInterface, Element, forceUpdate, h, Host, Prop, Watch} from "@stencil/core";
 import {shallowEqual} from "fast-equals";
 import {waitTillHydrated} from "ionx/utils";
-import VirtualScroller from "virtual-scroller";
+import VirtualScroller, {State} from "virtual-scroller";
 import engine from "./engine.js";
-import {VirtualScrollerState} from "./VirtualScrollerState";
 
 @Component({
     tag: "ionx-virtual-scroller",
@@ -29,46 +28,54 @@ export class VirtualScrollerComponent implements ComponentInterface {
     @Prop()
     estimatedItemHeight: number;
 
-    state: VirtualScrollerState;
-
-    prevState: VirtualScrollerState;
-
-    didUpdateState: (prevState: VirtualScrollerState) => void;
+    state: Partial<State<any>>;
 
     scroller: VirtualScroller<HTMLElement, any>;
 
-    beforeItemsHeight: number;
-
-    afterItemsHeight: number;
-
     initScroller() {
+
+        this.state = {
+            items: this.items,
+            firstShownItemIndex: 50,
+            lastShownItemIndex: 100,
+            itemHeights: new Array(this.items.length),
+            afterItemsHeight: 0,
+            beforeItemsHeight: 0,
+            itemStates: new Array(this.items.length)
+        }
 
         this.scroller = new VirtualScroller(() => this.element, this.items, {
             tbody: false,
             engine,
             scrollableContainer: this.element.closest("ion-content").shadowRoot.querySelector(".inner-scroll"),
-            getItemId: this.itemKey ? (item) => this.itemKey(item) : undefined,
-            getState: () => this.state as any,
-            setState: (state: any, callbacks?: {willUpdateState: (niu, prev) => void, didUpdateState: (prev) => void}) => {
+            getItemId: this.itemKey ? (item) => this.itemKey(item) : undefined
+        });
 
-                this.prevState = this.state;
+        this.scroller.useState({
+            getState: (): State<any> => {
+                return this.state as any;
+            },
+            updateState: (stateUpdate: Partial<State<any>>) => {
+                const prev = this.state;
+                const state = {...prev, ...stateUpdate};
+                // console.debug("%c[ionx-virtual-scroller] update state", "color: green; font-weight: bold; font-size: 120%", stateUpdate);
 
-                const newState = {...this.prevState, ...state};
+                if (prev.items !== state.items) {
+                    state.afterItemsHeight = prev.afterItemsHeight;
+                    state.beforeItemsHeight = prev.beforeItemsHeight;
+                }
 
-                if (!shallowEqual(this.prevState, newState)) {
-                    callbacks.willUpdateState(newState, this.prevState);
-                    this.didUpdateState = callbacks.didUpdateState;
-                    this.state = newState;
+                if (!shallowEqual(prev, state)) {
+                    this.state = state;
                     forceUpdate(this);
-
-                    if (!this.state.items || this.state.items.length === 0) {
-                        this.scroller.stop();
-                        this.scroller = undefined;
-                    }
                 }
             }
-        } as any);
+        })
 
+    }
+
+    componentDidRender() {
+        this.scroller?.onRender();
     }
 
     @Watch("items")
@@ -76,9 +83,11 @@ export class VirtualScrollerComponent implements ComponentInterface {
 
         if (Array.isArray(items) && items.length > 0 && !this.scroller) {
             this.initScroller();
-            setTimeout(() => this.scroller.listen());
+            setTimeout(() => this.scroller.start());
         } else {
-            const {preserveScrollPositionOnPrependItems} = this;
+            const {preserveScrollPositionOnPrependItems, state} = this;
+            const firstItemPosition = this.scroller.getItemScrollPosition(state.firstShownItemIndex);
+            console.log(firstItemPosition)
             this.scroller.setItems(items, {preserveScrollPositionOnPrependItems});
         }
     }
@@ -90,24 +99,12 @@ export class VirtualScrollerComponent implements ComponentInterface {
     }
 
     connectedCallback() {
-        this.state = {};
         this.initScroller();
     }
 
     async componentDidLoad() {
         await waitTillHydrated(this.element.closest("ion-content"));
-        setTimeout(() => this.scroller.listen());
-    }
-
-    componentDidRender() {
-
-        if (this.didUpdateState) {
-            const update = this.didUpdateState;
-            const state = this.prevState;
-            setTimeout(() => update(state));
-
-            this.didUpdateState = undefined;
-        }
+        setTimeout(() => this.scroller.start());
     }
 
     disconnectedCallback() {
@@ -115,13 +112,11 @@ export class VirtualScrollerComponent implements ComponentInterface {
     }
 
     render() {
-        console.debug("[ionx-virtual-scroller] render")
 
-        const {items, firstShownItemIndex, lastShownItemIndex, beforeItemsHeight, afterItemsHeight, itemHeights} = this.state;
+        let {items, firstShownItemIndex, lastShownItemIndex, beforeItemsHeight, afterItemsHeight} = this.state;
 
-        if (itemHeights.find(h => typeof h === "number") || items.length === 0) {
-            this.beforeItemsHeight = beforeItemsHeight;
-            this.afterItemsHeight = afterItemsHeight;
+        if (!items) {
+            items = this.items;
         }
 
         const itemsToRender: [item: any, index: number][] = [];
@@ -130,8 +125,9 @@ export class VirtualScrollerComponent implements ComponentInterface {
                 itemsToRender.push([items[i], i]);
             }
         }
+        // console.debug("%c[ionx-virtual-scroller] render", "color: magenta; font-weight: bold", firstShownItemIndex, lastShownItemIndex);
 
-        return <Host style={{display: "block", paddingTop: `${this.beforeItemsHeight}px`, paddingBottom: `${this.afterItemsHeight}px`}}>
+        return <Host style={{display: "block", paddingTop: `${beforeItemsHeight}px`, paddingBottom: `${afterItemsHeight}px`}}>
             {itemsToRender.map(item => this.renderItem(item[0], item[1]))}
         </Host>
     }
