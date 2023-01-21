@@ -16,6 +16,10 @@ export function buildSchemaWithOptions(options: {topNode?: string}, ...specs: Ma
 
     for (let spec of specs) {
 
+        if (!spec) {
+            continue;
+        }
+
         if (!(spec instanceof NodeSpecExtended || spec instanceof MarkSpecExtended)) {
             spec = new spec();
         }
