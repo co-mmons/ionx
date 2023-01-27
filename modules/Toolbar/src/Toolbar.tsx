@@ -154,7 +154,8 @@ export class Toolbar {
                 if (router && !nav.closest("[no-router]")) {
                     const canTransition = await router.canTransition();
                     if (canTransition === true) {
-                        return await router.back();
+                        // @ts-ignore
+                        return await router.back(true);
                     }
                 }
 

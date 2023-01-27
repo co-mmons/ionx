@@ -109,7 +109,8 @@ let Toolbar = class extends HTMLElement {
         if (router && !nav.closest("[no-router]")) {
           const canTransition = await router.canTransition();
           if (canTransition === true) {
-            return await router.back();
+            // @ts-ignore
+            return await router.back(true);
           }
         }
         return nav.pop({ skipIfBusy: true });

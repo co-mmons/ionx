@@ -23,7 +23,7 @@
 
 ## Methods
 
-### `back() => Promise<void>`
+### `back(ignoreGuards?: boolean) => Promise<void>`
 
 Go back to previous page in the window.history.
 

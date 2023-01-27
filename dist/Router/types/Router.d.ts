@@ -38,6 +38,7 @@ export declare class Router implements ComponentInterface {
   ionRouteDidChange: EventEmitter<RouterEventDetail>;
   componentWillLoad(): Promise<void>;
   componentDidLoad(): void;
+  private ignoreGuards;
   protected onPopState(): Promise<boolean>;
   protected onBackButton(ev: BackButtonEvent): void;
   /** @internal */
@@ -52,7 +53,7 @@ export declare class Router implements ComponentInterface {
   /**
    * Go back to previous page in the window.history.
    */
-  back(): Promise<void>;
+  back(ignoreGuards?: boolean): Promise<void>;
   /** @internal */
   printDebug(): Promise<void>;
   /** @internal */

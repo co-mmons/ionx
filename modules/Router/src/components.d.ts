@@ -11,7 +11,7 @@ export namespace Components {
         /**
           * Go back to previous page in the window.history.
          */
-        "back": () => Promise<void>;
+        "back": (ignoreGuards?: boolean) => Promise<void>;
         "canTransition": () => Promise<string | boolean>;
         "navChanged": (direction: RouterDirection) => Promise<boolean>;
         "printDebug": () => Promise<void>;

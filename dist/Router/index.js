@@ -487,6 +487,7 @@ let Router = class extends HTMLElement {
      * By default, this property is `true`, change to `false` to allow hash-less URLs.
      */
     this.useHash = true;
+    this.ignoreGuards = false;
   }
   async componentWillLoad() {
     console.debug("[ion-router] router will load");
@@ -501,13 +502,16 @@ let Router = class extends HTMLElement {
   async onPopState() {
     const direction = this.historyDirection();
     let path = this.getPath();
-    const canProceed = await this.runGuards(path);
-    if (canProceed !== true) {
-      if (typeof canProceed === "object") {
-        path = parsePath(canProceed.redirect);
+    if (!this.ignoreGuards) {
+      const canProceed = await this.runGuards(path);
+      if (canProceed !== true) {
+        if (typeof canProceed === "object") {
+          path = parsePath(canProceed.redirect);
+        }
+        return false;
       }
-      return false;
     }
+    this.ignoreGuards = false;
     console.debug("[ion-router] URL changed -> update nav", path, direction);
     return this.writeNavStateRoot(path, direction);
   }
@@ -559,7 +563,8 @@ let Router = class extends HTMLElement {
   /**
    * Go back to previous page in the window.history.
    */
-  back() {
+  back(ignoreGuards = false) {
+    this.ignoreGuards = !!ignoreGuards;
     window.history.back();
     return Promise.resolve(this.waitPromise);
   }

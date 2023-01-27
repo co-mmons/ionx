@@ -69,18 +69,23 @@ export class Router implements ComponentInterface {
         window.addEventListener("ionRouteDataChanged", debounce(this.onRoutesChanged.bind(this), 100));
     }
 
+    private ignoreGuards = false;
+
     @Listen("popstate", { target: "window" })
     protected async onPopState() {
         const direction = this.historyDirection();
         let path = this.getPath();
 
-        const canProceed = await this.runGuards(path);
-        if (canProceed !== true) {
-            if (typeof canProceed === "object") {
-                path = parsePath(canProceed.redirect);
+        if (!this.ignoreGuards) {
+            const canProceed = await this.runGuards(path);
+            if (canProceed !== true) {
+                if (typeof canProceed === "object") {
+                    path = parsePath(canProceed.redirect);
+                }
+                return false;
             }
-            return false;
         }
+        this.ignoreGuards = false;
         console.debug("[ion-router] URL changed -> update nav", path, direction);
         return this.writeNavStateRoot(path, direction);
     }
@@ -143,7 +148,8 @@ export class Router implements ComponentInterface {
      * Go back to previous page in the window.history.
      */
     @Method()
-    back(): Promise<void> {
+    back(ignoreGuards = false): Promise<void> {
+        this.ignoreGuards = !!ignoreGuards;
         window.history.back();
         return Promise.resolve(this.waitPromise);
     }
