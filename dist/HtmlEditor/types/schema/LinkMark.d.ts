@@ -15,6 +15,9 @@ export declare class LinkMark extends MarkSpecExtended {
     title: {
       default: any;
     };
+    value: {
+      default: any;
+    };
   };
   inclusive: boolean;
   parseDOM: {
@@ -23,6 +26,7 @@ export declare class LinkMark extends MarkSpecExtended {
       href: string;
       target: string;
       title: string;
+      value: any;
     };
   }[];
   toDOM(node: any): DOMOutputSpecArray;

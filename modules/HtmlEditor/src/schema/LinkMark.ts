@@ -1,3 +1,4 @@
+import {benc, unbenc} from "@appspltfrm/shared/benc";
 import {LinkScheme} from "ionx/LinkEditor";
 import {DOMOutputSpecArray} from "prosemirror-model";
 import {MarkSpecExtended} from "./MarkSpecExtended";
@@ -17,7 +18,8 @@ export class LinkMark extends MarkSpecExtended {
     attrs = {
         href: {},
         target: {default: null},
-        title: {default: null}
+        title: {default: null},
+        value: {default: null}
     }
 
     inclusive = false;
@@ -30,7 +32,8 @@ export class LinkMark extends MarkSpecExtended {
                     return {
                         href: dom.getAttribute("href"),
                         target: dom.getAttribute("target"),
-                        title: dom.getAttribute("title")
+                        title: dom.getAttribute("title"),
+                        value: unbenc(dom.getAttribute("benc:value"))
                     }
                 }
             }
@@ -38,7 +41,7 @@ export class LinkMark extends MarkSpecExtended {
     ]
 
     toDOM(node): DOMOutputSpecArray {
-        const {href, title, target} = node.attrs;
-        return ["a", {href, title, target}, 0]
+        const {href, title, target, value} = node.attrs;
+        return ["a", {href, title, target, value: value ? `benc:${benc(value)}` : undefined}, 0]
     }
 }

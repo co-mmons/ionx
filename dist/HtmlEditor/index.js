@@ -12,6 +12,7 @@ import { TextSelection, NodeSelection, EditorState } from 'prosemirror-state';
 import { findParentNode, findParentNodeOfType, findPositionOfNodeBefore, hasParentNodeOfType } from 'prosemirror-utils';
 import { defineIonxLinkEditor, showLinkEditor, loadIonxLinkEditorIntl } from 'ionx/LinkEditor';
 import { deepEqual, shallowEqual } from 'fast-equals';
+import { unbenc, benc } from './Volumes/Projekty/co.mmons/ionx/node_modules/@appspltfrm/shared/_esm2015/benc/index.js';
 import { GapCursor } from 'prosemirror-gapcursor';
 import { ReplaceAroundStep, liftTarget } from 'prosemirror-transform';
 import { undo, redo, history, undoDepth, redoDepth } from 'prosemirror-history';
@@ -259,7 +260,8 @@ class LinkMark extends MarkSpecExtended {
     this.attrs = {
       href: {},
       target: { default: null },
-      title: { default: null }
+      title: { default: null },
+      value: { default: null }
     };
     this.inclusive = false;
     this.parseDOM = [
@@ -270,7 +272,8 @@ class LinkMark extends MarkSpecExtended {
             return {
               href: dom.getAttribute("href"),
               target: dom.getAttribute("target"),
-              title: dom.getAttribute("title")
+              title: dom.getAttribute("title"),
+              value: unbenc(dom.getAttribute("benc:value"))
             };
           }
         }
@@ -279,8 +282,8 @@ class LinkMark extends MarkSpecExtended {
     this.schemes = options?.schemes;
   }
   toDOM(node) {
-    const { href, title, target } = node.attrs;
-    return ["a", { href, title, target }, 0];
+    const { href, title, target, value } = node.attrs;
+    return ["a", { href, title, target, value: value ? `benc:${benc(value)}` : undefined }, 0];
   }
 }
 
