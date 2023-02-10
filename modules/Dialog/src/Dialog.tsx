@@ -1,7 +1,6 @@
 import {HtmlString} from "@co.mmons/js-utils/core";
-import {OverlayEventDetail} from "@ionic/core";
+import {OverlayEventDetail} from "@ionic/core/components";
 import {Component, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
-import {prefetchComponent} from "ionx/utils";
 import {firstValueFrom, Subject} from "rxjs";
 import {DialogButton} from "./DialogButton";
 import {DialogOptions} from "./DialogOptions";
@@ -102,12 +101,6 @@ export class Dialog implements DialogOptions {
     @Method()
     onWillDismiss(): Promise<OverlayEventDetail<any>> {
         return this.element.closest("ion-modal").onWillDismiss();
-    }
-
-    componentDidLoad() {
-        if (this.prefetch) {
-            prefetchComponent({delay: 0},"ionx-dialog-content", "ionx-dialog-headers", "ionx-dialog-message", "ionx-dialog-buttons")
-        }
     }
 
     render() {

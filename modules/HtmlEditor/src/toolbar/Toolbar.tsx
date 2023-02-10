@@ -1,5 +1,5 @@
 import {intl, MessageRef, translate} from "@co.mmons/js-intl";
-import {createAnimation, isPlatform, popoverController} from "@ionic/core";
+import {createAnimation, isPlatform, popoverController} from "@ionic/core/components";
 import {Component, ComponentInterface, Element, forceUpdate, h, Host, Prop} from "@stencil/core";
 import {deepEqual} from "fast-equals";
 import {addEventListener, EventUnlisten} from "ionx/utils";
@@ -7,6 +7,13 @@ import {redo, redoDepth, undo, undoDepth} from "prosemirror-history";
 import {Schema} from "prosemirror-model";
 import {EditorView} from "prosemirror-view";
 import {ToolbarItem} from "./ToolbarItem";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
+
+defineButton();
+defineIcon();
+definePopover();
 
 interface Button {
     labelVisible: boolean;

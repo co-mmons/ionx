@@ -1,10 +1,10 @@
 import {Capacitor} from "@capacitor/core";
 import {intl, MessageRef} from "@co.mmons/js-intl";
 import {sleep, waitTill} from "@co.mmons/js-utils/core";
-import {isPlatform} from "@ionic/core";
+import {isPlatform} from "@ionic/core/components";
 import {Component, ComponentInterface, Element, forceUpdate, h, Host, Listen, Prop, State} from "@stencil/core";
-import {defineIonxLoading} from "ionx/Loading";
-import {defineIonxToolbar} from "ionx/Toolbar";
+import {Loading} from "ionx/Loading";
+import {Toolbar} from "ionx/Toolbar";
 import {waitTillHydrated} from "ionx/utils";
 import {findValueItem} from "./findValueItem";
 import {isEqualValue} from "./isEqualValue";
@@ -14,9 +14,33 @@ import {SelectItem} from "./SelectItem";
 import {SelectProps} from "./SelectProps";
 import {SelectValueItem} from "./SelectValueItem";
 import {ValueComparator} from "./ValueComparator";
+import {defineCustomElement as defineItem} from "@ionic/core/components/ion-item";
+import {defineCustomElement as defineLabel} from "@ionic/core/components/ion-label";
+import {defineCustomElement as defineCheckbox} from "@ionic/core/components/ion-checkbox";
+import {defineCustomElement as defineHeader} from "@ionic/core/components/ion-header";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
+import {defineCustomElement as defineSearchbar} from "@ionic/core/components/ion-searchbar";
+import {defineCustomElement as defineToolbar} from "@ionic/core/components/ion-toolbar";
+import {defineCustomElement as defineFooter} from "@ionic/core/components/ion-footer";
+import {defineCustomElement as defineContent} from "@ionic/core/components/ion-content";
+import {defineCustomElement as defineList} from "@ionic/core/components/ion-list";
+import {defineCustomElement as defineVirtualScroll} from "@ionic/core/components/ion-virtual-scroll";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
+import {defineCustomElement as defineSpinner} from "@ionic/core/components/ion-spinner";
 
-defineIonxToolbar();
-defineIonxLoading();
+defineSpinner();
+defineItem();
+defineLabel();
+defineCheckbox();
+defineHeader();
+defineButton();
+defineSearchbar();
+defineToolbar();
+defineFooter();
+defineContent();
+defineList();
+defineVirtualScroll();
+defineIcon();
 
 const indexAttribute = "ionx-select--idx";
 
@@ -413,7 +437,7 @@ export class SelectOverlay implements ComponentInterface {
             {this.useVirtualScroll && !this.didEnter && <div style={{visibility: "hidden"}}>{this.renderItem(this.items.find(o => !o.divider), 0)}</div>}
 
             {this.overlay === "modal" && <ion-header>
-                <ionx-toolbar
+                <Toolbar
                     button="close"
                     buttonHandler={() => this.cancel()}>
 
@@ -424,7 +448,7 @@ export class SelectOverlay implements ComponentInterface {
                         fill="clear"
                         onClick={() => this.ok()}>{intl.message`@co.mmons/js-intl#Done`}</ion-button>
 
-                </ionx-toolbar>
+                </Toolbar>
 
                 <ion-toolbar>
                     <ion-searchbar
@@ -438,7 +462,7 @@ export class SelectOverlay implements ComponentInterface {
 
             <ion-content scrollY={this.overlay === "modal"} scrollX={false}>
 
-                {!this.didEnter && this.overlay === "modal" && <ionx-loading type="spinner" cover={true} slot="fixed"/>}
+                {!this.didEnter && this.overlay === "modal" && <Loading type="spinner" cover={true} slot="fixed"/>}
 
                 {this.visibleItems && <ion-list lines="full">
 

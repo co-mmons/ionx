@@ -1,6 +1,6 @@
 import { HTMLElement, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { isPlatform } from '@ionic/core';
+import { isPlatform } from '@ionic/core/components';
 import tippy from 'tippy.js';
 
 class TooltipErrorPresenterImpl {

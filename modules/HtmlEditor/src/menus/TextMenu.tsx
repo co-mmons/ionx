@@ -1,5 +1,5 @@
 import {intl, MessageRef, translate} from "@co.mmons/js-intl";
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
 import {Component, Fragment, h, Prop, State} from "@stencil/core";
 import {toggleMark} from "prosemirror-commands";
 import {isMarkActive} from "../prosemirror/active";

@@ -1,5 +1,5 @@
 import {waitTill} from "@co.mmons/js-utils/core";
-import type {Components as ionic} from "@ionic/core";
+import type {Components as ionic} from "@ionic/core/components";
 import {Component, Element, h, Host, Prop} from "@stencil/core";
 import {closestElement} from "./closestElement";
 import {ExtendedContent} from "./ExtendedContent";

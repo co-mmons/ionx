@@ -1,4 +1,4 @@
-import { AnimationBuilder, BackButtonEvent, RouterDirection, RouterEventDetail } from "@ionic/core";
+import { AnimationBuilder, BackButtonEvent, RouterDirection, RouterEventDetail } from "@ionic/core/components";
 import { ComponentInterface, EventEmitter } from "@stencil/core";
 export declare class Router implements ComponentInterface {
   private previousPath;

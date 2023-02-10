@@ -1,6 +1,6 @@
 import {Capacitor} from "@capacitor/core";
 import {sleep, waitTill} from "@co.mmons/js-utils/core";
-import type {Components as ionic} from "@ionic/core";
+import type {Components as ionic} from "@ionic/core/components";
 import {Component, ComponentInterface, Element, h, Host, Listen, Method, Prop} from "@stencil/core";
 import {addEventListener, EventUnlisten, isHydrated, markAsReady, markAsUnready} from "ionx/utils";
 import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";

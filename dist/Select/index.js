@@ -1,14 +1,33 @@
 import { HTMLElement, createEvent, forceUpdate, h, Fragment, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { popoverController, modalController, isPlatform } from '@ionic/core';
+import { popoverController, modalController, isPlatform } from '@ionic/core/components';
+import { defineCustomElement } from '@ionic/core/components/ion-popover';
+import { defineCustomElement as defineCustomElement$1 } from '@ionic/core/components/ion-modal';
 import { deepEqual } from 'fast-equals';
+import { defineCustomElement as defineCustomElement$4 } from '@ionic/core/components/ion-item';
+import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-label';
+import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-reorder';
+import { defineCustomElement as defineCustomElement$6 } from '@ionic/core/components/ion-reorder-group';
+import { defineCustomElement as defineCustomElement$5 } from '@ionic/core/components/ion-spinner';
 import { prefetchComponent, waitTillHydrated } from 'ionx/utils';
 import { MessageRef, intl } from '@co.mmons/js-intl';
 import { Capacitor } from '@capacitor/core';
 import { sleep, waitTill } from '@co.mmons/js-utils/core';
-import { defineIonxLoading } from 'ionx/Loading';
-import { defineIonxToolbar } from 'ionx/Toolbar';
+import { Loading } from 'ionx/Loading';
+import { Toolbar } from 'ionx/Toolbar';
+import { defineCustomElement as defineCustomElement$7 } from '@ionic/core/components/ion-checkbox';
+import { defineCustomElement as defineCustomElement$8 } from '@ionic/core/components/ion-header';
+import { defineCustomElement as defineCustomElement$9 } from '@ionic/core/components/ion-button';
+import { defineCustomElement as defineCustomElement$a } from '@ionic/core/components/ion-searchbar';
+import { defineCustomElement as defineCustomElement$b } from '@ionic/core/components/ion-toolbar';
+import { defineCustomElement as defineCustomElement$c } from '@ionic/core/components/ion-footer';
+import { defineCustomElement as defineCustomElement$d } from '@ionic/core/components/ion-content';
+import { defineCustomElement as defineCustomElement$e } from '@ionic/core/components/ion-list';
+import { defineCustomElement as defineCustomElement$f } from '@ionic/core/components/ion-virtual-scroll';
+import { defineCustomElement as defineCustomElement$g } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
 
+defineCustomElement();
+defineCustomElement$1();
 async function showSelectOverlay(overlay, event) {
   let willDismiss;
   let didDismiss;
@@ -94,6 +113,11 @@ function valueLabel(items, value, props) {
 
 const selectComponentCss = ".sc-ionx-select-h{--select-placeholder-opacity:.5;--select-dropdown-icon-opacity:.5;--select-disabled-opacity:.5;padding:var(--select-padding-top, 0px) var(--select-padding-end, 0px) var(--select-padding-bottom, 0px) var(--select-padding-start, 0px);display:inline-block;overflow:hidden;color:var(--color);font-family:var(--ion-font-family, inherit);max-width:100%;position:relative;outline:none;cursor:pointer}.sc-ionx-select-h::-moz-focus-inner{border:0}.sc-ionx-select-h .ionx--inner.sc-ionx-select{display:flex;position:relative;align-items:center}.sc-ionx-select-h .sc-ionx-select-s>[slot=icon]{margin-right:8px}.sc-ionx-select-h .ionx--dropdown.sc-ionx-select{position:relative;width:16px;height:20px}.sc-ionx-select-h .ionx--dropdown.sc-ionx-select .ionx--dropdown-inner.sc-ionx-select{top:50%;right:0px;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--select-dropdown-icon-opacity, 0.5);pointer-events:none}.sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-select-h .ionx--text.ionx--placeholder-visible.sc-ionx-select{opacity:var(--select-placeholder-opacity, 0.5)}.ionx--disabled.sc-ionx-select-h{opacity:var(--select-disabled-opacity, 0.5);pointer-events:none}.ionx--readonly.sc-ionx-select-h{opacity:1;pointer-events:none}.ionx--readonly.sc-ionx-select-h .select-icon.sc-ionx-select{display:none}[white-space-normal].sc-ionx-select-h .ionx--text.sc-ionx-select,[ionx--white-space=normal].sc-ionx-select-h .ionx--text.sc-ionx-select{white-space:normal !important;overflow:auto}.in-item.sc-ionx-select-h{position:static}.sc-ionx-select-h ion-reorder-group.sc-ionx-select{overflow:hidden}.sc-ionx-select-h ion-item.sc-ionx-select{--padding-start:0;--padding-end:0;--inner-padding-start:0;--inner-padding-end:0}.sc-ionx-select-h ion-item.sc-ionx-select:last-child{--inner-border-width:0}.sc-ionx-select-h ion-item.sc-ionx-select ion-reorder.sc-ionx-select{margin-right:0}ion-toolbar.sc-ionx-select-h,ion-toolbar .sc-ionx-select-h{color:var(--ion-toolbar-color);--icon-color:var(--ion-toolbar-color);--select-padding-start:16px;--select-padding-end:16px}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{align-self:flex-start;--select-padding-top:8px;--select-padding-bottom:8px;--select-padding-start:0px}ionx-form-field.sc-ionx-select-h .ionx--text.sc-ionx-select,ionx-form-field .sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked.sc-ionx-select-h .ionx--text.sc-ionx-select,.item-label-stacked .sc-ionx-select-h .ionx--text.sc-ionx-select{max-width:calc(100% - 16px);flex:initial}[slot-container=default]>.sc-ionx-select-h,.item-label-stacked.sc-ionx-select-h,.item-label-stacked .sc-ionx-select-h{width:100%}[slot-container=default]>.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked.sc-ionx-select-h ion-reorder-group.sc-ionx-select,.item-label-stacked .sc-ionx-select-h ion-reorder-group.sc-ionx-select{width:100%}ionx-form-field.sc-ionx-select-h,ionx-form-field .sc-ionx-select-h{--select-padding-start:16px;--select-padding-end:16px}";
 
+defineCustomElement$2();
+defineCustomElement$3();
+defineCustomElement$4();
+defineCustomElement$5();
+defineCustomElement$6();
 let instanceCounter = 0;
 let SelectComponent = class extends HTMLElement {
   constructor() {
@@ -332,8 +356,19 @@ let SelectComponent = class extends HTMLElement {
 
 const selectOverlayCss = ".sc-ionx-select-overlay-h{display:block}.sc-ionx-select-overlay-h ion-list.sc-ionx-select-overlay{margin:4px 0px;padding:0px}.sc-ionx-select-overlay-h ion-item.sc-ionx-select-overlay:last-child{--border-width:0px}.sc-ionx-select-overlay-h ion-checkbox[slot=start].sc-ionx-select-overlay{margin:0 16px 0 0}.sc-ionx-select-overlay-h ion-checkbox[slot=start].md.sc-ionx-select-overlay{margin:0 13px 0 3px}.sc-ionx-select-overlay-h ion-icon[slot=start].sc-ionx-select-overlay{margin:0 16px 0 0}.sc-ionx-select-overlay-h ion-icon[slot=start].ios.sc-ionx-select-overlay{width:26px;height:26px}.sc-ionx-select-overlay-h ion-icon[slot=start].md.sc-ionx-select-overlay{margin-right:10px}.sc-ionx-select-overlay-h ion-item.ionx--divider.sc-ionx-select-overlay ion-label.sc-ionx-select-overlay{margin-top:32px;font-weight:500;font-size:small}ion-popover.sc-ionx-select-overlay-h ion-content.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-content.sc-ionx-select-overlay{--overflow:initial !important;height:auto !important;contain:content}ion-popover.sc-ionx-select-overlay-h ion-content.sc-ionx-select-overlay ion-item.sc-ionx-select-overlay ion-label.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-content.sc-ionx-select-overlay ion-item.sc-ionx-select-overlay ion-label.sc-ionx-select-overlay{white-space:normal}ion-popover.sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay{position:sticky;bottom:0px}ion-popover.sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay ion-toolbar.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay ion-toolbar.sc-ionx-select-overlay{--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px}ion-popover.sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay div.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay div.sc-ionx-select-overlay{flex:1;display:flex}ion-popover.sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay{min-height:44px;margin:0px}ion-popover.sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay:not(:last-child),ion-popover .sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay:not(:last-child){font-weight:400}ion-popover.sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay:last-child,ion-popover .sc-ionx-select-overlay-h ion-footer.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay:last-child{font-weight:500}ion-popover.sc-ionx-select-overlay-h ion-footer.md.sc-ionx-select-overlay div.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-footer.md.sc-ionx-select-overlay div.sc-ionx-select-overlay{justify-content:flex-end}ion-popover.sc-ionx-select-overlay-h ion-footer.md.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-footer.md.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay{flex:none !important}ion-popover.sc-ionx-select-overlay-h ion-footer.ios.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay,ion-popover .sc-ionx-select-overlay-h ion-footer.ios.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay{width:50%}ion-popover.sc-ionx-select-overlay-h ion-footer.ios.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay:not(:first-child),ion-popover .sc-ionx-select-overlay-h ion-footer.ios.sc-ionx-select-overlay ion-button.sc-ionx-select-overlay:not(:first-child){border-left:var(--ionx-border-width) solid var(--ion-border-color)}";
 
-defineIonxToolbar();
-defineIonxLoading();
+defineCustomElement$5();
+defineCustomElement$4();
+defineCustomElement$3();
+defineCustomElement$7();
+defineCustomElement$8();
+defineCustomElement$9();
+defineCustomElement$a();
+defineCustomElement$b();
+defineCustomElement$c();
+defineCustomElement$d();
+defineCustomElement$e();
+defineCustomElement$f();
+defineCustomElement$g();
 const indexAttribute = "ionx-select--idx";
 let SelectOverlay = class extends HTMLElement {
   constructor() {
@@ -574,14 +609,13 @@ let SelectOverlay = class extends HTMLElement {
       return;
     }
     const label = item.overlayLabel ?? item.label;
-    // detailIcon={this.expandedGroups[item.id] ? "chevron-up" : "chevron-down"}
     if (item.group) {
       return h("ion-item", { key: `group:${item.id}`, button: true, detail: false, onClick: () => this.toggleGroup(item) }, h("ion-icon", { slot: "start", name: this.expandedGroups[item.id] ? "chevron-up" : "chevron-down" }), h("ion-label", null, (label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)), this.loadingGroups[item.id] && h("ion-spinner", { name: "dots", slot: "end" }));
     }
     return h("ion-item", { key: index, ...{ [indexAttribute]: index }, class: { "ionx--divider": item.divider } }, !item.divider && h("ion-checkbox", { class: "sc-ionx-select-overlay", slot: "start", checked: this.values.findIndex(v => isEqualValue(v, item.value, this.comparator)) > -1, onClick: ev => this.onClick(ev, item) }), h("ion-label", null, (label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)));
   }
   render() {
-    return h(Host, null, this.useVirtualScroll && !this.didEnter && h("div", { style: { visibility: "hidden" } }, this.renderItem(this.items.find(o => !o.divider), 0)), this.overlay === "modal" && h("ion-header", null, h("ionx-toolbar", { button: "close", buttonHandler: () => this.cancel() }, h("span", { slot: "title" }, this.overlayTitle), h("ion-button", { slot: "action", fill: "clear", onClick: () => this.ok() }, intl.message `@co.mmons/js-intl#Done`)), h("ion-toolbar", null, h("ion-searchbar", { type: "text", autocomplete: "off", placeholder: intl.message `@co.mmons/js-intl#Search`, onIonChange: ev => this.search(ev) }))), h("ion-content", { scrollY: this.overlay === "modal", scrollX: false }, !this.didEnter && this.overlay === "modal" && h("ionx-loading", { type: "spinner", cover: true, slot: "fixed" }), this.visibleItems && h("ion-list", { lines: "full" }, this.useVirtualScroll && h("ion-virtual-scroll", { items: this.visibleItems, approxItemHeight: this.virtualItemHeight, renderItem: (item, index) => this.renderItem(item, index) }), (this.overlay === "popover" || !this.useVirtualScroll) && this.visibleItems.map((item, index) => this.renderItem(item, index)))), this.multiple && this.overlay === "popover" && h("ion-footer", null, h("ion-toolbar", null, h("div", null, h("ion-button", { size: "small", fill: "clear", onClick: () => this.cancel() }, intl.message `@co.mmons/js-intl#Cancel`), h("ion-button", { size: "small", fill: "clear", onClick: () => this.ok() }, intl.message `@co.mmons/js-intl#Ok`)))));
+    return h(Host, null, this.useVirtualScroll && !this.didEnter && h("div", { style: { visibility: "hidden" } }, this.renderItem(this.items.find(o => !o.divider), 0)), this.overlay === "modal" && h("ion-header", null, h(Toolbar, { button: "close", buttonHandler: () => this.cancel() }, h("span", { slot: "title" }, this.overlayTitle), h("ion-button", { slot: "action", fill: "clear", onClick: () => this.ok() }, intl.message `@co.mmons/js-intl#Done`)), h("ion-toolbar", null, h("ion-searchbar", { type: "text", autocomplete: "off", placeholder: intl.message `@co.mmons/js-intl#Search`, onIonChange: ev => this.search(ev) }))), h("ion-content", { scrollY: this.overlay === "modal", scrollX: false }, !this.didEnter && this.overlay === "modal" && h(Loading, { type: "spinner", cover: true, slot: "fixed" }), this.visibleItems && h("ion-list", { lines: "full" }, this.useVirtualScroll && h("ion-virtual-scroll", { items: this.visibleItems, approxItemHeight: this.virtualItemHeight, renderItem: (item, index) => this.renderItem(item, index) }), (this.overlay === "popover" || !this.useVirtualScroll) && this.visibleItems.map((item, index) => this.renderItem(item, index)))), this.multiple && this.overlay === "popover" && h("ion-footer", null, h("ion-toolbar", null, h("div", null, h("ion-button", { size: "small", fill: "clear", onClick: () => this.cancel() }, intl.message `@co.mmons/js-intl#Cancel`), h("ion-button", { size: "small", fill: "clear", onClick: () => this.ok() }, intl.message `@co.mmons/js-intl#Ok`)))));
   }
   get element() { return this; }
   static get style() { return selectOverlayCss; }

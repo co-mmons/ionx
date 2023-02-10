@@ -1,4 +1,4 @@
-import type { Components as ionic } from "@ionic/core";
+import type { Components as ionic } from "@ionic/core/components";
 import { EventUnlisten } from "ionx/utils";
 import { WidthBreakpointsContainer } from "ionx/WidthBreakpoints";
 import { ToolbarButtonType } from "./ToolbarButtonType";

@@ -7,7 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { HtmlString } from "@co.mmons/js-utils/core";
 import { DialogButton } from "./DialogButton";
-import { OverlayEventDetail } from "@ionic/core";
+import { OverlayEventDetail } from "@ionic/core/components";
 import { DialogValue } from "./DialogValue";
 export namespace Components {
     interface IonxDialog {
@@ -56,7 +56,6 @@ export namespace Components {
     interface IonxDialogButtons {
         "buttonClicked": (button: DialogButton) => Promise<void>;
         "buttons": DialogButton[];
-        "prefetch": boolean;
     }
     interface IonxDialogContent {
     }
@@ -146,7 +145,6 @@ declare namespace LocalJSX {
     }
     interface IonxDialogButtons {
         "buttons": DialogButton[];
-        "prefetch"?: boolean;
     }
     interface IonxDialogContent {
     }

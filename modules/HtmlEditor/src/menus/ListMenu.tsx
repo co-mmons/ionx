@@ -1,5 +1,5 @@
 import {intl} from "@co.mmons/js-intl";
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
 import {Component, Fragment, h, Prop} from "@stencil/core";
 import {findParentNode} from "prosemirror-utils";
 import {Command} from "../prosemirror/command";

@@ -1,12 +1,23 @@
 import {waitTill} from "@co.mmons/js-utils/core";
-import type {Components as ionic} from "@ionic/core";
-import {getMode} from "@ionic/core";
+import type {Components as ionic} from "@ionic/core/components";
+import {getMode} from "@ionic/core/components";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
 import {openUrl} from "ionx/Router";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
 import {ToolbarButtonType} from "./ToolbarButtonType";
 import {ToolbarTitleWrap} from "./ToolbarTitleWrap";
+import {defineCustomElement as defineToolbar} from "@ionic/core/components/ion-toolbar";
+import {defineCustomElement as defineMenuButton} from "@ionic/core/components/ion-menu-button";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
+import {defineCustomElement as defineButtons} from "@ionic/core/components/ion-buttons";
+
+defineToolbar();
+defineMenuButton();
+defineButton();
+defineIcon();
+defineButtons();
 
 @Component({
     tag: "ionx-toolbar",

@@ -1,4 +1,4 @@
-import type {Components as ionic} from "@ionic/core";
+import type {Components as ionic} from "@ionic/core/components";
 import {deepEqual} from "fast-equals";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";
 import {ensureLazyLoad} from "./ensureLazyLoad";

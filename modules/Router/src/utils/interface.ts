@@ -1,4 +1,4 @@
-import {AnimationBuilder, ComponentProps} from "@ionic/core";
+import {AnimationBuilder, ComponentProps} from "@ionic/core/components";
 import type {NavigationHookCallback} from "@ionic/core/dist/types/components/route/route-interface";
 
 export interface HTMLStencilElement extends HTMLElement {

@@ -1,8 +1,18 @@
-import {modalController} from "@ionic/core";
+import {modalController} from "@ionic/core/components";
+import {defineCustomElement as defineFooter} from "@ionic/core/components/ion-footer";
+import {defineCustomElement as defineToolbar} from "@ionic/core/components/ion-toolbar";
+import {defineCustomElement as defineButtons} from "@ionic/core/components/ion-buttons";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
 import {Component, Element, h, Host, Method, Prop} from "@stencil/core";
-import {prefetchComponent} from "ionx/utils";
 import {DialogButton} from "./DialogButton";
 import {DialogValue, dialogValueAttribute} from "./DialogValue";
+
+defineFooter();
+defineToolbar();
+defineButton();
+defineButtons();
+defineIcon();
 
 @Component({
     tag: "ionx-dialog-buttons",
@@ -16,12 +26,6 @@ export class DialogButtons {
 
     @Prop()
     buttons!: DialogButton[];
-
-    /**
-     * @internal
-     */
-    @Prop()
-    prefetch: boolean;
 
     @Method()
     async buttonClicked(button: DialogButton) {
@@ -70,17 +74,7 @@ export class DialogButtons {
         }
     }
 
-    componentDidLoad() {
-        if (this.prefetch) {
-            prefetchComponent({delay: 0}, "ion-footer", "ion-toolbar", "ion-buttons", "ion-button", "ion-icon")
-        }
-    }
-
     render() {
-
-        if (this.prefetch) {
-            return;
-        }
 
         return <Host>
             <ion-footer>

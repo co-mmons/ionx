@@ -1,10 +1,16 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { modalController } from '@ionic/core';
-import { prefetchComponent } from 'ionx/utils';
+import { modalController } from '@ionic/core/components';
+import { defineCustomElement } from '@ionic/core/components/ion-modal';
 import { Subject, firstValueFrom } from 'rxjs';
+import { defineCustomElement as defineCustomElement$1 } from '@ionic/core/components/ion-footer';
+import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-toolbar';
+import { defineCustomElement as defineCustomElement$4 } from '@ionic/core/components/ion-buttons';
+import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-button';
+import { defineCustomElement as defineCustomElement$5 } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
 import { HtmlString } from '@co.mmons/js-utils/core';
 
+defineCustomElement();
 async function showDialog(options) {
   const modal = await modalController.create(Object.assign({}, options, {
     component: "ionx-dialog",
@@ -67,11 +73,6 @@ let Dialog = class extends HTMLElement {
   onWillDismiss() {
     return this.element.closest("ion-modal").onWillDismiss();
   }
-  componentDidLoad() {
-    if (this.prefetch) {
-      prefetchComponent({ delay: 0 }, "ionx-dialog-content", "ionx-dialog-headers", "ionx-dialog-message", "ionx-dialog-buttons");
-    }
-  }
   render() {
     if (this.prefetch) {
       return;
@@ -86,6 +87,11 @@ _Dialog_didEnter = new WeakMap();
 
 const dialogButtonsCss = ".sc-ionx-dialog-buttons-h{--dialog--border-color:var(--dialog-border-color, var(--ion-border-color));display:block}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons{--border-color:var(--dialog--border-color)}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-toolbar.sc-ionx-dialog-buttons{--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px;--ion-toolbar-background:var(--dialog--background-color, #ffffff);--ion-toolbar-background-color:var(--dialog--background-color, #000000);--ion-toolbar-color:var(--dialog--foreground-color, #000000);padding:0 !important}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-buttons.sc-ionx-dialog-buttons{justify-content:var(--dialog-buttons-align, flex-end)}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons{min-height:44px;margin:0px}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons:not(:last-child){font-weight:400}.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons:last-child{font-weight:500}.md.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-toolbar.sc-ionx-dialog-buttons,.md .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-toolbar.sc-ionx-dialog-buttons{--padding-bottom:8px;--padding-end:8px}.md.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons::before,.md .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons::before{display:none}.md.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons,.md .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons{flex:none !important}.ios.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons,.ios .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons{flex:1}.ios.sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons:not(:first-child),.ios .sc-ionx-dialog-buttons-h ion-footer.sc-ionx-dialog-buttons ion-button.sc-ionx-dialog-buttons:not(:first-child){border-left:var(--ionx-border-width) solid var(--dialog--border-color)}";
 
+defineCustomElement$1();
+defineCustomElement$2();
+defineCustomElement$3();
+defineCustomElement$4();
+defineCustomElement$5();
 let DialogButtons = class extends HTMLElement {
   constructor() {
     super();
@@ -129,15 +135,7 @@ let DialogButtons = class extends HTMLElement {
       modalController.dismiss(button.role !== "cancel" ? value : undefined, button.role);
     }
   }
-  componentDidLoad() {
-    if (this.prefetch) {
-      prefetchComponent({ delay: 0 }, "ion-footer", "ion-toolbar", "ion-buttons", "ion-button", "ion-icon");
-    }
-  }
   render() {
-    if (this.prefetch) {
-      return;
-    }
     return h(Host, null, h("ion-footer", null, h("ion-toolbar", null, h("ion-buttons", null, h("slot", null), this.buttons.map(button => h("ion-button", { fill: "clear", style: { flex: `${button.flex}` || "1" }, color: button.color || "primary", size: button.size || "default", onClick: () => this.buttonClicked(button) }, button.label && h("span", null, button.label), button.icon && h("ion-icon", { icon: button.icon, slot: button.label ? "start" : "icon-only" })))))));
   }
   get element() { return this; }
@@ -187,7 +185,7 @@ let DialogMessage = class extends HTMLElement {
 };
 
 const IonxDialog = /*@__PURE__*/proxyCustomElement(Dialog, [0,"ionx-dialog",{"header":[1],"subheader":[1],"component":[1],"componentProps":[16],"message":[1],"messageComponent":[1,"message-component"],"messageComponentProps":[16],"buttons":[16],"prefetch":[4]},[[0,"ionViewDidEnter","ionDidEnter"]]]);
-const IonxDialogButtons = /*@__PURE__*/proxyCustomElement(DialogButtons, [6,"ionx-dialog-buttons",{"buttons":[16],"prefetch":[4]}]);
+const IonxDialogButtons = /*@__PURE__*/proxyCustomElement(DialogButtons, [6,"ionx-dialog-buttons",{"buttons":[16]}]);
 const IonxDialogContent = /*@__PURE__*/proxyCustomElement(DialogContent, [1,"ionx-dialog-content"]);
 const IonxDialogHeaders = /*@__PURE__*/proxyCustomElement(DialogHeaders, [1,"ionx-dialog-headers",{"header":[1],"subheader":[1]}]);
 const IonxDialogMessage = /*@__PURE__*/proxyCustomElement(DialogMessage, [1,"ionx-dialog-message",{"message":[1]}]);
@@ -206,5 +204,6 @@ const defineIonxDialog = (opts) => {
     });
   }
 };
+defineIonxDialog();
 
 export { IonxDialog, IonxDialogButtons, IonxDialogContent, IonxDialogHeaders, IonxDialogMessage, defineIonxDialog, dialogValueAttribute, markAsDialogValue, showDialog };

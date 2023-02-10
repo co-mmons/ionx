@@ -1,5 +1,8 @@
-import {modalController, ModalOptions} from "@ionic/core";
+import {modalController, ModalOptions} from "@ionic/core/components";
+import {defineCustomElement as defineModal} from "@ionic/core/components/ion-modal";
 import {DialogOptions} from "./DialogOptions";
+
+defineModal();
 
 export async function showDialog(options: DialogOptions & Exclude<Partial<ModalOptions>, "component" | "componentProps">) {
 

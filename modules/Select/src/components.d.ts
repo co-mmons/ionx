@@ -10,7 +10,7 @@ import { ValueComparator } from "./ValueComparator";
 import { SelectItem } from "./SelectItem";
 import { SelectLazyGroupItem } from "./SelectGroupItem";
 import { FunctionalComponent } from "@stencil/core";
-import { StyleEventDetail } from "@ionic/core";
+import { StyleEventDetail } from "@ionic/core/components";
 import { SelectValueItem } from "./SelectValueItem";
 import { SelectDividerItem } from "./SelectDividerItem";
 export namespace Components {

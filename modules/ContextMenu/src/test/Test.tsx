@@ -18,7 +18,8 @@ export class Test {
             <ion-app>
                 <ion-content>
                     <ion-button onClick={ev => showContextMenu(ev,[
-                        {label: "oalala", handler: () => alert("yeeee"), iconName: "reload"}
+                        {label: "oalala", handler: () => alert("yeeee"), iconName: "reload"},
+                        {label: "test 2", handler: () => alert("yeeee22"), iconName: "glob"}
                     ])}>open</ion-button>
                 </ion-content>
             </ion-app>

@@ -1,4 +1,4 @@
-import {AnimationBuilder, BackButtonEvent, RouterDirection, RouterEventDetail} from "@ionic/core";
+import {AnimationBuilder, BackButtonEvent, RouterDirection, RouterEventDetail} from "@ionic/core/components";
 import {debounce} from "./utils/debounce";
 import {Component, ComponentInterface, Element, Event, EventEmitter, Listen, Method, Prop} from "@stencil/core";
 

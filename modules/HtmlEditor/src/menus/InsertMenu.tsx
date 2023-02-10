@@ -1,5 +1,5 @@
 import {intl, MessageRef, translate} from "@co.mmons/js-intl";
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
 import {Component, ComponentInterface, h, Prop} from "@stencil/core";
 import {InsertMenuItem} from "./InsertMenuItem";
 

@@ -20,8 +20,11 @@ import { undoInputRule } from 'prosemirror-inputrules';
 import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { keymap } from 'prosemirror-keymap';
 import { EditorView } from 'prosemirror-view';
-import { popoverController, isPlatform, createAnimation } from '@ionic/core';
+import { popoverController, isPlatform, createAnimation } from '@ionic/core/components';
 import { addEventListener } from 'ionx/utils';
+import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-popover';
+import { defineCustomElement } from '@ionic/core/components/ion-button';
+import { defineCustomElement as defineCustomElement$1 } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
 
 class MarkSpecExtended {
 }
@@ -2306,6 +2309,9 @@ let TextMenu = class extends HTMLElement$1 {
 
 const toolbarCss = ".sc-ionx-html-editor-toolbar-h{outline:none;display:flex;justify-content:center;flex-wrap:wrap;position:sticky;position:-webkit-sticky;top:0;background-color:var(--background);z-index:1;padding:8px 0}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar{margin:0 4px;--padding-end:4px;--padding-start:4px}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar:not(.button-outline){border:1px solid transparent}.sc-ionx-html-editor-toolbar-h ion-button.button-outline.sc-ionx-html-editor-toolbar{--border-width:1px}.sc-ionx-html-editor-toolbar-h ion-icon[slot=end].sc-ionx-html-editor-toolbar{margin:0;font-size:1em}.sc-ionx-html-editor-toolbar-h ion-button[disabled].sc-ionx-html-editor-toolbar{opacity:0.5}.sc-ionx-html-editor-toolbar-h [ionx--buttons-group].sc-ionx-html-editor-toolbar{display:flex}.sc-ionx-html-editor-toolbar-h .buttons-group.sc-ionx-html-editor-toolbar ion-button.sc-ionx-html-editor-toolbar:not(:last-child){margin-right:0}.ion-focused.sc-ionx-html-editor-toolbar-h,.ion-focused .sc-ionx-html-editor-toolbar-h{background-color:var(--background-focused)}";
 
+defineCustomElement();
+defineCustomElement$1();
+defineCustomElement$2();
 let Toolbar = class extends HTMLElement$1 {
   constructor() {
     super();

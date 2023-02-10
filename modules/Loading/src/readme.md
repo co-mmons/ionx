@@ -45,23 +45,6 @@ Type: `Promise<void>`
 | `--loading-backdrop-opacity` | numeric value, from 0 to 1. By default 0.8.                            |
 
 
-## Dependencies
-
-### Depends on
-
-- ion-spinner
-- ion-text
-- ion-progress-bar
-
-### Graph
-```mermaid
-graph TD;
-  ionx-loading --> ion-spinner
-  ionx-loading --> ion-text
-  ionx-loading --> ion-progress-bar
-  style ionx-loading fill:#f9f,stroke:#333,stroke-width:4px
-```
-
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

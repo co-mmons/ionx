@@ -1,6 +1,9 @@
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
 import {LoadingOptions} from "./LoadingOptions";
 import {LoadingProxy} from "./LoadingProxy";
+
+definePopover();
 
 export async function showLoadingOverlay(options?: LoadingOptions) {
 

@@ -81,9 +81,6 @@ Type: `Promise<void>`
 ```mermaid
 graph TD;
   ionx-html-editor --> ionx-html-editor-toolbar
-  ionx-html-editor-toolbar --> ion-button
-  ionx-html-editor-toolbar --> ion-icon
-  ion-button --> ion-ripple-effect
   style ionx-html-editor fill:#f9f,stroke:#333,stroke-width:4px
 ```
 

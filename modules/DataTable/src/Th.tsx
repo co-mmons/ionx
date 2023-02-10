@@ -1,13 +1,15 @@
 import {toString} from "@co.mmons/js-utils/core";
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
 import {Component, Element, h, Host, Prop, State} from "@stencil/core";
 import {defineIonxSelect, SelectOption, showSelectOverlay} from "ionx/Select";
 import {DataTableColumnFilterOptions} from "./DataTableColumnFilterOptions";
 import {Filter} from "./filter/Filter";
 import {HasOneOfFilter} from "./filter/HasOneOfFilter";
 import {MatchStringFilter} from "./filter/MatchStringFilter";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
 
 defineIonxSelect();
+definePopover();
 
 @Component({
     tag: "ionx-data-table-th",

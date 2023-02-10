@@ -1,6 +1,17 @@
 import {intl} from "@co.mmons/js-intl";
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
+import {defineCustomElement as defineSearchbar} from "@ionic/core/components/ion-searchbar";
+import {defineCustomElement as defineFooter} from "@ionic/core/components/ion-footer";
+import {defineCustomElement as defineToolbar} from "@ionic/core/components/ion-toolbar";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
 import {Component, Element, h, Host, Listen, Prop} from "@stencil/core";
+
+definePopover();
+defineSearchbar();
+defineFooter();
+defineToolbar();
+defineButton();
 
 @Component({
     tag: "ionx-data-table-search-filter",

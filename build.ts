@@ -10,7 +10,7 @@ const modules = [
     "forms/TooltipErrorPresenter",
 
     "Loading",
-    ["Toolbar", ["WidthBreakpoints"]],
+    ["Toolbar", ["WidthBreakpoints", "Router"]],
 
     "Dialog",
     "ContextMenu",
@@ -23,7 +23,7 @@ const modules = [
     "ExpandingSearchbar",
     "Input",
     "InputGroup",
-    "LazyLoad",
+    ["LazyLoad", ["Svg"]],
     "LoadingSkeleton",
     ["MasonryGrid", ["WidthBreakpoints"]],
     "Router",

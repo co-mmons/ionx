@@ -1,5 +1,24 @@
-import {ItemReorderEventDetail, StyleEventDetail} from "@ionic/core";
-import {Component, Element, Event, EventEmitter, forceUpdate, Fragment, FunctionalComponent, h, Host, Listen, Method, Prop, Watch} from "@stencil/core";
+import {ItemReorderEventDetail, StyleEventDetail} from "@ionic/core/components";
+import {defineCustomElement as defineItem} from "@ionic/core/components/ion-item";
+import {defineCustomElement as defineLabel} from "@ionic/core/components/ion-label";
+import {defineCustomElement as defineReorder} from "@ionic/core/components/ion-reorder";
+import {defineCustomElement as defineReorderGroup} from "@ionic/core/components/ion-reorder-group";
+import {defineCustomElement as defineSpinner} from "@ionic/core/components/ion-spinner";
+import {
+    Component,
+    Element,
+    Event,
+    EventEmitter,
+    forceUpdate,
+    Fragment,
+    FunctionalComponent,
+    h,
+    Host,
+    Listen,
+    Method,
+    Prop,
+    Watch
+} from "@stencil/core";
 import {deepEqual} from "fast-equals";
 import {prefetchComponent} from "ionx/utils";
 import {findValueItem} from "./findValueItem";
@@ -11,6 +30,12 @@ import {SelectValueItem} from "./SelectValueItem";
 import {showSelectOverlay} from "./showSelectOverlay";
 import {ValueComparator} from "./ValueComparator";
 import {valueLabel} from "./valueLabel";
+
+defineReorder();
+defineLabel();
+defineItem();
+defineSpinner();
+defineReorderGroup();
 
 let instanceCounter = 0;
 

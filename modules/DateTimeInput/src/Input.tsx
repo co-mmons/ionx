@@ -1,6 +1,9 @@
 import {intl} from "@co.mmons/js-intl";
 import {LocalDate, NoTimeDate, sleep, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
-import {popoverController, StyleEventDetail} from "@ionic/core";
+import {popoverController, StyleEventDetail} from "@ionic/core/components";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {currentTimeZone} from "./currentTimeZone";
@@ -11,6 +14,10 @@ import {defaultDateTimeFormat, onlyDateDefaultFormat, onlyDateForceFormat} from 
 import {isDateOnlyType} from "./isDateOnlyType";
 import {isDateTimeType} from "./isDateTimeType";
 import {isLocalDateTimeType} from "./isLocaleDateTimeType";
+
+definePopover();
+defineIcon();
+defineButton();
 
 @Component({
     tag: "ionx-date-time-input",

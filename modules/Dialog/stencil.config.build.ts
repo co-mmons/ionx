@@ -13,6 +13,7 @@ export const config: Config = {
             dir: "../../dist/Dialog",
             includeGlobalScripts: false,
             defineFunctionName: "defineIonxDialog",
+            autoDefineCustomElements: true,
             external: [
                 ...defaultExternals,
                 /ionx\/(?!modules\/Dialog)/

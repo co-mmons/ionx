@@ -1,5 +1,5 @@
 import {intl} from "@co.mmons/js-intl";
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
 import {Component, h, Prop} from "@stencil/core";
 import {defineIonxLinkEditor, showLinkEditor} from "ionx/LinkEditor";
 import {toggleMark} from "prosemirror-commands";

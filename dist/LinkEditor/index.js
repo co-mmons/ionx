@@ -3,7 +3,7 @@ export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client'
 import { MessageRef, intl, setGlobalValues, translate } from '@co.mmons/js-intl';
 import { Enum } from '@co.mmons/js-utils/core';
 import { FormValidationError, validEmail, FormController, required, Form, FormField } from 'ionx/forms';
-import { createAnimation } from '@ionic/core';
+import { createAnimation } from '@ionic/core/components';
 import { defineIonxDialog, showDialog } from 'ionx/Dialog';
 import { deepEqual } from 'fast-equals';
 import { TooltipErrorPresenter } from 'ionx/forms/TooltipErrorPresenter';
@@ -332,6 +332,7 @@ let LinkEditor = class extends HTMLElement {
     data.onStateChange(({ value }) => {
       if (value) {
         const link = __classPrivateFieldGet(this, _LinkEditor_buildLink, "f").call(this);
+        console.log(link, this.value);
         if (!deepEqual(link, this.value)) {
           this.value = link;
           this.ionChange.emit({ value: link });

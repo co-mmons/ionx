@@ -1,6 +1,13 @@
 import {intl} from "@co.mmons/js-intl";
 import {Component, Element, h, Host, Method, Prop} from "@stencil/core";
 import {LoadingOptions} from "./LoadingOptions";
+import {defineCustomElement as defineSpinner} from "@ionic/core/components/ion-spinner";
+import {defineCustomElement as defineText} from "@ionic/core/components/ion-text";
+import {defineCustomElement as defineProgressBar} from "@ionic/core/components/ion-progress-bar";
+
+defineSpinner();
+defineText();
+defineProgressBar();
 
 /**
  * Very customizable loading indicator. It can be used as inline element or within overlay.

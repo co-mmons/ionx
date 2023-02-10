@@ -1,4 +1,4 @@
-import type {Components as ionic} from "@ionic/core";
+import type {Components as ionic} from "@ionic/core/components";
 import {ExtendedContent} from "./ExtendedContent";
 
 export interface EnsureLazyLoadOptions {

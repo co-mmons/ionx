@@ -1,4 +1,4 @@
-import type { Components as ionic } from "@ionic/core";
+import type { Components as ionic } from "@ionic/core/components";
 import { EventUnlisten } from "ionx/utils";
 export declare class LazyLoadController {
   constructor(content: HTMLElement & ionic.IonContent);

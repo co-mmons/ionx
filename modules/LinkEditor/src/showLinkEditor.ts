@@ -1,4 +1,4 @@
-import {createAnimation} from "@ionic/core";
+import {createAnimation} from "@ionic/core/components";
 import {defineIonxDialog, showDialog} from "ionx/Dialog";
 import {Link} from "./Link";
 import {LinkEditorProps} from "./LinkEditorProps";

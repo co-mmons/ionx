@@ -2,8 +2,16 @@ import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import { TimeZoneDate, NoTimeDate, LocalDate, timeZoneOffset, sleep, toInteger } from '@co.mmons/js-utils/core';
-import { popoverController, isPlatform } from '@ionic/core';
+import { popoverController, isPlatform } from '@ionic/core/components';
+import { defineCustomElement } from '@ionic/core/components/ion-popover';
+import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-button';
+import { defineCustomElement as defineCustomElement$1 } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
 import { addEventListener } from 'ionx/utils';
+import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-item';
+import { defineCustomElement as defineCustomElement$4 } from '@ionic/core/components/ion-footer';
+import { defineCustomElement as defineCustomElement$5 } from '@ionic/core/components/ion-toolbar';
+import { defineCustomElement as defineCustomElement$6 } from '@ionic/core/components/ion-label';
+import { defineCustomElement as defineCustomElement$7 } from '@ionic/core/components/ion-input';
 import { Select } from 'ionx/Select';
 
 const DateTimeInput = "ionx-date-time-input";
@@ -42,6 +50,9 @@ function isLocalDateTimeType(type) {
 
 const inputCss = ".sc-ionx-date-time-input-h{position:relative;display:inline-flex;max-width:100%;user-select:none;min-height:38px;align-items:center;outline:none;cursor:pointer}.sc-ionx-date-time-input-h::-moz-focus-inner{border:0}.sc-ionx-date-time-input-h .ionx--text.sc-ionx-date-time-input{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sc-ionx-date-time-input-h .ionx--text.ionx--placeholder-visible.sc-ionx-date-time-input{opacity:var(--date-time-placeholder-opacity, 0.5)}.sc-ionx-date-time-input-h .ionx--icon.sc-ionx-date-time-input{position:relative;width:16px;height:20px}.sc-ionx-date-time-input-h .ionx--icon.sc-ionx-date-time-input .ionx--icon-inner.sc-ionx-date-time-input{top:50%;right:0;margin-top:-3px;position:absolute;width:0;height:0;border-top:5px solid;border-right:5px solid transparent;border-left:5px solid transparent;color:currentColor;opacity:var(--date-time-dropdown-icon-opacity, 0.5);pointer-events:none}[disabled].sc-ionx-date-time-input-h{opacity:var(--date-time-disabled-opacity, 0.5);pointer-events:none;cursor:default}[readonly].sc-ionx-date-time-input-h{opacity:1;pointer-events:none;cursor:default}.sc-ionx-date-time-input-h ion-button.sc-ionx-date-time-input{--padding-start:4px;--padding-end:4px;margin:0 0 0 4px;height:auto}ionx-form-field [slot-container=default]>.sc-ionx-date-time-input-h,.item-label-stacked.sc-ionx-date-time-input-h,.item-label-stacked .sc-ionx-date-time-input-h{align-self:flex-start;width:calc(100% - 32px);margin-left:16px;margin-right:16px;min-height:38px}ionx-form-field [slot-container=default]>.sc-ionx-date-time-input-h .ionx--text.sc-ionx-date-time-input,.item-label-stacked.sc-ionx-date-time-input-h .ionx--text.sc-ionx-date-time-input,.item-label-stacked .sc-ionx-date-time-input-h .ionx--text.sc-ionx-date-time-input{max-width:calc(100% - 16px);flex:initial}";
 
+defineCustomElement();
+defineCustomElement$1();
+defineCustomElement$2();
 let Input = class extends HTMLElement {
   constructor() {
     super();
@@ -381,6 +392,12 @@ function timeZoneSelectItemsLoader(required, localAllowed, date) {
 
 const overlayCss = ":host{display:block}:host ion-input{flex:1;text-align:right;--padding-end:0px;font-weight:600}:host ion-input input::-webkit-outer-spin-button,:host ion-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}:host ion-input input[type=number]{-moz-appearance:textfield}:host ion-item{--inner-padding-start:16px;--inner-padding-end:16px;--padding-start:0px;--padding-end:0px}:host ion-item ion-button[slot=end]{margin:0}:host .numeric-label{white-space:normal}:host .numeric-label small{opacity:0.5}:host .numeric-buttons{text-align:center;margin-left:16px;margin-right:0}:host .numeric-buttons ion-button{margin:0;--padding-start:2px;--padding-end:2px}:host ion-footer{--border-width:0px}:host ion-footer::before{display:none}:host ion-footer ion-toolbar{--border-width:0px !important;--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px}:host ion-footer div{flex:1;display:flex}:host ion-footer ion-button{min-height:44px;margin:0px}:host ion-footer ion-button:not(:last-child){font-weight:400}:host ion-footer ion-button:last-child{font-weight:500}:host ion-footer.md div{justify-content:flex-end}:host ion-footer.md ion-button{flex:none !important}:host ion-footer.ios ion-button{width:50%}";
 
+defineCustomElement$3();
+defineCustomElement$2();
+defineCustomElement$4();
+defineCustomElement$5();
+defineCustomElement$6();
+defineCustomElement$7();
 let Overlay = class extends HTMLElement {
   constructor() {
     super();

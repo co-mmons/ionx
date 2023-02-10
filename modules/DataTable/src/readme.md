@@ -25,17 +25,9 @@
 
  - [ionx-data-table](.)
 
-### Depends on
-
-- ion-button
-- ion-icon
-
 ### Graph
 ```mermaid
 graph TD;
-  ionx-data-table-th --> ion-button
-  ionx-data-table-th --> ion-icon
-  ion-button --> ion-ripple-effect
   ionx-data-table --> ionx-data-table-th
   style ionx-data-table-th fill:#f9f,stroke:#333,stroke-width:4px
 ```

@@ -18,9 +18,9 @@ export declare class FormItem {
    * @deprecated
    */
   partProps: {
-    item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>;
+    item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core/components").Components.IonItem>;
   };
-  itemProps: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>;
+  itemProps: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core/components").Components.IonItem>;
   itemStyle?: {
     [key: string]: string;
   };

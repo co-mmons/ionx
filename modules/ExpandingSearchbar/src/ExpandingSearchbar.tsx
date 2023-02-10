@@ -1,6 +1,6 @@
 import {Component, ComponentInterface, Element, Host, h, Method, Prop, Watch} from "@stencil/core";
 import {addEventListener, EventUnlisten} from "ionx/utils";
-import type {Components} from "@ionic/core";
+import type {Components} from "@ionic/core/components";
 
 @Component({
     tag: "ionx-expanding-searchbar",

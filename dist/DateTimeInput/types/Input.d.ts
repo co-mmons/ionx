@@ -1,4 +1,4 @@
-import { StyleEventDetail } from "@ionic/core";
+import { StyleEventDetail } from "@ionic/core/components";
 import { EventEmitter } from "@stencil/core";
 import { EventUnlisten } from "ionx/utils";
 import { DateTimeInputProps } from "./DateTimeInputProps";
