@@ -10,6 +10,10 @@ export namespace Components {
     interface IonxContextMenu {
         "items": ContextMenuItem[];
     }
+    interface IonxFixSolid {
+    }
+    interface IonxModuleTest {
+    }
 }
 declare global {
     interface HTMLIonxContextMenuElement extends Components.IonxContextMenu, HTMLStencilElement {
@@ -18,16 +22,37 @@ declare global {
         prototype: HTMLIonxContextMenuElement;
         new (): HTMLIonxContextMenuElement;
     };
+    interface HTMLIonxFixSolidElement extends Components.IonxFixSolid, HTMLStencilElement {
+    }
+    var HTMLIonxFixSolidElement: {
+        prototype: HTMLIonxFixSolidElement;
+        new (): HTMLIonxFixSolidElement;
+    };
+    interface HTMLIonxModuleTestElement extends Components.IonxModuleTest, HTMLStencilElement {
+    }
+    var HTMLIonxModuleTestElement: {
+        prototype: HTMLIonxModuleTestElement;
+        new (): HTMLIonxModuleTestElement;
+    };
     interface HTMLElementTagNameMap {
         "ionx-context-menu": HTMLIonxContextMenuElement;
+        "ionx-fix-solid": HTMLIonxFixSolidElement;
+        "ionx-module-test": HTMLIonxModuleTestElement;
     }
 }
 declare namespace LocalJSX {
     interface IonxContextMenu {
         "items": ContextMenuItem[];
     }
+    interface IonxFixSolid {
+        "onSomeEvent"?: (event: CustomEvent<any>) => void;
+    }
+    interface IonxModuleTest {
+    }
     interface IntrinsicElements {
         "ionx-context-menu": IonxContextMenu;
+        "ionx-fix-solid": IonxFixSolid;
+        "ionx-module-test": IonxModuleTest;
     }
 }
 export { LocalJSX as JSX };
@@ -35,6 +60,8 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ionx-context-menu": LocalJSX.IonxContextMenu & JSXBase.HTMLAttributes<HTMLIonxContextMenuElement>;
+            "ionx-fix-solid": LocalJSX.IonxFixSolid & JSXBase.HTMLAttributes<HTMLIonxFixSolidElement>;
+            "ionx-module-test": LocalJSX.IonxModuleTest & JSXBase.HTMLAttributes<HTMLIonxModuleTestElement>;
         }
     }
 }

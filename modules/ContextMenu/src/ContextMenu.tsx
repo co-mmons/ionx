@@ -1,4 +1,4 @@
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
 import {Component, Element, Prop, h} from "@stencil/core";
 import {ContextMenuItem} from "./ContextMenuItem";
 

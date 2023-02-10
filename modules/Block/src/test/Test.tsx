@@ -1,4 +1,4 @@
-import {modalController} from "@ionic/core";
+import {modalController} from "@ionic/core/components";
 import {Component, Element, h, Host} from "@stencil/core";
 
 @Component({

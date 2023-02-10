@@ -15,6 +15,8 @@ export namespace Components {
         "margins": boolean;
         "padding": boolean;
     }
+    interface IonxTest {
+    }
 }
 declare global {
     interface HTMLIonxBlockElement extends Components.IonxBlock, HTMLStencilElement {
@@ -23,8 +25,15 @@ declare global {
         prototype: HTMLIonxBlockElement;
         new (): HTMLIonxBlockElement;
     };
+    interface HTMLIonxTestElement extends Components.IonxTest, HTMLStencilElement {
+    }
+    var HTMLIonxTestElement: {
+        prototype: HTMLIonxTestElement;
+        new (): HTMLIonxTestElement;
+    };
     interface HTMLElementTagNameMap {
         "ionx-block": HTMLIonxBlockElement;
+        "ionx-test": HTMLIonxTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -35,8 +44,11 @@ declare namespace LocalJSX {
         "margins"?: boolean;
         "padding"?: boolean;
     }
+    interface IonxTest {
+    }
     interface IntrinsicElements {
         "ionx-block": IonxBlock;
+        "ionx-test": IonxTest;
     }
 }
 export { LocalJSX as JSX };
@@ -44,6 +56,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ionx-block": LocalJSX.IonxBlock & JSXBase.HTMLAttributes<HTMLIonxBlockElement>;
+            "ionx-test": LocalJSX.IonxTest & JSXBase.HTMLAttributes<HTMLIonxTestElement>;
         }
     }
 }

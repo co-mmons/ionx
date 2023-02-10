@@ -1,5 +1,5 @@
 import {bestLocale, intl} from "@co.mmons/js-intl";
-import "@ionic/core";
+import {initialize} from "@ionic/core/components";
 
 export default async function() {
     INTL_DEFAULT_LOCALE = "en";
@@ -9,4 +9,5 @@ export default async function() {
     INTL_LOCALE = bestLocale();
 
     intl.setLocale(INTL_LOCALE);
+    initialize();
 }

@@ -1,4 +1,4 @@
-import {PredefinedColors} from "@ionic/core";
+import {PredefinedColors} from "@ionic/core/components";
 
 export interface ContextMenuItem {
     label: string;
