@@ -101,7 +101,7 @@ export class LazyLoadController {
                                 src = await src();
                             } catch (e) {
                                 console.debug("[ionx-lazy-load] item provider error", e);
-                                src = `#lazy-error-${srcIndex}-${Date.now()}`;
+                                src = `/lazy-error-${srcIndex}-${Date.now()}-${Math.random()}`;
                             }
                         }
 
