@@ -24,7 +24,7 @@ import { defineCustomElement as defineCustomElement$c } from '@ionic/core/compon
 import { defineCustomElement as defineCustomElement$d } from '@ionic/core/components/ion-content';
 import { defineCustomElement as defineCustomElement$e } from '@ionic/core/components/ion-list';
 import { defineCustomElement as defineCustomElement$f } from '@ionic/core/components/ion-virtual-scroll';
-import { defineCustomElement as defineCustomElement$g } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
+import { defineCustomElement as defineCustomElement$g } from 'ionicons/components/ion-icon';
 
 defineCustomElement();
 defineCustomElement$1();

@@ -7,7 +7,7 @@ import { addEventListener } from 'ionx/utils';
 import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-list';
 import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-item';
 import { defineCustomElement as defineCustomElement$4 } from '@ionic/core/components/ion-label';
-import { defineCustomElement as defineCustomElement$5 } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
+import { defineCustomElement as defineCustomElement$5 } from 'ionicons/components/ion-icon';
 
 defineCustomElement();
 defineCustomElement$1();

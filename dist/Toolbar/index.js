@@ -8,7 +8,7 @@ import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
 import { defineCustomElement } from '@ionic/core/components/ion-toolbar';
 import { defineCustomElement as defineCustomElement$1 } from '@ionic/core/components/ion-menu-button';
 import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-button';
-import { defineCustomElement as defineCustomElement$3 } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
+import { defineCustomElement as defineCustomElement$3 } from 'ionicons/components/ion-icon';
 import { defineCustomElement as defineCustomElement$4 } from '@ionic/core/components/ion-buttons';
 
 const Toolbar$1 = "ionx-toolbar";

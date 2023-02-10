@@ -24,7 +24,7 @@ import { popoverController, isPlatform, createAnimation } from '@ionic/core/comp
 import { addEventListener } from 'ionx/utils';
 import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-popover';
 import { defineCustomElement } from '@ionic/core/components/ion-button';
-import { defineCustomElement as defineCustomElement$1 } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
+import { defineCustomElement as defineCustomElement$1 } from 'ionicons/components/ion-icon';
 
 class MarkSpecExtended {
 }

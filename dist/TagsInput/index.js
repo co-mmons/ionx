@@ -1,7 +1,7 @@
 import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { defineCustomElement } from '@ionic/core/components/ion-chip';
-import { defineCustomElement as defineCustomElement$1 } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
+import { defineCustomElement as defineCustomElement$1 } from 'ionicons/components/ion-icon';
 import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-input';
 
 const TagsInput = "ionx-tags-input";

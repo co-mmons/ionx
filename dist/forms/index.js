@@ -9,7 +9,7 @@ import scrollIntoView from 'scroll-into-view';
 import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import { defineCustomElement } from '@ionic/core/components/ion-button';
 import ExtendableError from 'ts-error';
-import { defineCustomElement as defineCustomElement$1 } from './Volumes/Projekty/co.mmons/ionx/node_modules/ionicons/components/ion-icon.js';
+import { defineCustomElement as defineCustomElement$1 } from 'ionicons/components/ion-icon';
 import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-item';
 
 let loaded = [];
