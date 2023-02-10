@@ -2,6 +2,7 @@ import { HTMLElement as HTMLElement$1, createEvent, h, Host, Fragment as Fragmen
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import * as baseCommand from 'prosemirror-commands';
 import { toggleMark, chainCommands, deleteSelection, joinBackward, selectNodeBackward, joinForward, selectNodeForward, selectAll, joinUp, joinDown, lift, selectParentNode, newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock, exitCode, setBlockType } from 'prosemirror-commands';
+import { unbenc, benc } from '@appspltfrm/shared/benc';
 import * as baseListCommand from 'prosemirror-schema-list';
 import { splitListItem } from 'prosemirror-schema-list';
 import { MarkType, Schema, Slice, Fragment, NodeRange, DOMParser, DOMSerializer } from 'prosemirror-model';
@@ -12,7 +13,6 @@ import { TextSelection, NodeSelection, EditorState } from 'prosemirror-state';
 import { findParentNode, findParentNodeOfType, findPositionOfNodeBefore, hasParentNodeOfType } from 'prosemirror-utils';
 import { defineIonxLinkEditor, showLinkEditor, loadIonxLinkEditorIntl } from 'ionx/LinkEditor';
 import { deepEqual, shallowEqual } from 'fast-equals';
-import { unbenc, benc } from './Volumes/Projekty/co.mmons/ionx/node_modules/@appspltfrm/shared/_esm2015/benc/index.js';
 import { GapCursor } from 'prosemirror-gapcursor';
 import { ReplaceAroundStep, liftTarget } from 'prosemirror-transform';
 import { undo, redo, history, undoDepth, redoDepth } from 'prosemirror-history';

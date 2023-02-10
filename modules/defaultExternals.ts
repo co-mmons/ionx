@@ -6,5 +6,6 @@ export const defaultExternals = [
     /@capacitor\/.*/,
     /@ionic\/.*/,
     /@stencil\/.*/,
-    /rxjs/
+    /rxjs/,
+    /@appspltfrm\/.*/
 ]
