@@ -2,6 +2,7 @@ import {waitTill} from "@co.mmons/js-utils/core";
 import type {Components as ionic} from "@ionic/core/components";
 import {getMode} from "@ionic/core/components";
 import {Component, Element, h, Host, Prop, Watch} from "@stencil/core";
+import {arrowBack, chevronBack, close} from "ionicons/icons";
 import {openUrl} from "ionx/Router";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {WidthBreakpointsContainer} from "ionx/WidthBreakpoints";
@@ -208,7 +209,7 @@ export class Toolbar {
                     slot="start"
                     fill="clear"
                     onClick={ev => this.buttonClicked(ev)}>
-                    <ion-icon name={this.button === "close" ? "close" : (mode === "ios" ? "chevron-back" : "arrow-back")} slot="icon-only"/>
+                    <ion-icon src={this.button === "close" ? close : (mode === "ios" ? chevronBack : arrowBack)} slot="icon-only"/>
                 </ion-button>}
 
                 <div ionx--inner class={{"ionx--no-button": this.button === "none"}}>

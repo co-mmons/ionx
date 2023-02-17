@@ -13,6 +13,7 @@ import { prefetchComponent, waitTillHydrated } from 'ionx/utils';
 import { MessageRef, intl } from '@co.mmons/js-intl';
 import { Capacitor } from '@capacitor/core';
 import { sleep, waitTill } from '@co.mmons/js-utils/core';
+import { chevronUp, chevronDown } from 'ionicons/icons';
 import { Loading } from 'ionx/Loading';
 import { Toolbar } from 'ionx/Toolbar';
 import { defineCustomElement as defineCustomElement$7 } from '@ionic/core/components/ion-checkbox';
@@ -610,7 +611,7 @@ let SelectOverlay = class extends HTMLElement {
     }
     const label = item.overlayLabel ?? item.label;
     if (item.group) {
-      return h("ion-item", { key: `group:${item.id}`, button: true, detail: false, onClick: () => this.toggleGroup(item) }, h("ion-icon", { slot: "start", name: this.expandedGroups[item.id] ? "chevron-up" : "chevron-down" }), h("ion-label", null, (label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)), this.loadingGroups[item.id] && h("ion-spinner", { name: "dots", slot: "end" }));
+      return h("ion-item", { key: `group:${item.id}`, button: true, detail: false, onClick: () => this.toggleGroup(item) }, h("ion-icon", { slot: "start", src: this.expandedGroups[item.id] ? chevronUp : chevronDown }), h("ion-label", null, (label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)), this.loadingGroups[item.id] && h("ion-spinner", { name: "dots", slot: "end" }));
     }
     return h("ion-item", { key: index, ...{ [indexAttribute]: index }, class: { "ionx--divider": item.divider } }, !item.divider && h("ion-checkbox", { class: "sc-ionx-select-overlay", slot: "start", checked: this.values.findIndex(v => isEqualValue(v, item.value, this.comparator)) > -1, onClick: ev => this.onClick(ev, item) }), h("ion-label", null, (label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)));
   }

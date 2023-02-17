@@ -2,6 +2,7 @@ import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { waitTill } from '@co.mmons/js-utils/core';
 import { getMode } from '@ionic/core/components';
+import { close, chevronBack, arrowBack } from 'ionicons/icons';
 import { openUrl } from 'ionx/Router';
 import { addEventListener } from 'ionx/utils';
 import { WidthBreakpointsContainer } from 'ionx/WidthBreakpoints';
@@ -142,7 +143,7 @@ let Toolbar = class extends HTMLElement {
   }
   render() {
     const mode = getMode();
-    return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-button", { class: "back-close-button", slot: "start", fill: "clear", onClick: ev => this.buttonClicked(ev) }, h("ion-icon", { name: this.button === "close" ? "close" : (mode === "ios" ? "chevron-back" : "arrow-back"), slot: "icon-only" })), h("div", { "ionx--inner": true, class: { "ionx--no-button": this.button === "none" } }, h("ion-buttons", null, h("slot", { name: "action" })), h("h1", { style: { display: this.titleVisible ? null : "none" } }, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
+    return h(Host, { class: { "ionx--title-wrap": typeof this.titleWrap === "boolean" ? this.titleWrap : this.titleWrap === "collapse" } }, h("ion-toolbar", { ref: el => this.toolbarElement = el }, this.button === "menu" && h("ion-menu-button", { slot: "start" }), (this.button === "back" || this.button === "close") && h("ion-button", { class: "back-close-button", slot: "start", fill: "clear", onClick: ev => this.buttonClicked(ev) }, h("ion-icon", { src: this.button === "close" ? close : (mode === "ios" ? chevronBack : arrowBack), slot: "icon-only" })), h("div", { "ionx--inner": true, class: { "ionx--no-button": this.button === "none" } }, h("ion-buttons", null, h("slot", { name: "action" })), h("h1", { style: { display: this.titleVisible ? null : "none" } }, h("slot", { name: "title" }), h("slot", { name: "subtitle" }))), h("slot", null)));
   }
   get element() { return this; }
   static get watchers() { return {

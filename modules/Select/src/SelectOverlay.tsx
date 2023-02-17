@@ -3,6 +3,7 @@ import {intl, MessageRef} from "@co.mmons/js-intl";
 import {sleep, waitTill} from "@co.mmons/js-utils/core";
 import {isPlatform} from "@ionic/core/components";
 import {Component, ComponentInterface, Element, forceUpdate, h, Host, Listen, Prop, State} from "@stencil/core";
+import {chevronDown, chevronUp} from "ionicons/icons";
 import {Loading} from "ionx/Loading";
 import {Toolbar} from "ionx/Toolbar";
 import {waitTillHydrated} from "ionx/utils";
@@ -408,7 +409,7 @@ export class SelectOverlay implements ComponentInterface {
                 detail={false}
                 onClick={() => this.toggleGroup(item as SelectGroupItem)}>
 
-                <ion-icon slot="start" name={this.expandedGroups[item.id] ? "chevron-up" : "chevron-down"}/>
+                <ion-icon slot="start" src={this.expandedGroups[item.id] ? chevronUp : chevronDown}/>
 
                 <ion-label>{(label ? (label instanceof MessageRef ? intl.message(label) : label) : undefined) ?? (this.labelFormatter ? this.labelFormatter(item.value, true) : `${item.value}`)}</ion-label>
 

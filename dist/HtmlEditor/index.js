@@ -276,7 +276,7 @@ class LinkMark extends MarkSpecExtended {
               href: dom.getAttribute("href"),
               target: dom.getAttribute("target"),
               title: dom.getAttribute("title"),
-              value: unbenc(dom.getAttribute("benc:value"))
+              value: dom.getAttribute("benc:value") && unbenc(dom.getAttribute("benc:value"))
             };
           }
         }
