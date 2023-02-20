@@ -332,7 +332,6 @@ let LinkEditor = class extends HTMLElement {
     data.onStateChange(({ value }) => {
       if (value) {
         const link = __classPrivateFieldGet(this, _LinkEditor_buildLink, "f").call(this);
-        console.log(link, this.value);
         if (!deepEqual(link, this.value)) {
           this.value = link;
           this.ionChange.emit({ value: link });
