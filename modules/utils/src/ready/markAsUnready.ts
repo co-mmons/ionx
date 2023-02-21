@@ -1,4 +1,5 @@
 import {ElementOrComponentWithElement} from "./ElementOrComponentWithElement";
+import {readyClassName} from "./readyClassName";
 import {unreadyClassName} from "./unreadyClassName";
 
 export function markAsUnready(elementOrComponent: ElementOrComponentWithElement, partName?: string) {
@@ -10,6 +11,7 @@ export function markAsUnready(elementOrComponent: ElementOrComponentWithElement,
         element.classList.add(`${unreadyClassName}-${partName}`);
     }
 
+    element.classList.remove(readyClassName);
     element.classList.add(unreadyClassName);
 
     if (!wasUnready) {
