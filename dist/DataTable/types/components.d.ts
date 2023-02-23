@@ -11,8 +11,12 @@ import { DataTableColumnFilterOptions } from "./DataTableColumnFilterOptions";
 import { Filter } from "./filter/Filter";
 export namespace Components {
     interface IonxDataTable {
+        "cellStyle": any;
         "columns": DataTableColumn[];
         "data": Array<any[] | DataTableRow>;
+        "headingCellStyle": any;
+        "headingRowStyle": any;
+        "rowStyle": any;
     }
     interface IonxDataTableSearchFilter {
         "value": string;
@@ -58,8 +62,12 @@ declare global {
 }
 declare namespace LocalJSX {
     interface IonxDataTable {
+        "cellStyle"?: any;
         "columns"?: DataTableColumn[];
         "data"?: Array<any[] | DataTableRow>;
+        "headingCellStyle"?: any;
+        "headingRowStyle"?: any;
+        "rowStyle"?: any;
     }
     interface IonxDataTableSearchFilter {
         "value"?: string;

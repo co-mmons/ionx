@@ -4,6 +4,10 @@ import { Filter } from "./filter/Filter";
 export declare class DataTable {
   columns: DataTableColumn[];
   data: Array<any[] | DataTableRow>;
+  headingRowStyle: any;
+  headingCellStyle: any;
+  rowStyle: any;
+  cellStyle: any;
   visibleData: Array<any[] | DataTableRow>;
   filters: {
     [columnId: string]: Filter;
