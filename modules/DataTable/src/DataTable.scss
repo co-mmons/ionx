@@ -2,7 +2,7 @@ ionx-data-table {
     display: block;
     overflow: auto;
     max-height: 100%;
-    border-width: var(--data-table-border-width, var(--ionx-border-width));
+    border-width: var(--data-table-border-width, 1px);
     border-color: var(--data-table-border-color, var(--ion-border-color));
     border-style: var(--data-table-border-style, solid);
     border-radius: var(--data-table-border-radius, var(--ionx-border-radius));
@@ -19,14 +19,14 @@ ionx-data-table {
     > table > tbody > tr {
         background-color: var(--data-table-row-background-color, var(--data-table-background-color, inherit));
         color: var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit));
-        --data-table-cell-border-width: var(--data-table-row-border-width, var(--ionx-border-width));
+        --data-table-cell-border-width: var(--data-table-row-border-width, 1px);
         --data-table-cell-border-style: var(--data-table-row-border-style, var(--data-table-border-style, solid));
         --data-table-cell-border-color: var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color)));
 
         &:nth-child(odd) {
             background-color: var(--data-table-row-odd-background-color, var(--data-table-row-background-color, var(--data-table-background-color, inherit)));
             color: var(--data-table-row-odd-foreground-color, var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit)));
-            --data-table-cell-border-width: var(--data-table-row-odd-border-width, var(--data-table-row-border-width, var(--ionx-border-width)));
+            --data-table-cell-border-width: var(--data-table-row-odd-border-width, var(--data-table-row-border-width, 1px));
             --data-table-cell-border-style: var(--data-table-row-odd-border-style, var(--data-table-row-border-style, var(--data-table-border-style, solid)));
             --data-table-cell-border-color: var(--data-table-row-odd-border-color, var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color))));
         }
@@ -34,7 +34,7 @@ ionx-data-table {
         &:nth-child(even) {
             background-color: var(--data-table-row-even-background-color, var(--data-table-row-background-color, var(--data-table-background-color, inherit)));
             color: var(--data-table-row-even-foreground-color, var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit)));
-            --data-table-cell-border-width: var(--data-table-row-even-border-width, var(--data-table-row-border-width, var(--ionx-border-width)));
+            --data-table-cell-border-width: var(--data-table-row-even-border-width, var(--data-table-row-border-width, 1px));
             --data-table-cell-border-style: var(--data-table-row-even-border-style, var(--data-table-row-border-style, var(--data-table-border-style, solid)));
             --data-table-cell-border-color: var(--data-table-row-even-border-color, var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color))));
         }
