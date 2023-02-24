@@ -13,10 +13,12 @@
 
     &:first-child {
         border-left: 0;
+        border-top-left-radius: var(--data-table-border-radius, var(--ionx-border-radius));
     }
 
     &:last-child {
         border-right: 0;
+        border-top-right-radius: var(--data-table-border-radius, var(--ionx-border-radius));
     }
 
     .ionx--outer {
