@@ -45,6 +45,8 @@ export namespace Components {
     interface IonxHtmlEditorParagraphMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
+    interface IonxHtmlEditorTest {
+    }
     interface IonxHtmlEditorTextMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
@@ -90,6 +92,12 @@ declare global {
         prototype: HTMLIonxHtmlEditorParagraphMenuElement;
         new (): HTMLIonxHtmlEditorParagraphMenuElement;
     };
+    interface HTMLIonxHtmlEditorTestElement extends Components.IonxHtmlEditorTest, HTMLStencilElement {
+    }
+    var HTMLIonxHtmlEditorTestElement: {
+        prototype: HTMLIonxHtmlEditorTestElement;
+        new (): HTMLIonxHtmlEditorTestElement;
+    };
     interface HTMLIonxHtmlEditorTextMenuElement extends Components.IonxHtmlEditorTextMenu, HTMLStencilElement {
     }
     var HTMLIonxHtmlEditorTextMenuElement: {
@@ -109,6 +117,7 @@ declare global {
         "ionx-html-editor-link-menu": HTMLIonxHtmlEditorLinkMenuElement;
         "ionx-html-editor-list-menu": HTMLIonxHtmlEditorListMenuElement;
         "ionx-html-editor-paragraph-menu": HTMLIonxHtmlEditorParagraphMenuElement;
+        "ionx-html-editor-test": HTMLIonxHtmlEditorTestElement;
         "ionx-html-editor-text-menu": HTMLIonxHtmlEditorTextMenuElement;
         "ionx-html-editor-toolbar": HTMLIonxHtmlEditorToolbarElement;
     }
@@ -144,6 +153,8 @@ declare namespace LocalJSX {
     interface IonxHtmlEditorParagraphMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
+    interface IonxHtmlEditorTest {
+    }
     interface IonxHtmlEditorTextMenu {
         "editor": HTMLIonxHtmlEditorElement;
     }
@@ -158,6 +169,7 @@ declare namespace LocalJSX {
         "ionx-html-editor-link-menu": IonxHtmlEditorLinkMenu;
         "ionx-html-editor-list-menu": IonxHtmlEditorListMenu;
         "ionx-html-editor-paragraph-menu": IonxHtmlEditorParagraphMenu;
+        "ionx-html-editor-test": IonxHtmlEditorTest;
         "ionx-html-editor-text-menu": IonxHtmlEditorTextMenu;
         "ionx-html-editor-toolbar": IonxHtmlEditorToolbar;
     }
@@ -172,6 +184,7 @@ declare module "@stencil/core" {
             "ionx-html-editor-link-menu": LocalJSX.IonxHtmlEditorLinkMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorLinkMenuElement>;
             "ionx-html-editor-list-menu": LocalJSX.IonxHtmlEditorListMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorListMenuElement>;
             "ionx-html-editor-paragraph-menu": LocalJSX.IonxHtmlEditorParagraphMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorParagraphMenuElement>;
+            "ionx-html-editor-test": LocalJSX.IonxHtmlEditorTest & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorTestElement>;
             "ionx-html-editor-text-menu": LocalJSX.IonxHtmlEditorTextMenu & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorTextMenuElement>;
             "ionx-html-editor-toolbar": LocalJSX.IonxHtmlEditorToolbar & JSXBase.HTMLAttributes<HTMLIonxHtmlEditorToolbarElement>;
         }

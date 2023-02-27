@@ -20,7 +20,6 @@ import {
     Watch
 } from "@stencil/core";
 import {deepEqual} from "fast-equals";
-import {prefetchComponent} from "ionx/utils";
 import {findValueItem} from "./findValueItem";
 import {SelectLazyGroupItem} from "./SelectGroupItem";
 import {SelectItem} from "./SelectItem";
@@ -174,12 +173,6 @@ export class SelectComponent implements SelectProps {
 
     @Event()
     ionFocus: EventEmitter<any>;
-
-    /**
-     * @internal
-     */
-    @Prop()
-    prefetch: boolean;
 
     /**
      * Emitted when the styles change.
@@ -406,10 +399,6 @@ export class SelectComponent implements SelectProps {
         ev.detail.complete(true);
     }
 
-    componentDidLoad() {
-        prefetchComponent({delay: 0}, "ion-reorder-group", "ion-item", "ion-label", "ion-spinner", "ion-reorder");
-    }
-
     connectedCallback() {
 
         if (!this.items && this.options) {
@@ -455,10 +444,6 @@ export class SelectComponent implements SelectProps {
     }
 
     render() {
-
-        if (this.prefetch) {
-            return;
-        }
 
         const values = this.valueAsArray;
         const empty = values.length === 0;
