@@ -965,18 +965,24 @@ function liftSelectionList(state, tr) {
 /**
  * Removes marks from nodes in the current selection that are not supported
  */
-const sanitizeSelectionMarks = (state) => {
+const sanitizeSelectionMarks = (state, newParentType) => {
   let tr;
-  const { $from, $to } = state.tr.selection;
-  state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+  const { from, to } = state.tr.selection;
+  state.doc.nodesBetween(from, to, (node, pos, parent) => {
+    // If iterate over a node thats out of our defined range
+    // We skip here but continue to iterate over its children.
+    if (node.isText || pos < from || pos > to) {
+      return true;
+    }
     node.marks.forEach(mark => {
-      if (!node.type.allowsMarkType(mark.type)) {
+      if (!parent.type.allowsMarkType(mark.type) ||
+        (newParentType && !newParentType.allowsMarkType(mark.type))) {
         const filteredMarks = node.marks.filter(m => m.type !== mark.type);
         const position = pos > 0 ? pos - 1 : 0;
         tr = (tr || state.tr).setNodeMarkup(position, undefined, node.attrs, filteredMarks);
       }
     });
-  });
+  }, from);
   return tr;
 };
 
