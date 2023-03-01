@@ -170,6 +170,7 @@ let Input = class extends HTMLElement {
     }
   }
   async clearValue() {
+    this.valueChanging = true;
     this.value = undefined;
   }
   async open() {
