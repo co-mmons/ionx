@@ -255,6 +255,7 @@ export class Input implements DateTimeInputProps {
 
     @Method()
     async clearValue() {
+        this.valueChanging = true;
         this.value = undefined;
     }
 
