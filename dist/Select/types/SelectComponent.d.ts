@@ -1,4 +1,4 @@
-import { ItemReorderEventDetail, StyleEventDetail } from "@ionic/core";
+import { ItemReorderEventDetail, StyleEventDetail } from "@ionic/core/components";
 import { EventEmitter, FunctionalComponent } from "@stencil/core";
 import { SelectLazyGroupItem } from "./SelectGroupItem";
 import { SelectItem } from "./SelectItem";

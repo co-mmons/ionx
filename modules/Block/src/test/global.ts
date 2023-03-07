@@ -1,4 +1,5 @@
-import "@ionic/core";
+import {initialize} from "@ionic/core/components";
 
 export default async function() {
+    initialize()
 }

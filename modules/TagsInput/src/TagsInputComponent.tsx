@@ -1,5 +1,12 @@
-import {TextFieldTypes} from "@ionic/core";
+import {TextFieldTypes} from "@ionic/core/components";
 import {Component, Element, Event, EventEmitter, h, Host, Method, Prop, State} from "@stencil/core";
+import {defineCustomElement as defineChip} from "@ionic/core/components/ion-chip";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
+import {defineCustomElement as defineInput} from "@ionic/core/components/ion-input";
+
+defineChip();
+defineIcon();
+defineInput();
 
 @Component({
     tag: "ionx-tags-input",

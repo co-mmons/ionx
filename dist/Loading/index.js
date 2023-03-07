@@ -1,7 +1,11 @@
 import { HTMLElement, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
-import { popoverController } from '@ionic/core';
+import { popoverController } from '@ionic/core/components';
+import { defineCustomElement } from '@ionic/core/components/ion-popover';
 import { intl } from '@co.mmons/js-intl';
+import { defineCustomElement as defineCustomElement$1 } from '@ionic/core/components/ion-spinner';
+import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-text';
+import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-progress-bar';
 
 class LoadingProxy {
   constructor(element) {
@@ -120,6 +124,7 @@ class LoadingProxy {
   }
 }
 
+defineCustomElement();
 async function showLoadingOverlay(options) {
   if (!options?.type) {
     const app = document.querySelector("ion-app");
@@ -171,6 +176,9 @@ const Loading$1 = "ionx-loading";
 
 const loadingCss = "ionx-loading{display:flex;align-items:center;--loading-backdrop-opacity:0.8}ionx-loading[cover]{position:absolute;width:100%;height:100%;align-items:center;align-content:center;justify-items:center;justify-content:center;top:0px;left:0px}ionx-loading.ionx--backdrop-visible{background-color:rgba(var(--loading-backdrop-color, var(--ion-background-color-rgb)), var(--loading-backdrop-opacity))}ionx-loading:not(.ionx--has-color){color:var(--loading-foreground-color, #000)}ionx-loading:not(.ionx--has-color) ion-spinner,ionx-loading:not(.ionx--has-color) ion-progress-bar{--color:var(--loading-foreground-color, #000)}.ionx-loading-popover::part(wrapper){display:flex;align-content:center;justify-content:center;align-items:center;justify-items:center}.ionx-loading-popover .popover-content{position:initial !important}";
 
+defineCustomElement$1();
+defineCustomElement$2();
+defineCustomElement$3();
 let Loading = class extends HTMLElement {
   constructor() {
     super();

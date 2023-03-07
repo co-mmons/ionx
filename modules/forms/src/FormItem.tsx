@@ -3,6 +3,9 @@ import {Component, h, Host, Prop, State, Watch} from "@stencil/core";
 import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
+import {defineCustomElement as defineItem} from "@ionic/core/components/ion-item";
+
+defineItem();
 
 @Component({
     tag: "ionx-form-item",
@@ -64,11 +67,11 @@ export class FormItem {
      */
     @Prop()
     partProps: {
-        item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>
+        item?: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core/components").Components.IonItem>
     }
 
     @Prop()
-    itemProps: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core").Components.IonItem>;
+    itemProps: Partial<import("@stencil/core/internal").JSXBase.HTMLAttributes> & Partial<import("@ionic/core/components").Components.IonItem>;
 
     @Prop()
     itemStyle?: {[key: string]: string};

@@ -1,4 +1,4 @@
-import type { Components as ionic } from "@ionic/core";
+import type { Components as ionic } from "@ionic/core/components";
 import { ComponentInterface } from "@stencil/core";
 import { EventUnlisten } from "ionx/utils";
 import { WidthBreakpointsContainer } from "ionx/WidthBreakpoints";

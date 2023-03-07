@@ -1,6 +1,12 @@
 import {intl} from "@co.mmons/js-intl";
 import {LocalDate, NoTimeDate, TimeZoneDate, timeZoneOffset, toInteger} from "@co.mmons/js-utils/core";
-import {isPlatform} from "@ionic/core";
+import {isPlatform} from "@ionic/core/components";
+import {defineCustomElement as defineItem} from "@ionic/core/components/ion-item";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
+import {defineCustomElement as defineFooter} from "@ionic/core/components/ion-footer";
+import {defineCustomElement as defineToolbar} from "@ionic/core/components/ion-toolbar";
+import {defineCustomElement as defineLabel} from "@ionic/core/components/ion-label";
+import {defineCustomElement as defineInput} from "@ionic/core/components/ion-input";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
 import {Select} from "ionx/Select";
 import {currentTimeZone} from "./currentTimeZone";
@@ -12,6 +18,13 @@ import {isDateTimeType} from "./isDateTimeType";
 import {isLocalDateTimeType} from "./isLocaleDateTimeType";
 import {timeZoneSelectItemsLoader} from "./timeZoneSelectItemsLoader";
 import {unspecifiedTimeZoneSelectValue} from "./unspecifiedTimeZoneSelectValue";
+
+defineItem();
+defineButton();
+defineFooter();
+defineToolbar();
+defineLabel();
+defineInput();
 
 type NumericDateTimePart = "Hour" | "Minute" | "Year" | "Month" | "Day";
 

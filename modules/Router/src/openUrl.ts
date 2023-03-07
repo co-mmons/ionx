@@ -1,4 +1,4 @@
-import {AnimationBuilder, RouterDirection} from "@ionic/core";
+import {AnimationBuilder, RouterDirection} from "@ionic/core/components";
 
 const SCHEME = /^[a-z][a-z0-9+\-.]*:/;
 

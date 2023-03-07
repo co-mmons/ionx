@@ -1,6 +1,15 @@
-import {popoverController} from "@ionic/core";
+import {popoverController} from "@ionic/core/components";
 import {Component, Element, Prop, h} from "@stencil/core";
 import {ContextMenuItem} from "./ContextMenuItem";
+import {defineCustomElement as defineList} from "@ionic/core/components/ion-list";
+import {defineCustomElement as defineItem} from "@ionic/core/components/ion-item";
+import {defineCustomElement as defineLabel} from "@ionic/core/components/ion-label";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
+
+defineList();
+defineItem();
+defineLabel();
+defineIcon();
 
 @Component({
     tag: "ionx-context-menu",

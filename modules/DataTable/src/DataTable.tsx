@@ -16,6 +16,18 @@ export class DataTable {
     @Prop()
     data: Array<any[] | DataTableRow>;
 
+    @Prop()
+    headingRowStyle: any;
+
+    @Prop()
+    headingCellStyle: any;
+
+    @Prop()
+    rowStyle: any;
+
+    @Prop()
+    cellStyle: any;
+
     @State()
     visibleData: Array<any[] | DataTableRow>;
 
@@ -141,15 +153,16 @@ export class DataTable {
 
     renderCell(column: DataTableColumn, columnIndex: number, row: any, accessByIndex: boolean) {
         const value = row[accessByIndex ? columnIndex : column.id];
-        return <td>{column.formatter ? column.formatter(value) : value}</td>
+        return <td style={this.cellStyle}>{column.formatter ? column.formatter(value) : value}</td>
     }
 
     render() {
         return <Host>
             <table>
                 <thead>
-                    <tr>
+                    <tr style={this.headingRowStyle}>
                         {this.columns?.map((column, columnIndex) => <ionx-data-table-th
+                            style={this.headingCellStyle}
                             filterData={() => this.columnData(column, columnIndex)}
                             filterApply={value => this.setColumnFilter(column, value)}
                             filterType={column.filterType}
@@ -161,7 +174,7 @@ export class DataTable {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.visibleData?.map(row => <tr>
+                    {this.visibleData?.map(row => <tr style={this.rowStyle}>
                         {this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row)))}
                     </tr>)}
                 </tbody>

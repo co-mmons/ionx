@@ -7,7 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { DateTimeInputType } from "./DateTimeInputType";
 import { DateTimeInputValue } from "./DateTimeInputValue";
-import { StyleEventDetail } from "@ionic/core";
+import { StyleEventDetail } from "@ionic/core/components";
 export namespace Components {
     interface IonxDateTimeInput {
         /**

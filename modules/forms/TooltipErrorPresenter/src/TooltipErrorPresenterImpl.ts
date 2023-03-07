@@ -1,4 +1,4 @@
-import {isPlatform} from "@ionic/core";
+import {isPlatform} from "@ionic/core/components";
 import {Subscription} from "rxjs";
 import tippy, {Instance as TippyInstance} from "tippy.js";
 import {FormControl, FormController, FormValidationErrorPresenter} from "ionx/forms";

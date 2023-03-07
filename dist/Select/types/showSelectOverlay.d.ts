@@ -1,4 +1,4 @@
-import { OverlayEventDetail } from "@ionic/core";
+import { OverlayEventDetail } from "@ionic/core/components";
 import { SelectOverlayProps } from "./SelectOverlayProps";
 import { SelectValueItem } from "./SelectValueItem";
 export declare function showSelectOverlay<T = any>(overlay: SelectOverlayProps, event?: Event): Promise<{

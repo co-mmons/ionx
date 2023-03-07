@@ -2,8 +2,10 @@ ionx-data-table {
     display: block;
     overflow: auto;
     max-height: 100%;
-    border: var(--ionx-border-width) solid var(--ion-border-color);
-    border-radius: var(--ionx-border-radius);
+    border-width: var(--data-table-border-width, 1px);
+    border-color: var(--data-table-border-color, var(--ion-border-color));
+    border-style: var(--data-table-border-style, solid);
+    border-radius: var(--data-table-border-radius, var(--ionx-border-radius));
     user-select: none;
 
     > table {
@@ -15,9 +17,33 @@ ionx-data-table {
     }
 
     > table > tbody > tr {
+        background-color: var(--data-table-row-background-color, var(--data-table-background-color, inherit));
+        color: var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit));
+        --data-table-cell-border-width: var(--data-table-row-border-width, 1px);
+        --data-table-cell-border-style: var(--data-table-row-border-style, var(--data-table-border-style, solid));
+        --data-table-cell-border-color: var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color)));
+
+        &:nth-child(odd) {
+            background-color: var(--data-table-row-odd-background-color, var(--data-table-row-background-color, var(--data-table-background-color, inherit)));
+            color: var(--data-table-row-odd-foreground-color, var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit)));
+            --data-table-cell-border-width: var(--data-table-row-odd-border-width, var(--data-table-row-border-width, 1px));
+            --data-table-cell-border-style: var(--data-table-row-odd-border-style, var(--data-table-row-border-style, var(--data-table-border-style, solid)));
+            --data-table-cell-border-color: var(--data-table-row-odd-border-color, var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color))));
+        }
+
+        &:nth-child(even) {
+            background-color: var(--data-table-row-even-background-color, var(--data-table-row-background-color, var(--data-table-background-color, inherit)));
+            color: var(--data-table-row-even-foreground-color, var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit)));
+            --data-table-cell-border-width: var(--data-table-row-even-border-width, var(--data-table-row-border-width, 1px));
+            --data-table-cell-border-style: var(--data-table-row-even-border-style, var(--data-table-row-border-style, var(--data-table-border-style, solid)));
+            --data-table-cell-border-color: var(--data-table-row-even-border-color, var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color))));
+        }
+
         > td {
             padding: 8px;
-            border: var(--ionx-border-width) solid var(--ion-border-color);
+            border-width: var(--data-table-cell-border-width);
+            border-style: var(--data-table-cell-border-style);
+            border-color: var(--data-table-cell-border-color);
 
             &:first-child {
                 border-left: 0;

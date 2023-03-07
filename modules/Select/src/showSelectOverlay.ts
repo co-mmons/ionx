@@ -1,6 +1,11 @@
-import {modalController, OverlayEventDetail, popoverController} from "@ionic/core";
+import {modalController, OverlayEventDetail, popoverController} from "@ionic/core/components";
 import {SelectOverlayProps} from "./SelectOverlayProps";
 import {SelectValueItem} from "./SelectValueItem";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
+import {defineCustomElement as defineModal} from "@ionic/core/components/ion-modal";
+
+definePopover();
+defineModal();
 
 export async function showSelectOverlay<T = any>(overlay: SelectOverlayProps, event?: Event) {
 

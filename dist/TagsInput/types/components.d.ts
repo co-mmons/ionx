@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { TextFieldTypes } from "@ionic/core";
+import { TextFieldTypes } from "@ionic/core/components";
 export namespace Components {
     interface IonxTagsInput {
         "canBackspaceRemove": boolean;

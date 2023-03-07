@@ -1,7 +1,25 @@
-import {ItemReorderEventDetail, StyleEventDetail} from "@ionic/core";
-import {Component, Element, Event, EventEmitter, forceUpdate, Fragment, FunctionalComponent, h, Host, Listen, Method, Prop, Watch} from "@stencil/core";
+import {ItemReorderEventDetail, StyleEventDetail} from "@ionic/core/components";
+import {defineCustomElement as defineItem} from "@ionic/core/components/ion-item";
+import {defineCustomElement as defineLabel} from "@ionic/core/components/ion-label";
+import {defineCustomElement as defineReorder} from "@ionic/core/components/ion-reorder";
+import {defineCustomElement as defineReorderGroup} from "@ionic/core/components/ion-reorder-group";
+import {defineCustomElement as defineSpinner} from "@ionic/core/components/ion-spinner";
+import {
+    Component,
+    Element,
+    Event,
+    EventEmitter,
+    forceUpdate,
+    Fragment,
+    FunctionalComponent,
+    h,
+    Host,
+    Listen,
+    Method,
+    Prop,
+    Watch
+} from "@stencil/core";
 import {deepEqual} from "fast-equals";
-import {prefetchComponent} from "ionx/utils";
 import {findValueItem} from "./findValueItem";
 import {SelectLazyGroupItem} from "./SelectGroupItem";
 import {SelectItem} from "./SelectItem";
@@ -11,6 +29,12 @@ import {SelectValueItem} from "./SelectValueItem";
 import {showSelectOverlay} from "./showSelectOverlay";
 import {ValueComparator} from "./ValueComparator";
 import {valueLabel} from "./valueLabel";
+
+defineReorder();
+defineLabel();
+defineItem();
+defineSpinner();
+defineReorderGroup();
 
 let instanceCounter = 0;
 
@@ -149,12 +173,6 @@ export class SelectComponent implements SelectProps {
 
     @Event()
     ionFocus: EventEmitter<any>;
-
-    /**
-     * @internal
-     */
-    @Prop()
-    prefetch: boolean;
 
     /**
      * Emitted when the styles change.
@@ -381,10 +399,6 @@ export class SelectComponent implements SelectProps {
         ev.detail.complete(true);
     }
 
-    componentDidLoad() {
-        prefetchComponent({delay: 0}, "ion-reorder-group", "ion-item", "ion-label", "ion-spinner", "ion-reorder");
-    }
-
     connectedCallback() {
 
         if (!this.items && this.options) {
@@ -430,10 +444,6 @@ export class SelectComponent implements SelectProps {
     }
 
     render() {
-
-        if (this.prefetch) {
-            return;
-        }
 
         const values = this.valueAsArray;
         const empty = values.length === 0;

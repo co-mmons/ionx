@@ -1,10 +1,11 @@
 export const defaultExternals = [
     "ts-error",
     "fast-equals",
-    "ionicons",
+    /ionicons\/*.*/,
     /@co.mmons\/.*/,
     /@capacitor\/.*/,
     /@ionic\/.*/,
     /@stencil\/.*/,
-    /rxjs/
+    /rxjs/,
+    /@appspltfrm\/.*/
 ]

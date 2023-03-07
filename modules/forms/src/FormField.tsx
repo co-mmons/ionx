@@ -3,6 +3,11 @@ import {Component, ComponentInterface, Event, EventEmitter, h, Host, Method, Pro
 import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
+
+defineButton();
+defineIcon();
 
 @Component({
     tag: "ionx-form-field",

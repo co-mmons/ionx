@@ -1,4 +1,4 @@
-import type {Components as ionic} from "@ionic/core";
+import type {Components as ionic} from "@ionic/core/components";
 import {Svg} from "ionx/Svg";
 import {addEventListener, EventUnlisten, isHydrated, waitTillHydrated} from "ionx/utils";
 import {itemErrorCssClass, itemLoadedCssClass, itemLoadingCssClass, itemPendingCssClass} from "./cssClasses";

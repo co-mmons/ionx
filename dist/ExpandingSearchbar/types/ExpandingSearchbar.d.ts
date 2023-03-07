@@ -1,6 +1,6 @@
 import { ComponentInterface } from "@stencil/core";
 import { EventUnlisten } from "ionx/utils";
-import type { Components } from "@ionic/core";
+import type { Components } from "@ionic/core/components";
 export declare class ExpandingSearchbar implements ComponentInterface {
   element: HTMLElement;
   expanded: boolean;

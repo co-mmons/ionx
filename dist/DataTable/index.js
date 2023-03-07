@@ -2,12 +2,17 @@ import { HTMLElement, forceUpdate, h, Host, proxyCustomElement } from '@stencil/
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import { toString } from '@co.mmons/js-utils/core';
 import { intl } from '@co.mmons/js-intl';
-import { popoverController } from '@ionic/core';
+import { popoverController } from '@ionic/core/components';
+import { defineCustomElement } from '@ionic/core/components/ion-popover';
+import { defineCustomElement as defineCustomElement$1 } from '@ionic/core/components/ion-searchbar';
+import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-footer';
+import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-toolbar';
+import { defineCustomElement as defineCustomElement$4 } from '@ionic/core/components/ion-button';
 import { defineIonxSelect, showSelectOverlay } from 'ionx/Select';
 
 const DataTable$1 = "ionx-data-table";
 
-const dataTableCss = "ionx-data-table{display:block;overflow:auto;max-height:100%;border:var(--ionx-border-width) solid var(--ion-border-color);border-radius:var(--ionx-border-radius);-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}ionx-data-table>table{width:100%}ionx-data-table>table>tbody{-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;user-select:text}ionx-data-table>table>tbody>tr>td{padding:8px;border:var(--ionx-border-width) solid var(--ion-border-color)}ionx-data-table>table>tbody>tr>td:first-child{border-left:0}ionx-data-table>table>tbody>tr>td:last-child{border-right:0}ionx-data-table>table>tbody>tr:last-child>td{border-bottom:0}";
+const dataTableCss = "ionx-data-table{display:block;overflow:auto;max-height:100%;border-width:var(--data-table-border-width, 1px);border-color:var(--data-table-border-color, var(--ion-border-color));border-style:var(--data-table-border-style, solid);border-radius:var(--data-table-border-radius, var(--ionx-border-radius));-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}ionx-data-table>table{width:100%}ionx-data-table>table>tbody{-webkit-user-select:text;-moz-user-select:text;-ms-user-select:text;user-select:text}ionx-data-table>table>tbody>tr{background-color:var(--data-table-row-background-color, var(--data-table-background-color, inherit));color:var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit));--data-table-cell-border-width:var(--data-table-row-border-width, 1px);--data-table-cell-border-style:var(--data-table-row-border-style, var(--data-table-border-style, solid));--data-table-cell-border-color:var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color)))}ionx-data-table>table>tbody>tr:nth-child(odd){background-color:var(--data-table-row-odd-background-color, var(--data-table-row-background-color, var(--data-table-background-color, inherit)));color:var(--data-table-row-odd-foreground-color, var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit)));--data-table-cell-border-width:var(--data-table-row-odd-border-width, var(--data-table-row-border-width, 1px));--data-table-cell-border-style:var(--data-table-row-odd-border-style, var(--data-table-row-border-style, var(--data-table-border-style, solid)));--data-table-cell-border-color:var(--data-table-row-odd-border-color, var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color))))}ionx-data-table>table>tbody>tr:nth-child(even){background-color:var(--data-table-row-even-background-color, var(--data-table-row-background-color, var(--data-table-background-color, inherit)));color:var(--data-table-row-even-foreground-color, var(--data-table-row-foreground-color, var(--data-table-foreground-color, inherit)));--data-table-cell-border-width:var(--data-table-row-even-border-width, var(--data-table-row-border-width, 1px));--data-table-cell-border-style:var(--data-table-row-even-border-style, var(--data-table-row-border-style, var(--data-table-border-style, solid)));--data-table-cell-border-color:var(--data-table-row-even-border-color, var(--data-table-row-border-color, var(--data-table-border-color, var(--ion-border-color))))}ionx-data-table>table>tbody>tr>td{padding:8px;border-width:var(--data-table-cell-border-width);border-style:var(--data-table-cell-border-style);border-color:var(--data-table-cell-border-color)}ionx-data-table>table>tbody>tr>td:first-child{border-left:0}ionx-data-table>table>tbody>tr>td:last-child{border-right:0}ionx-data-table>table>tbody>tr:last-child>td{border-bottom:0}";
 
 let DataTable = class extends HTMLElement {
   constructor() {
@@ -106,10 +111,10 @@ let DataTable = class extends HTMLElement {
   }
   renderCell(column, columnIndex, row, accessByIndex) {
     const value = row[accessByIndex ? columnIndex : column.id];
-    return h("td", null, column.formatter ? column.formatter(value) : value);
+    return h("td", { style: this.cellStyle }, column.formatter ? column.formatter(value) : value);
   }
   render() {
-    return h(Host, null, h("table", null, h("thead", null, h("tr", null, this.columns?.map((column, columnIndex) => h("ionx-data-table-th", { filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled, sortingEnabled: column.sortingEnabled, sortingApply: order => this.setColumnSorting(column, order), sortingActive: this.sortingColumn.id === column.id ? this.sortingColumn.order : undefined }, column.label)))), h("tbody", null, this.visibleData?.map(row => h("tr", null, this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row))))))));
+    return h(Host, null, h("table", null, h("thead", null, h("tr", { style: this.headingRowStyle }, this.columns?.map((column, columnIndex) => h("ionx-data-table-th", { style: this.headingCellStyle, filterData: () => this.columnData(column, columnIndex), filterApply: value => this.setColumnFilter(column, value), filterType: column.filterType, filterCurrent: () => this.filters[column.id], filterEnabled: column.filterEnabled, sortingEnabled: column.sortingEnabled, sortingApply: order => this.setColumnSorting(column, order), sortingActive: this.sortingColumn.id === column.id ? this.sortingColumn.order : undefined }, column.label)))), h("tbody", null, this.visibleData?.map(row => h("tr", { style: this.rowStyle }, this.columns.map((column, columnIndex) => this.renderCell(column, columnIndex, row, Array.isArray(row))))))));
   }
   static get watchers() { return {
     "data": ["dataChanged"]
@@ -119,6 +124,11 @@ let DataTable = class extends HTMLElement {
 
 const searchPopoverCss = ":host ion-footer{position:-webkit-sticky;position:sticky;bottom:0px}:host ion-footer ion-toolbar{--padding-start:0px;--padding-end:0px;--padding-top:0px;--padding-bottom:0px;--min-height:none;--ion-safe-area-bottom:0px;--ion-safe-area-top:0px;--ion-safe-area-start:0px;--ion-safe-area-end:0px}:host ion-footer div{flex:1;display:flex}:host ion-footer ion-button{min-height:44px;margin:0px}:host ion-footer ion-button:not(:last-child){font-weight:400}:host ion-footer ion-button:last-child{font-weight:500}:host ion-footer.md div{justify-content:flex-end}:host ion-footer.md ion-button{flex:none !important}:host ion-footer.ios ion-button{width:50%}:host ion-footer.ios ion-button:not(:first-child){border-left:var(--ionx-border-width) solid var(--ion-border-color)}";
 
+defineCustomElement();
+defineCustomElement$1();
+defineCustomElement$2();
+defineCustomElement$3();
+defineCustomElement$4();
 let SearchPopover = class extends HTMLElement {
   constructor() {
     super();
@@ -172,9 +182,10 @@ class MatchStringFilter extends Filter {
   }
 }
 
-const thCss = ".sc-ionx-data-table-th-h{display:table-cell;position:-webkit-sticky;position:sticky;top:0;background-color:var(--data-table-background-color, var(--ion-background-color, #fff));box-shadow:0 1px 0 0 var(--ion-border-color);border-color:var(--ion-border-color);border-style:solid;border-width:0 var(--ionx-border-width) 0 var(--ionx-border-width);padding:8px;font-weight:500}.sc-ionx-data-table-th-h:first-child{border-left:0}.sc-ionx-data-table-th-h:last-child{border-right:0}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th{display:flex;align-items:center}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th{margin:0;--padding-start:4px;--padding-end:4px}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th:first-of-type{margin-left:4px}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th:last-of-type{margin-right:4px}.sc-ionx-data-table-th-h ion-icon[ionx--sorting].sc-ionx-data-table-th{--data-table--sorting-asc:var(--ion-border-color);--data-table--sorting-desc:var(--ion-border-color)}.sc-ionx-data-table-th-h ion-icon[ionx--sorting][ionx--sorting=asc].sc-ionx-data-table-th{--data-table--sorting-asc:var(--ion-color-primary)}.sc-ionx-data-table-th-h ion-icon[ionx--sorting][ionx--sorting=desc].sc-ionx-data-table-th{--data-table--sorting-desc:var(--ion-color-primary)}";
+const thCss = ".sc-ionx-data-table-th-h{display:table-cell;position:-webkit-sticky;position:sticky;top:0;background-color:var(--data-table-heading-background-color, var(--data-table-background-color, var(--ion-background-color, #fff)));color:var(--data-table-heading-foreground-color, var(--data-table-foreground-color, inherit));border-color:var(--data-table-heading-border-color, var(--ion-border-color));border-style:solid;border-width:0 var(--data-table-heading-border-end-width, var(--ionx-border-width)) 0 var(--data-table-heading-border-start-width, var(--ionx-border-width));padding:8px;font-weight:500}.sc-ionx-data-table-th-h:first-child{border-left:0;border-top-left-radius:var(--data-table-border-radius, var(--ionx-border-radius))}.sc-ionx-data-table-th-h:last-child{border-right:0;border-top-right-radius:var(--data-table-border-radius, var(--ionx-border-radius))}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th{display:flex;align-items:center}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th{margin:0;--padding-start:4px;--padding-end:4px;--color:var(--data-table-heading-action-color, var(--ion-color-primary))}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th:first-of-type{margin-left:4px}.sc-ionx-data-table-th-h .ionx--outer.sc-ionx-data-table-th ion-button.sc-ionx-data-table-th:last-of-type{margin-right:4px}.sc-ionx-data-table-th-h ion-icon[ionx--sorting][ionx--sorting=asc].sc-ionx-data-table-th{--data-table-sorting-asc-opacity:1}.sc-ionx-data-table-th-h ion-icon[ionx--sorting][ionx--sorting=desc].sc-ionx-data-table-th{--data-table-sorting-desc-opacity:1}";
 
 defineIonxSelect();
+defineCustomElement();
 let Th = class extends HTMLElement {
   constructor() {
     super();
@@ -247,7 +258,7 @@ let Th = class extends HTMLElement {
   static get style() { return thCss; }
 };
 
-const IonxDataTable = /*@__PURE__*/proxyCustomElement(DataTable, [0,"ionx-data-table",{"columns":[16],"data":[16],"visibleData":[32]}]);
+const IonxDataTable = /*@__PURE__*/proxyCustomElement(DataTable, [0,"ionx-data-table",{"columns":[16],"data":[16],"headingRowStyle":[8,"heading-row-style"],"headingCellStyle":[8,"heading-cell-style"],"rowStyle":[8,"row-style"],"cellStyle":[8,"cell-style"],"visibleData":[32]}]);
 const IonxDataTableSearchFilter = /*@__PURE__*/proxyCustomElement(SearchPopover, [1,"ionx-data-table-search-filter",{"value":[1]},[[0,"ionViewDidEnter","didEnter"]]]);
 const IonxDataTableTh = /*@__PURE__*/proxyCustomElement(Th, [6,"ionx-data-table-th",{"filterEnabled":[4,"filter-enabled"],"filterType":[1,"filter-type"],"filterData":[16],"filterApply":[16],"filterCurrent":[16],"sortingEnabled":[4,"sorting-enabled"],"sortingActive":[8,"sorting-active"],"sortingApply":[16],"filterActive":[32]}]);
 const defineIonxDataTable = (opts) => {

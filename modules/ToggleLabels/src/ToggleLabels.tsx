@@ -1,6 +1,8 @@
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Prop, Watch} from "@stencil/core";
-import type {Components as ionic} from "@ionic/core";
-import {prefetchComponent} from "ionx/utils";
+import type {Components as ionic} from "@ionic/core/components";
+import {defineCustomElement as defineToggle} from "@ionic/core/components/ion-toggle";
+
+defineToggle();
 
 @Component({
     tag: "ionx-toggle-labels",
@@ -32,12 +34,6 @@ export class ToggleLabels {
 
     @Prop({mutable: true})
     value: boolean;
-
-    /**
-     * @internal
-     */
-    @Prop()
-    prefetch: boolean;
 
     @Event()
     ionChange: EventEmitter<{value: boolean, checked: boolean}>;
@@ -86,19 +82,11 @@ export class ToggleLabels {
         toggle.disabled = this.readonly || this.disabled;
     }
 
-    componentDidLoad() {
-        prefetchComponent({delay: 0}, "ion-toggle");
-    }
-
     connectedCallback() {
         this.initialToggleState = {checked: this.value, disabled: this.readonly || this.disabled};
     }
 
     render() {
-
-        if (this.prefetch) {
-            return;
-        }
 
         return <Host class={{"ionx--interactive": !this.disabled && !this.readonly, "ionx--readonly": this.readonly}}>
 

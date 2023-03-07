@@ -204,7 +204,6 @@ export class LinkEditor implements LinkEditorProps, ComponentInterface, FormCont
         data.onStateChange(({value}) => {
             if (value) {
                 const link = this.#buildLink();
-                console.log(link, this.value)
                 if (!deepEqual(link, this.value)) {
                     this.value = link;
                     this.ionChange.emit({value: link});

@@ -1,4 +1,4 @@
-import { Node, Mark, MarkType } from "prosemirror-model";
+import {Node, Mark, MarkType, NodeType} from "prosemirror-model";
 import { SelectionRange, EditorState, Transaction } from "prosemirror-state";
 
 export const isMarkAllowedInRange = (
@@ -77,22 +77,37 @@ export const removeBlockMarks = (
  */
 export const sanitizeSelectionMarks = (
     state: EditorState,
+    newParentType?: NodeType,
 ): Transaction | undefined => {
     let tr: Transaction | undefined;
-    const { $from, $to } = state.tr.selection;
-    state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
-        node.marks.forEach(mark => {
-            if (!node.type.allowsMarkType(mark.type)) {
-                const filteredMarks = node.marks.filter(m => m.type !== mark.type);
-                const position = pos > 0 ? pos - 1 : 0;
-                tr = (tr || state.tr).setNodeMarkup(
-                    position,
-                    undefined,
-                    node.attrs,
-                    filteredMarks,
-                );
+    const { from, to } = state.tr.selection;
+
+    state.doc.nodesBetween(
+        from,
+        to,
+        (node, pos, parent) => {
+            // If iterate over a node thats out of our defined range
+            // We skip here but continue to iterate over its children.
+            if (node.isText || pos < from || pos > to) {
+                return true;
             }
-        });
-    });
+            node.marks.forEach(mark => {
+                if (
+                    !parent.type.allowsMarkType(mark.type) ||
+                    (newParentType && !newParentType.allowsMarkType(mark.type))
+                ) {
+                    const filteredMarks = node.marks.filter(m => m.type !== mark.type);
+                    const position = pos > 0 ? pos - 1 : 0;
+                    tr = (tr || state.tr).setNodeMarkup(
+                        position,
+                        undefined,
+                        node.attrs,
+                        filteredMarks,
+                    );
+                }
+            });
+        },
+        from,
+    );
     return tr;
 };

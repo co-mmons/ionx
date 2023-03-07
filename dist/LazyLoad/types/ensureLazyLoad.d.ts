@@ -1,4 +1,4 @@
-import type { Components as ionic } from "@ionic/core";
+import type { Components as ionic } from "@ionic/core/components";
 export interface EnsureLazyLoadOptions {
   retryError?: boolean;
 }

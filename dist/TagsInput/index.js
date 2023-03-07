@@ -1,10 +1,16 @@
 import { HTMLElement, createEvent, h, Host, proxyCustomElement } from '@stencil/core/internal/client';
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
+import { defineCustomElement } from '@ionic/core/components/ion-chip';
+import { defineCustomElement as defineCustomElement$1 } from 'ionicons/components/ion-icon';
+import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-input';
 
 const TagsInput = "ionx-tags-input";
 
 const tagsInputComponentCss = ".sc-ionx-tags-input-h{display:block}.sc-ionx-tags-input-h ion-chip.sc-ionx-tags-input{margin:4px 4px 4px 0;height:30px}.sc-ionx-tags-input-h ion-chip.chip-disabled.sc-ionx-tags-input{opacity:1}.sc-ionx-tags-input-h ion-input.sc-ionx-tags-input{--padding-start:0;--padding-end:0}.item-label-stacked.sc-ionx-tags-input-h,.item-label-stacked .sc-ionx-tags-input-h{width:100%}ionx-form-field [slot-container=default]>.sc-ionx-tags-input-h{margin-left:16px;margin-right:16px;min-height:38px}";
 
+defineCustomElement();
+defineCustomElement$1();
+defineCustomElement$2();
 let TagsInputComponent = class extends HTMLElement {
   constructor() {
     super();

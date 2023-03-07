@@ -1,5 +1,5 @@
 import { HtmlString } from "@co.mmons/js-utils/core";
-import { OverlayEventDetail } from "@ionic/core";
+import { OverlayEventDetail } from "@ionic/core/components";
 import { DialogButton } from "./DialogButton";
 import { DialogOptions } from "./DialogOptions";
 export declare class Dialog implements DialogOptions {
@@ -53,6 +53,5 @@ export declare class Dialog implements DialogOptions {
   ionDidEnter(): void;
   onDidDismiss(): Promise<OverlayEventDetail<any>>;
   onWillDismiss(): Promise<OverlayEventDetail<any>>;
-  componentDidLoad(): void;
   render(): any;
 }

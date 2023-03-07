@@ -1,4 +1,4 @@
-import { TextFieldTypes } from "@ionic/core";
+import { TextFieldTypes } from "@ionic/core/components";
 import { EventEmitter } from "@stencil/core";
 export declare class TagsInputComponent {
   element: HTMLElement;

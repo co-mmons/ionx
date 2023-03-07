@@ -23,48 +23,6 @@
 | `values`               | --              |             | `any[]`                                                                | `undefined` |
 
 
-## Dependencies
-
-### Depends on
-
-- ion-item
-- ion-icon
-- ion-label
-- ion-spinner
-- ion-checkbox
-- ion-header
-- ion-button
-- ion-toolbar
-- ion-searchbar
-- ion-content
-- ion-list
-- ion-virtual-scroll
-- ion-footer
-
-### Graph
-```mermaid
-graph TD;
-  ionx-select-overlay --> ion-item
-  ionx-select-overlay --> ion-icon
-  ionx-select-overlay --> ion-label
-  ionx-select-overlay --> ion-spinner
-  ionx-select-overlay --> ion-checkbox
-  ionx-select-overlay --> ion-header
-  ionx-select-overlay --> ion-button
-  ionx-select-overlay --> ion-toolbar
-  ionx-select-overlay --> ion-searchbar
-  ionx-select-overlay --> ion-content
-  ionx-select-overlay --> ion-list
-  ionx-select-overlay --> ion-virtual-scroll
-  ionx-select-overlay --> ion-footer
-  ion-item --> ion-icon
-  ion-item --> ion-ripple-effect
-  ion-item --> ion-note
-  ion-button --> ion-ripple-effect
-  ion-searchbar --> ion-icon
-  style ionx-select-overlay fill:#f9f,stroke:#333,stroke-width:4px
-```
-
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

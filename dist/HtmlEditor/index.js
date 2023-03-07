@@ -2,6 +2,7 @@ import { HTMLElement as HTMLElement$1, createEvent, h, Host, Fragment as Fragmen
 export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client';
 import * as baseCommand from 'prosemirror-commands';
 import { toggleMark, chainCommands, deleteSelection, joinBackward, selectNodeBackward, joinForward, selectNodeForward, selectAll, joinUp, joinDown, lift, selectParentNode, newlineInCode, createParagraphNear, liftEmptyBlock, splitBlock, exitCode, setBlockType } from 'prosemirror-commands';
+import { unbenc, benc } from '@appspltfrm/shared/benc';
 import * as baseListCommand from 'prosemirror-schema-list';
 import { splitListItem } from 'prosemirror-schema-list';
 import { MarkType, Schema, Slice, Fragment, NodeRange, DOMParser, DOMSerializer } from 'prosemirror-model';
@@ -12,7 +13,6 @@ import { TextSelection, NodeSelection, EditorState } from 'prosemirror-state';
 import { findParentNode, findParentNodeOfType, findPositionOfNodeBefore, hasParentNodeOfType } from 'prosemirror-utils';
 import { defineIonxLinkEditor, showLinkEditor, loadIonxLinkEditorIntl } from 'ionx/LinkEditor';
 import { deepEqual, shallowEqual } from 'fast-equals';
-import { unbenc, benc } from './Volumes/Projekty/co.mmons/ionx/node_modules/@appspltfrm/shared/_esm2015/benc/index.js';
 import { GapCursor } from 'prosemirror-gapcursor';
 import { ReplaceAroundStep, liftTarget } from 'prosemirror-transform';
 import { undo, redo, history, undoDepth, redoDepth } from 'prosemirror-history';
@@ -20,8 +20,11 @@ import { undoInputRule } from 'prosemirror-inputrules';
 import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { keymap } from 'prosemirror-keymap';
 import { EditorView } from 'prosemirror-view';
-import { popoverController, isPlatform, createAnimation } from '@ionic/core';
+import { popoverController, isPlatform, createAnimation } from '@ionic/core/components';
 import { addEventListener } from 'ionx/utils';
+import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-popover';
+import { defineCustomElement } from '@ionic/core/components/ion-button';
+import { defineCustomElement as defineCustomElement$1 } from 'ionicons/components/ion-icon';
 
 class MarkSpecExtended {
 }
@@ -273,7 +276,7 @@ class LinkMark extends MarkSpecExtended {
               href: dom.getAttribute("href"),
               target: dom.getAttribute("target"),
               title: dom.getAttribute("title"),
-              value: unbenc(dom.getAttribute("benc:value"))
+              value: dom.getAttribute("benc:value") && unbenc(dom.getAttribute("benc:value"))
             };
           }
         }
@@ -962,18 +965,24 @@ function liftSelectionList(state, tr) {
 /**
  * Removes marks from nodes in the current selection that are not supported
  */
-const sanitizeSelectionMarks = (state) => {
+const sanitizeSelectionMarks = (state, newParentType) => {
   let tr;
-  const { $from, $to } = state.tr.selection;
-  state.doc.nodesBetween($from.pos, $to.pos, (node, pos) => {
+  const { from, to } = state.tr.selection;
+  state.doc.nodesBetween(from, to, (node, pos, parent) => {
+    // If iterate over a node thats out of our defined range
+    // We skip here but continue to iterate over its children.
+    if (node.isText || pos < from || pos > to) {
+      return true;
+    }
     node.marks.forEach(mark => {
-      if (!node.type.allowsMarkType(mark.type)) {
+      if (!parent.type.allowsMarkType(mark.type) ||
+        (newParentType && !newParentType.allowsMarkType(mark.type))) {
         const filteredMarks = node.marks.filter(m => m.type !== mark.type);
         const position = pos > 0 ? pos - 1 : 0;
         tr = (tr || state.tr).setNodeMarkup(position, undefined, node.attrs, filteredMarks);
       }
     });
-  });
+  }, from);
   return tr;
 };
 
@@ -2306,6 +2315,9 @@ let TextMenu = class extends HTMLElement$1 {
 
 const toolbarCss = ".sc-ionx-html-editor-toolbar-h{outline:none;display:flex;justify-content:center;flex-wrap:wrap;position:sticky;position:-webkit-sticky;top:0;background-color:var(--background);z-index:1;padding:8px 0}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar{margin:0 4px;--padding-end:4px;--padding-start:4px}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar:not(.button-outline){border:1px solid transparent}.sc-ionx-html-editor-toolbar-h ion-button.button-outline.sc-ionx-html-editor-toolbar{--border-width:1px}.sc-ionx-html-editor-toolbar-h ion-icon[slot=end].sc-ionx-html-editor-toolbar{margin:0;font-size:1em}.sc-ionx-html-editor-toolbar-h ion-button[disabled].sc-ionx-html-editor-toolbar{opacity:0.5}.sc-ionx-html-editor-toolbar-h [ionx--buttons-group].sc-ionx-html-editor-toolbar{display:flex}.sc-ionx-html-editor-toolbar-h .buttons-group.sc-ionx-html-editor-toolbar ion-button.sc-ionx-html-editor-toolbar:not(:last-child){margin-right:0}.ion-focused.sc-ionx-html-editor-toolbar-h,.ion-focused .sc-ionx-html-editor-toolbar-h{background-color:var(--background-focused)}";
 
+defineCustomElement();
+defineCustomElement$1();
+defineCustomElement$2();
 let Toolbar = class extends HTMLElement$1 {
   constructor() {
     super();
