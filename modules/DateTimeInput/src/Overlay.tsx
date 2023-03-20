@@ -317,6 +317,7 @@ export class Overlay {
 
                 <ion-input
                     type="number"
+                    inputmode="numeric"
                     pattern="[0-9]*"
                     name={part}
                     placeholder={`${def}`}
