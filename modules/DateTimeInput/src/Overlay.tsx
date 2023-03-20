@@ -8,6 +8,7 @@ import {defineCustomElement as defineToolbar} from "@ionic/core/components/ion-t
 import {defineCustomElement as defineLabel} from "@ionic/core/components/ion-label";
 import {defineCustomElement as defineInput} from "@ionic/core/components/ion-input";
 import {Component, Element, h, Host, Listen, Prop, State} from "@stencil/core";
+import {addCircleOutline, removeCircleOutline} from "ionicons/icons";
 import {Select} from "ionx/Select";
 import {currentTimeZone} from "./currentTimeZone";
 import {DateTimeInputType} from "./DateTimeInputType";
@@ -306,16 +307,17 @@ export class Overlay {
                 </ion-label>
 
                 <div class="numeric-buttons" slot="end">
-                    <ion-button fill="clear" size="small" tabindex={-1} onClick={() => this.move(part, -1)}>
-                        <ion-icon slot="icon-only" name="remove-circle-outline"/>
+                    <ion-button fill="clear" size="large" tabindex={-1} onClick={() => this.move(part, -1)}>
+                        <ion-icon slot="icon-only" src={removeCircleOutline}/>
                     </ion-button>
-                    <ion-button fill="clear" size="small" tabindex={-1} onClick={() => this.move(part, 1)}>
-                        <ion-icon slot="icon-only" name="add-circle"/>
+                    <ion-button fill="clear" size="large" tabindex={-1} onClick={() => this.move(part, 1)}>
+                        <ion-icon slot="icon-only" src={addCircleOutline}/>
                     </ion-button>
                 </div>
 
                 <ion-input
                     type="number"
+                    pattern="[0-9]*"
                     name={part}
                     placeholder={`${def}`}
                     value={val}

@@ -11,7 +11,7 @@ export async function showDialog(options: DialogOptions & Exclude<Partial<ModalO
         componentProps: options
     } as ModalOptions));
 
-    modal.style.setProperty("--width", options.width || "300px");
+    modal.style.setProperty("--width", options?.width || "300px");
     modal.style.setProperty("--height", "auto");
     modal.style.setProperty("--max-width", "90vw");
     modal.style.setProperty("--max-height", "90vh");

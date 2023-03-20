@@ -39,11 +39,12 @@
 
     .numeric-buttons {
         text-align: center;
-        margin-left: 16px;
+        margin-left: 12px;
         margin-right: 0;
 
         ion-button {
-            margin: 0;
+            margin: 0 0 0 4px;
+            height: 2em;
             --padding-start: 2px;
             --padding-end: 2px;
         }

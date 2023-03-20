@@ -16,7 +16,7 @@ async function showDialog(options) {
     component: "ionx-dialog",
     componentProps: options
   }));
-  modal.style.setProperty("--width", options.width || "300px");
+  modal.style.setProperty("--width", options?.width || "300px");
   modal.style.setProperty("--height", "auto");
   modal.style.setProperty("--max-width", "90vw");
   modal.style.setProperty("--max-height", "90vh");
