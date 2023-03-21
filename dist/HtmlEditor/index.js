@@ -20,11 +20,12 @@ import { undoInputRule } from 'prosemirror-inputrules';
 import { waitTill, Enum } from '@co.mmons/js-utils/core';
 import { keymap } from 'prosemirror-keymap';
 import { EditorView } from 'prosemirror-view';
+import { defineCustomElement } from '@ionic/core/components/ion-item-divider';
 import { popoverController, isPlatform, createAnimation } from '@ionic/core/components';
 import { addEventListener } from 'ionx/utils';
-import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-popover';
-import { defineCustomElement } from '@ionic/core/components/ion-button';
-import { defineCustomElement as defineCustomElement$1 } from 'ionicons/components/ion-icon';
+import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-popover';
+import { defineCustomElement as defineCustomElement$1 } from '@ionic/core/components/ion-button';
+import { defineCustomElement as defineCustomElement$2 } from 'ionicons/components/ion-icon';
 
 class MarkSpecExtended {
 }
@@ -1651,6 +1652,7 @@ function scrollToCaret(parent) {
 
 const htmlEditorCss = ".ProseMirror-gapcursor{display:none;pointer-events:none;position:absolute}.ProseMirror-gapcursor:after{content:\"\";display:block;position:absolute;top:-2px;width:20px;border-top:1px solid black;animation:ProseMirror-cursor-blink 1.1s steps(2, start) infinite}@keyframes ProseMirror-cursor-blink{to{visibility:hidden}}.ProseMirror-focused .ProseMirror-gapcursor{display:block}.ProseMirror{position:relative}.ProseMirror{word-wrap:break-word;white-space:pre-wrap;white-space:break-spaces;-webkit-font-variant-ligatures:none;font-variant-ligatures:none;font-feature-settings:\"liga\" 0;}.ProseMirror pre{white-space:pre-wrap}.ProseMirror li{position:relative}.ProseMirror-hideselection *::selection{background:transparent}.ProseMirror-hideselection *::-moz-selection{background:transparent}.ProseMirror-hideselection{caret-color:transparent}.ProseMirror-selectednode{outline:2px solid #8cf}li.ProseMirror-selectednode{outline:none}li.ProseMirror-selectednode:after{content:\"\";position:absolute;left:-32px;right:-2px;top:-2px;bottom:-2px;border:2px solid #8cf;pointer-events:none}img.ProseMirror-separator{display:inline !important;border:none !important;margin:0 !important}ionx-html-editor{display:block}ionx-html-editor app-template-string{display:inline-block;width:1em;height:0.8em;background:red}ionx-html-editor .ProseMirror-selectednode{outline:var(--html-editor-selected-node-outline, 1px solid var(--ion-color-primary))}ionx-html-editor>.ionx--prosemirror>.ProseMirror{outline:none;user-select:text}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true]{min-height:60px;white-space:pre-wrap;word-wrap:break-word}ionx-html-editor>.ionx--prosemirror>.ProseMirror[contenteditable=true] .ionx--selected{border:4px solid var(--ion-color-primary)}ionx-html-editor>.ionx--prosemirror>.ProseMirror:not([contenteditable=true]) .ionx--interactive{display:none}ionx-html-editor>.ionx--prosemirror>.ProseMirror p{margin:16px 0 0 0}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1{font-size:130%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h2{font-size:125%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h3{font-size:120%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h4{font-size:115%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h5{font-size:110%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{font-size:105%}ionx-html-editor>.ionx--prosemirror>.ProseMirror h1,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6{margin-top:16px;margin-bottom:8px}ionx-html-editor>.ionx--prosemirror>.ProseMirror p:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror ul:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror ol:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h1:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h2:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h3:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h4:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h5:first-child,ionx-html-editor>.ionx--prosemirror>.ProseMirror h6:first-child{margin-top:0}ionx-form-field [slot-container=default]>ionx-html-editor{margin:8px 16px}";
 
+defineCustomElement();
 let HtmlEditor = class extends HTMLElement$1 {
   constructor() {
     super();
@@ -2315,9 +2317,9 @@ let TextMenu = class extends HTMLElement$1 {
 
 const toolbarCss = ".sc-ionx-html-editor-toolbar-h{outline:none;display:flex;justify-content:center;flex-wrap:wrap;position:sticky;position:-webkit-sticky;top:0;background-color:var(--background);z-index:1;padding:8px 0}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar{margin:0 4px;--padding-end:4px;--padding-start:4px}.sc-ionx-html-editor-toolbar-h ion-button.sc-ionx-html-editor-toolbar:not(.button-outline){border:1px solid transparent}.sc-ionx-html-editor-toolbar-h ion-button.button-outline.sc-ionx-html-editor-toolbar{--border-width:1px}.sc-ionx-html-editor-toolbar-h ion-icon[slot=end].sc-ionx-html-editor-toolbar{margin:0;font-size:1em}.sc-ionx-html-editor-toolbar-h ion-button[disabled].sc-ionx-html-editor-toolbar{opacity:0.5}.sc-ionx-html-editor-toolbar-h [ionx--buttons-group].sc-ionx-html-editor-toolbar{display:flex}.sc-ionx-html-editor-toolbar-h .buttons-group.sc-ionx-html-editor-toolbar ion-button.sc-ionx-html-editor-toolbar:not(:last-child){margin-right:0}.ion-focused.sc-ionx-html-editor-toolbar-h,.ion-focused .sc-ionx-html-editor-toolbar-h{background-color:var(--background-focused)}";
 
-defineCustomElement();
 defineCustomElement$1();
 defineCustomElement$2();
+defineCustomElement$3();
 let Toolbar = class extends HTMLElement$1 {
   constructor() {
     super();

@@ -16,6 +16,10 @@ import {fixIonItemOverflow} from "./utils/fixIonItemOverflow";
 import {scrollIntoView} from "./utils/scrollIntoView";
 import {scrollToCaret} from "./utils/scrollToCaret";
 
+import {defineCustomElement as defineItemDivider} from "@ionic/core/components/ion-item-divider";
+
+defineItemDivider();
+
 @Component({
     tag: "ionx-html-editor",
     styleUrl: "HtmlEditor.scss",
