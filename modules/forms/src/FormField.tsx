@@ -1,5 +1,6 @@
 import {intl, MessageRef} from "@co.mmons/js-intl";
 import {Component, ComponentInterface, Event, EventEmitter, h, Host, Method, Prop, State, Watch} from "@stencil/core";
+import {chevronUp} from "ionicons/icons";
 import {FormControlState} from "./FormControlState";
 import {FormValidationError} from "./FormValidationError";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
@@ -102,7 +103,7 @@ export class FormField implements ComponentInterface {
                     </div>
 
                     {this.collapsible && <ion-button class="ionx--expand-toggle" shape="round" size="small" fill="clear" onClick={() => this.expandCollapseClicked()}>
-                        <ion-icon name="chevron-up" slot="icon-only"/>
+                        <ion-icon src={chevronUp} slot="icon-only"/>
                     </ion-button>}
                 </legend>}
 

@@ -8,7 +8,7 @@ import {LazyLoadableCustomElement} from "./LazyLoadableCustomElement";
 import {realContainerElement} from "./realContainerElement";
 import {styleParents} from "./styleParents";
 
-const srcSupportedTagNames = ["IMG", "VIDEO", "IFRAME", Svg.toUpperCase()];
+const srcSupportedTagNames = ["IMG", "VIDEO", "AUDIO", "IFRAME", Svg.toUpperCase()];
 
 export class LazyLoadController {
 
@@ -49,7 +49,7 @@ export class LazyLoadController {
         const srcSupported = srcSupportedTagNames.includes(element.tagName);
         const options = element.__lazyLoadOptions;
 
-        const loadEventName = element.tagName === "VIDEO" ? "loadedmetadata" : "load";
+        const loadEventName = element.tagName === "VIDEO" || element.tagName === "AUDIO" ? "loadedmetadata" : "load";
 
         delete element.__lazyLoadSrc;
 

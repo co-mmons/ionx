@@ -40,6 +40,8 @@ export class LazyLoad {
 
                 this.observers.push(new MutationObserver(mutations => this.onMutation(mutations)));
                 this.observers[1].observe(container.shadowRoot, {childList: true, subtree: true});
+
+                this.onMutation([]);
             }
         }
 

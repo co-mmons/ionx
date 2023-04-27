@@ -9,6 +9,7 @@ import scrollIntoView from 'scroll-into-view';
 import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import { defineCustomElement } from '@ionic/core/components/ion-button';
 import ExtendableError from 'ts-error';
+import { chevronUp } from 'ionicons/icons';
 import { defineCustomElement as defineCustomElement$1 } from 'ionicons/components/ion-icon';
 import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-item';
 
@@ -1036,7 +1037,7 @@ let FormField = class extends HTMLElement {
     await loadIntlMessages();
   }
   render() {
-    return h$1(Host, { class: { "ionx--has-error": !!this.errorMessage } }, h$1("fieldset", null, this.hasLabel && h$1("legend", null, h$1("div", { key: "label", "slot-container": "label" }, h$1("slot", { name: "label" }, this.label)), h$1("div", { key: "label-end", "slot-container": "label-end" }, h$1("slot", { name: "label-end" })), this.collapsible && h$1("ion-button", { class: "ionx--expand-toggle", shape: "round", size: "small", fill: "clear", onClick: () => this.expandCollapseClicked() }, h$1("ion-icon", { name: "chevron-up", slot: "icon-only" }))), h$1("div", { key: "description", "slot-container": "description" }, h$1("slot", { name: "description" })), h$1("div", { key: "placeholder", "slot-container": "placeholder" }, h$1("slot", { name: "placeholder" })), h$1("div", { "ionx--content": true, style: { display: this.flexContent ? "flex" : "block" } }, h$1("div", { key: "start", "slot-container": "start" }, h$1("slot", { name: "start" })), h$1("div", { key: "default", "slot-container": "default" }, h$1("slot", null)), h$1("div", { key: "end", "slot-container": "end" }, h$1("slot", { name: "end" })))), h$1("div", { "slot-container": "error" }, this.errorMessage && h$1("span", { slot: "error" }, this.errorMessage), h$1("slot", { name: "error" })), h$1("div", { "slot-container": "hint" }, h$1("slot", { name: "hint" })));
+    return h$1(Host, { class: { "ionx--has-error": !!this.errorMessage } }, h$1("fieldset", null, this.hasLabel && h$1("legend", null, h$1("div", { key: "label", "slot-container": "label" }, h$1("slot", { name: "label" }, this.label)), h$1("div", { key: "label-end", "slot-container": "label-end" }, h$1("slot", { name: "label-end" })), this.collapsible && h$1("ion-button", { class: "ionx--expand-toggle", shape: "round", size: "small", fill: "clear", onClick: () => this.expandCollapseClicked() }, h$1("ion-icon", { src: chevronUp, slot: "icon-only" }))), h$1("div", { key: "description", "slot-container": "description" }, h$1("slot", { name: "description" })), h$1("div", { key: "placeholder", "slot-container": "placeholder" }, h$1("slot", { name: "placeholder" })), h$1("div", { "ionx--content": true, style: { display: this.flexContent ? "flex" : "block" } }, h$1("div", { key: "start", "slot-container": "start" }, h$1("slot", { name: "start" })), h$1("div", { key: "default", "slot-container": "default" }, h$1("slot", null)), h$1("div", { key: "end", "slot-container": "end" }, h$1("slot", { name: "end" })))), h$1("div", { "slot-container": "error" }, this.errorMessage && h$1("span", { slot: "error" }, this.errorMessage), h$1("slot", { name: "error" })), h$1("div", { "slot-container": "hint" }, h$1("slot", { name: "hint" })));
   }
   static get watchers() { return {
     "control": ["watchErrorProps"],

@@ -55,7 +55,7 @@ function styleParents(element, parents) {
   }
 }
 
-const srcSupportedTagNames = ["IMG", "VIDEO", "IFRAME", Svg.toUpperCase()];
+const srcSupportedTagNames = ["IMG", "VIDEO", "AUDIO", "IFRAME", Svg.toUpperCase()];
 class LazyLoadController {
   constructor(content) {
     this.containers = [];
@@ -72,7 +72,7 @@ class LazyLoadController {
   loadItem(element) {
     const srcSupported = srcSupportedTagNames.includes(element.tagName);
     const options = element.__lazyLoadOptions;
-    const loadEventName = element.tagName === "VIDEO" ? "loadedmetadata" : "load";
+    const loadEventName = element.tagName === "VIDEO" || element.tagName === "AUDIO" ? "loadedmetadata" : "load";
     delete element.__lazyLoadSrc;
     element.classList.remove(itemPendingCssClass);
     element.classList.add(itemLoadingCssClass);
@@ -314,6 +314,7 @@ let LazyLoad = class extends HTMLElement$1 {
         await waitTill(() => !!container.shadowRoot);
         this.observers.push(new MutationObserver(mutations => this.onMutation(mutations)));
         this.observers[1].observe(container.shadowRoot, { childList: true, subtree: true });
+        this.onMutation([]);
       }
     }
   }
