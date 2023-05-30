@@ -1,12 +1,13 @@
 import {toString} from "@co.mmons/js-utils/core";
 import {popoverController} from "@ionic/core/components";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
 import {Component, Element, h, Host, Prop, State} from "@stencil/core";
+import {filterOutline, searchOutline} from "ionicons/icons";
 import {defineIonxSelect, SelectOption, showSelectOverlay} from "ionx/Select";
 import {DataTableColumnFilterOptions} from "./DataTableColumnFilterOptions";
 import {Filter} from "./filter/Filter";
 import {HasOneOfFilter} from "./filter/HasOneOfFilter";
 import {MatchStringFilter} from "./filter/MatchStringFilter";
-import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
 
 defineIonxSelect();
 definePopover();
@@ -145,7 +146,7 @@ export class Th implements DataTableColumnFilterOptions {
                     shape="round"
                     color={this.filterActive ? "success" : "primary"}
                     onClick={() => this.filterClicked()}>
-                    <ion-icon name={this.filterType === "search" ? "search" : "filter"}/>
+                    <ion-icon src={this.filterType === "search" ? searchOutline : filterOutline}/>
                 </ion-button>}
 
             </div>
