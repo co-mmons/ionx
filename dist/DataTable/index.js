@@ -8,6 +8,7 @@ import { defineCustomElement as defineCustomElement$1 } from '@ionic/core/compon
 import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-footer';
 import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-toolbar';
 import { defineCustomElement as defineCustomElement$4 } from '@ionic/core/components/ion-button';
+import { searchOutline, filterOutline } from 'ionicons/icons';
 import { defineIonxSelect, showSelectOverlay } from 'ionx/Select';
 
 const DataTable$1 = "ionx-data-table";
@@ -252,7 +253,7 @@ let Th = class extends HTMLElement {
     }
   }
   render() {
-    return h(Host, null, h("div", { class: "ionx--outer" }, h("div", { "slot-container": "label" }, h("slot", null)), this.sortingEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.sortingClicked() }, h("ion-icon", { "ionx--sorting": this.sortingActive || "no", src: "/assets/ionx.DataTable/sort.svg" })), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.filterClicked() }, h("ion-icon", { name: this.filterType === "search" ? "search" : "filter" }))));
+    return h(Host, null, h("div", { class: "ionx--outer" }, h("div", { "slot-container": "label" }, h("slot", null)), this.sortingEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.sortingClicked() }, h("ion-icon", { "ionx--sorting": this.sortingActive || "no", src: "/assets/ionx.DataTable/sort.svg" })), this.filterEnabled && h("ion-button", { fill: "clear", size: "small", shape: "round", color: this.filterActive ? "success" : "primary", onClick: () => this.filterClicked() }, h("ion-icon", { src: this.filterType === "search" ? searchOutline : filterOutline }))));
   }
   get element() { return this; }
   static get style() { return thCss; }
