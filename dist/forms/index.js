@@ -41,6 +41,7 @@ const detachFunctionName = "__ionxFormControlDetach";
 class FormControlImpl {
   constructor(name) {
     this.name = name;
+    this.unlisteners = [];
     this.touched$ = false;
     this.dirty$ = false;
     this.valid$ = true;
@@ -215,8 +216,15 @@ class FormControlImpl {
           console.debug(`[ionx-form-control] attach control ${control.name}`, el);
           control.element$ = el;
           control.element$.setAttribute("ionx-form-control", control.name);
-          control.unlistenOnChange = addEventListener(control.element$, control.element$.formValueChangeEventName || "ionChange", ev => control.onElementChange(ev));
-          control.unlistenOnFocus = addEventListener(control.element$, control.element$.formTouchEventName || "ionFocus", () => control.markAsTouched());
+          if (el.tagName.startsWith("APPX-")) {
+            control.unlisteners.push(addEventListener(control.element$, control.element$.formValueChangeEventName || "valuechange", ev => control.onElementChange(ev)), addEventListener(control.element$, control.element$.formTouchEventName || "focus", () => control.markAsTouched()));
+          }
+          else {
+            if (el.tagName.startsWith("APP-")) {
+              control.unlisteners.push(addEventListener(control.element$, control.element$.formValueChangeEventName || "valuechange", ev => control.onElementChange(ev)), addEventListener(control.element$, control.element$.formTouchEventName || "focus", () => control.markAsTouched()));
+            }
+            control.unlisteners.push(addEventListener(control.element$, control.element$.formValueChangeEventName || "ionChange", ev => control.onElementChange(ev)), addEventListener(control.element$, control.element$.formTouchEventName || "ionFocus", () => control.markAsTouched()));
+          }
           control.applyElementState({ value: control.value$, valueChange: true, status: control.status(), statusChange: true });
         }
       }
@@ -232,10 +240,9 @@ class FormControlImpl {
   detach() {
     if (this.element$) {
       console.debug(`[ionx-form-control] detach control ${this.name}`, this.element$);
-      this.unlistenOnChange?.();
-      this.unlistenOnChange = undefined;
-      this.unlistenOnFocus?.();
-      this.unlistenOnFocus = undefined;
+      for (const u of this.unlisteners.splice(0)) {
+        u();
+      }
       delete this.element$[detachFunctionName];
       this.element$.removeAttribute("ionx-form-control");
       this.element$ = undefined;

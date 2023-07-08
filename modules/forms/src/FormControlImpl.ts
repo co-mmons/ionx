@@ -245,8 +245,24 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
                     control.element$ = el;
                     control.element$.setAttribute("ionx-form-control", control.name);
-                    control.unlistenOnChange = addEventListener(control.element$, control.element$.formValueChangeEventName || "ionChange", ev => control.onElementChange(ev as CustomEvent));
-                    control.unlistenOnFocus = addEventListener(control.element$, control.element$.formTouchEventName || "ionFocus", () => control.markAsTouched());
+
+                    if (el.tagName.startsWith("APPX-")) {
+                        control.unlisteners.push(
+                            addEventListener(control.element$, control.element$.formValueChangeEventName || "valuechange", ev => control.onElementChange(ev as CustomEvent)),
+                            addEventListener(control.element$, control.element$.formTouchEventName || "focus", () => control.markAsTouched()));
+                    } else {
+
+                        if (el.tagName.startsWith("APP-")) {
+                            control.unlisteners.push(
+                                addEventListener(control.element$, control.element$.formValueChangeEventName || "valuechange", ev => control.onElementChange(ev as CustomEvent)),
+                                addEventListener(control.element$, control.element$.formTouchEventName || "focus", () => control.markAsTouched()));
+                        }
+
+                        control.unlisteners.push(
+                            addEventListener(control.element$, control.element$.formValueChangeEventName || "ionChange", ev => control.onElementChange(ev as CustomEvent)),
+                            addEventListener(control.element$, control.element$.formTouchEventName || "ionFocus", () => control.markAsTouched()));
+                    }
+
                     control.applyElementState({value: control.value$, valueChange: true, status: control.status(), statusChange: true});
                 }
             }
@@ -268,11 +284,9 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
         if (this.element$) {
             console.debug(`[ionx-form-control] detach control ${this.name}`, this.element$);
 
-            this.unlistenOnChange?.();
-            this.unlistenOnChange = undefined;
-
-            this.unlistenOnFocus?.();
-            this.unlistenOnFocus = undefined;
+            for (const u of this.unlisteners.splice(0)) {
+                u();
+            }
 
             delete this.element$[detachFunctionName];
 
@@ -336,9 +350,7 @@ export class FormControlImpl<Value = any> implements FormControl<Value> {
 
     private element$: HTMLElement & Partial<FormControlElement>;
 
-    private unlistenOnChange: EventUnlisten;
-
-    private unlistenOnFocus: EventUnlisten;
+    private unlisteners: EventUnlisten[] = [];
 
     private validators$: FormValidator[];
 

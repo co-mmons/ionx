@@ -60,8 +60,7 @@ export declare class FormControlImpl<Value = any> implements FormControl<Value> 
     trigger: "valueChange" | "validate";
   }): Promise<boolean>;
   private element$;
-  private unlistenOnChange;
-  private unlistenOnFocus;
+  private unlisteners;
   private validators$;
   private touched$;
   private dirty$;
