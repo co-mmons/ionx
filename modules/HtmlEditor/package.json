@@ -21,6 +21,5 @@
         "prosemirror-model": "^1.19.0",
         "prosemirror-view": "^1.31.0",
         "orderedmap": "^2.1.0",
-        "@types/orderedmap": "^2.0.0"
     }
 }
