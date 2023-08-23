@@ -1,5 +1,5 @@
-import { Keymap } from "prosemirror-commands";
-import { DOMOutputSpecArray, Schema } from "prosemirror-model";
+import { DOMOutputSpec, Schema } from "prosemirror-model";
+import { Keymap } from "../Keymap";
 import { NodeSpecExtended } from "./NodeSpecExtended";
 export declare class HardBreakNode extends NodeSpecExtended {
   readonly name: string;
@@ -9,6 +9,6 @@ export declare class HardBreakNode extends NodeSpecExtended {
   parseDOM: {
     tag: string;
   }[];
-  toDOM(): DOMOutputSpecArray;
+  toDOM(): DOMOutputSpec[];
   keymap(schema: Schema): Keymap;
 }

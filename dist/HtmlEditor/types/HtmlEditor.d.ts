@@ -1,8 +1,8 @@
 import { ComponentInterface, EventEmitter } from "@stencil/core";
-import { Keymap } from "prosemirror-commands";
 import { Schema } from "prosemirror-model";
 import { EditorState, Plugin } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
+import { Keymap } from "./Keymap";
 import { ToolbarItem } from "./toolbar";
 export declare class HtmlEditor implements ComponentInterface {
   element: HTMLElement;
@@ -23,8 +23,8 @@ export declare class HtmlEditor implements ComponentInterface {
   ionChange: EventEmitter<{
     value: string;
   }>;
-  getView(): Promise<EditorView<Schema<any, any>>>;
-  getState(): Promise<EditorState<Schema>>;
+  getView(): Promise<EditorView>;
+  getState(): Promise<EditorState>;
   getScheme(): Promise<Schema>;
   setFocus(): Promise<void>;
   /**

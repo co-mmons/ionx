@@ -1,4 +1,4 @@
-import { DOMOutputSpecArray } from "prosemirror-model";
+import { DOMOutputSpec } from "prosemirror-model";
 import { MarkSpecExtended } from "./MarkSpecExtended";
 export declare class AlignmentMark extends MarkSpecExtended {
   readonly name: string;
@@ -13,5 +13,5 @@ export declare class AlignmentMark extends MarkSpecExtended {
       align: string;
     };
   }[];
-  toDOM(mark: any): DOMOutputSpecArray;
+  toDOM(mark: any): DOMOutputSpec[];
 }

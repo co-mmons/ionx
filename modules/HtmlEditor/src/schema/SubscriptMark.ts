@@ -1,4 +1,4 @@
-import {DOMOutputSpecArray, ParseRule} from "prosemirror-model";
+import {DOMOutputSpec, ParseRule} from "prosemirror-model";
 import {MarkSpecExtended} from "./MarkSpecExtended";
 
 export class SubscriptMark extends MarkSpecExtended {
@@ -11,7 +11,7 @@ export class SubscriptMark extends MarkSpecExtended {
         {tag: "sub"}
     ]
 
-    toDOM(): DOMOutputSpecArray {
+    toDOM(): DOMOutputSpec {
         return ["sub", 0]
     }
 }

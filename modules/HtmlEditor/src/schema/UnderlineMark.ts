@@ -1,5 +1,5 @@
 import {toggleMark} from "prosemirror-commands";
-import {DOMOutputSpecArray, ParseRule, Schema} from "prosemirror-model";
+import {DOMOutputSpec, ParseRule, Schema} from "prosemirror-model";
 import {MarkSpecExtended} from "./MarkSpecExtended";
 
 export class UnderlineMark extends MarkSpecExtended {
@@ -13,7 +13,7 @@ export class UnderlineMark extends MarkSpecExtended {
     ]
 
     toDOM() {
-        return ["u", 0] as DOMOutputSpecArray;
+        return ["u", 0] as DOMOutputSpec;
     }
 
     keymap(schema: Schema) {

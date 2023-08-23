@@ -1,4 +1,4 @@
-import { DOMOutputSpecArray } from "prosemirror-model";
+import { DOMOutputSpec } from "prosemirror-model";
 import { NodeSpecExtended } from "./NodeSpecExtended";
 export declare class BulletListNode extends NodeSpecExtended {
   readonly name: string;
@@ -7,5 +7,5 @@ export declare class BulletListNode extends NodeSpecExtended {
   parseDOM: {
     tag: string;
   }[];
-  toDOM(): DOMOutputSpecArray;
+  toDOM(): DOMOutputSpec;
 }

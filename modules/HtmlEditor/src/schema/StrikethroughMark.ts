@@ -1,4 +1,4 @@
-import {DOMOutputSpecArray, ParseRule} from "prosemirror-model";
+import {DOMOutputSpec, ParseRule} from "prosemirror-model";
 import {MarkSpecExtended} from "./MarkSpecExtended";
 
 export class StrikethroughMark extends MarkSpecExtended {
@@ -12,7 +12,7 @@ export class StrikethroughMark extends MarkSpecExtended {
         {style: "text-decoration-line=line-through"}
     ]
 
-    toDOM(): DOMOutputSpecArray {
+    toDOM(): DOMOutputSpec {
         return ["s", 0]
     }
 }

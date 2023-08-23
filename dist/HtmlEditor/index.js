@@ -22,10 +22,10 @@ import { keymap } from 'prosemirror-keymap';
 import { EditorView } from 'prosemirror-view';
 import { defineCustomElement } from '@ionic/core/components/ion-item-divider';
 import { popoverController, isPlatform, createAnimation } from '@ionic/core/components';
-import { addEventListener } from 'ionx/utils';
-import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-popover';
 import { defineCustomElement as defineCustomElement$1 } from '@ionic/core/components/ion-button';
+import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-popover';
 import { defineCustomElement as defineCustomElement$2 } from 'ionicons/components/ion-icon';
+import { addEventListener } from 'ionx/utils';
 
 class MarkSpecExtended {
 }

@@ -1,15 +1,14 @@
 import {intl, MessageRef, translate} from "@co.mmons/js-intl";
 import {createAnimation, isPlatform, popoverController} from "@ionic/core/components";
+import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
 import {Component, ComponentInterface, Element, forceUpdate, h, Host, Prop} from "@stencil/core";
 import {deepEqual} from "fast-equals";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {redo, redoDepth, undo, undoDepth} from "prosemirror-history";
-import {Schema} from "prosemirror-model";
 import {EditorView} from "prosemirror-view";
 import {ToolbarItem} from "./ToolbarItem";
-import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
-import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
-import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
 
 defineButton();
 defineIcon();
@@ -23,8 +22,8 @@ interface Button {
     iconName: string;
     active: boolean;
     menuComponent: string;
-    menuComponentProps: any | ((view: EditorView<Schema>) => any | Promise<any>);
-    handler: (view: EditorView<Schema>) => any;
+    menuComponentProps: any | ((view: EditorView) => any | Promise<any>);
+    handler: (view: EditorView) => any;
 }
 
 @Component({
@@ -79,7 +78,7 @@ export class Toolbar implements ComponentInterface {
         this.editor.setFocus();
     }
 
-    async showMenu(view: EditorView<Schema>, item: ToolbarItem) {
+    async showMenu(view: EditorView, item: ToolbarItem) {
 
         const popover = await popoverController.create({
             component: item.menuComponent,

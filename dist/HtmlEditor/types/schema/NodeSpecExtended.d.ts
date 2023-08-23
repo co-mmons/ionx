@@ -1,6 +1,6 @@
-import { Keymap } from "prosemirror-commands";
 import { Node as ProsemirrorNode, NodeSpec, Schema } from "prosemirror-model";
 import { Decoration, EditorView, NodeView } from "prosemirror-view";
+import { Keymap } from "../Keymap";
 import { MarkSpecExtended } from "./MarkSpecExtended";
 import { OrderedSchemaSpec } from "./OrderedSchemaSpec";
 export declare abstract class NodeSpecExtended implements NodeSpec {
@@ -11,5 +11,5 @@ export declare abstract class NodeSpecExtended implements NodeSpec {
   allowMark(mark: string | MarkSpecExtended): void;
   allowContent(node: string | NodeSpecExtended): void;
   configure?(schema: OrderedSchemaSpec): void;
-  render?(node: ProsemirrorNode<Schema>, view?: EditorView<Schema>, getPos?: () => number, decorations?: Decoration[]): NodeView<Schema>;
+  render?(node: ProsemirrorNode, view?: EditorView, getPos?: () => number, decorations?: Decoration[]): NodeView;
 }

@@ -1,4 +1,4 @@
-import { DOMOutputSpecArray, Schema } from "prosemirror-model";
+import { DOMOutputSpec, Schema } from "prosemirror-model";
 import { MarkSpecExtended } from "./MarkSpecExtended";
 export declare class EmphasisMark extends MarkSpecExtended {
   readonly name = "emphasis";
@@ -10,9 +10,9 @@ export declare class EmphasisMark extends MarkSpecExtended {
     style: string;
     tag?: undefined;
   })[];
-  toDOM(): DOMOutputSpecArray;
+  toDOM(): DOMOutputSpec;
   keymap(schema: Schema): {
-    "Mod-i": (state: import("prosemirror-state").EditorState<Schema<any, any>>, dispatch?: (tr: import("prosemirror-state").Transaction<Schema<any, any>>) => void) => boolean;
-    "Mod-I": (state: import("prosemirror-state").EditorState<Schema<any, any>>, dispatch?: (tr: import("prosemirror-state").Transaction<Schema<any, any>>) => void) => boolean;
+    "Mod-i": import("prosemirror-state").Command;
+    "Mod-I": import("prosemirror-state").Command;
   };
 }

@@ -1,5 +1,4 @@
 import {toggleMark} from "prosemirror-commands";
-import {Schema} from "prosemirror-model";
 import {EditorView} from "prosemirror-view";
 import {isMarkActive} from "../prosemirror/active";
 import {ToolbarItem} from "./ToolbarItem";
@@ -12,7 +11,7 @@ export abstract class TextToolbarItem extends ToolbarItem {
 
     labelVisible = false;
 
-    isVisible(view: EditorView<Schema>): boolean {
+    isVisible(view: EditorView): boolean {
         return !!view.state.schema.marks[this.markName];
     }
 
@@ -20,7 +19,7 @@ export abstract class TextToolbarItem extends ToolbarItem {
         return isMarkActive(view.state, view.state.schema.marks[this.markName]);
     }
 
-    handler(view: EditorView<Schema>) {
+    handler(view: EditorView) {
 
         const {marks} = view.state.schema;
 

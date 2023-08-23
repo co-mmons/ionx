@@ -1,13 +1,13 @@
 import {waitTill} from "@co.mmons/js-utils/core";
 import {Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Method, Prop, Watch} from "@stencil/core";
 import {loadIonxLinkEditorIntl} from "ionx/LinkEditor";
-import {Keymap} from "prosemirror-commands";
 import {history} from "prosemirror-history";
 import {keymap} from "prosemirror-keymap";
 import {DOMParser, DOMSerializer, Schema} from "prosemirror-model";
 import {EditorState, Plugin, Transaction} from "prosemirror-state";
 import {EditorView} from "prosemirror-view";
 import {loadIntlMessages} from "./intl/loadIntlMessages";
+import {Keymap} from "./Keymap";
 import {undoRedoKeymap} from "./keymaps";
 import {MarkSpecExtended, NodeSpecExtended} from "./schema";
 import {ToolbarItem} from "./toolbar";
@@ -78,7 +78,7 @@ export class HtmlEditor implements ComponentInterface {
     }
 
     @Method()
-    async getState(): Promise<EditorState<Schema>> {
+    async getState(): Promise<EditorState> {
         return this.view.state;
     }
 
@@ -115,7 +115,7 @@ export class HtmlEditor implements ComponentInterface {
 
     private scrollParent: HTMLElement;
 
-    private view: EditorView<Schema>;
+    private view: EditorView;
 
     @Watch("value")
     protected valueChanged(value: string, old: string) {

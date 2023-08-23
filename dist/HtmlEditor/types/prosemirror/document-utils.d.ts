@@ -27,5 +27,5 @@ export declare const getStepRange: (transaction: Transaction) => {
  */
 export declare const findFarthestParentNode: (predicate: (node: Node) => boolean) => (selection: Selection) => ContentNodeWithPos | null;
 export declare const isSelectionEndOfParagraph: (state: EditorState) => boolean;
-export declare function nodesBetweenChanged(tr: Transaction, f: (node: Node<any>, pos: number, parent: Node<any>, index: number) => boolean | null | undefined | void, startPos?: number): void;
+export declare function nodesBetweenChanged(tr: Transaction, f: (node: Node, pos: number, parent: Node, index: number) => boolean | null | undefined | void, startPos?: number): void;
 export declare function getNodesCount(node: Node): Record<string, number>;

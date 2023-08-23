@@ -1,4 +1,4 @@
-import { DOMOutputSpecArray, ParseRule } from "prosemirror-model";
+import { DOMOutputSpec, ParseRule } from "prosemirror-model";
 import { MarkSpecExtended } from "./MarkSpecExtended";
 export declare class TextBackgroundColorMark extends MarkSpecExtended {
   readonly name: string;
@@ -7,5 +7,5 @@ export declare class TextBackgroundColorMark extends MarkSpecExtended {
     color: {};
   };
   parseDOM: ParseRule[];
-  toDOM(mark: any): DOMOutputSpecArray;
+  toDOM(mark: any): DOMOutputSpec;
 }

@@ -1,4 +1,4 @@
-import {DOMOutputSpecArray} from "prosemirror-model";
+import {DOMOutputSpec} from "prosemirror-model";
 import {MarkSpecExtended} from "./MarkSpecExtended";
 
 export class AlignmentMark extends MarkSpecExtended {
@@ -27,7 +27,7 @@ export class AlignmentMark extends MarkSpecExtended {
                 "data-align": mark.attrs.align,
             },
             0
-        ] as DOMOutputSpecArray;
+        ] as DOMOutputSpec[];
     }
 
 }

@@ -1,10 +1,10 @@
-import {Keymap} from "prosemirror-commands";
-import {DOMOutputSpecArray, Schema} from "prosemirror-model";
+import {DOMOutputSpec, Schema} from "prosemirror-model";
 import {isApple} from "../isApple";
+import {Keymap} from "../Keymap";
 import {NodeSpecExtended} from "./NodeSpecExtended";
 
 const br = "br"
-const brDOM: DOMOutputSpecArray = [br];
+const brDOM: DOMOutputSpec[] = [br];
 
 export class HardBreakNode extends NodeSpecExtended {
 

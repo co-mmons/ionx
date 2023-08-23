@@ -1,5 +1,6 @@
 export * from "./schema";
 export * from "./toolbar";
 export { InsertLinkMenuItem, InsertMenuItemFactory, InsertMenuItem, InsertListMenuItems } from "./menus";
-export { baseKeymap, enterKeymap, Keymap } from "./keymaps";
+export { baseKeymap, enterKeymap } from "./keymaps";
+export type { Keymap } from "./Keymap";
 export declare const HtmlEditor = "ionx-html-editor";

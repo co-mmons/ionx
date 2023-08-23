@@ -1,7 +1,7 @@
-import {Keymap} from "prosemirror-commands";
 import {redo, undo} from "prosemirror-history";
 import {undoInputRule} from "prosemirror-inputrules";
 import {isApple} from "../isApple";
+import {Keymap} from "../Keymap";
 
 export const undoRedoKeymap: Keymap = {
     "Mod-z": undo,

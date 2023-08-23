@@ -10,7 +10,7 @@ export declare class ListItemNode extends NodeSpecExtended {
   }[];
   toDOM(): (string | number)[];
   keymap(schema: Schema): {
-    Enter: (state: import("prosemirror-state").EditorState<Schema<any, any>>, dispatch?: (tr: import("prosemirror-state").Transaction<Schema<any, any>>) => void) => boolean;
+    Enter: import("prosemirror-state").Command;
   };
   configure(schema: OrderedSchemaSpec): void;
 }

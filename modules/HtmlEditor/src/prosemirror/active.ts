@@ -1,7 +1,7 @@
 import {Mark, MarkType, NodeType} from "prosemirror-model";
 import {EditorState, NodeSelection} from "prosemirror-state";
 
-export function active(state: EditorState, nodeType: NodeType, attrs?: {[key: string]: any}, marks?: Array<Mark<any>>) {
+export function active(state: EditorState, nodeType: NodeType, attrs?: {[key: string]: any}, marks?: Array<Mark>) {
 
     const selection = state.selection;
 

@@ -1,2 +1,2 @@
-import { Keymap } from "prosemirror-commands";
+import { Keymap } from "../Keymap";
 export declare const undoRedoKeymap: Keymap;

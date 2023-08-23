@@ -1,4 +1,4 @@
-import {DOMOutputSpecArray, Node, ParseRule} from "prosemirror-model";
+import {DOMOutputSpec, Node, ParseRule} from "prosemirror-model";
 import {NodeSpecExtended} from "./NodeSpecExtended";
 
 export class HeadingNode extends NodeSpecExtended {
@@ -44,6 +44,6 @@ export class HeadingNode extends NodeSpecExtended {
             attrs["style"] = style.join(";");
         }
 
-        return [`h${node.attrs.level}`, attrs, 0] as DOMOutputSpecArray;
+        return [`h${node.attrs.level}`, attrs, 0] as DOMOutputSpec;
     }
 }

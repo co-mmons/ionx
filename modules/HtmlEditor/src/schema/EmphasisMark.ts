@@ -1,9 +1,9 @@
 import {toggleMark} from "prosemirror-commands";
-import {DOMOutputSpecArray, Schema} from "prosemirror-model";
+import {DOMOutputSpec, Schema} from "prosemirror-model";
 import {MarkSpecExtended} from "./MarkSpecExtended";
 
 const em = "em";
-const emDOM = [em, 0] as DOMOutputSpecArray;
+const emDOM = [em, 0] as DOMOutputSpec;
 
 export class EmphasisMark extends MarkSpecExtended {
 

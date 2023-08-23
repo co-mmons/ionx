@@ -1,8 +1,8 @@
-import {DOMOutputSpecArray, ParseRule} from "prosemirror-model";
+import {DOMOutputSpec, ParseRule} from "prosemirror-model";
 import {NodeSpecExtended} from "./NodeSpecExtended";
 
 const blockquote = "blockquote";
-const blockquoteDOM: DOMOutputSpecArray = [blockquote, 0];
+const blockquoteDOM: DOMOutputSpec = [blockquote, 0];
 
 export class BlockquoteNode extends NodeSpecExtended {
     readonly name: string = blockquote;

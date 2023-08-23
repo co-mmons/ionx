@@ -1,4 +1,4 @@
-import {DOMOutputSpecArray, ParseRule} from "prosemirror-model";
+import {DOMOutputSpec, ParseRule} from "prosemirror-model";
 import {MarkSpecExtended} from "./MarkSpecExtended";
 
 export class TextBackgroundColorMark extends MarkSpecExtended {
@@ -20,7 +20,7 @@ export class TextBackgroundColorMark extends MarkSpecExtended {
         }
     ]
 
-    toDOM(mark): DOMOutputSpecArray {
+    toDOM(mark): DOMOutputSpec {
         return [
             "span",
             {style: `background-color: ${mark.attrs.color}`},

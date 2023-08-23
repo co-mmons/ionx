@@ -1,10 +1,9 @@
-import * as baseCommand from "prosemirror-commands";
 import { Node, NodeType, ResolvedPos } from "prosemirror-model";
 import { EditorState, TextSelection, Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { Command } from "./command";
 export declare const enterKeyCommand: Command;
-export declare const backspaceKeyCommand: baseCommand.Command<any>;
+export declare const backspaceKeyCommand: import("prosemirror-state").Command;
 export declare function outdentList(): Command;
 export declare function indentList(): Command;
 export declare function liftListItems(): Command;

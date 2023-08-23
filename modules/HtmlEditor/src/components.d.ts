@@ -7,7 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Schema } from "prosemirror-model";
 import { EditorState, Plugin } from "prosemirror-state";
-import { Keymap } from "prosemirror-commands";
+import { Keymap } from "./Keymap";
 import { ToolbarItem } from "./toolbar";
 import { EditorView } from "prosemirror-view";
 import { InsertMenuItem } from "./menus/InsertMenuItem";
@@ -18,8 +18,8 @@ export namespace Components {
         "disabled": boolean;
         "emptyValue": string | null | undefined;
         "getScheme": () => Promise<Schema>;
-        "getState": () => Promise<EditorState<Schema>>;
-        "getView": () => Promise<EditorView<Schema<any, any>>>;
+        "getState": () => Promise<EditorState>;
+        "getView": () => Promise<EditorView>;
         "historyDisabled": boolean;
         "keymap": Keymap | Keymap[];
         "plugins": Plugin[];

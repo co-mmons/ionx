@@ -1,5 +1,5 @@
 import { LinkScheme } from "ionx/LinkEditor";
-import { DOMOutputSpecArray } from "prosemirror-model";
+import { DOMOutputSpec } from "prosemirror-model";
 import { MarkSpecExtended } from "./MarkSpecExtended";
 export declare class LinkMark extends MarkSpecExtended {
   constructor(options?: {
@@ -29,5 +29,5 @@ export declare class LinkMark extends MarkSpecExtended {
       value: any;
     };
   }[];
-  toDOM(node: any): DOMOutputSpecArray;
+  toDOM(node: any): DOMOutputSpec;
 }
