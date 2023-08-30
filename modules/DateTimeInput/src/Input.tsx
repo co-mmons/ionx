@@ -1,10 +1,11 @@
 import {intl} from "@co.mmons/js-intl";
 import {LocalDate, NoTimeDate, sleep, TimeZoneDate, timeZoneOffset} from "@co.mmons/js-utils/core";
 import {popoverController, StyleEventDetail} from "@ionic/core/components";
-import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
 import {defineCustomElement as defineButton} from "@ionic/core/components/ion-button";
-import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
+import {defineCustomElement as definePopover} from "@ionic/core/components/ion-popover";
 import {Component, Element, Event, EventEmitter, h, Host, Listen, Method, Prop, Watch} from "@stencil/core";
+import {defineCustomElement as defineIcon} from "ionicons/components/ion-icon";
+import {backspace} from "ionicons/icons";
 import {addEventListener, EventUnlisten} from "ionx/utils";
 import {currentTimeZone} from "./currentTimeZone";
 import {DateTimeInputProps} from "./DateTimeInputProps";
@@ -413,7 +414,7 @@ export class Input implements DateTimeInputProps {
                 tabIndex={-1}
                 onClick={ev => this.clearButtonClicked(ev)}>
 
-                <ion-icon name="backspace" slot="icon-only"/>
+                <ion-icon src={backspace} slot="icon-only"/>
 
             </ion-button>}
 

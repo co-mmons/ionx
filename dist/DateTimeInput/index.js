@@ -3,16 +3,16 @@ export { setAssetPath, setPlatformOptions } from '@stencil/core/internal/client'
 import { intl, setGlobalValues, MessageRef } from '@co.mmons/js-intl';
 import { TimeZoneDate, NoTimeDate, LocalDate, timeZoneOffset, sleep, toInteger } from '@co.mmons/js-utils/core';
 import { popoverController, isPlatform } from '@ionic/core/components';
-import { defineCustomElement } from '@ionic/core/components/ion-popover';
 import { defineCustomElement as defineCustomElement$2 } from '@ionic/core/components/ion-button';
+import { defineCustomElement } from '@ionic/core/components/ion-popover';
 import { defineCustomElement as defineCustomElement$1 } from 'ionicons/components/ion-icon';
+import { backspace, removeCircleOutline, addCircleOutline } from 'ionicons/icons';
 import { addEventListener } from 'ionx/utils';
 import { defineCustomElement as defineCustomElement$3 } from '@ionic/core/components/ion-item';
 import { defineCustomElement as defineCustomElement$4 } from '@ionic/core/components/ion-footer';
 import { defineCustomElement as defineCustomElement$5 } from '@ionic/core/components/ion-toolbar';
 import { defineCustomElement as defineCustomElement$6 } from '@ionic/core/components/ion-label';
 import { defineCustomElement as defineCustomElement$7 } from '@ionic/core/components/ion-input';
-import { removeCircleOutline, addCircleOutline } from 'ionicons/icons';
 import { Select } from 'ionx/Select';
 
 const DateTimeInput = "ionx-date-time-input";
@@ -284,7 +284,7 @@ let Input = class extends HTMLElement {
     return h(Host, null, h("div", { class: {
         "ionx--text": true,
         "ionx--placeholder-visible": !value && !!placeholder
-      } }, value ? this.formatValue() : placeholder), !readonly && !disabled && h("div", { class: "ionx--icon", role: "presentation" }, h("div", { class: "ionx--icon-inner" })), clearButtonVisible && !readonly && !disabled && value && h("ion-button", { fill: "clear", size: "small", tabIndex: -1, onClick: ev => this.clearButtonClicked(ev) }, h("ion-icon", { name: "backspace", slot: "icon-only" })));
+      } }, value ? this.formatValue() : placeholder), !readonly && !disabled && h("div", { class: "ionx--icon", role: "presentation" }, h("div", { class: "ionx--icon-inner" })), clearButtonVisible && !readonly && !disabled && value && h("ion-button", { fill: "clear", size: "small", tabIndex: -1, onClick: ev => this.clearButtonClicked(ev) }, h("ion-icon", { src: backspace, slot: "icon-only" })));
   }
   get element() { return this; }
   static get watchers() { return {
