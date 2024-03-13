@@ -56,7 +56,7 @@ export class LazyLoad {
         } else {
 
             if (!content.__ionxLazyLoad) {
-                content.__ionxLazyLoad = new LazyLoadController(content);
+                content.__ionxLazyLoad = new (window["LAZY_LOAD_CONTROLLER"] ?? LazyLoadController)(content);
             }
 
             content.__ionxLazyLoad.connectContainer(this.element);
